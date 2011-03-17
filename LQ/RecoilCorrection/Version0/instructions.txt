@@ -1,0 +1,21 @@
+1) The main file to run is GetRecoilBins.C
+   > root -l
+   > root [0] .x GetRecoilBins.C+
+
+
+
+2) This file runs on post-analysis level root files which store just the esstential variables for the last stage of analysis. 
+  - such files can be found at:
+    /castor/cern.ch/user/d/darinb/AnalysisData/March17
+
+   file locations for these variables are specified at the very top of the .C file.
+
+3) This file will output plots in a plots/fits and plots/gaus directory. The former plots of fits. The latter stores the individual gaussian distributions. Please make these directories in the directory where you run GetRecoilBins.C
+
+4) There will be an output file RecoilBinLog.txt that gives the fit paramters for the correction equations. 
+
+5) Using those paramters one can rerun the WJets RootTuples with corrections implemented. An example of the C/h scripts (which are just of the MakeClass variety) is in /UserCode/baumgartel/LQ/NTupleAnalyzer_Basic. 
+
+  a) From these you can take the corrected functions like "float F_U1Prime(float P)" in line 19-39, which will return a U1 and U2 value given an input of P, the W boson Pt. 
+
+  b) The calculations of the corrected U1 and U2 are implemented in line 1331-1388. Some variables used here are defined earlier in the code in the Gen-Level addon area, since the gen level neutrino is used. So you can find these in lines 929-1128
