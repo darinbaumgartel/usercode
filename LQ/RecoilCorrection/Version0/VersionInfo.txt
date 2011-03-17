@@ -1,0 +1,38 @@
+This version of the recoil corrections has implemented the following:
+
+1) Binning: Maximum PT of 250. 100 events/bin. 
+
+   Note: This uses a higher PT range than the W' analysis note. 
+
+2) Fitting paramters:
+   a) U1 Mean: degree 1
+   b) U2 Mean: degree 1
+   c) U1 RMS : degree 2
+   d) U2 RMS : degree 2
+
+   Note: These are the same as the W' analysis note. 
+
+
+3) Final Correction Functions:
+
+
+float F_U1Prime(float P)
+{
+float newU1 =+(0.794254)/(1.09126)*(1.29887)+(-0.883448)/(-0.91393)*(-0.905936)*(P);
+
+float newsU1 =+(5.83895)/(4.6548)*(4.41959)+(0.0668703)/(0.0797865)*(0.0928476)*(P)+(0.000447746)/(0.000908574)*(0.00049701)*(pow(P,2.0));
+
+
+return gRandom->Gaus(newU1,newsU1);
+}
+
+
+float F_U2Prime(float P)
+{
+float newU2 =+(0.00486499)/(-0.00367621)*(-0.0225686)+(-0.00211337)/(0.00064751)*(0.000600862)*(P);
+
+float newsU2 =+(5.7388)/(4.67223)*(4.41606)+(0.0609486)/(0.0654114)*(0.080841)*(P)+(-2.46186e-05)/(-0.000202861)*(-0.000317848)*(pow(P,2.0));
+
+return gRandom->Gaus(newU2,newsU2);
+}
+
