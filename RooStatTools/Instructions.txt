@@ -1,0 +1,51 @@
+This is a basic package which uses the python script "RunStats.py" to facilitate the use of limit 
+setting and plot production using an input spreadsheet which contains the number of signal and 
+background events, data events, and integrated luminosity, and their respective errors. 
+
+To run the code, there are only a couple steps:
+
+1) Make a spreadsheet in csv format similar to that of LQDataOld.csv. The only part that
+   matters here is the portion between the lines "Summary" and "End Summary" where the 
+   data is summarized in a manner that can be easily fed into the roostats_cl95.C tool. 
+
+   The information at the top of the spreadsheet is an aid in calculating systematic 
+   uncertainties and data/MC totals, if necessary. An example of this is in "LQData.xls"
+
+   If you use the excel file to guide your calculations, just make sure the summary portion
+   is correctly filled out and save as a "CSV" file so the python script can read it.
+
+   Ultimately, the only columns that matter to the process are the leftmost column of the
+   summary information and the columns Signal, Error, Data, BG, Error that follow. 
+   Everything else is just helper information to make calculations. Also, there must be
+   the line in the summary info which has integrated luminosity stated like:
+   "Integrated Luminosity: 152.8 +- 5.2"    
+
+2) Then, with an input CSV file (e.g. MyLQData.csv), simply run the command:
+  
+   python RunStats.py MyLQData.csv
+
+   The script will make sure you are running the appropriate root version, and then
+   parse the information in the CSV file into C scripts using roostats_cl95.C, and
+   calculate limits (This can take some time). When calculations are complete, the limit
+   values will be stored in a LimitResults.csv file, which give the values of the
+   observed and expected limits 1/2 sigma confidence intervals. 
+
+   Limit values are then placed into plot macros based on the BetaPlot_Template.C
+   and BetaSquaredPlot_Template.C, and plots are produced. 
+
+   To change the format of the plots, edit the template files to your liking. Keep
+   in mind that all limit values used in the plots are changed by the python 
+   script automatically, there is no need to ever edit these by hand. 
+
+   Plots are returned in PDF,EPS and PNG format. 
+
+NOTE: 
+
+   If you are running locally (not on LXPlus) you must use root 5.28 or higher. 
+   Root 5.28 is tested and working, but root 5.27 will not. 
+
+   On LXPlus, if 5.28 is not the current working release in your environment, 
+   the script will detect this and return you commands you can use to 
+   update the root version in your environment. Then simply rerun.
+
+Enjoy!
