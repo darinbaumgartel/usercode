@@ -1,0 +1,72 @@
+{
+
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_150.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_175.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_200.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_225.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_250.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_280.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_300.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_320.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_340.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_400.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_450.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_500.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+
+gROOT->ProcessLine(".L OptimizationCLA_LQToCMu_M_600.C++");
+gROOT->ProcessLine("Optimize()");
+gROOT->ProcessLine("gROOT->Reset()");
+gROOT->ProcessLine("gROOT->Clear()");
+gROOT->ProcessLine(".q");
+
+
+
+}

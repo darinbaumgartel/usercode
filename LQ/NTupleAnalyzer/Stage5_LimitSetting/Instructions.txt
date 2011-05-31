@@ -1,0 +1,3 @@
+This has been migrated to the RooStats package. Please get the roostats package and follow the instructions within.
+
+cvs co -d RooStatTools UserCode/baumgartel/RooStatTools

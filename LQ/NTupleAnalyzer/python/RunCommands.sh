@@ -1,0 +1,41 @@
+#!/bin/sh
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_150
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_150
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_175
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_175
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_200
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_200
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_225
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_225
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_250
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_250
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_280
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_280
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_300
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_300
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_320
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_320
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_340
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_340
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_400
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_400
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_450
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_450
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_500
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_500
+
+root -l RootCommandsBasicLQToCMu_MuNuJJFilter_M_600
+root -l RootCommandsCLALQToCMu_MuNuJJFilter_M_600
+

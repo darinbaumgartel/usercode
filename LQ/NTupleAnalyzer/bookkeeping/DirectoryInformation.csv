@@ -1,0 +1,8 @@
+# Backgrounds Root Files
+BGDirectory,/home/darinb/scratch0/LQ/data_7TeV/FULLSIM_Summer2010_V2/Backgrounds_MC/
+# Signals Root Files
+SigDirectory,/home/darinb/scratch0/LQ/data_7TeV/FULLSIM_Summer2010_V2/LQ2_Signals_MC/
+# Collision Data Root Files
+DataDirectory,/home/darinb/scratch0/LQ/data_7TeV/Data/
+# Where the NTuples are kept
+AnalysisDirectory,/home/darinb/scratch0/LQ/Summer2011/

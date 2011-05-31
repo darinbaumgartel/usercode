@@ -1,0 +1,23 @@
+#!/bin/sh
+
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_150 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_150.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_175 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_175.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_200 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_200.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_225 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_225.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_250 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_250.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_280 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_280.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_300 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_300.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_320 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_320.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_340 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_340.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_400 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_400.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_450 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_450.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_500 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_500.txt
+root -l RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_600 > Log_RootOptCommandsSCP_LQToCMu_MuNuJJFilter_M_600.txt
+
+cat Log*SCP*txt > Log_Total_SCP.txt
+
+
+
+grep ">>" Log_Total_SCP.txt > Log_Summary_SCP.txt
+
+
