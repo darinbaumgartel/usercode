@@ -128,6 +128,7 @@ void NTupleAnalyzer_placeholder::Loop()
 	BRANCH(minval_muon1pfMET);
 	BRANCH(Pt_Z);  BRANCH(Pt_W);
 	BRANCH(Phi_Z); BRANCH(Phi_W);
+  BRANCH(N_PileUpInterations);
 
 	// Generator Level Variables
 	BRANCH(Pt_genjet1);     BRANCH(Pt_genjet2);
@@ -158,7 +159,7 @@ void NTupleAnalyzer_placeholder::Loop()
 	Double_t lumi=desired_luminosity;
 
 	// Number of events passing LJ Filter
-	Events_AfterLJ = 1.0*(fChain->GetEntries());
+//	Events_AfterLJ = 1.0*(fChain->GetEntries());
 
 	// PlaceHolder, values stored in bookkeeping/NTupleInfo.csv
 	Events_Orig = Numberofevents;
@@ -175,11 +176,11 @@ void NTupleAnalyzer_placeholder::Loop()
 	int xx=0;					 //dummy variable used for progress %
 
 	// Display status to screen
-	std::cout<<"            "<<std::endl;
-	std::cout<<" Evaluating for: placeholder \n MC events: "<<Events_AfterLJ
-		<< " \n Actual Events: "<<weight*Events_Orig<<" \n Integrated Luminosity: "
-		<<lumi<<" pb^(-1) \n Cross Section: "<<xsection<<" pb "<<std::endl;
-	std::cout<<"            "<<std::endl;
+//	std::cout<<"            "<<std::endl;
+//	std::cout<<" Evaluating for: placeholder \n MC events: "<<Events_AfterLJ
+//		<< " \n Actual Events: "<<weight*Events_Orig<<" \n Integrated Luminosity: "
+//		<<lumi<<" pb^(-1) \n Cross Section: "<<xsection<<" pb "<<std::endl;
+//	std::cout<<"            "<<std::endl;
 
 	//===================================================================================================
 	//===================================================================================================
@@ -190,23 +191,23 @@ void NTupleAnalyzer_placeholder::Loop()
 
 	if (fChain == 0) return;	 //check for correctly assigned chain from h file
 
-	//Long64_t nentries = fChain->GetEntriesFast();
+	Long64_t nentries = fChain->GetEntriesFast();
 	Long64_t nbytes = 0, nb = 0;
 
 	//N=1000;  /// TEST>>>>>> COMMENT THIS ALWAYS
 
-	for (Long64_t jentry=0; jentry<Events_AfterLJ;jentry++)
+	for (Long64_t jentry=0; jentry<nentries;jentry++)
 	{
 		//-------------------------------------------------------
 		// Show progress so you know the program hasn't failed...
 		//-------------------------------------------------------
-		for (xx=0; xx<100; xx=xx+1)
-		{
-			if ((100*jentry/(Events_AfterLJ)>xx)&&(100*(jentry-1)/(Events_AfterLJ)<xx))
-			{
-				std::cout<<xx<<" % complete"<<std::endl;
-			}
-		}
+//		for (xx=0; xx<100; xx=xx+1)
+//		{
+//			if ((100*jentry/(Events_AfterLJ)>xx)&&(100*(jentry-1)/(Events_AfterLJ)<xx))
+//			{
+//				std::cout<<xx<<" % complete"<<std::endl;
+//			}
+//		}
 		//-------------------------------------------------------
 		//-------------------------------------------------------
 
@@ -264,6 +265,8 @@ void NTupleAnalyzer_placeholder::Loop()
 		if ( !vtxFound ) continue;
 
 		N_Vertices = VertexZ->size();
+
+		if (!isData) N_PileUpInteractions = 1.0*PileUpInteractions;
 
 		//========================     Electron Conditions   ================================//
 
