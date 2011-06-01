@@ -51,12 +51,14 @@ for x in variables:
 f1.close()
 ###----------------------------------------------------------------------###
 
-now=str(strftime("%Y-%m-%d %H:%M:%S"))
+now=str(strftime("%Y-%m-%d-%H:%M:%S"))
 now = now.replace(" ","")
 now = now.replace("\t","")
-os.system("mkdir ../Stage1_NTupleAnalysis/ROOTBAK_"+now)
-os.system("mv ../Stage1_NTupleAnalysis/CurrentRootFiles/*.root ../Stage1_NTupleAnalysis/ROOTBAK_"+now)
-os.system("rm ../Stage1_NTupleAnalysis/*_*.* ../Stage1_NTupleAnalysis/RootProcesses")
+now = now.replace("-","_")
+now = now.replace(":","_")
+#os.system("mkdir ../Stage1_NTupleAnalysis/ROOTBAK_"+now)
+#os.system("mv ../Stage1_NTupleAnalysis/CurrentRootFiles/*.root ../Stage1_NTupleAnalysis/ROOTBAK_"+now)
+#os.system("rm ../Stage1_NTupleAnalysis/*_*.* ../Stage1_NTupleAnalysis/RootProcesses")
 # Analysis Details Below
 WhatType=['Background','Signal','CollisionData'] # So that WhatType[SigOrBG[x]] returns string "Signal" or "Background"
 
@@ -64,9 +66,32 @@ WhatType=['Background','Signal','CollisionData'] # So that WhatType[SigOrBG[x]] 
 f_root = open("RootProcesses", 'w')
 f_root.write('{\n')
 
+f_sub = open("sub_AllAnalyzer.csh", 'w')
+f_sub.write('#!/bin/csh')
 
+
+thisdir = os.popen('pwd').readlines()[0].replace('\n','')
+person = os.popen('whoami').readlines()[0].replace('\n','')
+thiscastor = '/castor/cern.ch/user/'+person[0]+'/'+person+'/LQAnalyzerOutput/NTupleAnalyzer_'+now
+os.system('rfmkdir '+ thiscastor.replace('NTupleAnalyzer_'+now,''))
+os.system('rfmkdir '+ thiscastor)
 
 for x in range(len(SignalType)):
+	sub_thisroot = open("sub_"+SignalType[x]+".csh",'w')
+	sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x]+'.*\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+' .\nroot -b RootProcesses_'+SignalType[x]+'\nrfcp '+SignalType[x]+'.root '+thiscastor+'\n')
+	sub_thisroot.close()
+
+	f_sub.write('\nbsub -q 1nd -J job'+SignalType[x]+' < sub_'+SignalType[x]+'.csh\n')
+
+	f_thisroot =  open("RootProcesses_"+SignalType[x],'w')
+
+
+	f_thisroot.write('{\n')
+	RootLinesToAdd = 'gROOT->ProcessLine(\"gErrorIgnoreLevel = 3001;\");\ngROOT->ProcessLine(\".L NTupleAnalyzer_'+ SignalType[x] + '.C++\");\ngROOT->ProcessLine(\"NTupleAnalyzer_'+ SignalType[x] + ' t\");\ngROOT->ProcessLine(\"t.Loop()\");\ngROOT->ProcessLine(\"gROOT->Reset()\");\ngROOT->ProcessLine(".q");\n}\n'
+	f_thisroot.write(RootLinesToAdd)
+	f_thisroot.close()
+
+	
 	print 'Preparing '+ SignalType[x]
 	path = CastorDirectory[x]	
 	FullList = os.popen('nsls '+path).readlines()
@@ -126,3 +151,5 @@ for x in range(len(SignalType)):
 	f_root.write(RootLinesToAdd)
 f_root.write('\ngROOT->ProcessLine(\".q\");\n}')
 f_root.close()
+f_sub.close()
+os.system('chmod 777 sub*.csh')
