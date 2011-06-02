@@ -78,16 +78,16 @@ os.system('rfmkdir '+ thiscastor)
 
 for x in range(len(SignalType)):
 	sub_thisroot = open("sub_"+SignalType[x]+".csh",'w')
-	sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x]+'.*\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+' .\nroot -b RootProcesses_'+SignalType[x]+'\nrfcp '+SignalType[x]+'.root '+thiscastor+'\n')
+	sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x].replace('-','_')+'.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+' .\nroot -b RootProcesses_'+SignalType[x]+'\nrfcp '+SignalType[x].replace('-','_')+'.root '+thiscastor+'\n')
 	sub_thisroot.close()
 
-	f_sub.write('\nbsub -q 1nd -J job'+SignalType[x]+' < sub_'+SignalType[x]+'.csh\n')
+	f_sub.write('\nbsub -R "pool>50000" -q 1nd -J job'+SignalType[x]+' < sub_'+SignalType[x]+'.csh\n')
 
 	f_thisroot =  open("RootProcesses_"+SignalType[x],'w')
 
 
 	f_thisroot.write('{\n')
-	RootLinesToAdd = 'gROOT->ProcessLine(\"gErrorIgnoreLevel = 3001;\");\ngROOT->ProcessLine(\".L NTupleAnalyzer_'+ SignalType[x] + '.C++\");\ngROOT->ProcessLine(\"NTupleAnalyzer_'+ SignalType[x] + ' t\");\ngROOT->ProcessLine(\"t.Loop()\");\ngROOT->ProcessLine(\"gROOT->Reset()\");\ngROOT->ProcessLine(".q");\n}\n'
+	RootLinesToAdd = 'gROOT->ProcessLine(\"gErrorIgnoreLevel = 3001;\");\ngROOT->ProcessLine(\".L NTupleAnalyzer_'+ SignalType[x].replace('-','_') + '.C++\");\ngROOT->ProcessLine(\"NTupleAnalyzer_'+ SignalType[x].replace('-','_') + ' t\");\ngROOT->ProcessLine(\"t.Loop()\");\ngROOT->ProcessLine(\"gROOT->Reset()\");\ngROOT->ProcessLine(".q");\n}\n'
 	f_thisroot.write(RootLinesToAdd)
 	f_thisroot.close()
 
@@ -104,7 +104,7 @@ for x in range(len(SignalType)):
 
 	s1 = open("NTupleAnalyzer.C").read() # Open the NTupleAnalyzer.C template and replace with array values
 	s1 = s1.replace('Numberofevents',str(float(N_orig[x])))
-	s1 = s1.replace('placeholder', SignalType[x])
+	s1 = s1.replace('placeholder', SignalType[x].replace('-','_'))
 	s1 = s1.replace('crosssection', str(float(Xsections[x])))
 	s1 = s1.replace('efficiency', str(float(FilterEffs[x])))
 	s1 = s1.replace('desired_luminosity', str(float(1.0)))
@@ -116,16 +116,16 @@ for x in range(len(SignalType)):
 	if SignalType[x][0] != 'W':
 		s1 = s1.replace('IsItWMC', 'false')
 
-	os.system('rm NTupleAnalyzer_'+SignalType[x]+'.*')
-	f1 = open("NTupleAnalyzer_"+SignalType[x]+".C", 'w') # write a new file based on the template
+#	os.system('rm NTupleAnalyzer_'+SignalType[x]+'.*')
+	f1 = open("NTupleAnalyzer_"+SignalType[x].replace('-','_')+".C", 'w') # write a new file based on the template
 	f1.write(s1)
 	f1.close()
 	
 
 	s2 = open("NTupleAnalyzer.h") # Same deal for the .h file now...
-	f2 = open("NTupleAnalyzer_"+SignalType[x]+".h", 'a')
+	f2 = open("NTupleAnalyzer_"+SignalType[x].replace('-','_')+".h", 'w')
 	for line in s2.readlines():
-		line = line.replace('placeholder', SignalType[x])
+		line = line.replace('placeholder', SignalType[x].replace('-','_'))
 		f2.write(line)
 		if 'filetracermark000' in line:	
 			f2.write('\nTChain * chain = new TChain(\"rootTupleTree/tree\",\"\");\n')

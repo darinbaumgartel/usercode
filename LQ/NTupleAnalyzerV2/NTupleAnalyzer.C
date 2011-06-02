@@ -128,7 +128,7 @@ void NTupleAnalyzer_placeholder::Loop()
 	BRANCH(minval_muon1pfMET);
 	BRANCH(Pt_Z);  BRANCH(Pt_W);
 	BRANCH(Phi_Z); BRANCH(Phi_W);
-  BRANCH(N_PileUpInterations);
+  BRANCH(N_PileUpInteractions);
 
 	// Generator Level Variables
 	BRANCH(Pt_genjet1);     BRANCH(Pt_genjet2);
