@@ -3,9 +3,10 @@ TTJets,121,1164208,1,1,0,0,/castor/cern.ch/user/e/eberry/LQ/RootNtupleSpring11/R
 TToBLNu_TuneZ2_s-channel,0.99,494967,1,1,0,0,/castor/cern.ch/user/e/eberry/LQ/RootNtupleSpring11/RootNtuple-V00-02-01-Spring11MC-SingleTopMadGraph_20110528_083757
 TToBLNu_TuneZ2_t-channel,63.3,484060,1,1,0,0,/castor/cern.ch/user/e/eberry/LQ/RootNtupleSpring11/RootNtuple-V00-02-01-Spring11MC-SingleTopMadGraph_20110528_083757
 TToBLNu_TuneZ2_tW-channel,10.56,489417,1,1,0,0,/castor/cern.ch/user/e/eberry/LQ/RootNtupleSpring11/RootNtuple-V00-02-01-Spring11MC-SingleTopMadGraph_20110528_083757
-#WW,28,122980,1,1,0,0,
-#ZZ,4.3,145368,1,1,0,0,
-#WZ,10.5,118120,1,1,0,0,
+WJetsToLNu,24640,14808756,1,1,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_WJets_MADGRAPH_20110526_153439
+WW,27.79,2061760,1,1,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_Diboson_PYTHIA_20110526_154507
+ZZ,4.297,2108608,1,1,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_Diboson_PYTHIA_20110526_154507
+WZ,10.4,2108416,1,1,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_Diboson_PYTHIA_20110526_154507
 Z0Jets,1929,1435909,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_ZJets_ALPGEN_20110525_203142
 Z1Jets_ptZ-0to100,380.8,14606305,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_ZJets_ALPGEN_20110525_203142
 Z1Jets_ptZ-100to300,8.721,11923684,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_ZJets_ALPGEN_20110525_203142
@@ -34,6 +35,9 @@ QCD_Pt-50to80_MuPt5Enriched,144421.74,11352301,1,1,0,0,/castor/cern.ch/user/d/da
 QCD_Pt-80to120_MuPt5Enriched,29048.7,9888652,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_QCDMuEnriched_PYTHIA_20110526_162616
 QCD_Pt-120to150_MuPt5Enriched,4440.2215,10686315,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_QCDMuEnriched_PYTHIA_20110526_162616
 QCD_Pt-150_MuPt5Enriched,2837.6712,3183540,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_QCDMuEnriched_PYTHIA_20110526_162616
+GJets_TuneD6T_HT-40To100,23620,2217101,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_GammaJets_MADGRAPH_20110602_195843
+GJets_TuneD6T_HT-100To200,3476,1065691,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_GammaJets_MADGRAPH_20110602_195843
+GJets_TuneD6T_HT-200_7TeV-madgraph,485,1142171,1,1,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC/RootNtuple-V00-02-01-Spring11MC_GammaJets_MADGRAPH_20110602_195843
 SingleMu__Run2011A-May10ReReco,1,1,1,1,2,-1,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple-V00-02-01-SingleMu_May10ReReco_4_2_2_20110525_232004
 #W0Jets_Pt0to100,25060.8,3541971,1,1,0,0,
 #W1Jets_Pt0to100,4582.3,745069,1,1,0,0,
