@@ -1,0 +1,92 @@
+###########################################################################
+##        Instructions for using NTupleAnalyzer Batch Version            ##
+##         Darin Baumgartel - June 3, 2011 - darinb@cern.ch              ##
+###########################################################################
+
+This version of the NTupleAnalyzer package has minimal clutter and uses the 
+lxplus batch system. Its intent is to keep two things synchronized between
+the LQMu analyzers - the NTuple Information and directories, and the 
+MakeClass-style analyzer code. 
+
+     Instructions for running. 
+
+1) Check out the package. If you haven't already: 
+
+   cmsrel CMSSW_4_1_5
+   cd CMSSW_4_1_5/src
+   cmsenv
+   cvs co -d NTupleAnalyzerV2 UserCode/baumgartel/LQ/NTupleAnalyzerV2
+
+2) Organize the NTuple information. A working example using the Spring11
+   MC and the May10 ReReco data is in "NTupleInfoSpring11.csv". 
+
+   Make a CSV file in the style of the example file, or use the default
+   CSV file. The CSV file must contain these columns: 
+     1) SignalType: A string of characters that the root files begin 
+        with which identifies them uniquely. 
+     2) XSections: The cross sections for each SignalType (process)
+     3) N_orig: The number of events before the NTupleSkimming **
+     4) FilterEffs: Filter efficiencies. These can be absorbed into
+        the cross section, or specified here. If absorbed into the
+        cross-section, just leave as 1.0. 
+     5) HLTBit: Currently not in use. Could be implemented to keep
+        HLTResults information organized. Ignore this for now.
+     6) SigOrBG: An integer: 0 if Background, 1 if Signal. 
+     7) MassOfLQ: The LQ mass for signal. 0 For background or -1 for 
+        data. Not needed explicityly but can be useful. 
+     8) CastorDirectory: The castor directory where the SignalType 
+        is kept. There can be more than one SignalType in each 
+        castor directory, the script will figure this out. 
+
+3) Check or modify analyzer code. NTupleAnalyzer.C(h) are the C and h 
+   files which are TEMPLATES of the analyzer code. There are a few
+   placeholders in this code which are swapped out from th CSV file. 
+   Make sure all the particle selection and variables to store in the
+   analyzer code are OK in the NTupleAnalyzer.C file. Modify as needed.
+
+4) Run the analyzer process. There are two methods for this: 
+
+   A) The basic method. Run the basic analyzer code with: 
+
+         python AnalyzerMaker.py NTupleInfoSpring11.csv
+
+      This will make an analyzer C and h file for each SignalType, 
+      and the necessary scripts to submit jobs to batch. You then
+      submit the jobs with by running the submission script:
+
+         ./sub_AllAnalyzer.csh
+
+      Jobs will return to a castor directory that is labeled by the
+      data and time: 
+      /castor/cern.ch/user/initial/username/LQAnalyzerOutput/NTupleAnalyzer_Datetime
+
+   B) The FAST method (recommended). Run the analyzer with:
+
+         python AnalyzerMakerFast.py NTupleInfoSpring11.csv
+
+      The Fast method splits jobs up to a maximum of 15 root files for 
+      faster processing. It automatically submits the jobs and checks
+      the job status until completion. Once complete, it double-checks
+      the castor output to make sure all root files are present. After
+      the jobs and checks are complete, it copies the output root files
+      to the lxplus /tmp directory.
+
+5) Gather your analyzer output and run whatever you would like. 
+   With the analyzer output .root files, you can easily hadd the files
+   into a more coherent structure, e.g. 
+
+      hadd ZJets.root Z*Jets*root
+      hadd Diboson.root WW.root WZ.root ZZ.root
+      hadd QCDMu.root QCD*Mu*root
+
+6) Standard plot and optimization macros to be added shortly. 
+
+
+
+
+
+
+
+
+
+
