@@ -1,4 +1,4 @@
-bool PassFilter(irun,ils)
+bool PassFilter(int irun, int ils)
 {
 bool keepevent = false;
 

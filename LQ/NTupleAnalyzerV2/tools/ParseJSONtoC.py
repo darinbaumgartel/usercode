@@ -30,7 +30,7 @@ if len( isfile ) > 2:
 	
 h = open('JSONFilterFunction.h','w')
 
-h.write('bool PassFilter(irun,ils)\n{\nbool keepevent = false;\n\n')
+h.write('bool PassFilter(int irun, int ils)\n{\nbool keepevent = false;\n\n')
 
 sets = contents.split('\n')
 
