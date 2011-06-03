@@ -10,6 +10,7 @@
 #include <cmath>
 #include <TMath.h>
 #include "TRandom2.h"
+#include "tools/JSONFilterFunction.h"
 
 #define BRANCH(bname) Double_t bname = -99999.12345; tree->Branch(#bname,& bname," bname /D ");
 #define VRESET(vname) vname = -99999.12345;
@@ -248,6 +249,13 @@ void NTupleAnalyzer_placeholder::Loop()
 		//			else continue;
 		//		}
 
+
+		//========================     JSON   Conditions   ================================//
+
+		if (isData){
+		bool KeepEvent = PassFilter(run, ls);
+		if (!KeepEvent) continue;
+		}
 		//========================     Vertex Conditions   ================================//
 
 		if ( isBeamScraping ) continue;
