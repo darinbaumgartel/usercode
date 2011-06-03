@@ -111,7 +111,7 @@ for x in range(len(SignalType)):
 		sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x].replace('-','_')+part+'.* .\ncp '+thisdir+'/JSONFilterFunction.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+part+' .\nroot -b RootProcesses_'+SignalType[x]+part+'\nrfcp '+SignalType[x].replace('-','_')+part+'.root '+thiscastor+'\n')
 		sub_thisroot.close()
 
-		f_sub.write('\nsleep 1\nbsub -R "pool>50000" -o /dev/null -e /dev/null -q 1nd -J job'+SignalType[x]+part+' < sub_'+SignalType[x]+part+'.csh\n')
+		f_sub.write('\nsleep 1\nbsub -R "pool>10000" -o /dev/null -e /dev/null -q 1nd -J job'+SignalType[x]+part+' < sub_'+SignalType[x]+part+'.csh\n')
 
 		f_thisroot =  open("RootProcesses_"+SignalType[x]+part,'w')
 
