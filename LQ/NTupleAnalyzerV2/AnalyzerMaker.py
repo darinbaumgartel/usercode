@@ -80,7 +80,7 @@ os.system('rfmkdir '+ thiscastor)
 
 for x in range(len(SignalType)):
 	sub_thisroot = open("sub_"+SignalType[x]+".csh",'w')
-	sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x].replace('-','_')+'.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+' .\nroot -b RootProcesses_'+SignalType[x]+'\nrfcp '+SignalType[x].replace('-','_')+'.root '+thiscastor+'\n')
+	sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x].replace('-','_')+'.* .\ncp '+thisdir+'/JSONFilterFunction* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+' .\nroot -b RootProcesses_'+SignalType[x]+'\nrfcp '+SignalType[x].replace('-','_')+'.root '+thiscastor+'\n')
 	sub_thisroot.close()
 
 	f_sub.write('\nbsub -R "pool>50000" -o /dev/null -e /dev/null -q 1nd -J job'+SignalType[x]+' < sub_'+SignalType[x]+'.csh\n')

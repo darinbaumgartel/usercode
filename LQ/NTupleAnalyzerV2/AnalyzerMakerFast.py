@@ -108,7 +108,7 @@ for x in range(len(SignalType)):
 		part = 'part'+str(y+1)+'of'+str(len(newdirList))
 
 		sub_thisroot = open("sub_"+SignalType[x]+part+".csh",'w')
-		sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x].replace('-','_')+part+'.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+part+' .\nroot -b RootProcesses_'+SignalType[x]+part+'\nrfcp '+SignalType[x].replace('-','_')+part+'.root '+thiscastor+'\n')
+		sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/NTupleAnalyzer_'+SignalType[x].replace('-','_')+part+'.* .\ncp '+thisdir+'/JSONFilterFunction.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+part+' .\nroot -b RootProcesses_'+SignalType[x]+part+'\nrfcp '+SignalType[x].replace('-','_')+part+'.root '+thiscastor+'\n')
 		sub_thisroot.close()
 
 		f_sub.write('\nsleep 1\nbsub -R "pool>50000" -o /dev/null -e /dev/null -q 1nd -J job'+SignalType[x]+part+' < sub_'+SignalType[x]+part+'.csh\n')
