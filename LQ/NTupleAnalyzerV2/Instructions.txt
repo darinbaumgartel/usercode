@@ -81,6 +81,15 @@ MakeClass-style analyzer code.
       the castor output to make sure all root files are present. After
       the jobs and checks are complete, it copies the output root files
       to the lxplus /tmp directory.
+      
+      Note: Automatic submission is optioinal:
+      The script will prepare the jobs and created needed code and files. 
+      You will then be prompted whether you want to continue with automatic
+      job submission. If you enter n for no, you will be instructed on 
+      the command to enter to submit the jobs yourself, of how to run code
+      without batch.
+
+
 
 6) Gather your analyzer output and run whatever you would like. 
    With the analyzer output .root files, you can easily hadd the files
