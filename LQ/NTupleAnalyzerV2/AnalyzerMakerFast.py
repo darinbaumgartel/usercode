@@ -140,7 +140,7 @@ for x in range(len(SignalType)):
 
 		s1 = open(cfile).read() # Open the NTupleAnalyzer.C template and replace with array values
 		s1 = s1.replace('Numberofevents',str(float(N_orig[x])))
-		s1 = s1.replace('placeholder', SignalType[x].replace('-','_')+part)
+		s1 = s1.replace('placeholder', c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part)
 		s1 = s1.replace('crosssection', str(float(Xsections[x])))
 		s1 = s1.replace('efficiency', str(float(FilterEffs[x])))
 		s1 = s1.replace('desired_luminosity', str(float(1.0)))

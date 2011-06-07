@@ -5,15 +5,15 @@
 // found on file: RootNtuple2011Feb10_Run2010A_Nov4ReReco_ALL_20110211_172658.root
 //////////////////////////////////////////////////////////
 
-#ifndef NTupleAnalyzer_placeholder_h
-#define NTupleAnalyzer_placeholder_h
+#ifndef placeholder_h
+#define placeholder_h
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
 #include <iostream>
 #include <TH1F.h>
-class NTupleAnalyzer_placeholder {
+class placeholder {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -490,8 +490,8 @@ public :
 
 
 
-   NTupleAnalyzer_placeholder(TTree *tree=0);
-   virtual ~NTupleAnalyzer_placeholder();
+   placeholder(TTree *tree=0);
+   virtual ~placeholder();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -503,8 +503,8 @@ public :
 
 #endif
 
-#ifdef NTupleAnalyzer_placeholder_cxx
-NTupleAnalyzer_placeholder::NTupleAnalyzer_placeholder(TTree *tree)
+#ifdef placeholder_cxx
+placeholder::placeholder(TTree *tree)
 
 {
 // if parameter tree is not specified (or zero), connect the file
@@ -540,19 +540,19 @@ NTupleAnalyzer_placeholder::NTupleAnalyzer_placeholder(TTree *tree)
    Init(tree);
 }
 
-NTupleAnalyzer_placeholder::~NTupleAnalyzer_placeholder()
+placeholder::~placeholder()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t NTupleAnalyzer_placeholder::GetEntry(Long64_t entry)
+Int_t placeholder::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t NTupleAnalyzer_placeholder::LoadTree(Long64_t entry)
+Long64_t placeholder::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -567,7 +567,7 @@ Long64_t NTupleAnalyzer_placeholder::LoadTree(Long64_t entry)
    return centry;
 }
 
-void NTupleAnalyzer_placeholder::Init(TTree *tree)
+void placeholder::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1035,7 +1035,7 @@ void NTupleAnalyzer_placeholder::Init(TTree *tree)
    //filetracermarkstatus
 }
 
-Bool_t NTupleAnalyzer_placeholder::Notify()
+Bool_t placeholder::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -1046,14 +1046,14 @@ Bool_t NTupleAnalyzer_placeholder::Notify()
    return kTRUE;
 }
 
-void NTupleAnalyzer_placeholder::Show(Long64_t entry)
+void placeholder::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t NTupleAnalyzer_placeholder::Cut(Long64_t entry)
+Int_t placeholder::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
@@ -1062,4 +1062,4 @@ float WHY=entry;
 WHY=0;
    return 1;
 }
-#endif // #ifdef NTupleAnalyzer_placeholder_cxx
+#endif // #ifdef placeholder_cxx

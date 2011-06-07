@@ -1,5 +1,5 @@
-#define NTupleAnalyzer_placeholder_cxx
-#include "NTupleAnalyzer_placeholder.h"
+#define placeholder_cxx
+#include "placeholder.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -42,7 +42,7 @@ float F_U2Prime(float P)
 // Boolean switches for Recoil and Smearing corrections, False by default.
 bool DoRecoilCorrections = false;
 
-void NTupleAnalyzer_placeholder::Loop()
+void placeholder::Loop()
 {
 
 	//===================================================================================================
