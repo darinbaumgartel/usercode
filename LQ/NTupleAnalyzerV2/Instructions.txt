@@ -44,9 +44,11 @@ MakeClass-style analyzer code.
    Make sure all the particle selection and variables to store in the
    analyzer code are OK in the NTupleAnalyzer.C file. Modify as needed.
 
+4) Organize the good runs with a JSON file. 
+
 4) Run the analyzer process. There are two methods for this: 
 
-   A) The basic method. Run the basic analyzer code with: 
+   A) The basic method (deprecated). Run the basic analyzer code with: 
 
          python AnalyzerMaker.py NTupleInfoSpring11.csv
 
@@ -60,9 +62,9 @@ MakeClass-style analyzer code.
       data and time: 
       /castor/cern.ch/user/initial/username/LQAnalyzerOutput/NTupleAnalyzer_Datetime
 
-   B) The FAST method (recommended). Run the analyzer with:
+   B) The FAST method (recommended). Run the analyzer, specifying the C, h and CSV files:
 
-         python AnalyzerMakerFast.py NTupleInfoSpring11.csv
+         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_01_Basic.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_01_Basic.h -i NTupleInfoSpring2011.csv
 
       The Fast method splits jobs up to a maximum of 15 root files for 
       faster processing. It automatically submits the jobs and checks

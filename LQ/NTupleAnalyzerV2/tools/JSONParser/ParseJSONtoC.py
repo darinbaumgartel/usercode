@@ -1,8 +1,11 @@
 #fileinput=sys.argv[1] 
 
 import os
+import sys
 
-jsons = (os.popen('ls *JSON*.txt')).readlines()
+jsons = []
+#jsons = (os.popen('ls *JSON*.txt')).readlines()
+jsons.append(sys.argv[1])
 j = []
 for x in jsons:
 	x = x.replace('\n','')
@@ -39,8 +42,8 @@ for x in sets:
 		continue
 	run =  (x.split('[[') [0])
 	lumis = (((((x.split('[[') [-1])).replace(']','')).replace('[','')).replace(' ','')).split(',')
-#	print run
-	print lumis
+	print 'Parsing run:  ' + run
+#	print lumis
 
 	for n in range(len(lumis)/2):
 		h.write('if ((irun == ' +run+')&&(ils >= '+lumis[2*n]+')&&(ils <= '+lumis[2*n+1]+')) keepevent = true;\n' )
@@ -48,3 +51,4 @@ for x in sets:
 h.write('\n\nreturn keepevent;\n\n}\n\n')
 #	print 	x.split('[[')
 #	print run
+print 'JSON Filtering function written to JSONFilterFunction.h. Please move this file to the main NTupleAnalyzerV2 directory'
