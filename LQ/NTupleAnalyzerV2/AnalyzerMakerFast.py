@@ -161,7 +161,7 @@ for x in range(len(SignalType)):
 		s2 = open(hfile) # Same deal for the .h file now...
 		f2 = open(c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+".h", 'w')
 		for line in s2.readlines():
-			line = line.replace('placeholder', SignalType[x].replace('-','_')+part)
+			line = line.replace('placeholder', c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part)
 			f2.write(line)
 			if 'filetracermark000' in line:	
 				f2.write('\nTChain * chain = new TChain(\"rootTupleTree/tree\",\"\");\n')
@@ -185,6 +185,16 @@ f_sub.close()
 os.system('chmod 777 sub*.csh')
 
 os.system('./sub_AllAnalyzer.csh')
+
+subjobs = ''
+while subjobs != 'y' and subjobs != 'n':
+	subjobs = raw_input('\n\n  Would you like to automatically submit and check jobs now? (answer y/n):  ')
+if subjobs == 'n':
+	print '\n\n Jobs can be submitted now using the submission command:\n\n    ./sub_AllAnalyzer.csh\n'
+	print '\n If you wish to test functionality, run a single root process like:\n'
+	print '  root -l RootProcesses_TTJetspart1of4  (or whatever RootProcesses file you have available)\n\n'
+	sys.exit()
+
 
 done = 0
 print '\n Waiting for job completion. Status as follows: \n\n'
