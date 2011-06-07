@@ -184,9 +184,6 @@ for x in range(len(SignalType)):
 f_sub.close()
 os.system('chmod 777 sub*.csh')
 
-sys.exit()
-
-
 os.system('./sub_AllAnalyzer.csh')
 
 done = 0
