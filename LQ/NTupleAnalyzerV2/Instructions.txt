@@ -44,9 +44,18 @@ MakeClass-style analyzer code.
    Make sure all the particle selection and variables to store in the
    analyzer code are OK in the NTupleAnalyzer.C file. Modify as needed.
 
-4) Organize the good runs with a JSON file. 
+4) Organize the good runs with a JSON file. To create a C function based
+   on a json file, go to the tools/JSONParser directory. Move your 
+   desired JSON file here, and create a .h file with the filter function
+   using a command like:
+   
+      python ParseJSONtoC.py Cert_160404-163869_7TeV_May10ReReco_Collisions11_JSON.txt
+      
+   Then move the output file to the main working directory:
 
-4) Run the analyzer process. There are two methods for this: 
+      mv JSONFilterFunction.h ../../
+
+5) Run the analyzer process. There are two methods for this: 
 
    A) The basic method (deprecated). Run the basic analyzer code with: 
 
@@ -73,7 +82,7 @@ MakeClass-style analyzer code.
       the jobs and checks are complete, it copies the output root files
       to the lxplus /tmp directory.
 
-5) Gather your analyzer output and run whatever you would like. 
+6) Gather your analyzer output and run whatever you would like. 
    With the analyzer output .root files, you can easily hadd the files
    into a more coherent structure, e.g. 
 
@@ -81,7 +90,7 @@ MakeClass-style analyzer code.
       hadd Diboson.root WW.root WZ.root ZZ.root
       hadd QCDMu.root QCD*Mu*root
 
-6) Standard plot and optimization macros to be added shortly. 
+7) Standard plot and optimization macros to be added shortly. 
 
 
 
