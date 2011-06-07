@@ -58,7 +58,7 @@ for x in datavalues:
 
 for x in range(len(normvalues)):
   factor =  normvalues[x]/genvalues[x]
-  print 'cut_mc += *((N_PileUpInteractions > '+str(x-.5)+')*(N_PileUpInteractions < '+str(x+.5)+')*('+str(factor)+'))'
+  print 'cut_mc += "*((N_PileUpInteractions > '+str(x-.5)+')*(N_PileUpInteractions < '+str(x+.5)+')*('+str(factor)+'))";'
   
 
 
