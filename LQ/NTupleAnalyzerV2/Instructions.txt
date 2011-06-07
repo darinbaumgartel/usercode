@@ -98,7 +98,8 @@ MakeClass-style analyzer code.
  ** Calculation of the original number events can be gotten from
     the event count histogram in the NTuples. The easiest way to
     to do this is to copy a castor directory to tmp and copy the 
-    script tools/CheckEventCountLocal.py into that directory and run.  
+    script tools/EventCountCheck/CheckEventCountLocal.py into 
+    that directory and run.  
 
 
 
