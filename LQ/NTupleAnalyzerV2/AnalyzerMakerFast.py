@@ -305,11 +305,11 @@ for g in range(len(groups)):
 		if groups[g] == Group[x]:
 			Contents[g].append(SignalType[x])
 for g in range(len(groups)):
-	haddstring = 'hadd '+thistemp+'/SummaryInfo/'+groups[g]+'.root'
+	haddstring = 'hadd '+thistemp+'/SummaryFiles/'+groups[g]+'.root'
 	for c in Contents[g]:
 		haddstring += ' *'+thistemp+'/'+c.replace('-','_')+'*root'+' '
 	os.system(haddstring)
-	os.system('rfcp '+thistemp+'/SummaryInfo/'+groups[g]+'.root '+thiscastor+'/SummaryFiles')
+	os.system('rfcp '+thistemp+'/SummaryFiles/'+groups[g]+'.root '+thiscastor+'/SummaryFiles')
 
 print ('\n\n'+40*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiscastor+'/SummaryFiles')
 os.system('nsls -l '+thiscastor+'/SummaryFiles')
