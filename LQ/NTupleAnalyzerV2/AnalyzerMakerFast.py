@@ -129,7 +129,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>14:
+		if len(sublist)>10:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
