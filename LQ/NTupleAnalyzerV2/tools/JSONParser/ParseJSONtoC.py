@@ -43,7 +43,7 @@ for x in sets:
 	run =  (x.split('[[') [0])
 	lumis = (((((x.split('[[') [-1])).replace(']','')).replace('[','')).replace(' ','')).split(',')
 	print 'Parsing run:  ' + run
-#	print lumis
+	print lumis
 
 	for n in range(len(lumis)/2):
 		h.write('if ((irun == ' +run+')&&(ils >= '+lumis[2*n]+')&&(ils <= '+lumis[2*n+1]+')) keepevent = true;\n' )
