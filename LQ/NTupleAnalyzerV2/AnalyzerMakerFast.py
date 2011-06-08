@@ -11,7 +11,14 @@ import sys
 cfile = ''
 hfile = ''
 ifile = ''
+print '-------------------------------------------------------------------'
+print '          Precauationary cleanup... please ignore\n'
+os.system('rm RootProcess* *part*.C *part*.h *part*.d *part*.so sub*csh ')
+print (' ')
+print '-------------------------------------------------------------------'
 
+
+StagerCheck = 0
 a = sys.argv
 for x in range(len(a)):
 	if a[x] == '-i':
@@ -19,7 +26,9 @@ for x in range(len(a)):
 	if a[x] == '-c':
 		cfile = a[x+1]
 	if a[x] == '-h':
-		hfile = a[x+1]	
+		hfile = a[x+1]
+	if a[x] == '--stager_check':
+		StagerCheck=1
 
 if cfile == '' or hfile == '' or ifile == '':
 	print 'Must specify input .C, .h, and .csv files, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv -c NTupleAnalyzer.C -h NTupleAnalyzer.h\n\n   Exiting   \n\n'
@@ -95,6 +104,7 @@ os.system('rfmkdir '+ thiscastor)
 
 bjobs = []
 
+
 for x in range(len(SignalType)):
 	
 	print 'Preparing '+ SignalType[x]
@@ -106,7 +116,15 @@ for x in range(len(SignalType)):
 		thistype = y[0:len(SignalType[x])]
 		if SignalType[x] ==thistype:
 			dirList.append(y)
-
+		
+	if StagerCheck:	
+		for cf in dirList:
+			cf = CastorDirectory[x]+'/' + cf
+			fstatus = (((os.popen('stager_qry -M '+cf).readlines())[-1]).split(' '))[-1]
+			if 'STAGED' not in fstatus:
+				os.system('stager_get -M '+cf)
+		
+		
 	newdirList = []
 	sublist = []
 	for y in dirList:
@@ -142,16 +160,36 @@ for x in range(len(SignalType)):
 		s1 = s1.replace('Numberofevents',str(float(N_orig[x])))
 		s1 = s1.replace('placeholder', c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part)
 		s1 = s1.replace('crosssection', str(float(Xsections[x])))
-		s1 = s1.replace('efficiency', str(float(FilterEffs[x])))
 		s1 = s1.replace('desired_luminosity', str(float(1.0)))
 		s1 = s1.replace('FILEINPUT', path + '/' + dirList[0] )
 		s1 = s1.replace('MassOfLQ', str(float(MassOfLQ[x])))
 	
-		if SignalType[x][0] == 'W':
+		if SignalType[x][0] == 'W' and 'Jets' in SignalType[x][0]:
 			s1 = s1.replace('IsItWMC', 'true')
-		if SignalType[x][0] != 'W':
+		if SignalType[x][0] != 'W' or 'Jets' not in SignalType[x][0]:
 			s1 = s1.replace('IsItWMC', 'false')
+			
+		if SignalType[x][0] == 'Z' and 'Spring11' in CastorDirectory[x] and 'ALPGEN' in CastorDirectory[x]:
+			s1 = s1.replace('IsItSpring11ZAlpgen', 'true')
+		if SignalType[x][0] != 'Z' or 'Spring11' in CastorDirectory[x] or 'ALPGEN' in CastorDirectory[x]:
+			s1 = s1.replace('IsItSpring11ZAlpgen', 'false')
 	
+		ScaleFacs =  (RescalingInfo[x]).replace('[','').replace(']','').replace(' ','')
+		ScaleFacs = ScaleFacs.split(';')
+
+		eFac = 1.0
+		muFac = 1.0
+		tauFac = 1.0
+		if len(ScaleFacs)>1:
+			eFac = ScaleFacs[0]
+			muFac = ScaleFacs[1]
+			tauFac = ScaleFacs[2]
+		
+		s1 = s1.replace('electron_rescalevalue',str(eFac))
+		s1 = s1.replace('muon_rescalevalue',str(muFac))
+		s1 = s1.replace('tau_rescalevalue',str(tauFac))
+
+		
 	#	os.system('rm NTupleAnalyzer_'+SignalType[x]+'.*')
 		f1 = open(c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+".C", 'w') # write a new file based on the template
 		f1.write(s1)
@@ -247,6 +285,34 @@ while ok!=1:
 			ok = 0
 	print 'Waiting on '+str(unfin)+' files to transfer.\n' 
 
-print ('\n\n Analysis and transfer complete.')
+print ('\n\n Analysis and transfer complete. Grouping files for easier use. Please wait !')
+os.system('sleep 60')
 
+os.system('mkdir '+thistemp+'/SummaryFiles')
+os.system('rfmkdir '+thiscastor+'/SummaryFiles')
+	
+os.system('cmsenv')
 
+groups = []
+for x in range(len(SignalType)):
+	if Group[x] not in groups:
+		groups.append(Group[x])
+Contents = []
+for g in groups:
+	Contents.append([])
+for g in range(len(groups)):
+	for x in range(len(SignalType)):
+		if groups[g] == Group[x]:
+			Contents[g].append(SignalType[x])
+for g in range(len(groups)):
+	haddstring = 'hadd '+thistemp+'/SummaryInfo/'+groups[g]+'.root'
+	for c in Contents[g]:
+		haddstring += ' *'+thistemp+'/'+c.replace('-','_')+'*root'+' '
+	os.system(haddstring)
+	os.system('rfcp '+thistemp+'/SummaryInfo/'+groups[g]+'.root '+thiscastor+'/SummaryFiles')
+
+print ('\n\n'+40*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiscastor+'/SummaryFiles')
+os.system('nsls -l '+thiscastor+'/SummaryFiles')
+print ('\n\n'+40*'*'+ '\n\n')
+
+os.system('rm RootProcess* *part* sub*csh ')

@@ -24,11 +24,13 @@ MakeClass-style analyzer code.
    CSV file. The CSV file must contain these columns: 
      1) SignalType: A string of characters that the root files begin 
         with which identifies them uniquely. 
-     2) XSections: The cross sections for each SignalType (process)
+     2) XSections: The cross sections for each SignalType (process). 
+        Should include the Filter Efficiency.
      3) N_orig: The number of events before the NTupleSkimming **
-     4) FilterEffs: Filter efficiencies. These can be absorbed into
-        the cross section, or specified here. If absorbed into the
-        cross-section, just leave as 1.0. 
+     4) Group: Organize the binned NTuples by group. For instance, if
+        there are 15 Jet and PT Binned ZJets Alpgen samples, these 
+        will all be "hadded" into "ZJets.root" if they all have the
+        Group label "ZJets" in the CSV file.
      5) HLTBit: Currently not in use. Could be implemented to keep
         HLTResults information organized. Ignore this for now.
      6) SigOrBG: An integer: 0 if Background, 1 if Signal. 
@@ -88,6 +90,12 @@ MakeClass-style analyzer code.
       job submission. If you enter n for no, you will be instructed on 
       the command to enter to submit the jobs yourself, of how to run code
       without batch.
+      
+      Note, if files haven't been used recently, you can also provide
+      the arguement "--stager_check" to check the staged status of each
+      file and stage unstaged files. This takes a few minutes to check
+      before jobs are submitted, but it can be worth it if there are
+      unstaged files!
 
 
 
