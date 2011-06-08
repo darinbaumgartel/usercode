@@ -5,8 +5,44 @@ genvalues = [0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.
 							0.0698146584,0.0698146584,0.0630151648,0.0526654164,0.0402754482,0.0292988928,0.0194384503,0.0122016783,0.007207042,
 							0.004003637,0.0020278322,0.0010739954,0.0004595759,0.0002229748,0.0001028162,4.58337152809607E-05]
 
+a = sys.argv
+rootfile = ''
+newgenvalues = []
+distfile = ''
+for x in range(len(a)):
+	if a[x] == '-r':
+		rootfile = a[x+1]
 
-rootfile = sys.argv[1]
+	if a[x] == '-f':
+		distfile = a[x+1]
+		os.system('wget '+distfile)
+		distfile = distfile.split('/')[-1]
+		info = os.popen('cat '+distfile).readlines()
+		print info
+		for y in info:
+			if 'probValue' in y:
+				genvalues2 = y
+		genvalues2 = genvalues2.split('(')[-1]
+		genvalues2 = genvalues2.split(')')[0]
+		genvalues2 = genvalues2.split(',')
+		for y in genvalues2:
+			newgenvalues.append[float(y)]
+		os.system('rm '+distfile)
+		genvalues = newgenvalues
+		
+if rootfile == '':
+	print 'No root file specified. Specify root file (from estimatePileUpD.py) with "-r rootfile.root".'
+	sys.exit()
+	
+if distfile == '':
+	print 'No generator distribution specified. Using default gen values for Spring11 MC'
+	os.system('sleep 0')
+	
+print rootfile
+print newgenvalues
+print distfile
+	
+sys.exit()
 
 f = open('GetDataValues.C','w')
 f.write('{\n\n')
