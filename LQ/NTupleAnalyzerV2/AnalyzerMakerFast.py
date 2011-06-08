@@ -307,7 +307,7 @@ for g in range(len(groups)):
 for g in range(len(groups)):
 	haddstring = 'hadd '+thistemp+'/SummaryFiles/'+groups[g]+'.root'
 	for c in Contents[g]:
-		haddstring += ' *'+thistemp+'/'+c.replace('-','_')+'*root'+' '
+		haddstring += ' '+thistemp+'/*'+c.replace('-','_')+'*root'+' '
 	os.system(haddstring)
 	os.system('rfcp '+thistemp+'/SummaryFiles/'+groups[g]+'.root '+thiscastor+'/SummaryFiles')
 
