@@ -167,12 +167,12 @@ void placeholder::Loop()
 
 	// Another placeHolder. Needed because recoil corrections only get applied to W MC.
 	bool IsW = IsItWMC;
+	bool IsSpring11ZAlpgen = IsItSpring11ZAlpgen;
+
 
 	xsection = crosssection;	 // Another PlaceHolder for the cross sections in bookkeeping/NTupleInfo.csv
-	Double_t eff = efficiency;	 // Another PlaceHolder, for filter efficiency or what have you. Multiply by sigma for "effective cross section"
 
 	//	Event Weight Calculation
-	weight = eff*lumi*xsection/Events_Orig;
 
 	int xx=0;					 //dummy variable used for progress %
 
@@ -222,6 +222,31 @@ void placeholder::Loop()
 		run_number = run;
 		event_number = event;
 		bx = bunch;
+		
+		weight = lumi*xsection/Events_Orig;
+
+		//========================     Weight Fix for Spring 11 Z Alpgen ===============//
+		Double_t rescale = 1.0;
+		for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip){
+			int pdgId = GenParticlePdgId->at(ip);
+			int motherIndex = GenParticleMotherIndex->at(ip);
+			if (motherIndex >= 0){
+				if (abs(GenParticlePdgId->at(motherIndex) ) == 23){
+					int lepton = 999;
+					if (abs(pdgId) == 11) lepton = 11;
+					if (abs(pdgId) == 13) lepton = 13;
+					if (abs(pdgId) == 15) lepton = 15;										
+					if (IsSpring11ZAlpgen){
+						if (lepton == 999) rescale = 1.0;
+						if (lepton == 11) rescale = electron_rescalevalue;
+						if (lepton == 13) rescale = muon_rescalevalue;
+						if (lepton == 15) rescale = tau_rescalevalue;
+						weight = weight*rescale;
+					}							
+				if (lepton <999) break;
+				}
+			}
+		}		
 
 		//========================     HLT Conditions   ================================//
 
