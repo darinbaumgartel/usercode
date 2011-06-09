@@ -14,8 +14,7 @@ ifile = ''
 print '-------------------------------------------------------------------'
 print '          Precauationary cleanup... please ignore\n'
 os.system('rm RootProcess* *part*.C *part*.h *part*.d *part*.so sub*csh ')
-print (' ')
-print '-------------------------------------------------------------------'
+
 
 
 StagerCheck = 0
@@ -80,8 +79,6 @@ f1.close()
 
 c2file = cfile.split('/')[-1]
 
-###----------------------------------------------------------------------###
-
 now=str(strftime("%Y-%m-%d-%H:%M:%S"))
 now = now.replace(" ","")
 now = now.replace("\t","")
@@ -101,7 +98,8 @@ person = os.popen('whoami').readlines()[0].replace('\n','')
 thiscastor = '/castor/cern.ch/user/'+person[0]+'/'+person+'/LQAnalyzerOutput/'+c2file.replace('.C','')+'_'+now
 os.system('rfmkdir '+ thiscastor.replace(c2file.replace('.C','')+'_'+now,''))
 os.system('rfmkdir '+ thiscastor)
-
+print (' ')
+print '-------------------------------------------------------------------'
 bjobs = []
 
 
@@ -245,7 +243,7 @@ while done!=1:
 	if jobsleft == -1:
 		done = 1
 	if jobsleft>=0:
-		print '\n' + str(jobsleft) +' jobs remaining.'
+		print  str(jobsleft) +' jobs remaining.'
 	
 print '\n Checking output root files in directory '+thiscastor+' \n\n'
 
