@@ -40,7 +40,7 @@ QCD_Pt-150_MuPt5Enriched,2837.6712,3183540,QCDMu,1,0,0,0,/castor/cern.ch/user/d/
 #GJets_TuneD6T_HT-100To200,3476,1065691,Gjets,1,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC_V2/RootNtuple-V00-02-04-Spring11MC_GammaJets_MADGRAPH_20110607_222949
 #GJets_TuneD6T_HT-200_7TeV-madgraph,485,1142171,Gjets,1,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Spring2011MC_V2/RootNtuple-V00-02-04-Spring11MC_GammaJets_MADGRAPH_20110607_222949
 SingleMu__Run2011A-May10ReReco-v1,1,1,SingleMuData,1,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_42X-V00-02-04-RERECODATA-160404-163869_20110608_173348
-SingleMu__Run2011A-PromptReco-v4,,,SingleMuData,1,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_42X-V00-02-04-PROMPTDATA-1603870-166563_20110608_205826
+SingleMu__Run2011A-PromptReco-v4,1,1,SingleMuData,1,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_42X-V00-02-04-PROMPTDATA-1603870-166563_20110608_205826
 #W0Jets_Pt0to100,25060.8,3541971,WJetsALP,1,0,0,0,
 #W1Jets_Pt0to100,4582.3,745069,WJetsALP,1,0,0,0,
 #W1Jets_Pt100to300,96.6599,162861,WJetsALP,1,0,0,0,
