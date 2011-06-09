@@ -311,8 +311,19 @@ for g in range(len(groups)):
 	os.system(haddstring)
 	os.system('rfcp '+thistemp+'/SummaryFiles/'+groups[g]+'.root '+thiscastor+'/SummaryFiles')
 
+print '-------------------------------------------------------------------'
+print '         Cleaning up temporary files\n'
+from subprocess import call
+print '         Removing Root Run Processes' 
+call('rm RootProcess*',shell=True)
+print '         Removing Temporary C/h modules'
+call('rm *part*',shell=True)
+print '         Removing batch submission scripts'
+call('rm sub*csh',shell=True)
+print (' ')
+print '-------------------------------------------------------------------'
+
 print ('\n\n'+40*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiscastor+'/SummaryFiles')
 os.system('nsls -l '+thiscastor+'/SummaryFiles')
 print ('\n\n'+40*'*'+ '\n\n')
 
-os.system('rm RootProcess* *part* sub*csh ')

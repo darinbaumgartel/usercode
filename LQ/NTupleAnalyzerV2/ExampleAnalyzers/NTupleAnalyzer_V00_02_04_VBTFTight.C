@@ -129,7 +129,7 @@ void placeholder::Loop()
 	BRANCH(minval_muon1pfMET);
 	BRANCH(Pt_Z);  BRANCH(Pt_W);
 	BRANCH(Phi_Z); BRANCH(Phi_W);
-  BRANCH(N_PileUpInteractions);
+	BRANCH(N_PileUpInteractions);
 
 	// Generator Level Variables
 	BRANCH(Pt_genjet1);     BRANCH(Pt_genjet2);
@@ -181,7 +181,7 @@ void placeholder::Loop()
 	Long64_t nbytes = 0, nb = 0;
 
 	//nentries=10000;  /// TEST>>>>>> COMMENT THIS ALWAYS
-		
+
 	for (Long64_t jentry=0; jentry<nentries;jentry++)
 	{
 
@@ -195,31 +195,35 @@ void placeholder::Loop()
 		run_number = run;
 		event_number = event;
 		bx = bunch;
-		
+
 		weight = lumi*xsection/Events_Orig;
 
 		//========================     Weight Fix for Spring 11 Z Alpgen ===============//
 		Double_t rescale = 1.0;
-		for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip){
+		for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
+		{
 			int pdgId = GenParticlePdgId->at(ip);
 			int motherIndex = GenParticleMotherIndex->at(ip);
-			if (motherIndex >= 0){
-				if (abs(GenParticlePdgId->at(motherIndex) ) == 23){
+			if (motherIndex >= 0)
+			{
+				if (abs(GenParticlePdgId->at(motherIndex) ) == 23)
+				{
 					int lepton = 999;
 					if (abs(pdgId) == 11) lepton = 11;
 					if (abs(pdgId) == 13) lepton = 13;
-					if (abs(pdgId) == 15) lepton = 15;										
-					if (IsSpring11ZAlpgen){
+					if (abs(pdgId) == 15) lepton = 15;
+					if (IsSpring11ZAlpgen)
+					{
 						if (lepton == 999) rescale = 1.0;
 						if (lepton == 11) rescale = electron_rescalevalue;
 						if (lepton == 13) rescale = muon_rescalevalue;
 						if (lepton == 15) rescale = tau_rescalevalue;
 						weight = weight*rescale;
-					}							
-				if (lepton <999) break;
+					}
+					if (lepton <999) break;
 				}
 			}
-		}		
+		}
 
 		//========================     HLT Conditions   ================================//
 
@@ -247,12 +251,12 @@ void placeholder::Loop()
 		//			else continue;
 		//		}
 
-
 		//========================     JSON   Conditions   ================================//
 
-		if (isData){
-		bool KeepEvent = PassFilter(run, ls);
-		if (!KeepEvent) continue;
+		if (isData)
+		{
+			bool KeepEvent = PassFilter(run, ls);
+			if (!KeepEvent) continue;
 		}
 		//========================     Vertex Conditions   ================================//
 
@@ -307,20 +311,20 @@ void placeholder::Loop()
 			float muonEta = MuonEta->at(imuon);
 
 			if (checkPT && (muonPt < 30.0) ) continue;
-			if	( fabs(muonEta) > 2.4 )      continue;
-			
-			bool PassVBTFLoose = 
-			MuonIsGlobal ->at(imuon) == 1 &&           // VBTF Loose
-			MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&   // VBTF Loose
-			MuonTrkHits ->at(imuon) >= 11   ;          // VBTF Loose
-			
-			bool PassVBTFTight = 			
-			MuonIsTracker ->at(imuon) == 1 &&          // VBTF Tight
-			fabs(MuonTrkD0 ->at(imuon)) < 0.2  &&      // VBTF Tight
-			MuonGlobalChi2 ->at(imuon) < 10.0 &&       // VBTF Tight
-			MuonPixelHitCount ->at(imuon) >=1 &&       // VBTF Tight
-            MuonSegmentMatches->at(imuon) >=2 &&       // VBTF Tight
-            MuonGlobalTrkValidHits->at(imuon)>=1 ;     // VBTF Tight
+			if  ( fabs(muonEta) > 2.4 )      continue;
+
+			bool PassVBTFLoose =
+				MuonIsGlobal ->at(imuon) == 1 &&
+				MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&
+				MuonTrkHits ->at(imuon) >= 11   ;
+
+			bool PassVBTFTight =
+				MuonIsTracker ->at(imuon) == 1 &&
+				fabs(MuonTrkD0 ->at(imuon)) < 0.2  &&
+				MuonGlobalChi2 ->at(imuon) < 10.0 &&
+				MuonPixelHitCount ->at(imuon) >=1 &&
+				MuonSegmentMatches->at(imuon) >=2 &&
+				MuonGlobalTrkValidHits->at(imuon)>=1 ;
 
 			if ( ! (PassVBTFLoose && PassVBTFTight) ) continue;
 			iMUON = imuon;
@@ -455,7 +459,7 @@ void placeholder::Loop()
 			deltaR_thisjet =  newjet.DeltaR(muon);
 			if ( deltaR_thisjet < deltaR_muon1closestPFJet)  deltaR_muon1closestPFJet = deltaR_thisjet ;
 
-//			if ( deltaR_thisjet < 0.5 ) continue;
+			//			if ( deltaR_thisjet < 0.5 ) continue;
 
 			if ( PFJetTrackCountingHighEffBTag->at(jetindex) > 1.7 )
 			{
@@ -466,7 +470,7 @@ void placeholder::Loop()
 			v_idx_pfjet_final.push_back(jetindex);
 		}
 		PFJetCount = 1.0*v_idx_pfjet_final.size();
-		
+
 		if (PFJetCount <2) continue;
 
 		//========================     Generator Level Module  ================================//
