@@ -38,9 +38,9 @@ if distfile == '':
 	print 'No generator distribution specified. Using default gen values for Spring11 MC'
 	os.system('sleep 0')
 	
-print rootfile
-print newgenvalues
-print distfile
+#print rootfile
+#print newgenvalues
+#print distfile
 	
 
 f = open('GetDataValues.C','w')
@@ -91,7 +91,7 @@ for x in datavalues:
 		normvalues.append(x/total)
 	n = n + 1;
 
-print 'cut_mc += *(';
+print 'cut_mc += "*("';
 makeplus = 1
 n = 0
 for x in range(len(normvalues)):
