@@ -321,7 +321,7 @@ call('rm sub*csh',shell=True)
 print (' ')
 print '-------------------------------------------------------------------'
 
-print ('\n\n'+40*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiscastor+'/SummaryFiles')
+print ('\n\n'+140*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiscastor+'/SummaryFiles\n')
 os.system('nsls -l '+thiscastor+'/SummaryFiles')
-print ('\n\n'+40*'*'+ '\n\n')
+print ('\n\n'+140*'*'+ '\n\n')
 
