@@ -51,7 +51,7 @@ MakeClass-style analyzer code.
    desired JSON file here, and create a .h file with the filter function
    using a command like:
    
-      python ParseJSONtoC.py Cert_160404-163869_7TeV_May10ReReco_Collisions11_JSON.txt
+      python ParseJSONtoC.py CustomCert_160404_165970_May10ReRecoTo163869_June8_JSON.txt
       
    Then move the output file to the main working directory:
 
@@ -75,7 +75,7 @@ MakeClass-style analyzer code.
 
    B) The FAST method (recommended). Run the analyzer, specifying the C, h and CSV files:
 
-         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_01_Basic.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_01_Basic.h -i NTupleInfoSpring2011.csv
+         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_04_VBTFTight.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_04_VBTFTight.h -i NTupleInfoSpring2011_V2.csv
 
       The Fast method splits jobs up to a maximum of 15 root files for 
       faster processing. It automatically submits the jobs and checks
