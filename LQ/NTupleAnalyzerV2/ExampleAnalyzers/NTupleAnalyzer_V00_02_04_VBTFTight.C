@@ -340,8 +340,6 @@ void placeholder::Loop()
 		MuonCount = 1.0*v_idx_muon_final.size();
 
 		if ( MuonCount < 1 ) continue;
-		n += 1;
-
 		TLorentzVector muon = muons[0];
 
 		//========================     PFJet Conditions   ================================//
