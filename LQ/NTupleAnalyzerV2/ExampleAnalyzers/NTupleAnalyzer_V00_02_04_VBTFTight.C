@@ -180,8 +180,8 @@ void placeholder::Loop()
 	Long64_t nentries = fChain->GetEntriesFast();
 	Long64_t nbytes = 0, nb = 0;
 
-	//N=1000;  /// TEST>>>>>> COMMENT THIS ALWAYS
-
+	//nentries=10000;  /// TEST>>>>>> COMMENT THIS ALWAYS
+		
 	for (Long64_t jentry=0; jentry<nentries;jentry++)
 	{
 
@@ -307,7 +307,7 @@ void placeholder::Loop()
 			float muonEta = MuonEta->at(imuon);
 
 			if (checkPT && (muonPt < 30.0) ) continue;
-			if	( fabs(muonEta) < 2.4 )      continue;
+			if	( fabs(muonEta) > 2.4 )      continue;
 			
 			bool PassVBTFLoose = 
 			MuonIsGlobal ->at(imuon) == 1 &&           // VBTF Loose
@@ -336,6 +336,7 @@ void placeholder::Loop()
 		MuonCount = 1.0*v_idx_muon_final.size();
 
 		if ( MuonCount < 1 ) continue;
+		n += 1;
 
 		TLorentzVector muon = muons[0];
 
@@ -465,6 +466,8 @@ void placeholder::Loop()
 			v_idx_pfjet_final.push_back(jetindex);
 		}
 		PFJetCount = 1.0*v_idx_pfjet_final.size();
+		
+		if (PFJetCount <2) continue;
 
 		//========================     Generator Level Module  ================================//
 
