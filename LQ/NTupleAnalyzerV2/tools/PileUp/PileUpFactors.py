@@ -42,7 +42,6 @@ print rootfile
 print newgenvalues
 print distfile
 	
-sys.exit()
 
 f = open('GetDataValues.C','w')
 f.write('{\n\n')
