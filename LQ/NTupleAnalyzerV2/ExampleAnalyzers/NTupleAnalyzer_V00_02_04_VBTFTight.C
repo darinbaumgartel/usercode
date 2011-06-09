@@ -159,9 +159,6 @@ void placeholder::Loop()
 	// "desired_luminosity" is a PlaceHolder that gets replaced from the python template replicator
 	Double_t lumi=desired_luminosity;
 
-	// Number of events passing LJ Filter
-//	Events_AfterLJ = 1.0*(fChain->GetEntries());
-
 	// PlaceHolder, values stored in bookkeeping/NTupleInfo.csv
 	Events_Orig = Numberofevents;
 
@@ -169,19 +166,7 @@ void placeholder::Loop()
 	bool IsW = IsItWMC;
 	bool IsSpring11ZAlpgen = IsItSpring11ZAlpgen;
 
-
 	xsection = crosssection;	 // Another PlaceHolder for the cross sections in bookkeeping/NTupleInfo.csv
-
-	//	Event Weight Calculation
-
-	int xx=0;					 //dummy variable used for progress %
-
-	// Display status to screen
-//	std::cout<<"            "<<std::endl;
-//	std::cout<<" Evaluating for: placeholder \n MC events: "<<Events_AfterLJ
-//		<< " \n Actual Events: "<<weight*Events_Orig<<" \n Integrated Luminosity: "
-//		<<lumi<<" pb^(-1) \n Cross Section: "<<xsection<<" pb "<<std::endl;
-//	std::cout<<"            "<<std::endl;
 
 	//===================================================================================================
 	//===================================================================================================
@@ -199,18 +184,6 @@ void placeholder::Loop()
 
 	for (Long64_t jentry=0; jentry<nentries;jentry++)
 	{
-		//-------------------------------------------------------
-		// Show progress so you know the program hasn't failed...
-		//-------------------------------------------------------
-//		for (xx=0; xx<100; xx=xx+1)
-//		{
-//			if ((100*jentry/(Events_AfterLJ)>xx)&&(100*(jentry-1)/(Events_AfterLJ)<xx))
-//			{
-//				std::cout<<xx<<" % complete"<<std::endl;
-//			}
-//		}
-		//-------------------------------------------------------
-		//-------------------------------------------------------
 
 		Long64_t ientry = LoadTree(jentry);
 		if (ientry < 0) break;
@@ -326,7 +299,7 @@ void placeholder::Loop()
 		// select muons
 
 		bool checkPT = true;	 // Pt requirement only on first muon at this stage
-std::cout<<"-----"<<std::endl;
+
 		for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 		{
 
@@ -336,23 +309,6 @@ std::cout<<"-----"<<std::endl;
 			if (checkPT && (muonPt < 30.0) ) continue;
 			if	( fabs(muonEta) < 2.4 )      continue;
 			
-			std::cout<<imuon<<std::endl;
-
-
-
-
-			//bool quality =
-								 // Fiducial Region
-			//	fabs(muonEta) < 2.1  &&
-								 // pass isolation requirements
-			//	MuonPassIso ->at(imuon) == 1    &&
-								 // pass muon ID
-			//	MuonPassID  ->at(imuon) == 1    &&
-								 // at least 11 muon track hits
-			//	MuonTrkHits ->at(imuon) >= 11   &&
-								 // track d0 < 0.2 cm
-			//	fabs(MuonTrkD0   ->at(imuon)) < 0.2;
-
 			bool PassVBTFLoose = 
 			MuonIsGlobal ->at(imuon) == 1 &&           // VBTF Loose
 			MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&   // VBTF Loose
@@ -364,11 +320,10 @@ std::cout<<"-----"<<std::endl;
 			MuonGlobalChi2 ->at(imuon) < 10.0 &&       // VBTF Tight
 			MuonPixelHitCount ->at(imuon) >=1 &&       // VBTF Tight
             MuonSegmentMatches->at(imuon) >=2 &&       // VBTF Tight
-            MuonGlobaltrkValidHits->at(imuon)>=1 ;     // VBTF Tight
+            MuonGlobalTrkValidHits->at(imuon)>=1 ;     // VBTF Tight
 
 			if ( ! (PassVBTFLoose && PassVBTFTight) ) continue;
 			iMUON = imuon;
-std::cout<<"*****"<<std::endl;
 			TLorentzVector muon;
 			muon.SetPtEtaPhiM( MuonPt -> at(imuon), MuonEta-> at(imuon),    MuonPhi-> at(imuon),    0);
 
