@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include "/home/darinb/CMSStyle.C"
+#include "CMSStyle.C"
 
 void fillHisto(TString cut_mc, TString cut_data,  bool drawHistograms,
 int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileName,TString title, TString Luminosity,Double_t extrascalefactor,Double_t wnorm,TString tag)
@@ -258,13 +258,26 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 	c1->Print("PlotsMuNuSub/"+varname+"_"+tag+".png");
 
+	TIter next(gDirectory->GetList());
+	TObject* obj;
+	while(obj= (TObject*)next()){
+		if(obj->InheritsFrom(TH1::Class())){
+			obj->Delete();
+		}
+	}
 }
 
 
 void MakePlotsMuNuSub()
 {
 
-	// -------- PF ---------
+
+	// Load Files and Trees:
+	gROOT->ProcessLine(".x LoadCastorFiles.C");
+
+
+
+	// Cut Conditions
 
 	TString lumi = "341"  ;
 	TString cut_data = "(Pt_muon1>40)*(MET_pf>45.0)";
@@ -339,83 +352,59 @@ void MakePlotsMuNuSub()
 
 	float WNormalization = 1.22;
 
-	//gROOT->Reset();	gROOT->ProcessLine(".x LoadLocal.C");
 	//fillHisto(cut_mc, cut_data, true, 4000,0,4000, "MT_muon1pfMET", false, "","M^{T}_{#mu#nu}(GeV) " +xtag,lumi,10,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data ,true,25,.-.5,24.5, "N_Vertices", false, "","N_{Vertices} " +xtag,lumi,100,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data ,true,6,.-.5,5.5, "GlobalMuonCount", false, "","N_{Global #mu} " +xtag,lumi,100,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data ,true,6,.-.5,5.5, "TrackerMuonCount", false, "","N_{Tracker #mu} " +xtag,lumi,100,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data ,true,12,.-.5,11.5, "PFJetCount", false, "","N_{PFJet} " +xtag,lumi,100,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data ,true,8,.-.5,7.5, "BpfJetCount", false, "","N_{BPFJet} " +xtag,lumi,100,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data, true, 50,0,500, "MT_muon1pfMET", false, "","M^{T}_{#mu#nu}(GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 25,70,170, "MT_muon1pfMET", false, "","M^{T}_{#mu#nu}(GeV) " +xtag,lumi,100,WNormalization,filetag+"ZOOMRegion");
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 60,0,30, "EcalIso_muon1", false, "","ECAL Iso_{#mu} (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,3, "HcalIso_muon1", false, "","HCAL Iso (#mu) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 35,0,3.5, "TrkIso_muon1", false, "","Track Iso (#mu) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,500, "MET_pf",        false, "","E_{T}^{miss}(GeV) " +xtag  ,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 42,-2.1,2.1, "Eta_muon1", false, "","#eta (#mu) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,.001, "EtaError_muon1", false, "","#sigma(#eta) (#mu) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true,30,-3.141593,3.141593, "Phi_muon1", false, "","#phi (#mu) " +xtag,lumi,2000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,.0005, "PhiError_muon1", false, "","#sigma(#phi) (#mu) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 40,0,.0008, "QOverPError_muon1", false, "","#sigma(Q/p)_{#mu}(GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 30,.8,3.15,"deltaPhi_muon1pfMET", false, "","#Delta #phi (#mu,E_{T}^{miss}) " +xtag,lumi,100,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 60,200,1200, "ST_pf_munu", false, "","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 40,0,400, "Pt_muon1", false, "","p_{T} (#mu) (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,50, "PtError_muon1", false, "","#sigma(p_{T}) (#mu) (GeV) " +xtag,lumi,10,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data, true, 60,0,600, "Pt_pfjet1", false, "","p_{T} (jet_{1}) (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,500, "Pt_pfjet2", false, "","p_{T} (jet_{2}) (GeV) " +xtag,lumi,10,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data, true, 40,-3.0,3.0, "Eta_pfjet1", false, "","#eta (jet_{1}) " +xtag,lumi,1000,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data, true, 40,-3.0,3.0, "Eta_pfjet2", false, "","#eta (jet_{2}) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 100,0,2000, "M_bestmupfjet_munu", false, "","M_{#mu jet} " +xtag,lumi,100,WNormalization,filetag);
+
+
 
 	xtag = " [M_{T}>90]";
 
@@ -423,79 +412,55 @@ void MakePlotsMuNuSub()
 	cut_mc += "*(MT_muon1pfMET>90.0)";
 	filetag = "2011_MT_Gr90";
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data ,true,25,.-.5,24.5, "N_Vertices", false, "","N_{Vertices} " +xtag,lumi,100,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data ,true,6,.-.5,5.5, "GlobalMuonCount", false, "","N_{Global #mu} " +xtag,lumi,100,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data ,true,6,.-.5,5.5, "TrackerMuonCount", false, "","N_{Tracker #mu} " +xtag,lumi,100,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data ,true,12,.-.5,11.5, "PFJetCount", false, "","N_{PFJet} " +xtag,lumi,100,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data ,true,8,.-.5,7.5, "BpfJetCount", false, "","N_{BPFJet} " +xtag,lumi,100,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,500, "MT_muon1pfMET", false, "","M^{T}_{#mu#nu}(GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 25,70,170, "MT_muon1pfMET", false, "","M^{T}_{#mu#nu}(GeV) " +xtag,lumi,100,WNormalization,filetag+"ZOOMRegion");
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 60,0,30, "EcalIso_muon1", false, "","ECAL Iso_{#mu} (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,3, "HcalIso_muon1", false, "","HCAL Iso (#mu) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 35,0,3.5, "TrkIso_muon1", false, "","Track Iso (#mu) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,500, "MET_pf",        false, "","E_{T}^{miss}(GeV) " +xtag  ,lumi,10,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data, true, 42,-2.1,2.1, "Eta_muon1", false, "","#eta (#mu) " +xtag,lumi,1000,WNormalization,filetag);
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
 	fillHisto(cut_mc, cut_data, true, 50,0,.001, "EtaError_muon1", false, "","#sigma(#eta) (#mu) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true,30,-3.141593,3.141593, "Phi_muon1", false, "","#phi (#mu) " +xtag,lumi,2000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,.0005, "PhiError_muon1", false, "","#sigma(#phi) (#mu) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 40,0,.0008, "QOverPError_muon1", false, "","#sigma(Q/p)_{#mu}(GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 30,.8,3.15,"deltaPhi_muon1pfMET", false, "","#Delta #phi (#mu,E_{T}^{miss}) " +xtag,lumi,100,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 60,200,1200, "ST_pf_munu", false, "","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 40,0,400, "Pt_muon1", false, "","p_{T} (#mu) (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,50, "PtError_muon1", false, "","#sigma(p_{T}) (#mu) (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 60,0,600, "Pt_pfjet1", false, "","p_{T} (jet_{1}) (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 50,0,500, "Pt_pfjet2", false, "","p_{T} (jet_{2}) (GeV) " +xtag,lumi,10,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 40,-3.0,3.0, "Eta_pfjet1", false, "","#eta (jet_{1}) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 40,-3.0,3.0, "Eta_pfjet2", false, "","#eta (jet_{2}) " +xtag,lumi,1000,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mc, cut_data, true, 100,0,2000, "M_bestmupfjet_munu", false, "","M_{#mu jet} " +xtag,lumi,100,WNormalization,filetag);
 
 	xtag = " [Full Selection]";
@@ -508,10 +473,9 @@ void MakePlotsMuNuSub()
 	TString cut_st_data = cut_data + "*(MT_muon1pfMET>125.0)*(Pt_muon1>85)*(MET_pf>85.0)*(ST_pf_munu>250)";
 	TString cut_st_mc = lumi+ "*weight*("+cut_st_data+")";
 
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_mass_mc, cut_mass_data, true, 40,0.0,2000.0, "M_bestmupfjet_munu", false, "","M_{#mu j} " +xtag,lumi,40,WNormalization,filetag);
-
-	gROOT->Reset(); gROOT->ProcessLine(".x LoadLocal.C");
+	
 	fillHisto(cut_st_mc, cut_st_data, true, 30,200,1700, "ST_pf_munu", false, "","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
 
 	gROOT->Reset(); gROOT->ProcessLine(".q;");
