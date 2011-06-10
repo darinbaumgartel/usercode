@@ -60,16 +60,20 @@ void placeholder::Loop()
 
 	// Particle Counts
 	BRANCH(MuonCount); BRANCH(EleCount); BRANCH(PFJetCount); BRANCH(BpfJetCount);
+	BRANCH(GlobalMuonCount); BRANCH(TrackerMuonCount);
 
 	// Leading muon 1
 	BRANCH(TrkD0_muon1);     BRANCH(NHits_muon1);   BRANCH(TrkDZ_muon1);   BRANCH(ChiSq_muon1);
 	BRANCH(TrkIso_muon1); BRANCH(EcalIso_muon1); BRANCH(HcalIso_muon1); BRANCH(RelIso_muon1);
 	BRANCH(Phi_muon1);    BRANCH(Eta_muon1);     BRANCH(Pt_muon1);      BRANCH(Charge_muon1);
+	BRANCH(QOverPError_muon1); BRANCH(PhiError_muon1);    BRANCH(EtaError_muon1);     BRANCH(PtError_muon1); 
 
 	// Leading muon 2
 	BRANCH(TrkD0_muon2);     BRANCH(NHits_muon2);   BRANCH(TrkDZ_muon2);   BRANCH(ChiSq_muon2);
 	BRANCH(TrkIso_muon2); BRANCH(EcalIso_muon2); BRANCH(HcalIso_muon2); BRANCH(RelIso_muon2);
 	BRANCH(Phi_muon2);    BRANCH(Eta_muon2);     BRANCH(Pt_muon2);      BRANCH(Charge_muon2);
+	BRANCH(QOverPError_muon2); BRANCH(PhiError_muon2);    BRANCH(EtaError_muon2);     BRANCH(PtError_muon2); 
+
 
 	// PFJet 1
 	BRANCH(Phi_pfjet1); BRANCH(Eta_pfjet1); BRANCH(Pt_pfjet1); BRANCH(BDisc_pfjet1);
@@ -341,6 +345,16 @@ void placeholder::Loop()
 
 		if ( MuonCount < 1 ) continue;
 		TLorentzVector muon = muons[0];
+		
+		// SubRoutine for Muon Counts
+		GlobalMuonCount = 0.0;
+		TrackerMuonCount = 0.0;
+
+		for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
+		{
+			if (MuonIsGlobal  ->at(imuon) == 1) GlobalMuonCount += 1.0;
+			if (MuonIsTracker ->at(imuon) == 1) TrackerMuonCount += 1.0;
+		}
 
 		//========================     PFJet Conditions   ================================//
 
@@ -369,7 +383,7 @@ void placeholder::Loop()
 			v_idx_pfjet_prefinal.push_back(ijet);
 		}
 
-		/// Filter out jets that are actuall muons
+		/// Filter out jets that are actually muons
 		TLorentzVector thisjet, thismu;
 		vector<int> jetstoremove;
 
@@ -635,11 +649,15 @@ void placeholder::Loop()
 		VRESET(TrkD0_muon1);     VRESET(NHits_muon1);   VRESET(TrkDZ_muon1);   VRESET(ChiSq_muon1);
 		VRESET(TrkIso_muon1); VRESET(EcalIso_muon1); VRESET(HcalIso_muon1); VRESET(RelIso_muon1);
 		VRESET(Phi_muon1);    VRESET(Eta_muon1);     VRESET(Pt_muon1);      VRESET(Charge_muon1);
+		VRESET(QOverPError_muon1); VRESET(PhiError_muon1);    VRESET(EtaError_muon1);     VRESET(PtError_muon1); 
+
 
 		// Leading muon 2
 		VRESET(TrkD0_muon2);     VRESET(NHits_muon2);   VRESET(TrkDZ_muon2);   VRESET(ChiSq_muon2);
 		VRESET(TrkIso_muon2); VRESET(EcalIso_muon2); VRESET(HcalIso_muon2); VRESET(RelIso_muon2);
 		VRESET(Phi_muon2);    VRESET(Eta_muon2);     VRESET(Pt_muon2);      VRESET(Charge_muon2);
+		VRESET(QOverPError_muon2); VRESET(PhiError_muon2);    VRESET(EtaError_muon2);     VRESET(PtError_muon2); 
+
 
 		// PFJet 1
 		VRESET(Phi_pfjet1); VRESET(Eta_pfjet1); VRESET(Pt_pfjet1); VRESET(BDisc_pfjet1);
@@ -774,6 +792,12 @@ void placeholder::Loop()
 			EcalIso_muon1 = MuonEcalIso->at(v_idx_muon_final[0]);
 			HcalIso_muon1 = MuonHcalIso->at(v_idx_muon_final[0]);
 			ChiSq_muon1 = MuonGlobalChi2->at(v_idx_muon_final[0]);
+            QOverPError_muon1 = MuonQOverPError->at(v_idx_muon_final[0]);
+            PhiError_muon1  = MuonPhiError->at(v_idx_muon_final[0]);
+            EtaError_muon1  = MuonEtaError->at(v_idx_muon_final[0]);
+            PtError_muon1 = MuonPtError->at(v_idx_muon_final[0]);
+
+
 
 			// muon Pt/Eta/Phi
 			Pt_muon1 = MuonPt->at(v_idx_muon_final[0]);
@@ -818,6 +842,12 @@ void placeholder::Loop()
 			EcalIso_muon2 = MuonEcalIso->at(v_idx_muon_final[1]);
 			HcalIso_muon2 = MuonHcalIso->at(v_idx_muon_final[1]);
 			ChiSq_muon2 = MuonGlobalChi2->at(v_idx_muon_final[1]);
+            QOverPError_muon2 = MuonQOverPError->at(v_idx_muon_final[1]);
+            PhiError_muon2  = MuonPhiError->at(v_idx_muon_final[1]);
+            EtaError_muon2  = MuonEtaError->at(v_idx_muon_final[1]);
+            PtError_muon2 = MuonPtError->at(v_idx_muon_final[1]);
+			
+			
 
 			// muon Pt/Eta/Phi
 			Pt_muon2 = MuonPt->at(v_idx_muon_final[1]);
