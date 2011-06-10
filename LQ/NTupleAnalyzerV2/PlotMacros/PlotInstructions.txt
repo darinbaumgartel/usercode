@@ -1,0 +1,41 @@
+##############################################################
+####   Plot Macro Use In The NTupleAnalyzerV2 Framework   ####
+##############################################################
+
+If you have succesfully run the NTupleAnalyzer with the AnalyzerMakerFast.py
+facility with "Group" labels in the input CSV file, then in addition to the
+Castor directory in which the output of the individual jobs in stored, there
+is a subdirectory labelled "SummaryFiles", in which there are simplified
+root files which make plotting and further analysis easier. These root files
+look something like "zjets.root", "ttbar.root", etc. 
+
+These plotting macros like "MakePlotsMuNuSub.C" have a plotting routine which
+can be called multiple times for variables which are output from the analyzer
+code. The default macro has 40some plots. 
+
+It relies on the "LoadCastorFiles.C", a file which will load the files and 
+trees into memory from the SummaryFiles on castor. In this file you can 
+change the Castor directories or root files. 
+
+These should run out-of-the-box, and give a nice re-useable skeleton for
+getting numbers and plots from histograms. The default code also calculates
+scale factors in the standard way. So you can implement a mass region 
+cut (commented out by default) and just run the mass plot, and part of
+the screen output will be a "normalization factor" which can tell you 
+how you will need to scale the Z (MuMu analysis) or W (MuNu analysis). 
+Of course, this can all be easily modified. 
+
+
+Furthermore, these macros are called *Sub.C because they contain a sub-plot
+beneath the main histogram which indicatees the N_poisson difference 
+between data and MC in each bin. (N_data - N_MC)/sqrt(N_data). 
+
+
+To run a macro, just do:
+
+    root -b MakePlotsMuNuSub.C
+    
+    
+The "-b" is for batch mode, so the plot X Windows don't pop up and slow
+things down. Plots will output to the Plots_MuNuSub or Plots_MuMuSub 
+directory. 
