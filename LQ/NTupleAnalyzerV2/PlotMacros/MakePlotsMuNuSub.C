@@ -66,6 +66,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	Double_t Nt = h_ttbar->Integral();
 	Double_t Nz = h_zjets->Integral();
 	//	Double_t Nlq = h_lq->Integral();
+	Double_t N_other = Nmc - Nw;
+
 	
 	Double_t sigma_Nw = Nw*pow(1.0*(h_wjets->GetEntries()),-0.5);
 
