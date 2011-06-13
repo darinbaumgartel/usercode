@@ -359,7 +359,7 @@ void MakePlotsMuMuSub()
 
 	// ------------- Normalization Calculation                         -------------- //
 
-	if (ZNormalization = 1.00){
+	if (ZNormalization == 1.00){
 		std::cout<<"\n\n Z Normalization is unity. Program will calculate Z rescaling factor and exit.\n\n"<<std::endl;
 		filetag = "2011Data_NormalizationSelection";
 		xtag = " [Z Normalization Condition]";
