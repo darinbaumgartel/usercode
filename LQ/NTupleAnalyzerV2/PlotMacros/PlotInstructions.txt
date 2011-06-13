@@ -39,3 +39,8 @@ To run a macro, just do:
 The "-b" is for batch mode, so the plot X Windows don't pop up and slow
 things down. Plots will output to the Plots_MuNuSub or Plots_MuMuSub 
 directory. 
+
+Note: There seems to be a graphical problem in ROOT version 5.27 which
+is default for many CMSSW releases, in which stacked histograms do not
+appear "stacked" -> layers are visible beneath one another. You can
+reset to Root 5.26 with the commands in Root526Reset.txt. 

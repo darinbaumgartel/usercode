@@ -53,8 +53,12 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 	THStack* H_stack = new THStack("H_stack","");
 
+	// ******************************************************************************************************************************* //
+	// Rescaling Routine and Event number Readout
+	
 	h_wjets->Scale(wnorm);
 	h_ttbar->Scale(165.0/121.0);
+
 
 	Double_t Nd = h_data->Integral();
 	Double_t Nmc = h_zjets->Integral()+h_ttbar->Integral()+h_vvjets->Integral()+h_wjets->Integral()+h_singtop->Integral()+h_qcd->Integral();
@@ -62,15 +66,39 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	Double_t Nt = h_ttbar->Integral();
 	Double_t Nz = h_zjets->Integral();
 	//	Double_t Nlq = h_lq->Integral();
+	
+	Double_t sigma_Nw = Nw*pow(1.0*(h_wjets->GetEntries()),-0.5);
+
+	Double_t sigma_N_other = 0.0;
+	if (h_ttbar->GetEntries()>0) sigma_N_other += h_ttbar->Integral()*pow((1.0*h_ttbar->GetEntries()),-0.5);
+	if (h_zjets->GetEntries()>0) sigma_N_other += h_wjets->Integral()*pow((1.0*h_zjets->GetEntries() ),-0.5);
+	if (h_vvjets->GetEntries()>0) sigma_N_other += h_vvjets->Integral()*pow((1.0*h_vvjets->GetEntries() ),-0.5);
+	if (h_singtop->GetEntries()>0) sigma_N_other += h_singtop->Integral()*pow((1.0*singtop->GetEntries()),-0.5); 
+	if (h_qcd->GetEntries()>0) sigma_N_other += h_qcd->Integral()*pow((1.0*h_qcd->GetEntries()),-0.5);
+
+	Double_t sigam_Nd = sqrt(Nd);
+
 
 	std::cout<<"Data   :"<<Nd<<std::endl;
 	std::cout<<"All MC :"<<Nmc<<std::endl;
 	std::cout<<"tt   :"<<h_ttbar->Integral()<<"  +-"<<h_ttbar->Integral()*pow(1.0*(h_ttbar->GetEntries()),-0.5)<<std::endl;
 	std::cout<<"w    :"<<h_wjets->Integral()<<"  +-"<<h_wjets->Integral()*pow(1.0*(h_wjets->GetEntries()),-0.5)<<std::endl;
 	//	std::cout<<"LQ    :"<<h_lq->Integral()<<"  +-"<<h_lq->Integral()*pow(1.0*(h_lq->GetEntries()),-0.5)<<std::endl;
+	
+	
+	Double_t fac_Numerator = Nd - N_other;
+	Double_t fac_Denominator = Nw;
+	Double_t fac = fac_Numerator/fac_Denominator;
 
-	float fac =1.0*( ( Nd - (Nmc - Nw) )/Nw );
-	std::cout<<"W Scale Factor: "<<fac<<std::endl;
+	Double_t sigma_fac_Numerator = sqrt( pow( sigam_Nd ,2.0) + pow( sigma_N_other ,2.0) ) ;
+	Double_t sigma_fac_Denominator = sigma_Nw; 
+	Double_t sigma_fac_over_fac = pow( pow((sigma_fac_Numerator/fac_Numerator),2.0)    +  pow((sigma_fac_Denominator/fac_Denominator),2.0)    ,0.5);
+	Double_t sigma_fac = sigma_fac_over_fac*fac;
+
+	std::cout<<"W Scale Factor:  "<<fac<<"  +-  "<<sigma_fac<<std::endl;
+	
+	// ******************************************************************************************************************************* //
+	
 
 	H_bkg->Add(h_vvjets);
 	H_bkg->Add(h_qcd);

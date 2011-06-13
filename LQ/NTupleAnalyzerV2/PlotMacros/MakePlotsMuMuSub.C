@@ -13,6 +13,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	//  TCanvas c1("c1", "First canvas", 400, 300); // problems here
 	//	c1->Divide(1,2);
 
+	std::cout<<"\n Looking at variable:  "<<var<<"  \n"<<std::endl;
+
 	TCanvas *c1 = new TCanvas("c1","Example 2 pads (20,80)",800,800);
 	TPad *pad1 = new TPad("pad1", "The pad 80% of the height",0.0,0.3,1.0,1.0,0);
 	TPad *pad2 = new TPad("pad2", "The pad 20% of the height",0.0,0.0,1.0,0.3,0);
@@ -88,6 +90,9 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 	THStack* H_stack = new THStack("H_stack","");
 
+	// ******************************************************************************************************************************* //
+	// Rescaling Routine and Event number Readout
+
 	h_zjets->Scale(znorm);
 	h_ttbar->Scale(165.0/121.0);
 
@@ -95,15 +100,43 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	Double_t Nmc = h_zjets->Integral()+h_ttbar->Integral()+h_vvjets->Integral()+h_wjets->Integral()+h_singtop->Integral()+h_qcd->Integral();
 	Double_t Nw = h_wjets->Integral();
 	Double_t Nz = h_zjets->Integral();
+	Double_t N_other = Nmc - Nz;
+	
+	
+	Double_t sigma_Nz = Nz*pow(1.0*(h_zjets->GetEntries()),-0.5);
+	
+	Double_t sigma_N_other = 0.0;
+	if (h_ttbar->GetEntries()>0) sigma_N_other += h_ttbar->Integral()*pow((1.0*h_ttbar->GetEntries()),-0.5);
+	if (h_wjets->GetEntries()>0) sigma_N_other += h_wjets->Integral()*pow((1.0*h_wjets->GetEntries() ),-0.5);
+	if (h_vvjets->GetEntries()>0) sigma_N_other += h_vvjets->Integral()*pow((1.0*h_vvjets->GetEntries() ),-0.5);
+	if (h_singtop->GetEntries()>0) sigma_N_other += h_singtop->Integral()*pow((1.0*singtop->GetEntries()),-0.5); 
+	if (h_qcd->GetEntries()>0) sigma_N_other += h_qcd->Integral()*pow((1.0*h_qcd->GetEntries()),-0.5);
+	
+	Double_t sigam_Nd = sqrt(Nd);
+	
+	
 
 	std::cout<<"Data   : "<<Nd<<std::endl;
 	std::cout<<"All MC : "<<Nmc<<std::endl;
 	std::cout<<"tt   : "<<h_ttbar->Integral()<<"  +- "<<h_ttbar->Integral()*pow(1.0*(h_ttbar->GetEntries()),-0.5)<<std::endl;
 	std::cout<<"z   : "<<h_zjets->Integral()<<"  +- "<<h_zjets->Integral()*pow(1.0*(h_zjets->GetEntries()),-0.5)<<std::endl;
 
-	Double_t fac =1.0*( ( Nd - (Nmc - Nz) )/Nz );
 
-	std::cout<<"Z Scale Factor:  "<<fac<<std::endl;
+
+	Double_t fac_Numerator = Nd - N_other;
+	Double_t fac_Denominator = Nz;
+	Double_t fac = fac_Numerator/fac_Denominator;
+
+	Double_t sigma_fac_Numerator = sqrt( pow( sigam_Nd ,2.0) + pow( sigma_N_other ,2.0) ) ;
+	Double_t sigma_fac_Denominator = sigma_Nz; 
+	Double_t sigma_fac_over_fac = pow( pow((sigma_fac_Numerator/fac_Numerator),2.0)    +  pow((sigma_fac_Denominator/fac_Denominator),2.0)    ,0.5);
+	Double_t sigma_fac = sigma_fac_over_fac*fac;
+
+	std::cout<<"Z Scale Factor:  "<<fac<<"  +-  "<<sigma_fac<<std::endl;
+
+	// ******************************************************************************************************************************* //
+
+
 
 	H_bkg->Add(h_vvjets);
 	H_bkg->Add(h_wjets);
@@ -227,7 +260,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	TString varname = var;
 	varname +="_";
 	varname += str;
-	std::cout<<varname<<std::endl;
+	//std::cout<<varname<<std::endl;
 
 	pad2->cd();
 
@@ -276,7 +309,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 		}
 
-		std::cout<<"Chi^2 for this distribution is:  "<< chi2<<std::endl;
+		//std::cout<<"Chi^2 for this distribution is:  "<< chi2<<std::endl;
 	}
 	h_comp->GetYaxis()->SetTitle("Poisson N(#sigma) Diff");
 
