@@ -347,7 +347,7 @@ void MakePlotsMuNuSub()
 	cut_mc += "((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)*(0.0748840402223))";
 	cut_mc += ")";
 
-	float WNormalization = 1.22;
+	float WNormalization = 1.216;
 	TString filetag ="";
 	TString xtag ="";
 
@@ -356,7 +356,8 @@ void MakePlotsMuNuSub()
 
 	// ------------- Normalization Calculation                         -------------- //
 
-	if (false){
+	if (WNormalization == 1.00){
+		std::cout<<"\n\n W Normalization is unity. Program will calculate W rescaling factor and exit.\n\n"<<std::endl;
 		filetag ="2011Data_NormalizationSelection";
 		xtag =" [W Normalization Condition]";
 		TString NormCondition ="*(ST_pf_munu>250)*(MT_muon1pfMET>50)*(MT_muon1pfMET<110)";

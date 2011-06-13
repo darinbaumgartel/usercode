@@ -351,7 +351,7 @@ void MakePlotsMuMuSub()
 	cut_mc += ")";
 
 
-	float ZNormalization = 1.33;
+	float ZNormalization = 1.344;
 	TString filetag = " ";
 	TString xtag = " ";
 
@@ -359,7 +359,8 @@ void MakePlotsMuMuSub()
 
 	// ------------- Normalization Calculation                         -------------- //
 
-	if (false){
+	if (ZNormalization = 1.00){
+		std::cout<<"\n\n Z Normalization is unity. Program will calculate Z rescaling factor and exit.\n\n"<<std::endl;
 		filetag = "2011Data_NormalizationSelection";
 		xtag = " [Z Normalization Condition]";
 		TString NormCondition = "*(ST_pf_mumu>250)*(M_muon1muon2>80)*(M_muon1muon2<100)";
