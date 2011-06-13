@@ -1,0 +1,6 @@
+
+source /afs/cern.ch/sw/lcg/external/gcc/4.3.2/x86_64-slc5/setup.csh
+source /afs/cern.ch/sw/lcg/app/releases/ROOT/5.26.00c_python2.6/x86_64-slc5-gcc43-opt/root/bin/thisroot.csh
+
+
+
