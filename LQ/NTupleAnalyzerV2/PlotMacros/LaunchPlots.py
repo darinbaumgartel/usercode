@@ -7,9 +7,9 @@ for x in range(len(sys.argv)):
 cast = castordirectory.split('/')[-1]
 
 f = open('LoadCastorFiles.C','r')
-f2 = open('LoadCastorFilesTemp.C','w')
+f2 = open('LoadCastorFiles_'+cast+'.C','w')
 for line in f:
-	line = line.replace('/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_VBTFTight_2011_06_10_12_28_30/',castordirectory)
+	line = line.replace('/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_VBTFTight_2011_06_10_12_28_30',castordirectory)
 	f2.write(line)
 f.close()
 f2.close()
@@ -21,6 +21,8 @@ for line in f:
 		line =  'float ZNormalization = 1.0;'
 	if 'PlotsMuMuSub' in line:
 		line = line.replace('PlotsMuMuSub','PlotsMuMuSub_'+cast)
+	if 'LoadCastorFiles' in line:
+		line = line.replace('LoadCastorFiles','LoadCastorFiles_'+cast)
 	f2.write(line)
 f.close()
 f2.close()
@@ -32,6 +34,8 @@ for line in f:
 		line =  'float WNormalization = 1.0;'
 	if 'PlotsMuNuSub' in line:
 		line = line.replace('PlotsMuNuSub','PlotsMuNuSub_'+cast)
+	if 'LoadCastorFiles' in line:
+		line = line.replace('LoadCastorFiles','LoadCastorFiles_'+cast)
 	f2.write(line)
 f.close()
 f2.close()
@@ -45,6 +49,8 @@ call ('rm -r PlotsMuNuSub_'+cast,shell=True)
 call ('mkdir PlotsMuMuSub_'+cast,shell=True)
 call ('mkdir PlotsMuNuSub_'+cast,shell=True)
 
+
+print 'Getting Scale factors for ZJets for MuMu Plots ...'
 ZOutput = os.popen('root -b MakePlotsMuMuSub_'+cast+'.C').readlines()
 
 for x in ZOutput:
@@ -52,6 +58,7 @@ for x in ZOutput:
 		Zfac = (x.split(':')[-1])
 		ZfacCode = Zfac.split('+-')[0]
 
+print 'Getting Scale factors for WJets for MuNu Plots ...'
 WOutput = os.popen('root -b MakePlotsMuNuSub_'+cast+'.C').readlines()
 
 for x in WOutput:
@@ -73,6 +80,8 @@ for line in f:
 		line =  'float ZNormalization = ' + ZfacCode +';'
 	if 'PlotsMuMuSub' in line:
 		line = line.replace('PlotsMuMuSub','PlotsMuMuSub_'+cast)
+	if 'LoadCastorFiles' in line:
+		line = line.replace('LoadCastorFiles','LoadCastorFiles_'+cast)
 	f2.write(line)
 f.close()
 f2.close()
@@ -84,18 +93,34 @@ for line in f:
 		line =  'float WNormalization = ' + WfacCode +';'
 	if 'PlotsMuNuSub' in line:
 		line = line.replace('PlotsMuNuSub','PlotsMuNuSub_'+cast)
+	if 'LoadCastorFiles' in line:
+		line = line.replace('LoadCastorFiles','LoadCastorFiles_'+cast)
 	f2.write(line)
 f.close()
 f2.close()
 
 
 
+thisdir = os.popen('pwd').readlines()[0].replace('\n','')
+sub_mumu = open("subMuMu_"+cast+".sh",'w')
+sub_mumu.write('#!/bin/sh\ncd '+thisdir+'\nsource /afs/cern.ch/sw/lcg/external/gcc/4.3.2/x86_64-slc5/setup.sh\nsource /afs/cern.ch/sw/lcg/app/releases/ROOT/5.26.00c_python2.6/x86_64-slc5-gcc43-opt/root/bin/thisroot.sh\nroot -b MakePlotsMuMuSub_'+cast+'.C\n\n')
+sub_mumu.close()
 
-os.system('root -b MakePlotsMuMuSub_'+cast+'.C')
+sub_munu = open("subMuNu_"+cast+".sh",'w')
+sub_munu.write('#!/bin/sh\ncd '+thisdir+'\nsource /afs/cern.ch/sw/lcg/external/gcc/4.3.2/x86_64-slc5/setup.sh\nsource /afs/cern.ch/sw/lcg/app/releases/ROOT/5.26.00c_python2.6/x86_64-slc5-gcc43-opt/root/bin/thisroot.sh\nroot -b MakePlotsMuNuSub_'+cast+'.C\n\n')
+sub_munu.close()
 
-os.system('root -b MakePlotsMuNuSub_'+cast+'.C')
+os.system('chmod 777 sub*sh')
 
-print 'Plots completed using Z scale factor: '+Zfac
+os.system('bsub -R "pool>20000" -o /dev/null -e /dev/null -q 1nd -J jobMuMu_'+cast+' < subMuMu_'+cast+'.sh')
+os.system('bsub -R "pool>20000" -o /dev/null -e /dev/null -q 1nd -J jobMuNu_'+cast+'< subMuNu_'+cast+'.sh')
 
-print 'Plots completed using W scale factor: '+Wfac
+
+#os.system('root -b MakePlotsMuMuSub_'+cast+'.C')
+
+#os.system('root -b MakePlotsMuNuSub_'+cast+'.C')
+
+print 'Plots in batch using Z scale factor: '+Zfac
+
+print 'Plots in batch using W scale factor: '+Wfac
 
