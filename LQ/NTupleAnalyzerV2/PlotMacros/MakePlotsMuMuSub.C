@@ -38,7 +38,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	ttbar->Draw(var+">>h_ttbar",cut_mc);
 	vvjets->Draw(var+">>h_vvjets",cut_mc);
 	singtop->Draw(var+">>h_singtop",cut_mc);
-	qcd->Draw(var+">>h_qcd",cut_mc);
+	//qcd->Draw(var+">>h_qcd",cut_mc);
 	//lqmumu->Draw(var+">>h_lqmumu",cut_mc);
 
 	data->Draw(+var+">>h_data",cut_data);
@@ -61,7 +61,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 		ttbar->Draw(var2+">>h2_ttbar",cut_mc);
 		vvjets->Draw(var2+">>h2_vvjets",cut_mc);
 		singtop->Draw(var2+">>h2_singtop",cut_mc);
-		qcd->Draw(var2+">>h2_qcd",cut_mc);
+		//qcd->Draw(var2+">>h2_qcd",cut_mc);
 		data->Draw(+var2+">>h2_data",cut_data);
 		//lqmumu->Draw(var2+">>h2_lqmumu",cut_mc);
 
@@ -70,7 +70,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 		h_ttbar->Add(h2_ttbar);
 		h_vvjets->Add(h2_vvjets);
 		h_singtop->Add(h2_singtop);
-		h_singtop->Add(h2_qcd);
+		h_qcd->Add(h2_qcd);
 		h_data->Add(h2_data);
 		//h_lqmumu->Add(h2_lqmumu);
 

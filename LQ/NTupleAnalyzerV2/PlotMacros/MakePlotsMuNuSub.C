@@ -36,7 +36,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	ttbar->Draw(var+">>h_ttbar",cut_mc);
 	vvjets->Draw(var+">>h_vvjets",cut_mc);
 	singtop->Draw(var+">>h_singtop",cut_mc);
-	qcd->Draw(var+">>h_qcd",cut_mc);
+	//qcd->Draw(var+">>h_qcd",cut_mc);
 	//	lq->Draw(var+">>h_lq",cut_mc);
 
 	data->Draw(+var+">>h_data",cut_data);
