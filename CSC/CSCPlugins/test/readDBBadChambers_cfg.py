@@ -10,10 +10,14 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     timetype = cms.string('runnumber'),
     toGet = cms.VPSet(cms.PSet(
         record = cms.string('CSCBadChambersRcd'),
-        tag = cms.string('CSCBadChambers_none_FiveLiveME42')
+        #tag = cms.string('CSCBadChambers_none_FiveLiveME42')
+        tag = cms.string('CSCBadChambers_prompt')
+
     )),
     #read from sqlite_file
-    connect = cms.string('sqlite_file:CSCBadChambers_04March2011_V2.db'),
+    #connect=cms.string("oracle://cms_orcon_prod/CMS_COND_31X_CSC"),
+     connect = cms.string('frontier://PromptProd/CMS_COND_31X_CSC'),	
+    #connect = cms.string('sqlite_file:CSCBadChambers_04March2011_V2.db'),
     # read from database
     #connect=cms.string("frontier://FrontierDev/CMS_COND_CSC"),
     #connect =  cms.string("oracle://cms_orcoff_prep/CMS_COND_CSC"),

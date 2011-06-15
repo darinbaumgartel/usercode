@@ -13,9 +13,10 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
         tag = cms.string('CSCDBGains_express')
     )),
     #read from sqlite_file
-    connect=cms.string("oracle://cms_orcon_prod/CMS_COND_31X_CSC"),
+     connect = cms.string('frontier://FrontierInt/CMS_COND_31X_FRONTIER'),
+    #connect=cms.string("oracle://cms_orcon_prod/CMS_COND_31X_CSC"),
     # read from database
-    #string connect="frontier://FrontierDev/CMS_COND_CSC"
+    #connect="frontier://FrontierDev/CMS_COND_CSC"
     DBParameters = cms.PSet(
         authenticationPath = cms.untracked.string('/nfshome0/popcondev/conddb/'),
         authenticationMethod = cms.untracked.uint32(1)
