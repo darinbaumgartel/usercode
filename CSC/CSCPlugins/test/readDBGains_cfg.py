@@ -13,7 +13,7 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
         tag = cms.string('CSCDBGains_express')
     )),
     #read from sqlite_file
-     connect = cms.string('frontier://FrontierInt/CMS_COND_31X_FRONTIER'),
+     connect = cms.string('frontier://PromptProd/CMS_COND_31X_CSC'),
     #connect=cms.string("oracle://cms_orcon_prod/CMS_COND_31X_CSC"),
     # read from database
     #connect="frontier://FrontierDev/CMS_COND_CSC"
