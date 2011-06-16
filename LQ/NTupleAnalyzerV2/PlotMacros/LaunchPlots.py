@@ -38,7 +38,6 @@ for line in f:
 				repstring = repstring.replace('/SummaryFiles/','')
 				repstring = repstring.replace(' ','')
 	line = line.replace(repstring,castordirectory)
-	print line
 	f2.write(line)
 f.close()
 f2.close()
