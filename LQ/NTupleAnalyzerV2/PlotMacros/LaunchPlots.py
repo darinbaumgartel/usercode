@@ -25,10 +25,25 @@ for x in norun:
 f = open('LoadCastorFiles.C','r')
 f2 = open('LoadCastorFiles_'+cast+'.C','w')
 for line in f:
-	line = line.replace('/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_VBTFTight_2011_06_10_12_28_30',castordirectory)
+	
+	repstring = 'somestringthatineveractuallyuseforanythingatallever'
+	if 'TFile' in line:
+		store = line.split('"')
+		for x in store:
+			if '.root' in x:
+				repstring = x
+				repstring2 = repstring.split('/')[-1]
+				repstring = repstring.replace(repstring2,'')
+				repstring = repstring.replace('rfio:','')
+				repstring = repstring.replace('/SummaryFiles/','')
+				repstring = repstring.replace(' ','')
+	line = line.replace(repstring,castordirectory)
+	print line
 	f2.write(line)
 f.close()
 f2.close()
+
+sys.exit()
 
 if (domumu):
 	f = open('MakePlotsMuMuSub.C','r')
