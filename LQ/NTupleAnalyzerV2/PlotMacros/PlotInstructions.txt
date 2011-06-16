@@ -44,3 +44,26 @@ Note: There seems to be a graphical problem in ROOT version 5.27 which
 is default for many CMSSW releases, in which stacked histograms do not
 appear "stacked" -> layers are visible beneath one another. You can
 reset to Root 5.26 with the commands in Root526Reset.txt. 
+
+
+---- NEW!!! Python Plotting Utility -----
+
+This facility makes uses of the default macros MakePlotsMuNu.C and MakePlotsMuMu.C.
+
+It will automatically calculated and use scale factors for Z and W MC and run all of
+the plots in the standard C macros, based on a castor directory created with the 
+NTupleAnalyzer facility. Flags are as follows:
+
+  --mumu  :  Run plots for the MuMu analysis
+  --munu  :  Run plots for the MuNu analysis
+  --norun :  Do not launch plot production - just calculate scale factors and exit
+  
+  -c /castor/cern.ch/... :  to specify the input castor directory (This must have the normal SummaryFiles sub directory)
+  
+  e.g. 
+  
+  python LaunchAnalysis.py --munu /castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_2011_06_16_17_23_41
+  
+  Plots will run in batch. Check your bjobs to know when it's done. 
+  The output plots will be put in a directory labelled with the castor directory. e.g.  
+        PlotsMuNuNTupleAnalyzer_V00_02_04_Default_2011_06_16_17_23_41
