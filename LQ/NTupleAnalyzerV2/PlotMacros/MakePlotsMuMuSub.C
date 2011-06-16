@@ -15,6 +15,20 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 	std::cout<<"\n Looking at variable:  "<<var<<"  \n"<<std::endl;
 
+	TIter next(PhysicalVariables->GetListOfBranches());
+	TObject* obj;
+	bool usevar = false;
+	while(obj= (TObject*)next()){
+			if (var == obj->GetName()) usevar = true;
+	}
+	//std::cout<<usevar<<std::endl;
+	if (!usevar) 
+	{
+		std::cout<<"\nWARNING: Branch for variable "<<var<<"  not found. Skipping plot for this variable. \n"<<std::endl;
+		return;
+	}
+
+
 	TCanvas *c1 = new TCanvas("c1","Example 2 pads (20,80)",800,800);
 	TPad *pad1 = new TPad("pad1", "The pad 80% of the height",0.0,0.3,1.0,1.0,0);
 	TPad *pad2 = new TPad("pad2", "The pad 20% of the height",0.0,0.0,1.0,0.3,0);
