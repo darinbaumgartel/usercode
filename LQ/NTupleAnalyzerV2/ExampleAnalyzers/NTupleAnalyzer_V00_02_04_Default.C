@@ -820,8 +820,8 @@ void placeholder::Loop()
 			}
 			if (consider)
 			{
-				if (MetJetDphi < deltaPhi_METClosestPFJet) deltaPhi_METClosestPT10PFJet = MetJetDphi;
-				if (MetJetDphi > deltaPhi_METFurthestPFJet) deltaPhi_METFurthestPT10PFJet = MetJetDphi;	
+				if (MetJetDphi < deltaPhi_METClosestPT10PFJet) deltaPhi_METClosestPT10PFJet = MetJetDphi;
+				if (MetJetDphi > deltaPhi_METFurthestPT10PFJet) deltaPhi_METFurthestPT10PFJet = MetJetDphi;	
 			}
 		}
 		
@@ -832,8 +832,8 @@ void placeholder::Loop()
 
 			MetJetDphi = abs(ThisCaloJet.DeltaPhi(caloMET));
 
-			if (MetJetDphi < deltaPhi_METClosestCaloJet) deltaPhi_METClosestPT10CaloJet = MetJetDphi;
-			if (MetJetDphi > deltaPhi_METFurthestCaloJet) deltaPhi_METFurthestPT10CaloJet = MetJetDphi;	
+			if (MetJetDphi < deltaPhi_METClosestPT10CaloJet) deltaPhi_METClosestPT10CaloJet = MetJetDphi;
+			if (MetJetDphi > deltaPhi_METFurthestPT10CaloJet) deltaPhi_METFurthestPT10CaloJet = MetJetDphi;	
 
 		}
 
