@@ -75,7 +75,7 @@ MakeClass-style analyzer code.
 
    B) The FAST method (recommended). Run the analyzer, specifying the C, h and CSV files:
 
-         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_04_VBTFTight.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_04_VBTFTight.h -i NTupleInfoSpring2011_V2.csv
+         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_04_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_04_Default.h -i NTupleInfoSpring2011_V2.csv
 
       The Fast method splits jobs up to a maximum of 15 root files for 
       faster processing. It automatically submits the jobs and checks
