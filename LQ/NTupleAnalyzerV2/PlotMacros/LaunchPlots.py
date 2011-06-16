@@ -43,8 +43,6 @@ for line in f:
 f.close()
 f2.close()
 
-sys.exit()
-
 if (domumu):
 	f = open('MakePlotsMuMuSub.C','r')
 	f2 = open('MakePlotsMuMuSub_'+cast+'.C','w')
