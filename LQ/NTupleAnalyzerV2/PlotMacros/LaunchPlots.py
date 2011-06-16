@@ -8,15 +8,19 @@ cast = castordirectory.split('/')[-1]
 options = str(sys.argv)
 domumu = 0
 domunu = 0
+donorun = 0
 mumu = ['--MuMu','--mumu','--MUMU']
 munu = ['--MuNu','--munu','--MUNU']
+norun = ['--NoRun','--norun','--NORUN']
 for x in mumu:
 	if x in options:
 		domumu = 1
 for x in munu:
 	if x in options:
 		domunu = 1
-
+for x in norun:
+	if x in options:
+		donorun = 1
 
 f = open('LoadCastorFiles.C','r')
 f2 = open('LoadCastorFiles_'+cast+'.C','w')
@@ -121,7 +125,8 @@ if (domumu) :
 	sub_mumu.write('#!/bin/sh\ncd '+thisdir+'\nsource /afs/cern.ch/sw/lcg/external/gcc/4.3.2/x86_64-slc5/setup.sh\nsource /afs/cern.ch/sw/lcg/app/releases/ROOT/5.26.00c_python2.6/x86_64-slc5-gcc43-opt/root/bin/thisroot.sh\nroot -b MakePlotsMuMuSub_'+cast+'.C\n\n')
 	sub_mumu.close()
 	os.system('chmod 777 sub*sh')
-	os.system('bsub -R "pool>20000" -o /dev/null -e /dev/null -q 1nd -J jobMuMu_'+cast+' < subMuMu_'+cast+'.sh')
+	if (donorun==0):
+		os.system('bsub -R "pool>20000" -o /dev/null -e /dev/null -q 1nd -J jobMuMu_'+cast+' < subMuMu_'+cast+'.sh')
 
 if (domunu):
 	thisdir = os.popen('pwd').readlines()[0].replace('\n','')
@@ -129,12 +134,13 @@ if (domunu):
 	sub_munu.write('#!/bin/sh\ncd '+thisdir+'\nsource /afs/cern.ch/sw/lcg/external/gcc/4.3.2/x86_64-slc5/setup.sh\nsource /afs/cern.ch/sw/lcg/app/releases/ROOT/5.26.00c_python2.6/x86_64-slc5-gcc43-opt/root/bin/thisroot.sh\nroot -b MakePlotsMuNuSub_'+cast+'.C\n\n')
 	sub_munu.close()
 	os.system('chmod 777 sub*sh')
-	os.system('bsub -R "pool>20000" -o /dev/null -e /dev/null -q 1nd -J jobMuNu_'+cast+'< subMuNu_'+cast+'.sh')
+	if (donorun==0):
+		os.system('bsub -R "pool>20000" -o /dev/null -e /dev/null -q 1nd -J jobMuNu_'+cast+'< subMuNu_'+cast+'.sh')
 
 #os.system('root -b MakePlotsMuMuSub_'+cast+'.C')
 #os.system('root -b MakePlotsMuNuSub_'+cast+'.C')
-if (domumu) :
+if (domumu and donorun==0) :
 	print 'Plots in batch using Z scale factor: '+Zfac
-if (domunu):
+if (domunu and donorun==0):
 	print 'Plots in batch using W scale factor: '+Wfac
 
