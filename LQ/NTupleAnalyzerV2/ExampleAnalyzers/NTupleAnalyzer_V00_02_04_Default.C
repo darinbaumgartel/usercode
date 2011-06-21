@@ -233,6 +233,7 @@ void placeholder::Loop()
 		// Important Event Informations
 		run_number = run;
 		event_number = event;
+		ls_number = ls;
 		bx = bunch;
 
 		weight = lumi*xsection/Events_Orig;
