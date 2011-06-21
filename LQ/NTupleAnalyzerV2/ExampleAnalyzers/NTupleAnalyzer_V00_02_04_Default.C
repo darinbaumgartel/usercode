@@ -112,8 +112,11 @@ void placeholder::Loop()
 	BRANCH(Pt_ele1);
 
 	// Event Information
-	BRANCH(run_number); BRANCH(event_number); BRANCH(bx);
-	BRANCH(xsection);   BRANCH(weight);
+	UInt_t run_number,event_number,ls_number;
+	tree->Branch("event_number",&event_number,"event_number/i");
+	tree->Branch("run_number",&run_number,"run_number/i");
+	tree->Branch("ls_number",&ls_number,"ls_number/i");
+	BRANCH(bx);	BRANCH(xsection);   BRANCH(weight);
 	BRANCH(Events_AfterLJ); BRANCH(Events_Orig);
 	BRANCH(N_Vertices);
 
