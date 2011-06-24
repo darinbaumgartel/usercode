@@ -79,7 +79,7 @@ void placeholder::Loop()
 	//*****************************************************************
 
 	// Particle Counts
-	BRANCH(MuonCount); BRANCH(EleCount); BRANCH(PFJetCount); BRANCH(BpfJetCount);
+	BRANCH(MuonCount); BRANCH(EleCount); BRANCH(HEEPEleCount); BRANCH(PFJetCount); BRANCH(BpfJetCount);
 	BRANCH(GlobalMuonCount); BRANCH(TrackerMuonCount);
 	BRANCH(PFJetRawCount);   BRANCH(CaloJetRawCount);
 
@@ -110,6 +110,12 @@ void placeholder::Loop()
 
 	// Electron (If any)
 	BRANCH(Pt_ele1);
+	BRANCH(Eta_ele1);
+	BRANCH(Phi_ele1);
+	BRANCH(Pt_HEEPele1);
+	BRANCH(Eta_HEEPele1);
+	BRANCH(Phi_HEEPele1);
+
 
 	// Event Information
 	UInt_t run_number,event_number,ls_number;
@@ -122,6 +128,9 @@ void placeholder::Loop()
 
 	// PFMET
 	BRANCH(MET_pf); BRANCH(Phi_MET_pf);
+
+	// Event Flags
+	BRANCH(FailIDJetPT25); BRANCH(FailIDJetPT30);
 
 	// Delta Phi Variables
 	BRANCH(deltaPhi_muon1muon2);  BRANCH(deltaPhi_pfjet1pfjet2);
@@ -151,6 +160,7 @@ void placeholder::Loop()
 	BRANCH(M_muon1muon2pfjet1pfjet2);
 	BRANCH(M_bestmupfjet1_mumu); BRANCH(M_bestmupfjet2_mumu);
 	BRANCH(M_bestmupfjet_munu);
+	BRANCH(M_muon1HEEPele1);
 	BRANCH(M_mujetjet);
 	BRANCH(M_AllCaloJet);	BRANCH(M_AllPFJet);
 
@@ -163,7 +173,8 @@ void placeholder::Loop()
 	// ST Variables
 	BRANCH(ST_pf_mumu); BRANCH(ST_pf_munu);
 	BRANCH(ST_pf_hadronic); BRANCH(ST_calo_hadronic);
-
+	BRANCH(ST_pf_emu);
+	
 	// Other Variables
 	BRANCH(minval_muon1pfMET);
 	BRANCH(Pt_Z);  BRANCH(Pt_W);
@@ -187,6 +198,7 @@ void placeholder::Loop()
 	BRANCH(U1_Z);     BRANCH(U2_Z);
 	BRANCH(U1_W);     BRANCH(U2_W);
 	BRANCH(UdotMu);   BRANCH(UdotMu_overmu);
+	
 
 	//===================================================================================================
 	//===================================================================================================
@@ -348,6 +360,46 @@ void placeholder::Loop()
 			}
 		}
 
+		EleCount = 1.0*v_idx_ele_final.size();
+		
+
+		//========================     Stricter Electron Conditions   =============================//
+		
+		vector<int> v_idx_ele_good_final;
+
+		int heepBitMask_EB  =  0x000;                          //In this case all heepBitMasks have the same value
+		int heepBitMask_GAP =  0x000;                          //I define them here just in case we need to change them later
+		int heepBitMask_EE  =  0x000;
+		int heepBitMask;
+
+		double eleEta_end_min = 1.560;
+		double eleEta_end_max = 2.5;
+		double eleEta_bar = 1.442;
+
+		//===  NOTE: Currently not implementing a cut on ElectronPt, this would be the cut if we wanted to:   double ele_PtCut = 35;
+
+		for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
+		{
+		  if( fabs(ElectronEta->at(iele)) < eleEta_bar )
+		    {
+		      heepBitMask = heepBitMask_EB;
+		    }
+		  else if ( fabs(ElectronEta->at(iele)) > eleEta_end_min && fabs(ElectronEta->at(iele)) < eleEta_end_max )
+		    {
+		      heepBitMask = heepBitMask_EE;
+		    }
+		  else
+		    {		      
+		      heepBitMask = heepBitMask_GAP;
+		    }
+		  
+		  if ( (ElectronHeepID->at(iele) && ~heepBitMask)==0x0  )  
+		    {		      
+		      v_idx_ele_good_final.push_back(iele);  
+		    }
+		}
+		HEEPEleCount = 1.0*v_idx_ele_good_final.size();
+		
 		//========================      Muon Conditions   ================================//
 
 		vector<int> v_idx_muon_final;
@@ -410,6 +462,8 @@ void placeholder::Loop()
 		vector<int> v_idx_pfjet_final_unseparated;
 		vector<int> v_idx_pfjet_final;
 		BpfJetCount = 0.0;
+		FailIDJetPT25 = 0.0;
+		FailIDJetPT30 = 0.0;
 
 		// Initial Jet Quality Selection
 		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
@@ -417,7 +471,12 @@ void placeholder::Loop()
 			double jetPt = PFJetPt -> at(ijet);
 			double jetEta = PFJetEta -> at(ijet);
 
-			if ( jetPt < 30.0 ) continue;
+			if ( jetPt < 25.0 ) continue;
+			if (PFJetPassLooseID->at(ijet) != 1)  FailIDJetPT25 = 1.0;
+
+			if ( jetPt < 30.0 ) continue;			
+			if (PFJetPassLooseID->at(ijet) != 1)  FailIDJetPT30 = 1.0;
+
 			if ( fabs(jetEta) > 3.0 ) continue;
 
 			if (PFJetPassLooseID->at(ijet) != 1) continue;
@@ -711,8 +770,13 @@ void placeholder::Loop()
 		VRESET(PFJetChargedHadronEnergyFraction_pfjet2); VRESET(PFJetChargedEmEnergyFraction_pfjet2);
 
 		// Electron (If any)
-
 		VRESET(Pt_ele1);
+		VRESET(Eta_ele1);
+		VRESET(Phi_ele1);
+		VRESET(Pt_HEEPele1);
+		VRESET(Eta_HEEPele1);
+		VRESET(Phi_HEEPele1);
+	
 		// PFMET
 		VRESET(MET_pf); VRESET(Phi_MET_pf);
 
@@ -744,6 +808,7 @@ void placeholder::Loop()
 		VRESET(M_muon1muon2pfjet1pfjet2);
 		VRESET(M_bestmupfjet1_mumu); VRESET(M_bestmupfjet2_mumu);
 		VRESET(M_bestmupfjet_munu);
+		VRESET(M_muon1HEEPele1);
 		VRESET(M_mujetjet);
 		VRESET(M_AllCaloJet);	VRESET(M_AllPFJet);
 
@@ -777,7 +842,7 @@ void placeholder::Loop()
 		//===================================================================================================
 
 		// 4-Vectors for Particles
-		TLorentzVector jet1, jet2, pfjet1, pfjet2, muon1,muon3, caloMET,muon2,pfMET,tcMET;
+		TLorentzVector jet1, jet2, pfjet1, pfjet2, muon1,muon3, caloMET,muon2,pfMET,tcMET,heepele1;
 
 		//========================     MET Basics  ================================//
 
@@ -927,7 +992,19 @@ void placeholder::Loop()
 		if (EleCount>=1)
 		{
 			Pt_ele1 = ElectronPt->at(v_idx_ele_final[0]);
+			Eta_ele1 = ElectronEta->at(v_idx_ele_final[0]);
+			Phi_ele1 = ElectronPhi->at(v_idx_ele_final[0]);
 		}
+		
+
+		if (HEEPEleCount>=1)
+		{
+			Pt_HEEPele1 = ElectronPt->at(v_idx_ele_good_final[0]);
+			Eta_HEEPele1 = ElectronEta->at(v_idx_ele_good_final[0]);
+			Phi_HEEPele1 = ElectronPhi->at(v_idx_ele_good_final[0]);
+			heepele1.SetPtEtaPhiM(Pt_HEEPele1,Eta_HEEPele1,Phi_HEEPele1,0.0);
+		}
+	
 
 		//========================   At least 1 muon  ================================//
 
@@ -1126,6 +1203,14 @@ void placeholder::Loop()
 			MT_muon2pfjet2 = TMass(Pt_pfjet2,Pt_muon2,deltaPhi_muon2pfjet2);
 
 			M_muon1muon2pfjet1pfjet2 = (muon1+muon2+pfjet1+pfjet2).M();
+		}
+		
+		//=========================   1 Electron 1 Muon 2 Jet ====================//
+
+		if ((MuonCount>=1) && (PFJetCount>1) && (HEEPEleCount>=1))
+		{
+   		        ST_pf_emu = Pt_muon1 + Pt_pfjet1 + Pt_pfjet2 + Pt_HEEPele1;
+				M_muon1HEEPele1 = (muon1 + heepele1).M();
 		}
 
 		//========================   LQ Mass Concepts ================================//
