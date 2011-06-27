@@ -499,25 +499,35 @@ void placeholder::Loop()
 		FailIDJetPT25 = 0.0;
 		FailIDJetPT30 = 0.0;
 		FailIDPFThreshold = -1.0;
-
+		TLorentzVector CurrentLepton,CurrentPFJet;
 
 		// Initial Jet Quality Selection
 		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 		{
 			double jetPt = PFJetPt -> at(ijet);
 			double jetEta = PFJetEta -> at(ijet);
+			CurrentPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
 
-			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)) FailIDPFThreshold = PFJetPt->at(ijet);
+			bool IsLepton = false;
+			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
+			{
+				CurrentLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
+				if (CurrentLepton.DeltaR(CurrentPFJet) < .2) IsLepton = true;
+			}
 
 
+			if (PFJetMuonEnergyFraction->at(ijet) > .8) IsLepton = true;
+
+			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)&&(!IsLepton)) FailIDPFThreshold = PFJetPt->at(ijet);
+			
 			if ( jetPt < 20.0 ) continue;
-			if (PFJetPassLooseID->at(ijet) != 1)  FailIDJetPT20 = 1.0;
+			if ((PFJetPassLooseID->at(ijet) != 1)&&(!IsLepton))  FailIDJetPT20 = 1.0;
 
 			if ( jetPt < 25.0 ) continue;
-			if (PFJetPassLooseID->at(ijet) != 1)  FailIDJetPT25 = 1.0;
+			if ((PFJetPassLooseID->at(ijet) != 1)&&(!IsLepton))  FailIDJetPT25 = 1.0;
 
 			if ( jetPt < 30.0 ) continue;			
-			if (PFJetPassLooseID->at(ijet) != 1)  FailIDJetPT30 = 1.0;
+			if ((PFJetPassLooseID->at(ijet) != 1)&&(!IsLepton))  FailIDJetPT30 = 1.0;
 
 			if ( fabs(jetEta) > 3.0 ) continue;
 
