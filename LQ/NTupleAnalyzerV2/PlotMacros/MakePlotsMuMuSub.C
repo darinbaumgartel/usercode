@@ -28,12 +28,17 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 		return;
 	}
 
+	TCanvas *c1 = new TCanvas("c1","",800,800);
+	TPad *pad1 = new TPad("pad1","The pad 60% of the height",0.0,0.4,1.0,1.0,0);
+	TPad *pad2 = new TPad("pad2","The pad 20% of the height",0.0,0.2,1.0,0.4,0);
+	TPad *pad2r = new TPad("pad2r","The pad 20% of the height",0.0,0.0,1.0,0.2,0);
+   //pad2->SetFillStyle(4000); //will be transparent
+   //pad2r->SetFillStyle(4000); //will be transparent
 
-	TCanvas *c1 = new TCanvas("c1","Example 2 pads (20,80)",800,800);
-	TPad *pad1 = new TPad("pad1", "The pad 80% of the height",0.0,0.3,1.0,1.0,0);
-	TPad *pad2 = new TPad("pad2", "The pad 20% of the height",0.0,0.0,1.0,0.3,0);
 	pad1->Draw();
 	pad2->Draw();
+	pad2r->Draw();
+
 	pad1->cd();
 	pad1->SetLogy();
 
@@ -113,6 +118,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	Double_t Nd = h_data->Integral();
 	Double_t Nmc = h_zjets->Integral()+h_ttbar->Integral()+h_vvjets->Integral()+h_wjets->Integral()+h_singtop->Integral()+h_qcd->Integral();
 	Double_t Nw = h_wjets->Integral();
+	Double_t Nt = h_ttbar->Integral();
 	Double_t Nz = h_zjets->Integral();
 	Double_t N_other = Nmc - Nz;
 	
@@ -231,6 +237,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	H_data->GetXaxis()->SetTitleFont(132);
 	H_data->GetYaxis()->SetTitleFont(132);
 
+	H_data->SetMarkerStyle(21);
+	H_data->SetMarkerSize(0.0);
 	gStyle->SetOptStat(0);
 	H_data->Draw("E");
 
@@ -247,7 +255,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	leg->AddEntry(H_bkg,"Other backgrounds");
 	//leg->AddEntry(H_lqmumu,"LQ M = 400");
 	leg->Draw("SAME");
-	//  gPad->SetLogy();
+	c1->SetLogy();
 
 	H_data->SetMinimum(.1);
 	H_data->SetMaximum(1.2*extrascalefactor*(H_data->GetMaximum()));
@@ -279,14 +287,14 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	pad2->cd();
 
 	TH1F* h_comp = new TH1F("h_comp","",nBins,xLow,xMax);
-	TH1F* h_zero = new TH1F("h_zero","",nBins,xLow,xMax);
-	TH1F* h_2p = new TH1F("h_2p","",nBins,xLow,xMax);
-	TH1F* h_2m = new TH1F("h_2m","",nBins,xLow,xMax);
+	TH1F* h_compr = new TH1F("h_compr","",nBins,xLow,xMax);	
+
 
 	if (true)
 	{
 
 		TH1F* h_bg = new TH1F("h_bg","",nBins,xLow,xMax);
+		h_bg->Sumw2();
 		h_bg->Add(h_zjets);
 		h_bg->Add(h_wjets);
 		h_bg->Add(h_vvjets);
@@ -302,6 +310,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 		float ndat = 0.0;
 		float nbg = 0.0;
+		float err_nbg = 0.0;
+		float err_total = 0.0;
 
 		float datmean = 0.0;
 		float mcmean = 0.0;
@@ -309,17 +319,25 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 		float xminl = 0;
 		float xmaxl = 0;
 
-		for (ibin=0;ibin<nbinsx;ibin++)
+		//std::cout<<" Starting bin analysis" <<std::endl;
+		for (ibin=0;ibin<=nbinsx;ibin++)
 		{
 			ndat = 1.0*(h_data->GetBinContent(ibin));
 			nbg = 1.0*(h_bg->GetBinContent(ibin));
 			datmean += 1.0*(h_data->GetBinContent(ibin))*h_data->GetBinCenter(ibin);
+			err_nbg = 1.0*(h_bg->GetBinError(ibin));
+			err_total = sqrt(  pow(err_nbg,2.0) + ndat );
 
 			mcmean += 1.0*(h_bg->GetBinContent(ibin))*h_bg->GetBinCenter(ibin);
 			if (ndat!=0)   chi2 += pow((ndat -nbg),2.0)/pow(ndat,0.5);
-			//if (nbg>.0010) std::cout<<h_data->GetBinCenter(ibin)<<"   "<<nbg<<"  "<<"   "<<ndat/nbg<<"   "<<(ndat-nbg)/sqrt(ndat)<<std::endl;
-			if (ndat!=0) h_comp ->SetBinContent(ibin, (ndat - nbg)/sqrt(ndat) );
-			if ((ndat!=0)&&(abs((ndat - nbg)/sqrt(ndat))>7.99 )) h_comp ->SetBinContent(ibin, 7.95*(ndat>nbg) - 7.95*(ndat<nbg));
+			//if (nbg>.0010) std::cout<<h_data->GetBinCenter(ibin)<<"  "<<nbg<<" "<<"  "<<ndat/nbg<<"  "<<(ndat-nbg)/sqrt(ndat)<<std::endl;
+			h_comp ->SetBinContent(ibin,0.0 );
+			h_compr ->SetBinContent(ibin,0.0 );
+			if (ndat!=0 && nbg != 0) h_comp ->SetBinContent(ibin, (ndat - nbg)/err_total );
+			if (ndat!=0 && nbg != 0) h_compr ->SetBinContent(ibin, (ndat - nbg)/nbg );
+			if (ndat!=0 && nbg != 0) h_compr ->SetBinError(ibin, (err_total)/nbg );
+
+			//if ((ndat!=0)&&(abs((ndat - nbg)/sqrt(ndat))>7.99 )) h_comp ->SetBinContent(ibin, 7.95*(ndat>nbg) - 7.95*(ndat<nbg));
 
 		}
 
@@ -327,20 +345,48 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	}
 	h_comp->GetYaxis()->SetTitle("Poisson N(#sigma) Diff");
 
+
 	TLine *line0 = new TLine(xLow,0,xMax,0);
 	TLine *line2u = new TLine(xLow,2,xMax,2);
 	TLine *line2d = new TLine(xLow,-2,xMax,-2);
 
 	h_comp->SetMinimum(-8);
 	h_comp->SetMaximum(8);
+	h_comp->SetMarkerStyle(21);
+	h_comp->SetMarkerSize(0.5);
+	//h_comp->SetMarkerSize(0.0);
+
 
 	h_comp->Draw("p");
 	line0->Draw("SAME");
 	line2u->Draw("SAME");
 	line2d->Draw("SAME");
+	
+	
+	pad2r->cd();
+
+	h_compr->GetYaxis()->SetTitle("Fractional Diff");
+
+   //TGaxis *axis = new TGaxis(xMax,-2,xMax,2,-2,2,50510,"+L");
+   //axis->SetLabelColor(kRed);
+//axis->Draw();
+
+	h_compr->SetMinimum(-2);
+	h_compr->SetMaximum(2);
+	h_compr->SetLineColor(kRed);
+	h_compr->SetLineWidth(2);
+	h_compr->SetMarkerColor(kRed);
+	h_compr->SetMarkerStyle(1);
+	h_compr->SetMarkerSize(0.0);
+
+	h_compr->Draw("ep");
+	line0->Draw("SAME");
+
+
 
 	c1->Print("PlotsMuMuSub/"+varname+"_"+tag+".png");
-
+	
+	
 	TIter next(gDirectory->GetList());
 	TObject* obj;
 	while(obj= (TObject*)next()){
