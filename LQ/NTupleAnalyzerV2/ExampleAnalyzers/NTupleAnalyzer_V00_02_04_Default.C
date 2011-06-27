@@ -130,7 +130,9 @@ void placeholder::Loop()
 	BRANCH(MET_pf); BRANCH(Phi_MET_pf);
 
 	// Event Flags
-	BRANCH(FailIDJetPT25); BRANCH(FailIDJetPT30);
+	BRANCH(FailIDJetPT20); BRANCH(FailIDJetPT25); BRANCH(FailIDJetPT30);
+	BRANCH(FailIDCaloJetPT20); BRANCH(FailIDCaloJetPT25); BRANCH(FailIDCaloJetPT30);
+	BRANCH(FailIDCaloThreshold); BRANCH(FailIDPFThreshold);
 
 	// Delta Phi Variables
 	BRANCH(deltaPhi_muon1muon2);  BRANCH(deltaPhi_pfjet1pfjet2);
@@ -152,6 +154,8 @@ void placeholder::Loop()
 	BRANCH(deltaR_muon1pfjet1); BRANCH(deltaR_muon1pfjet2);
 	BRANCH(deltaR_muon2pfjet1); BRANCH(deltaR_muon2pfjet2);
 	BRANCH(deltaR_muon1closestPFJet);
+	BRANCH(deltaR_muon1HEEPele1);
+
 
 	// Mass Combinations
 	BRANCH(M_muon1muon2);  BRANCH(M_pfjet1pfjet2);
@@ -450,9 +454,38 @@ void placeholder::Loop()
 
 		if ( MuonCount < 1 ) continue;
 		TLorentzVector muon = muons[0];
+		
+		//========================    CaloJet Flags Conditions   ================================//
+
+		FailIDCaloJetPT20 = 0.0;
+		FailIDCaloJetPT25 = 0.0;
+		FailIDCaloJetPT30 = 0.0;		
+		FailIDCaloThreshold = -1.0;
+
+		for(int ijet=0;ijet<(*CaloJetPt).size();ijet++)
+		{
+
+			bool IsBadCaloJet = false;
+			
+			if (fabs((*CaloJetEta)[ijet])<2.6)
+			{
+				if ((*CaloJetEMF)[ijet]<.01) IsBadCaloJet = true;
+			}
+			if ((*CaloJetn90Hits)[ijet]<=1) IsBadCaloJet = true;
+
+			if ((*CaloJetfHPD)[ijet]>.98) IsBadCaloJet = true;
+
+			if (!IsBadCaloJet) continue;
+			
+			if (CaloJetPt->at(ijet) > FailIDCaloThreshold) FailIDCaloThreshold = CaloJetPt->at(ijet);
+
+			if ((*CaloJetPt)[ijet] > 20.0) FailIDCaloJetPT20 = 1.0;
+			if ((*CaloJetPt)[ijet] > 25.0) FailIDCaloJetPT25 = 1.0;
+			if ((*CaloJetPt)[ijet] > 30.0) FailIDCaloJetPT30 = 1.0;
+
+		}			
 
 		//========================     PFJet Conditions   ================================//
-
 		// Get Good Jets in general
 
 		deltaR_muon1closestPFJet = 999.9;
@@ -462,14 +495,23 @@ void placeholder::Loop()
 		vector<int> v_idx_pfjet_final_unseparated;
 		vector<int> v_idx_pfjet_final;
 		BpfJetCount = 0.0;
+		FailIDJetPT20 = 0.0;
 		FailIDJetPT25 = 0.0;
 		FailIDJetPT30 = 0.0;
+		FailIDPFThreshold = -1.0;
+
 
 		// Initial Jet Quality Selection
 		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 		{
 			double jetPt = PFJetPt -> at(ijet);
 			double jetEta = PFJetEta -> at(ijet);
+
+			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)) FailIDPFThreshold = PFJetPt->at(ijet);
+
+
+			if ( jetPt < 20.0 ) continue;
+			if (PFJetPassLooseID->at(ijet) != 1)  FailIDJetPT20 = 1.0;
 
 			if ( jetPt < 25.0 ) continue;
 			if (PFJetPassLooseID->at(ijet) != 1)  FailIDJetPT25 = 1.0;
@@ -484,7 +526,7 @@ void placeholder::Loop()
 
 			v_idx_pfjet_prefinal.push_back(ijet);
 		}
-
+		
 		/// Filter out jets that are actually muons
 		TLorentzVector thisjet, thismu;
 		vector<int> jetstoremove;
@@ -800,6 +842,8 @@ void placeholder::Loop()
 		VRESET(deltaR_muon1pfjet1); VRESET(deltaR_muon1pfjet2);
 		VRESET(deltaR_muon2pfjet1); VRESET(deltaR_muon2pfjet2);
 		VRESET(deltaR_muon1closestPFJet);
+		VRESET(deltaR_muon1HEEPele1);
+
 
 		// Mass Combinations
 		VRESET(M_muon1muon2);  VRESET(M_pfjet1pfjet2);
@@ -1211,6 +1255,7 @@ void placeholder::Loop()
 		{
    		        ST_pf_emu = Pt_muon1 + Pt_pfjet1 + Pt_pfjet2 + Pt_HEEPele1;
 				M_muon1HEEPele1 = (muon1 + heepele1).M();
+				deltaR_muon1HEEPele1 = (heepele1).DeltaR(muon1);
 		}
 
 		//========================   LQ Mass Concepts ================================//
