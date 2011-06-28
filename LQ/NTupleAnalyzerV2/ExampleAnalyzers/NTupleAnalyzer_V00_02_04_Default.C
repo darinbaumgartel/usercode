@@ -167,6 +167,10 @@ void placeholder::Loop()
 	BRANCH(M_muon1HEEPele1);
 	BRANCH(M_mujetjet);
 	BRANCH(M_AllCaloJet);	BRANCH(M_AllPFJet);
+	BRANCH(Pt_AllCaloJet);	BRANCH(Pt_AllPFJet);
+	BRANCH(MetDirComp_AllCaloJet);	BRANCH(MetDirComp_AllPFJet);
+	BRANCH(MetDirCompOverMET_AllCaloJet);	BRANCH(MetDirCompOverMET_AllPFJet);
+
 
 	// Transverse Mass Combinations
 	BRANCH(MT_muon1pfMET);
@@ -865,6 +869,9 @@ void placeholder::Loop()
 		VRESET(M_muon1HEEPele1);
 		VRESET(M_mujetjet);
 		VRESET(M_AllCaloJet);	VRESET(M_AllPFJet);
+		VRESET(Pt_AllCaloJet);	VRESET(Pt_AllPFJet);
+		VRESET(MetDirComp_AllCaloJet);	VRESET(MetDirComp_AllPFJet);
+		VRESET(MetDirCompOverMET_AllCaloJet);	VRESET(MetDirCompOverMET_AllPFJet);
 
 
 
@@ -1335,6 +1342,14 @@ void placeholder::Loop()
 
 		M_AllCaloJet = AllCaloJets.M();
 		M_AllPFJet = AllPFJets.M();
+		Pt_AllCaloJet = AllCaloJets.Pt();	
+		Pt_AllPFJet = AllPFJets.Pt();
+		MetDirComp_AllCaloJet = Pt_AllCaloJet*cos(AllCaloJets.DeltaPhi(caloMET));
+		MetDirComp_AllPFJet = Pt_AllPFJet*cos(AllPFJets.DeltaPhi(pfMET));
+		MetDirCompOverMET_AllCaloJet = MetDirComp_AllCaloJet/(caloMET.Pt());
+		MetDirCompOverMET_AllPFJet = MetDirComp_AllPFJet/(pfMET.Pt());
+
+		
 		//std::cout<<M_AllCaloJet<<"   "<<M_AllPFJet<<std::endl;
 
 		tree->Fill();			 // FILL FINAL TREE
