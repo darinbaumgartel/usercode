@@ -11,6 +11,7 @@ import sys
 cfile = ''
 hfile = ''
 ifile = ''
+tagname = ''
 print '-------------------------------------------------------------------'
 print '          Precauationary cleanup... please ignore\n'
 os.system('rm RootProcess* *part*.C *part*.h *part*.d *part*.so sub*csh ')
@@ -28,6 +29,8 @@ for x in range(len(a)):
 		hfile = a[x+1]
 	if a[x] == '--stager_check':
 		StagerCheck=1
+	if a[x] == '-2':
+		tagname = a[x+1]
 
 if cfile == '' or hfile == '' or ifile == '':
 	print 'Must specify input .C, .h, and .csv files, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv -c NTupleAnalyzer.C -h NTupleAnalyzer.h\n\n   Exiting   \n\n'
@@ -95,7 +98,7 @@ f_sub.write('#!/bin/csh')
 
 thisdir = os.popen('pwd').readlines()[0].replace('\n','')
 person = os.popen('whoami').readlines()[0].replace('\n','')
-thiscastor = '/castor/cern.ch/user/'+person[0]+'/'+person+'/LQAnalyzerOutput/'+c2file.replace('.C','')+'_'+now
+thiscastor = '/castor/cern.ch/user/'+person[0]+'/'+person+'/LQAnalyzerOutput/'+c2file.replace('.C','')+'_'+tagname+'_'+now
 os.system('rfmkdir '+ thiscastor.replace(c2file.replace('.C','')+'_'+now,''))
 os.system('rfmkdir '+ thiscastor)
 print (' ')
@@ -142,7 +145,7 @@ for x in range(len(SignalType)):
 		sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/'+c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+'.* .\ncp '+thisdir+'/JSONFilterFunction.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+part+' .\nroot -b RootProcesses_'+SignalType[x]+part+'\nrfcp '+c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+'.root '+thiscastor+'\n')
 		sub_thisroot.close()
 
-		f_sub.write('\nsleep 1\nbsub -R "pool>10000" -o /dev/null -e /dev/null -q 1nd -J job'+SignalType[x]+part+' < sub_'+SignalType[x]+part+'.csh\n')
+		f_sub.write('\nsleep 1\nbsub -R "pool>10000" -o /dev/null -e /dev/null -q 8nh -J job'+SignalType[x]+part+' < sub_'+SignalType[x]+part+'.csh\n')
 
 		f_thisroot =  open("RootProcesses_"+SignalType[x]+part,'w')
 
@@ -284,7 +287,7 @@ while ok!=1:
 	print 'Waiting on '+str(unfin)+' files to transfer.\n' 
 
 print ('\n\n Analysis and transfer complete. Grouping files for easier use. Please wait !')
-os.system('sleep 60')
+os.system('sleep 300')
 
 os.system('mkdir '+thistemp+'/SummaryFiles')
 os.system('rfmkdir '+thiscastor+'/SummaryFiles')
