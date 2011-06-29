@@ -29,7 +29,7 @@ for x in range(len(a)):
 		hfile = a[x+1]
 	if a[x] == '--stager_check':
 		StagerCheck=1
-	if a[x] == '-2':
+	if a[x] == '-t':
 		tagname = a[x+1]
 
 if cfile == '' or hfile == '' or ifile == '':
