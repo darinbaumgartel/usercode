@@ -15,7 +15,8 @@
 #define BRANCH(bname) Double_t bname = -99999.12345; tree->Branch(#bname,& bname," bname /D ");
 #define VRESET(vname) vname = -99999.12345;
 
-Double_t JetRescaleFactor = 1.0;
+Double_t JetRescaleFactor = 1.00;
+Double_t MuonRescaleFactor = 1.00;
 
 
 Double_t TMass(Double_t Pt1, Double_t Pt2, Double_t DPhi12)
@@ -23,13 +24,13 @@ Double_t TMass(Double_t Pt1, Double_t Pt2, Double_t DPhi12)
 	return sqrt( 2*Pt2*Pt1*(1-cos(DPhi12)) );
 }
 
-Double_t ScaleJet(Double_t PT, Double_t fraction)
+Double_t ScaleObject(Double_t PT, Double_t fraction)
 {
 	return (PT*(fraction));
 }
 
 
-TLorentzVector PropagateJetScaleToMET(Double_t MET, Double_t METPhi, Double_t PTCorrJet, Double_t PTOrigJet, Double_t JetPhi)
+TLorentzVector PropagateScaleToMET(Double_t MET, Double_t METPhi, Double_t PTCorrJet, Double_t PTOrigJet, Double_t JetPhi)
 {
 	Double_t yMET = MET*sin(METPhi) - ( (PTCorrJet - PTOrigJet)*sin(JetPhi)  );
 	Double_t xMET = MET*cos(METPhi) - ( (PTCorrJet - PTOrigJet)*cos(JetPhi)  );
@@ -340,21 +341,64 @@ void placeholder::Loop()
 
 		//========================     Jet Rescaling Sequence   ================================//
 
-		TLorentzVector AdjustedMET;
-		AdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
+		TLorentzVector JetAdjustedMET;
+		JetAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
+		
 		
 		if (!isData)
 		{
 			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 			{
-				double NewJetPT =  ScaleJet((*PFJetPt)[ijet],JetRescaleFactor); 
-				AdjustedMET = PropagateJetScaleToMET(AdjustedMET.Pt(),  AdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+				bool consider = true;
+				TLorentzVector ThisPFJet;
+				Double_t JetLepDR;
+				ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
+
+			
+				for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
+				{
+					TLorentzVector ThisLepton;	
+					ThisLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
+					JetLepDR = ThisLepton.DeltaR(ThisPFJet);
+					if (JetLepDR < .2) consider = false;
+				}
+				for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
+				{
+					TLorentzVector ThisLepton;	
+					ThisLepton.SetPtEtaPhiM(ElectronPt->at(iele),ElectronEta->at(iele),ElectronPhi->at(iele),0.0);
+					JetLepDR = ThisLepton.DeltaR(ThisPFJet);
+					if (JetLepDR < .2) consider = false;
+				}
+				
+				if (!consider) continue;
+			
+				double NewJetPT =  ScaleObject((*PFJetPt)[ijet],JetRescaleFactor); 
+				JetAdjustedMET = PropagateScaleToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
 				(*PFJetPt)[ijet] = NewJetPT ;	
 			}
 		}
-		(*PFMET)[0] = AdjustedMET.Pt();
-		(*PFMETPhi)[0] = AdjustedMET.Phi();
 		
+		(*PFMET)[0] = JetAdjustedMET.Pt();
+		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
+
+		//========================     Muon Rescaling Sequence   ================================//
+
+		TLorentzVector MuAdjustedMET;
+		MuAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
+		
+		if (!isData)
+		{
+			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
+			{
+				double NewMuonPT =  ScaleObject((*MuonPt)[imuon],MuonRescaleFactor); 
+				MuAdjustedMET = PropagateScaleToMET(MuAdjustedMET.Pt(),  MuAdjustedMET.Phi(), NewMuonPT, (*MuonPt)[imuon], MuonPhi->at(imuon));
+				(*MuonPt)[imuon] = NewMuonPT ;	
+			}
+		}
+		(*PFMET)[0] = MuAdjustedMET.Pt();
+		(*PFMETPhi)[0] = MuAdjustedMET.Phi();
+		
+		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
 
 		//========================     Electron Conditions   ================================//
 
