@@ -2,32 +2,44 @@ import os
 import sys
 from ROOT import *
 
-castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_NoScaling_2011_06_29_23_09_36/SummaryFiles','/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_JetScaleDown0p4_2011_06_29_23_10_16/SummaryFiles',
+castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_NoScaling_2011_06_29_23_09_36/SummaryFiles',
 '/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_JetScaleUp0p4_2011_06_29_23_10_02/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_MuonScaleDown0p1_2011_06_29_23_12_34/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_MuonScaleUp0p1_2011_06_29_23_11_46/SummaryFiles'
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_JetScaleDown0p4_2011_06_29_23_10_16/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_MuonScaleUp0p1_2011_06_29_23_11_46/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_MuonScaleDown0p1_2011_06_29_23_12_34/SummaryFiles'
 ]
 
+normtag = 'NoScaling'
+scaletags = ['JetScaleUp','JetScaleDown','MuonScaleUp','MuonScaleDown']
+
+prefix = 'rfio'
+lsqry = 'nsls'
 if "--neuswitch" in sys.argv:
+	os.system('sshfs -o nonempty darinb@neu:/home/darinb/ ~/neuhome;')
 	castors2 = []
 	for x in castors:
-		castors2.append(x.replace(x.split('LQAnalyzerOutput')[0],'/home/darinb/'))
+		castors2.append(x.replace(x.split('LQAnalyzerOutput')[0],'~/neuhome/'))
+	castors = castors2
+	prefix = 'file'
+	lsqry = 'ls'
+	
 
 for c in castors:
 	print '-'*100
-	print 'Evaluating files in castor directory: \n\n  ' +c + '\n\n'
-	files = os.popen('nsls '+c).readlines()
+	print 'Evaluating files in directory: \n\n  ' +c + '\n\n'
+	files = os.popen(lsqry+' '+c).readlines()
 	cfiles = []
 	for x in files:
 		cfiles.append(c+'/'+x.replace('\n',''))
-	for x in cfiles:
-		os.system('stager_qry -M '+x)
-		os.system('stager_get -M '+x)
+	if lsqry == 'nsls':
+		for x in cfiles:
+			os.system('stager_qry -M '+x)
+			os.system('stager_get -M '+x)
 		
 		
 lumi = 361.0
 preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
-preselectionmunu = str(lumi)+'*weight*((Pt_muon1>40)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))'
+preselectionmunu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))'
 
 
 cut_mc = ''
@@ -66,14 +78,15 @@ theintegrals = []
 thecastors = []
 theselection = []
 
+
 print '\n\n'+'='*100+'\n           EVALUATING FOR MUMU PRESELECTION           \n'+'='*100 +'\n\n'
 for c in castors:
 	print '-'*100
 	print 'Evaluating files in castor directory: \n\n  ' +c + '\n\n'
-	files = os.popen('nsls '+c).readlines()
+	files = os.popen(lsqry+' '+c).readlines()
 	cfiles = []
 	for x in files:
-		cfiles.append('rfio://'+c+'/'+x.replace('\n',''))
+		cfiles.append(prefix+'://'+c+'/'+x.replace('\n',''))
 	for x in cfiles:
 		f = TFile.Open(x)
 		t = f.Get("PhysicalVariables")
@@ -92,10 +105,10 @@ print '='*100+'\n           EVALUATING FOR MUMU PRESELECTION           \n'+'='*1
 for c in castors:
 	print '-'*100
 	print 'Evaluating files in castor directory: \n\n  ' +c + '\n\n'
-	files = os.popen('nsls '+c).readlines()
+	files = os.popen(lsqry+' '+c).readlines()
 	cfiles = []
 	for x in files:
-		cfiles.append('rfio://'+c+'/'+x.replace('\n',''))
+		cfiles.append(prefix+'://'+c+'/'+x.replace('\n',''))
 	for x in cfiles:
 		f = TFile.Open(x)
 		t = f.Get("PhysicalVariables")
@@ -110,7 +123,60 @@ for c in castors:
 		theselection.append('MuNu')
 		
 print '\n\n'
-fout = open('SystematicsLog.csv')
+fout = open('SystematicsLog.csv','w')
+fout.write('Location,File,Selection,N_Events\n\n')
+
 for x in range(len(thefiles)):
 	c = ','
-	fout.write(thecastors[x]+c+thefiles[x]+c+theselection[x]+c+theintegrals[x])
+	fout.write(thecastors[x]+c+thefiles[x]+c+theselection[x]+c+theintegrals[x]+'\n')
+
+
+fout.close()
+fout = open('SystematicsSummaryTable.csv','w')
+
+uniquefiles = []
+for x in thefiles:
+	if x not in uniquefiles:
+		uniquefiles.append(x)
+uniqueselections = []
+for x in theselection:
+	if x not in uniqueselections:
+		uniqueselections.append(x)
+fout.write('\n\n , , , Integrals , , , , , , Percent Variations , , \n')
+fout.write('Selection,File, ,'+normtag)
+for x in scaletags:
+	fout.write(c+x)
+fout.write(' , ')
+for x in scaletags:
+	fout.write(c+x)
+fout.write(' \n\n')
+
+for sel in uniqueselections:
+	for f in uniquefiles:
+		scalevalues = []
+		for x in range(len(thefiles)):
+			if normtag in thecastors[x] and sel in theselection[x] and f in thefiles[x]:
+				normvalue = float(theintegrals[x])
+			for s in scaletags:
+				if s in thecastors[x] and sel in theselection[x] and f in thefiles[x]:
+					scalevalues.append(float(theintegrals[x]))
+		scalepercents = []
+		fout.write(sel+c+f+c+' ')
+		for s in scalevalues:
+			if normvalue > .001:
+				scalepercents.append(100.0*(s - normvalue)/normvalue)
+			if normvalue<.001:
+				scalepercents.append(0)
+		fout.write(c+str(s))
+		for x in scalevalues:
+			fout.write(c+str(x))
+		fout.write(' , ')
+		for x in scalepercents:
+			fout.write(c+str(x))
+		fout.write('\n')
+	fout.write('\n')
+fout.close()
+			
+		
+
+fout.close()
