@@ -15,7 +15,7 @@ tagname = ''
 print '-------------------------------------------------------------------'
 print '          Precauationary cleanup... please ignore\n'
 os.system('rm RootProcess* *part*.C *part*.h *part*.d *part*.so sub*csh ')
-
+neucopy = False 
 
 
 StagerCheck = 0
@@ -31,6 +31,8 @@ for x in range(len(a)):
 		StagerCheck=1
 	if a[x] == '-t':
 		tagname = a[x+1]
+	if 'neucopy' in a[x] or 'NEUCOPY' in a[x] or 'NEUcopy' in a[x] or 'NEUCopy' in a[x]:
+		neucopy = True
 
 if cfile == '' or hfile == '' or ifile == '':
 	print 'Must specify input .C, .h, and .csv files, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv -c NTupleAnalyzer.C -h NTupleAnalyzer.h\n\n   Exiting   \n\n'
@@ -264,7 +266,7 @@ if ok == 1:
 castorinfo = os.popen('nsls '+thiscastor).readlines()
 
 os.system
-thistemp = '/tmp/'+person+'/'+c2file.replace('.C','')+'_'+now
+thistemp = '/tmp/'+person+'/'+c2file.replace('.C','')+'_'+tagname+'_'+now
 os.system('mkdir '+thistemp)
 
 print ('Waiting for file transfers to complete\n\n')
@@ -327,4 +329,14 @@ print '-------------------------------------------------------------------'
 print ('\n\n'+140*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiscastor+'/SummaryFiles\n')
 os.system('nsls -l '+thiscastor+'/SummaryFiles')
 print ('\n\n'+140*'*'+ '\n\n')
+
+if neucopy == False:
+	sys.exit()
+
+print ('Please wait - transfering output additionally to neu machine. ')
+neudir =  '/home/'+person+'/LQAnalyzerOutput/'
+os.system('rm '+thistemp+'/*.*')
+os.system('scp -r '+thistemp+' neu:'+neudir)
+
+print ('Transfer Complete. ')
 
