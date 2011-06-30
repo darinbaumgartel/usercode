@@ -2,10 +2,32 @@ import os
 import sys
 from ROOT import *
 
-castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_2011_06_28_21_08_21/SummaryFiles']
+castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_NoScaling_2011_06_29_23_09_36/SummaryFiles','/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_JetScaleDown0p4_2011_06_29_23_10_16/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_JetScaleUp0p4_2011_06_29_23_10_02/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_MuonScaleDown0p1_2011_06_29_23_12_34/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default_MuonScaleUp0p1_2011_06_29_23_11_46/SummaryFiles'
+]
+
+if "--neuswitch" in sys.argv:
+	castors2 = []
+	for x in castors:
+		castors2.append(x.replace(x.split('LQAnalyzerOutput')[0],'/home/darinb/'))
+
+for c in castors:
+	print '-'*100
+	print 'Evaluating files in castor directory: \n\n  ' +c + '\n\n'
+	files = os.popen('nsls '+c).readlines()
+	cfiles = []
+	for x in files:
+		cfiles.append(c+'/'+x.replace('\n',''))
+	for x in cfiles:
+		os.system('stager_qry -M '+x)
+		os.system('stager_get -M '+x)
+		
+		
 lumi = 361.0
 preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
-preselectionmunu = str(lumi)+'*weight*((Pt_muon1>40)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))'
+preselectionmunu = str(lumi)+'*weight*((Pt_muon1>40)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))'
 
 
 cut_mc = ''
@@ -39,6 +61,11 @@ cut_mc += ")";
 preselectionmumu = preselectionmumu + cut_mc
 preselectionmunu = preselectionmunu + cut_mc
 
+thefiles = []
+theintegrals = []
+thecastors = []
+theselection = []
+
 print '\n\n'+'='*100+'\n           EVALUATING FOR MUMU PRESELECTION           \n'+'='*100 +'\n\n'
 for c in castors:
 	print '-'*100
@@ -55,7 +82,11 @@ for c in castors:
 		n = h.Integral()
 		rootfile = (x.split('/')[-1]).replace('.root','')
 		print rootfile +(50-len(rootfile))*' '+ str(n)
-
+		thecastors.append(c)
+		theintegrals.append(str(n))
+		thefiles.append(rootfile)
+		theselection.append('MuMu')
+	
 print '='*100+'\n           EVALUATING FOR MUMU PRESELECTION           \n'+'='*100 +'\n\n'
 
 for c in castors:
@@ -73,5 +104,13 @@ for c in castors:
 		n = h.Integral()
 		rootfile = (x.split('/')[-1]).replace('.root','')
 		print rootfile +(50-len(rootfile))*' '+ str(n)
+		thecastors.append(c)
+		theintegrals.append(str(n))
+		thefiles.append(rootfile)
+		theselection.append('MuNu')
 		
 print '\n\n'
+fout = open('SystematicsLog.csv')
+for x in range(len(thefiles)):
+	c = ','
+	fout.write(thecastors[x]+c+thefiles[x]+c+theselection[x]+c+theintegrals[x])
