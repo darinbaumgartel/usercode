@@ -82,6 +82,7 @@ process.muonEffs = cms.EDAnalyzer("TagProbeFitTreeProducer",
         ## two defined by simple string cuts
         passingGlb = cms.string("isGlobalMuon"),
         passingIso = cms.string("(isolationR03.hadEt+isolationR03.emEt+isolationR03.sumPt) < 0.1 * pt"),
+        passingTight = cms.string("(isGlobalMuon && globalTrack().normalizedChi2<10 && globalTrack().hitPattern().numberOfValidMuonHits>0 && numberOfMatchedStations>1  && track().hitPattern().numberOfValidPixelHits>0 && track().hitPattern().numberOfValidTrackerHits>10)"),
     ),
     # mc-truth info
     isMC = cms.bool(False),
