@@ -124,6 +124,7 @@ for x in range(len(SignalType)):
 		for cf in dirList:
 			cf = CastorDirectory[x]+'/' + cf
 			fstatus = (((os.popen('stager_qry -M '+cf).readlines())[-1]).split(' '))[-1]
+			os.system('sleep .5')
 			if 'STAGED' not in fstatus:
 				os.system('stager_get -M '+cf)
 		
