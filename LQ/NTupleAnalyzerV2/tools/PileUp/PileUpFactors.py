@@ -34,7 +34,7 @@ genvaluesFlat10 = [0.0698146584, #0
 # Contact: Mike Hildreth
 # Stated as useable for Spring11 and Summer11 MC samples
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupInformation
-genvaluesFlat10PlusTail = [ 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999990.069286816, #0
+genvaluesFlat10PlusTail = [ 0.069286816, #0
 0.069286816, #1
 0.069286816, #2
 0.069286816, #3
@@ -115,7 +115,7 @@ genvaluesFlat10PlusTailMCDriven = [0.06111756549114,
 0.00037790915564]
 
 # Use Mike Hildreth's provided numbers by default:
-genvalues = genvaluesFlat10PlusTailMCDriven
+genvalues = genvaluesFlat10PlusTail
 
 a = sys.argv
 rootfile = ''
