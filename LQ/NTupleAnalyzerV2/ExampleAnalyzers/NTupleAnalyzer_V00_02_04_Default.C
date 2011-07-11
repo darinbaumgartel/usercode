@@ -126,6 +126,8 @@ void placeholder::Loop()
 	BRANCH(bx);	BRANCH(xsection);   BRANCH(weight);
 	BRANCH(Events_AfterLJ); BRANCH(Events_Orig);
 	BRANCH(N_Vertices);
+	BRANCH(N_GoodVertices);
+
 
 	// PFMET
 	BRANCH(MET_pf); BRANCH(Phi_MET_pf);
@@ -197,9 +199,13 @@ void placeholder::Loop()
 	BRANCH(Eta_genmuon1);   BRANCH(Eta_genmuon2);
 	BRANCH(Pt_genMET);      BRANCH(Phi_genMET);    BRANCH(Eta_genMET);
 	BRANCH(Pt_genneutrino); BRANCH(Phi_genneutrino); BRANCH(Eta_genneutrino);
-	BRANCH(genWTM);
+	BRANCH(MT_genmuon1genMET);
 	BRANCH(Pt_Z_gen);       BRANCH(Pt_W_gen);
 	BRANCH(Phi_Z_gen);      BRANCH(Phi_W_gen);
+	BRANCH(deltaPhi_genmuon1genMET);  
+	BRANCH(deltaPhi_genjet1genMET); BRANCH(deltaPhi_genjet2genMET);
+	BRANCH(ST_gen_mumu); BRANCH(ST_gen_munu);
+
 
 	// Recoil variables
 	BRANCH(U1_Z_gen); BRANCH(U2_Z_gen);
@@ -208,7 +214,14 @@ void placeholder::Loop()
 	BRANCH(U1_W);     BRANCH(U2_W);
 	BRANCH(UdotMu);   BRANCH(UdotMu_overmu);
 	
-
+	// Extra Discriminating Variables
+	BRANCH(RangeMass_BestLQCombo);
+	BRANCH(RangeTransverseMass_BestLQCombo);
+	BRANCH(CenterMass_BestLQCombo);
+	BRANCH(CenterTransverseMass_BestLQCombo);
+	BRANCH(RangeCenterMassRatio_BestLQCombo);
+	BRANCH(RangeCenterTransverseMassRatio_BestLQCombo);
+	
 	//===================================================================================================
 	//===================================================================================================
 
@@ -324,6 +337,7 @@ void placeholder::Loop()
 		if ( isBeamScraping ) continue;
 
 		bool vtxFound = false;
+		N_GoodVertices = 0.0;
 		for(unsigned int ivtx = 0; ivtx != VertexZ->size(); ++ivtx)
 		{
 			if ( VertexIsFake->at(ivtx) == true ) continue;
@@ -331,12 +345,11 @@ void placeholder::Loop()
 			if ( TMath::Abs(VertexZ->at(ivtx)) > 24.0 ) continue;
 			if ( TMath::Abs(VertexRho->at(ivtx)) >= 2.0 ) continue;
 			vtxFound = true;
-			break;
+			N_GoodVertices = N_GoodVertices + 1.0;
 		}
 		if ( !vtxFound ) continue;
 
-		N_Vertices = VertexZ->size();
-
+		N_Vertices = 1.0*(VertexZ->size());
 		if (!isData) N_PileUpInteractions = 1.0*PileUpInteractions;
 
 		//========================     Jet Rescaling Sequence   ================================//
@@ -451,7 +464,7 @@ void placeholder::Loop()
 		    }
 		}
 		HEEPEleCount = 1.0*v_idx_ele_good_final.size();
-		
+
 		//========================      Muon Conditions   ================================//
 
 		vector<int> v_idx_muon_final;
@@ -502,7 +515,7 @@ void placeholder::Loop()
 
 		if ( MuonCount < 1 ) continue;
 		TLorentzVector muon = muons[0];
-		
+
 		//========================    CaloJet Flags Conditions   ================================//
 
 		FailIDCaloJetPT20 = 0.0;
@@ -666,8 +679,8 @@ void placeholder::Loop()
 			newjet.SetPtEtaPhiM(jetPt,  jetEta, PFJetPhi->at(jetindex),     0);
 			// require a separation between a muon and a jet
 
-			deltaR_thisjet =  newjet.DeltaR(muon);
-			if ( deltaR_thisjet < deltaR_muon1closestPFJet)  deltaR_muon1closestPFJet = deltaR_thisjet ;
+			//deltaR_thisjet =  newjet.DeltaR(muon);
+			//if ( deltaR_thisjet < deltaR_muon1closestPFJet)  deltaR_muon1closestPFJet = deltaR_thisjet ;
 
 			//			if ( deltaR_thisjet < 0.5 ) continue;
 
@@ -681,7 +694,7 @@ void placeholder::Loop()
 		}
 		PFJetCount = 1.0*v_idx_pfjet_final.size();
 
-		if (PFJetCount <2) continue;
+		//if (PFJetCount <2) continue;
 
 		//========================     Generator Level Module  ================================//
 
@@ -700,7 +713,6 @@ void placeholder::Loop()
 		VRESET(Eta_genmuon1);   VRESET(Eta_genmuon2);
 		VRESET(Pt_genMET);      VRESET(Phi_genMET);    VRESET(Eta_genMET);
 		VRESET(Pt_genneutrino); VRESET(Phi_genneutrino); VRESET(Eta_genneutrino);
-		VRESET(genWTM);
 		VRESET(Pt_Z_gen);       VRESET(Pt_W_gen);
 		VRESET(Phi_Z_gen);      VRESET(Phi_W_gen);
 
@@ -777,18 +789,27 @@ void placeholder::Loop()
 				}
 
 			}
-
+			
+			Pt_genjet1 = -1.0;
+			Pt_genjet2 = -1.0;
+			TLorentzVector genjet1, genjet2;
+			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
+			{
+				if (GenJetEta->at(ijet)>3.0) continue;
+				if (Pt_genjet1 > 0.0 && Pt_genjet2 < 0.0 ) {
+					Pt_genjet2 = GenJetPt->at(ijet);
+					genjet2.SetPtEtaPhiM(Pt_genjet2,GenJetEta->at(ijet),GenJetPhi->at(ijet),0);
+				}
+				
+				if (Pt_genjet1 < 0.0) {
+					Pt_genjet1 = GenJetPt->at(ijet);
+					genjet1.SetPtEtaPhiM(Pt_genjet1,GenJetEta->at(ijet),GenJetPhi->at(ijet),0);					
+				}
+			}
+				
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
-			genWTM = 0.0;
-			genWTM =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
-
-			// Set the recoil variables
-
-			U1_Z_gen = 990.0;
-			U2_Z_gen = 990.0;
-			U1_W_gen = 990.0;
-			U2_W_gen = 990.0;
+			MT_genmuon1genMET =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
 
 			TLorentzVector v_GenMuon1, v_GenMuon2, v_GenMet;
 
@@ -797,14 +818,38 @@ void placeholder::Loop()
 			v_GenNu.SetPtEtaPhiM( Pt_genneutrino ,Eta_genneutrino,Phi_genneutrino ,0);
 			v_GenMet.SetPtEtaPhiM ( Pt_genMET, 0, Phi_genMET,0 );
 
+			v_GenMuon1.SetPtEtaPhiM(Pt_genmuon1,Eta_genmuon1,Phi_genmuon1,0);
+			v_GenMuon2.SetPtEtaPhiM(Pt_genmuon2,Eta_genmuon2,Phi_genmuon2,0);
+
+			deltaPhi_genmuon1genMET = v_GenMuon1.DeltaPhi(v_GenMet);
+			deltaPhi_genjet1genMET = genjet1.DeltaPhi(v_GenMet);
+			deltaPhi_genjet2genMET = genjet2.DeltaPhi(v_GenMet);
+			
+			ST_gen_mumu = Pt_genjet1 + Pt_genjet2 + Pt_genmuon1 + Pt_genmuon2;
+			ST_gen_munu = Pt_genjet1 + Pt_genjet2 + Pt_genmuon1 + Pt_genMET;
+			
+			//std::cout<<Pt_genmuon1<<"  "<<Pt_genmuon2<<std::endl;
+			//std::cout<<Pt_genjet1<<"  "<<Pt_genjet2<<std::endl;
+			//std::cout<<Pt_genMET<<"  "<<MT_genmuon1genMET<<std::endl;
+			//std::cout<<ST_gen_mumu<<"  "<<ST_gen_munu<<std::endl;
+			//std::cout<<deltaPhi_genmuon1genMET<<"  "<<deltaPhi_genjet1genMET<<"  "<<deltaPhi_genjet2genMET<<std::endl;
+			//std::cout<<" -----------------------------------------------"<<std::endl;
+
 			Pt_Z_gen = (v_GenMuon1 + v_GenMuon2).Pt();
 			Phi_Z_gen = (v_GenMuon1 + v_GenMuon2).Phi();
+
+			// Set the recoil variables
+
+			U1_Z_gen = 990.0;
+			U2_Z_gen = 990.0;
+			U1_W_gen = 990.0;
+			U2_W_gen = 990.0;
 
 			TLorentzVector UZ_gen = -(v_GenMet + v_GenMuon1 + v_GenMuon2);
 			TLorentzVector BZ_gen = (v_GenMuon1+v_GenMuon2 );
 			U1_Z_gen = (UZ_gen.Pt()) * (cos(UZ_gen.DeltaPhi(BZ_gen))) ;
 			U2_Z_gen = (UZ_gen.Pt()) * (sin(UZ_gen.DeltaPhi(BZ_gen))) ;
-
+			
 			TLorentzVector pfMETtest;
 			pfMETtest.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0.0);
 			muon1test.SetPtEtaPhiM(MuonPt->at(v_idx_muon_final[0]),MuonEta->at(v_idx_muon_final[0]),MuonPhi->at(v_idx_muon_final[0]),0.0);
@@ -819,7 +864,6 @@ void placeholder::Loop()
 
 			if (IsW && DoRecoilCorrections)
 			{
-
 				Double_t U1Phi = - BW_gen.Phi();
 				Double_t U2Phi = BW_gen.Phi() + piover2;
 
@@ -933,6 +977,15 @@ void placeholder::Loop()
 		VRESET(Pt_Z);  VRESET(Pt_W);
 		VRESET(Phi_Z); VRESET(Phi_W);
 
+		// Extra Discriminating Variables
+
+		VRESET(RangeMass_BestLQCombo);
+		VRESET(RangeTransverseMass_BestLQCombo);
+		VRESET(CenterMass_BestLQCombo);
+		VRESET(CenterTransverseMass_BestLQCombo);
+		VRESET(RangeCenterMassRatio_BestLQCombo);
+		VRESET(RangeCenterTransverseMassRatio_BestLQCombo);
+
 		// Recoil variables
 		VRESET(U1_Z);     VRESET(U2_Z);
 		VRESET(U1_W);     VRESET(U2_W);
@@ -941,6 +994,7 @@ void placeholder::Loop()
 		// Additional Counts
 		PFJetRawCount = 0.0;   CaloJetRawCount=0.0;
 		ST_pf_hadronic = 0.0;  ST_calo_hadronic = 0.0;
+		
 
 		//===================================================================================================
 		//      Run the Calculations of physical variables using selected particles.
@@ -1328,12 +1382,18 @@ void placeholder::Loop()
 			{
 				M_bestmupfjet1_mumu = M_muon1pfjet1;
 				M_bestmupfjet2_mumu = M_muon2pfjet2;
+				RangeMass_BestLQCombo = abs(M_muon1pfjet1 - M_muon2pfjet2);
+				CenterMass_BestLQCombo = abs(M_muon1pfjet1 + M_muon2pfjet2)/2.0;
+				RangeCenterMassRatio_BestLQCombo = RangeMass_BestLQCombo/CenterMass_BestLQCombo;
 			}
 
 			if (abs(M_muon1pfjet1 - M_muon2pfjet2) > abs(M_muon1pfjet2 - M_muon2pfjet1) )
 			{
 				M_bestmupfjet1_mumu = M_muon2pfjet1;
 				M_bestmupfjet2_mumu = M_muon1pfjet2;
+				RangeMass_BestLQCombo = abs(M_muon2pfjet1 - M_muon1pfjet2);
+				CenterMass_BestLQCombo = abs(M_muon2pfjet1 + M_muon1pfjet2)/2.0;
+				RangeCenterMassRatio_BestLQCombo = RangeMass_BestLQCombo/CenterMass_BestLQCombo;
 			}
 		}
 
@@ -1343,13 +1403,20 @@ void placeholder::Loop()
 			if (abs(MT_muon1pfjet1 - MT_pfjet2pfMET) < abs(MT_muon1pfjet2 - MT_pfjet1pfMET) )
 			{
 				M_bestmupfjet_munu= M_muon1pfjet1;
+				RangeTransverseMass_BestLQCombo = abs(MT_muon1pfjet1 - MT_pfjet2pfMET);
+				CenterTransverseMass_BestLQCombo = abs(MT_muon1pfjet1 + MT_pfjet2pfMET) / 2.0 ;
+				RangeCenterTransverseMassRatio_BestLQCombo = RangeTransverseMass_BestLQCombo/CenterTransverseMass_BestLQCombo;
 			}
 
 			if (abs(MT_muon1pfjet1 - MT_pfjet2pfMET) > abs(MT_muon1pfjet2 - MT_pfjet1pfMET) )
 			{
 				M_bestmupfjet_munu= M_muon1pfjet2;
+				RangeTransverseMass_BestLQCombo = abs(MT_muon1pfjet2 - MT_pfjet1pfMET);
+				CenterTransverseMass_BestLQCombo = abs(MT_muon1pfjet2 + MT_pfjet1pfMET) / 2.0 ;
+				RangeCenterTransverseMassRatio_BestLQCombo = RangeTransverseMass_BestLQCombo/CenterTransverseMass_BestLQCombo;
 			}
 		}
+		
 		
 		// Nonsense for testing - test of jet masses
 		
@@ -1395,6 +1462,9 @@ void placeholder::Loop()
 
 		
 		//std::cout<<M_AllCaloJet<<"   "<<M_AllPFJet<<std::endl;
+		if (Pt_muon1 < 40.0 && Pt_genmuon1 < 40.0 ) continue;
+		if (Pt_pfjet1 < 30.0 && Pt_pfjet2 < 30.0 && Pt_genjet1 < 30.0 && Pt_genjet2 < 30.0 ) continue;
+		if (Pt_muon2 < 30.0 && Pt_genmuon2 < 30.0 && Pt_genMET < 40.0 && MET_pf < 40.0) continue; 
 
 		tree->Fill();			 // FILL FINAL TREE
 
