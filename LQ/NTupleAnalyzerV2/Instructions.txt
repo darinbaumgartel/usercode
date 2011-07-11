@@ -75,7 +75,7 @@ MakeClass-style analyzer code.
 
    B) The FAST method (recommended). Run the analyzer, specifying the C, h and CSV files:
 
-         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_04_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_04_Default.h -i NTupleInfo2011_SpringSummer.csv
+         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_04_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_04_Default.h -i NTupleInfo2011_SpringSummer.csv -t StandardSelections
 
       The Fast method splits jobs up to a maximum of 15 root files for 
       faster processing. It automatically submits the jobs and checks
@@ -96,7 +96,16 @@ MakeClass-style analyzer code.
       file and stage unstaged files. This takes a few minutes to check
       before jobs are submitted, but it can be worth it if there are
       unstaged files!
-
+      
+      Optioons are as follows:
+      
+      -c  [ Path To .C File ]
+      -h  [ Path To .h File ]
+      -i  [ Path To .CSV NTuple Information File] 
+      -t  [ Tag to help keep track of NTuples]   
+          e.g.  -t JES_Rescale_5_Percent , or
+                -t UsingTightPFJets
+      --stager_check   < Checks Stage status of all files and stages unstaged files>
 
 
 6) Gather your analyzer output and run whatever you would like. 
