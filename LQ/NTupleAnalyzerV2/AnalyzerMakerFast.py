@@ -124,7 +124,7 @@ for x in range(len(SignalType)):
 		for cf in dirList:
 			cf = CastorDirectory[x]+'/' + cf
 			fstatus = (((os.popen('stager_qry -M '+cf).readlines())[-1]).split(' '))[-1]
-			os.system('sleep .5')
+			os.system('sleep .25')
 			if 'STAGED' not in fstatus:
 				os.system('stager_get -M '+cf)
 		
@@ -133,7 +133,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>15:
+		if len(sublist)>10:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
