@@ -10,14 +10,19 @@
 #include <cmath>
 #include <TMath.h>
 #include "TRandom2.h"
+#include "TRandom3.h"
 #include "JSONFilterFunction.h"
 
 #define BRANCH(bname) Double_t bname = -99999.12345; tree->Branch(#bname,& bname," bname /D ");
 #define VRESET(vname) vname = -99999.12345;
 
+TRandom3* rr = new TRandom3();
+
+
 Double_t JetRescaleFactor = 1.00;
 Double_t MuonRescaleFactor = 1.00;
-
+Double_t JetSmearFactor = 0.0;
+Double_t MuonSmearFactor = 0.10;
 
 Double_t TMass(Double_t Pt1, Double_t Pt2, Double_t DPhi12)
 {
@@ -29,11 +34,15 @@ Double_t ScaleObject(Double_t PT, Double_t fraction)
 	return (PT*(fraction));
 }
 
-
-TLorentzVector PropagateScaleToMET(Double_t MET, Double_t METPhi, Double_t PTCorrJet, Double_t PTOrigJet, Double_t JetPhi)
+Double_t SmearObject(Double_t PT, Double_t fraction)
 {
-	Double_t yMET = MET*sin(METPhi) - ( (PTCorrJet - PTOrigJet)*sin(JetPhi)  );
-	Double_t xMET = MET*cos(METPhi) - ( (PTCorrJet - PTOrigJet)*cos(JetPhi)  );
+	return (rr->Gaus(PT,fraction*PT));
+}
+
+TLorentzVector PropagatePTChangeToMET(Double_t MET, Double_t METPhi, Double_t PTCorr, Double_t PTOrig, Double_t Phi)
+{
+	Double_t yMET = MET*sin(METPhi) - ( (PTCorr - PTOrig)*sin(Phi)  );
+	Double_t xMET = MET*cos(METPhi) - ( (PTCorr - PTOrig)*cos(Phi)  );
 	Double_t metCorr =  sqrt(xMET*xMET + yMET*yMET);
 	Double_t metPhiCorr = acos (xMET/metCorr);
 	if (yMET<0) metPhiCorr *= -1;
@@ -41,6 +50,7 @@ TLorentzVector PropagateScaleToMET(Double_t MET, Double_t METPhi, Double_t PTCor
 	vmetcorr.SetPtEtaPhiM( metCorr,0,metPhiCorr,0 );
 	return vmetcorr;
 }
+
 
 // Recoil Correction Function for U1
 Double_t F_U1Prime(Double_t P)
@@ -135,8 +145,6 @@ void placeholder::Loop()
 	BRANCH(MET_pf); BRANCH(Phi_MET_pf);
 
 	// Event Flags
-	BRANCH(FailIDJetPT20); BRANCH(FailIDJetPT25); BRANCH(FailIDJetPT30);
-	BRANCH(FailIDCaloJetPT20); BRANCH(FailIDCaloJetPT25); BRANCH(FailIDCaloJetPT30);
 	BRANCH(FailIDCaloThreshold); BRANCH(FailIDPFThreshold);
 
 	// Delta Phi Variables
@@ -245,7 +253,6 @@ void placeholder::Loop()
 
 	// Another placeHolder. Needed because recoil corrections only get applied to W MC.
 	bool IsW = IsItWMC;
-	bool IsSpring11ZAlpgen = IsItSpring11ZAlpgen;
 
 	xsection = crosssection;	 // Another PlaceHolder for the cross sections in bookkeeping/NTupleInfo.csv
 
@@ -279,59 +286,6 @@ void placeholder::Loop()
 		bx = bunch;
 
 		weight = lumi*xsection/Events_Orig;
-
-		//========================     Weight Fix for Spring 11 Z Alpgen ===============//
-		Double_t rescale = 1.0;
-		for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
-		{
-			int pdgId = GenParticlePdgId->at(ip);
-			int motherIndex = GenParticleMotherIndex->at(ip);
-			if (motherIndex >= 0)
-			{
-				if (abs(GenParticlePdgId->at(motherIndex) ) == 23)
-				{
-					int lepton = 999;
-					if (abs(pdgId) == 11) lepton = 11;
-					if (abs(pdgId) == 13) lepton = 13;
-					if (abs(pdgId) == 15) lepton = 15;
-					if (IsSpring11ZAlpgen)
-					{
-						if (lepton == 999) rescale = 1.0;
-						if (lepton == 11) rescale = electron_rescalevalue;
-						if (lepton == 13) rescale = muon_rescalevalue;
-						if (lepton == 15) rescale = tau_rescalevalue;
-						weight = weight*rescale;
-					}
-					if (lepton <999) break;
-				}
-			}
-		}
-
-		//========================     HLT Conditions   ================================//
-
-		//		if (run_number<1000)
-		//		{
-		//			if ( ((*HLTResults)[60] ==1) ||((*HLTResults)[0] ==1) ) precut_HLT=1.0;
-		//			else continue;
-		//		}
-
-		//		if ((run_number>1000)&&(run_number<146000))
-		//		{
-		//			if ((*HLTResults)[60] ==1) precut_HLT=1.0;
-		//			else continue;
-		//		}
-
-		//		if ((run_number>146000)&&(run_number<147455))
-		//		{
-		//			if ((*HLTResults)[61] ==1) precut_HLT=1.0;
-		//			else continue;
-		//		}
-
-		//		if (run_number>=147455)
-		//		{
-		//			if ((*HLTResults)[66] ==1) precut_HLT=1.0;
-		//			else continue;
-		//		}
 
 		//========================     JSON   Conditions   ================================//
 
@@ -380,7 +334,6 @@ void placeholder::Loop()
 		//========================     Trigger Scanning  ================================//
 
 		string hltmu ("HLT_Mu");
-		string digits[10] = {"0","1","2","3","4","5","6","7","8","9"};
 
 		LowestUnprescaledTrigger = -1.;
 		LowestUnprescaledTriggerPass = -1.;
@@ -429,11 +382,12 @@ void placeholder::Loop()
 		//std::cout<<LowestUnprescaledTriggerPass<<"  "<<LowestUnprescaledTrigger<<"              "<<Closest40UnprescaledTrigger<<"  "<<Closest40UnprescaledTriggerPass<<std::endl;
 		
 		
-		//========================     Jet Rescaling Sequence   ================================//
+		//========================     Jet Rescaling / Smearing Sequence   ================================//
 
 		TLorentzVector JetAdjustedMET;
 		JetAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
-		
+		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
+
 		
 		if (!isData)
 		{
@@ -444,7 +398,6 @@ void placeholder::Loop()
 				Double_t JetLepDR;
 				ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
 
-			
 				for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 				{
 					TLorentzVector ThisLepton;	
@@ -461,17 +414,18 @@ void placeholder::Loop()
 				}
 				
 				if (!consider) continue;
-			
 				double NewJetPT =  ScaleObject((*PFJetPt)[ijet],JetRescaleFactor); 
-				JetAdjustedMET = PropagateScaleToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+				NewJetPT =  SmearObject(NewJetPT,JetSmearFactor); 
+				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
 				(*PFJetPt)[ijet] = NewJetPT ;	
+
 			}
 		}
 		
 		(*PFMET)[0] = JetAdjustedMET.Pt();
 		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
 
-		//========================     Muon Rescaling Sequence   ================================//
+		//========================     Muon Rescaling / Smearing Sequence   ================================//
 
 		TLorentzVector MuAdjustedMET;
 		MuAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
@@ -481,14 +435,16 @@ void placeholder::Loop()
 			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 			{
 				double NewMuonPT =  ScaleObject((*MuonPt)[imuon],MuonRescaleFactor); 
-				MuAdjustedMET = PropagateScaleToMET(MuAdjustedMET.Pt(),  MuAdjustedMET.Phi(), NewMuonPT, (*MuonPt)[imuon], MuonPhi->at(imuon));
+				NewMuonPT =  SmearObject(NewMuonPT,MuonSmearFactor); 
+				MuAdjustedMET = PropagatePTChangeToMET(MuAdjustedMET.Pt(),  MuAdjustedMET.Phi(), NewMuonPT, (*MuonPt)[imuon], MuonPhi->at(imuon));
 				(*MuonPt)[imuon] = NewMuonPT ;	
 			}
 		}
 		(*PFMET)[0] = MuAdjustedMET.Pt();
 		(*PFMETPhi)[0] = MuAdjustedMET.Phi();
-		
+		//std::cout<<MuonPt->size()<<std::endl;
 		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
+		//std::cout<<" ---------------------------------------------------"<<std::endl;
 
 		//========================     Electron Conditions   ================================//
 
@@ -593,10 +549,7 @@ void placeholder::Loop()
 		TLorentzVector muon = muons[0];
 
 		//========================    CaloJet Flags Conditions   ================================//
-
-		FailIDCaloJetPT20 = 0.0;
-		FailIDCaloJetPT25 = 0.0;
-		FailIDCaloJetPT30 = 0.0;		
+	
 		FailIDCaloThreshold = -1.0;
 
 		for(int ijet=0;ijet<(*CaloJetPt).size();ijet++)
@@ -616,10 +569,6 @@ void placeholder::Loop()
 			
 			if (CaloJetPt->at(ijet) > FailIDCaloThreshold) FailIDCaloThreshold = CaloJetPt->at(ijet);
 
-			if ((*CaloJetPt)[ijet] > 20.0) FailIDCaloJetPT20 = 1.0;
-			if ((*CaloJetPt)[ijet] > 25.0) FailIDCaloJetPT25 = 1.0;
-			if ((*CaloJetPt)[ijet] > 30.0) FailIDCaloJetPT30 = 1.0;
-
 		}			
 
 		//========================     PFJet Conditions   ================================//
@@ -632,9 +581,6 @@ void placeholder::Loop()
 		vector<int> v_idx_pfjet_final_unseparated;
 		vector<int> v_idx_pfjet_final;
 		BpfJetCount = 0.0;
-		FailIDJetPT20 = 0.0;
-		FailIDJetPT25 = 0.0;
-		FailIDJetPT30 = 0.0;
 		FailIDPFThreshold = -1.0;
 		TLorentzVector CurrentLepton,CurrentPFJet;
 
@@ -652,19 +598,11 @@ void placeholder::Loop()
 				if (CurrentLepton.DeltaR(CurrentPFJet) < .2) IsLepton = true;
 			}
 
-
 			if (PFJetMuonEnergyFraction->at(ijet) > .8) IsLepton = true;
 
 			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)&&(!IsLepton)) FailIDPFThreshold = PFJetPt->at(ijet);
-			
-			if ( jetPt < 20.0 ) continue;
-			if ((PFJetPassLooseID->at(ijet) != 1)&&(!IsLepton))  FailIDJetPT20 = 1.0;
-
-			if ( jetPt < 25.0 ) continue;
-			if ((PFJetPassLooseID->at(ijet) != 1)&&(!IsLepton))  FailIDJetPT25 = 1.0;
 
 			if ( jetPt < 30.0 ) continue;			
-			if ((PFJetPassLooseID->at(ijet) != 1)&&(!IsLepton))  FailIDJetPT30 = 1.0;
 
 			if ( fabs(jetEta) > 3.0 ) continue;
 
