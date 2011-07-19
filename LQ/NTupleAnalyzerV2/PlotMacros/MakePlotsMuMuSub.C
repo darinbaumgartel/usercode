@@ -119,7 +119,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 	h_zjets->Scale(znorm);
 	if (!Use_mu) {h_ttbar->Scale(165.0/121.0);}
-	else if (Use_mu) {h_ttbar->Scale(0.5 * (/*INSERT PROPER EFFICIENCIES HERE*/) );}
+	else if (Use_mu) {h_ttbar->Scale(0.6284);}
 
 	Double_t Nd = h_data->Integral();
 	Double_t Nmc = h_zjets->Integral()+h_ttbar->Integral()+h_vvjets->Integral()+h_wjets->Integral()+h_singtop->Integral()+h_qcd->Integral();
