@@ -224,6 +224,11 @@ void placeholder::Loop()
 	BRANCH(CenterTransverseMass_BestLQCombo);
 	BRANCH(RangeCenterMassRatio_BestLQCombo);
 	BRANCH(RangeCenterTransverseMassRatio_BestLQCombo);
+	BRANCH(LowestMass_BestLQCombo);
+	
+	// Trigger
+	BRANCH(LowestUnprescaledTrigger); BRANCH(Closest40UnprescaledTrigger);
+	BRANCH(LowestUnprescaledTriggerPass); BRANCH(Closest40UnprescaledTriggerPass);
 	
 	//===================================================================================================
 	//===================================================================================================
@@ -356,6 +361,9 @@ void placeholder::Loop()
 		
 		
 		
+		//========================     PileUp Methodology   ================================//
+		
+		
 		N_PileUpInteractions = 0.0;
 		N_WeightedPileUpInteractions = 0.0;
 
@@ -368,30 +376,59 @@ void placeholder::Loop()
 			}	
 		}
 
-		vector<string> hltmu ;
-		hltmu.push_back("HLT_Mu17_v");
 
-		hltmu.push_back("HLT_Mu24_v");
+		//========================     Trigger Scanning  ================================//
 
-		hltmu.push_back("HLT_Mu30_v");
+		string hltmu ("HLT_Mu");
+		string digits[10] = {"0","1","2","3","4","5","6","7","8","9"};
 
-		hltmu.push_back("HLT_Mu40_v");
+		LowestUnprescaledTrigger = -1.;
+		LowestUnprescaledTriggerPass = -1.;
+		Closest40UnprescaledTrigger = -1.;
+		Closest40UnprescaledTrigger = -1.;
+		
+		vector <double> SingleMuThresholds;
+		vector <int> SingleMuPrescales;
+		vector <int> SingleMuPasses;
+
 
 		for(unsigned int iHLT = 0; iHLT != HLTInsideDatasetTriggerNames->size(); ++iHLT)
 		{
 			string thishlt = HLTInsideDatasetTriggerNames->at(iHLT);
 			
-			for(unsigned int itrig = 0; itrig != hltmu.size(); ++itrig){
+			bool isSingleMuTrigger = (thishlt.compare(0,6,hltmu)==0) && (thishlt.length()>7) && (thishlt.length()<13);
+			if (!isSingleMuTrigger) continue;
 
-			if (thishlt.compare(0,10,hltmu[itrig])==0){
-			std::cout<<HLTInsideDatasetTriggerNames->at(iHLT)<<"  "<<HLTInsideDatasetTriggerPrescales->at(iHLT)<<"  "<<HLTInsideDatasetTriggerDecisions->at(iHLT)<<std::endl;
+			string onesplace,tensplace;	
+			onesplace = thishlt[7];
+			tensplace = thishlt[6];
+			bool notrigger = (onesplace=="_" || tensplace=="_");
+			if (notrigger) continue;
+			
+			std::string thresh = tensplace+onesplace+".0";
+			double triggervalue  = ::atof(thresh.c_str());
+			SingleMuThresholds.push_back(triggervalue);
+			SingleMuPrescales.push_back(HLTInsideDatasetTriggerPrescales->at(iHLT));
+			SingleMuPasses.push_back(HLTInsideDatasetTriggerDecisions->at(iHLT));
 		}
+		
+		for(unsigned int iHLTmu = 0; iHLTmu !=SingleMuThresholds.size(); ++iHLTmu)
+		{
+			
+			if (LowestUnprescaledTrigger < 0 && SingleMuPrescales[iHLTmu] ==1) 
+			{
+				LowestUnprescaledTriggerPass = 1.0*SingleMuPasses[iHLTmu];
+				LowestUnprescaledTrigger = 1.0*SingleMuThresholds[iHLTmu];
+			}
+			if (SingleMuPrescales[iHLTmu] ==1 && SingleMuThresholds[iHLTmu] < 40.01)
+			{
+				Closest40UnprescaledTrigger = 1.0*SingleMuThresholds[iHLTmu];
+				Closest40UnprescaledTriggerPass = 1.0*SingleMuPasses[iHLTmu];
+			}
 		}
-		}
-
-		std::cout<<" ---------------------------------- "<<std::endl;
-		//std::cout<<N_PileUpInteractions<<"  "<<N_WeightedPileUpInteractions<<std::endl;
-	
+		//std::cout<<LowestUnprescaledTriggerPass<<"  "<<LowestUnprescaledTrigger<<"              "<<Closest40UnprescaledTrigger<<"  "<<Closest40UnprescaledTriggerPass<<std::endl;
+		
+		
 		//========================     Jet Rescaling Sequence   ================================//
 
 		TLorentzVector JetAdjustedMET;
@@ -527,20 +564,19 @@ void placeholder::Loop()
 			if (checkPT && (muonPt < 30.0) ) continue;
 			if  ( fabs(muonEta) > 2.4 )      continue;
 
-			bool PassVBTFLoose =
+			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&
-				MuonTrkHits ->at(imuon) >= 11   ;
+				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;
 
-			bool PassVBTFTight =
-				MuonIsTracker ->at(imuon) == 1 &&
-				fabs(MuonTrkD0 ->at(imuon)) < 0.2  &&
+			bool PassPOGTight =
+				MuonStationMatches->at(imuon) > 1 && 
+				fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
 				MuonGlobalChi2 ->at(imuon) < 10.0 &&
 				MuonPixelHitCount ->at(imuon) >=1 &&
-				MuonSegmentMatches->at(imuon) >=2 &&
 				MuonGlobalTrkValidHits->at(imuon)>=1 ;
 
-			if ( ! (PassVBTFLoose && PassVBTFTight) ) continue;
+			if ( ! (PassGlobalTightPrompt && PassPOGTight) ) continue;
 			iMUON = imuon;
 			TLorentzVector muon;
 			muon.SetPtEtaPhiM( MuonPt -> at(imuon), MuonEta-> at(imuon),    MuonPhi-> at(imuon),    0);
@@ -1027,6 +1063,8 @@ void placeholder::Loop()
 		VRESET(CenterTransverseMass_BestLQCombo);
 		VRESET(RangeCenterMassRatio_BestLQCombo);
 		VRESET(RangeCenterTransverseMassRatio_BestLQCombo);
+		VRESET(LowestMass_BestLQCombo);
+
 
 		// Recoil variables
 		VRESET(U1_Z);     VRESET(U2_Z);
@@ -1440,6 +1478,10 @@ void placeholder::Loop()
 				RangeCenterMassRatio_BestLQCombo = RangeMass_BestLQCombo/CenterMass_BestLQCombo;
 			}
 		}
+		
+		LowestMass_BestLQCombo = M_bestmupfjet1_mumu;
+		if (M_bestmupfjet1_mumu > M_bestmupfjet2_mumu) LowestMass_BestLQCombo = M_bestmupfjet2_mumu;
+
 
 		// Beta - Half production - minimize difference of transverse masses
 		if ((MuonCount>0) && (PFJetCount> 1))
