@@ -22,7 +22,7 @@ TRandom3* rr = new TRandom3();
 Double_t JetRescaleFactor = 1.00;
 Double_t MuonRescaleFactor = 1.00;
 Double_t JetSmearFactor = 0.0;
-Double_t MuonSmearFactor = 0.10;
+Double_t MuonSmearFactor = 0.0;
 
 Double_t TMass(Double_t Pt1, Double_t Pt2, Double_t DPhi12)
 {
