@@ -7,7 +7,7 @@
 #include "CMSStyle.C"
 
 void fillHisto(TString cut_mc, TString cut_data,  TString cut_data_emu,  bool Use_emu, bool drawHistograms,
-int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileName,TString title, TString Luminosity,Double_t extrascalefactor,Double_t znorm,TString tag)
+	       int nBins, float xLow, float xMax, TString var, TString var_emu, bool writeoutput, TString fileName,TString title, TString Luminosity,Double_t extrascalefactor,Double_t znorm,TString tag)
 {
 	CMSStyle();
 	//  TCanvas c1("c1", "First canvas", 400, 300); // problems here
@@ -56,7 +56,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	wjets->Draw(var+">>h_wjets",cut_mc);
 
 	if (!Use_emu) {ttbar->Draw(var+">>h_ttbar",cut_mc);}
-	else if (Use_emu) {data->Draw(var+">>h_ttbar",cut_data_emu);}
+	else if (Use_emu) {data->Draw(var_emu+">>h_ttbar",cut_data_emu);}
+
 
 	vvjets->Draw(var+">>h_vvjets",cut_mc);
 	singtop->Draw(var+">>h_singtop",cut_mc);
@@ -80,8 +81,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 		zjets->Draw(var2+">>h2_zjets",cut_mc);
 		wjets->Draw(var2+">>h2_wjets",cut_mc);
-		if (!Use_emu) {ttbar->Draw(va2r+">>h2_ttbar",cut_mc);}
-		else if (Use_emu) {data->Draw(var+">>h2_ttbar",cut_data_emu);}
+		if (!Use_emu) {ttbar->Draw(var+">>h2_ttbar",cut_mc);}
+		else if (Use_emu) {data->Draw(var_emu+">>h2_ttbar",cut_data_emu);}
 		ttbar->Draw(var2+">>h2_ttbar",cut_mc);
 		vvjets->Draw(var2+">>h2_vvjets",cut_mc);
 		singtop->Draw(var2+">>h2_singtop",cut_mc);
@@ -118,8 +119,9 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	// Rescaling Routine and Event number Readout
 
 	h_zjets->Scale(znorm);
-	if (!Use_mu) {h_ttbar->Scale(165.0/121.0);}
-	else if (Use_mu) {h_ttbar->Scale(0.6284);}
+	if (!Use_emu) {h_ttbar->Scale(165.0/121.0);}
+	else if (Use_emu) {h_ttbar->Scale(0.6284);}
+
 
 	Double_t Nd = h_data->Integral();
 	Double_t Nmc = h_zjets->Integral()+h_ttbar->Integral()+h_vvjets->Integral()+h_wjets->Integral()+h_singtop->Integral()+h_qcd->Integral();
@@ -394,6 +396,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 
 	c1->Print("PlotsMuMuSub/"+varname+"_"+tag+".png");
+	c1->Print("PlotsMuMuSub/"+varname+"_"+tag+".pdf");
 	
 	
 	TIter next(gDirectory->GetList());
@@ -432,36 +435,72 @@ void MakePlotsMuMuSub()
 	//cut_data += "*((M_muon1muon2>80)*(M_muon1muon2<100))";
 
 	TString cut_mc = lumi+ "*weight*("+cut_data+")";
+
+// These are MC - driven Summer11 for the bug fix
 cut_mc += "*(";
-cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.185626207798))+";
-cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.42583555701))+";
-cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.983425220588))+";
-cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.60756198475))+";
-cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.06101780086))+";
-cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.20045322833))+";
-cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.03181596181))+";
-cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.66526505721))+";
-cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.23451631687))+";
-cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.83971609875))+";
-cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.52995300733))+";
-cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.332814874864))+";
-cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.224446370555))+";
-cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.156753261452))+";
-cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.107016604049))+";
-cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.0797487370731))+";
-cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.0591346986699))+";
-cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0437285788856))+";
-cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0314714756899))+";
-cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0272704760569))+";
-cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.0210989861712))+";
-cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0207102970854))+";
-cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0205646801805))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0197259419363))+";
-cut_mc += "((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)*(0.0445172018043))";
+cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.133068262644))+";
+cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.531177727826))+";
+cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.08393607934))+";
+cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.75485574706))+";
+cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.23265146857))+";
+cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.29302545029))+";
+cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.08187693395))+";
+cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.74354004493))+";
+cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.32963414181))+";
+cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.950884829018))+";
+cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.653989809522))+";
+cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.421230072952))+";
+cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.259599212011))+";
+cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.158601185413))+";
+cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.100442489896))+";
+cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.0594521650904))+";
+cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.0345162335823))+";
+cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0207204183018))+";
+cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0117033339315))+";
+cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.00694640146464))+";
+cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.00348689915421))+";
+cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.00191943200042))+";
+cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.00120128248423))+";
+cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.000647624891971))+";
+cut_mc += "((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)*(0.000455476442992))+";
+cut_mc += "((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)*(0.000196385472519))+";
+cut_mc += "((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)*(0.000101079948326))+";
+cut_mc += "((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)*(8.14199879897e-05))+";
+cut_mc += "((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)*(4.89354471066e-05))+";
+cut_mc += "((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)*(3.35058351289e-05))";
 cut_mc += ")";
+	
+	
+//cut_mc += "*(";
+//cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.185626207798))+";
+//cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.42583555701))+";
+//cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.983425220588))+";
+//cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.60756198475))+";
+//cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.06101780086))+";
+//cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.20045322833))+";
+//cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.03181596181))+";
+//cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.66526505721))+";
+//cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.23451631687))+";
+//cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.83971609875))+";
+//cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.52995300733))+";
+//cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.332814874864))+";
+//cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.224446370555))+";
+//cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.156753261452))+";
+//cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.107016604049))+";
+//cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.0797487370731))+";
+//cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.0591346986699))+";
+//cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0437285788856))+";
+//cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0314714756899))+";
+//cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0272704760569))+";
+//cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.0210989861712))+";
+//cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0207102970854))+";
+//cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0205646801805))+";
+//cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0197259419363))+";
+//cut_mc += "((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)*(0.0445172018043))";
+//cut_mc += ")";
 
 
-	float ZNormalization = 1.00;
+	float ZNormalization = 1.334;
 	TString filetag = " ";
 	TString xtag = " ";
 
@@ -474,7 +513,8 @@ cut_mc += ")";
 		filetag = "2011Data_NormalizationSelection";
 		xtag = " [Z Normalization Condition]";
 		TString NormCondition = "*(ST_pf_mumu>250)*(M_muon1muon2>80)*(M_muon1muon2<100)";
-		fillHisto(cut_mc + NormCondition, cut_data+NormCondition, true, 20,80,100, "M_muon1muon2", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10,ZNormalization,filetag);	
+		Use_emu = false;
+		fillHisto(cut_mc + NormCondition, cut_data+NormCondition, cut_data_emu, Use_emu, true, 20,80,100, "M_muon1muon2", "M_muon1muon2", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10,ZNormalization,filetag);	
 		gROOT->Reset();	gROOT->ProcessLine(".q;");
 	}
 
@@ -483,10 +523,10 @@ cut_mc += ")";
 	filetag = "2011Data_MinimalSelection";
 	xtag = " [Presel sans ST cut]";
 
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,800, "M_pfjet1pfjet2", false, "","M_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
-	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,400, "MT_pfjet1pfjet2", false, "","M^{T}_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,8, "deltaR_pfjet1pfjet2", false, "","#Delta R (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.15,3.15, "deltaPhi_pfjet1pfjet2", false, "","#Delta#phi (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,800, "M_pfjet1pfjet2", false, "","M_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
+	////fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,400, "MT_pfjet1pfjet2", false, "","M^{T}_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,8, "deltaR_pfjet1pfjet2", false, "","#Delta R (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.15,3.15, "deltaPhi_pfjet1pfjet2", false, "","#Delta#phi (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
 
 	//gROOT->Reset();	gROOT->ProcessLine(".q;");
 
@@ -497,56 +537,57 @@ cut_mc += ")";
 	
 	cut_data += "*(ST_pf_mumu>250.0)";
 	cut_mc += "*(ST_pf_mumu>250.0)";
+	cut_data_emu += "*(ST_pf_emu>250.0)";
 	TString filetag = "2011Data_PreSelection";
 	TString xtag = " [preselection]";
 
 	//gROOT->Reset();	gROOT->ProcessLine(".q;");	
 
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,40,340, "M_muon1muon2", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,25,.-.5,24.5, "N_Vertices", false, "","N_{Vertices} " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "GlobalMuonCount", false, "","N_{Global #mu} " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "TrackerMuonCount", false, "","N_{Tracker #mu} " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,12,.-.5,11.5, "PFJetCount", false, "","N_{PFJet} " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,8,.-.5,7.5, "BpfJetCount", false, "","N_{BPFJet} " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,30, "EcalIso_muon1", false, "","ECAL Iso_{#mu_{1}} (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,3, "HcalIso_muon1", false, "","HCAL Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 35,0,3.5, "TrkIso_muon1", false, "","Track Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,500, "Pt_muon1", false, "","p_{T} (#mu_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,50, "PtError_muon1", false, "","#sigma(p_{T}) (#mu_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 42,-2.1,2.1, "Eta_muon1", false, "","#eta (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.001, "EtaError_muon1", false, "","#sigma(#eta) (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,30,-3.141593,3.141593, "Phi_muon1", false, "","#phi (#mu_{1}) " +xtag,lumi,2000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.0005, "PhiError_muon1", false, "","#sigma(#phi) (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,.0008, "QOverPError_muon1", false, "","#sigma(Q/p)_{#mu_{1}}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,30, "EcalIso_muon2", false, "","ECAL Iso_{#mu_{2}} (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,3, "HcalIso_muon2", false, "","HCAL Iso (#mu_{2}) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 35,0,3.5, "TrkIso_muon2", false, "","Track Iso (#mu_{2}) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,400, "Pt_muon2", false, "","p_{T} (#mu_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,50, "PtError_muon2", false, "","#sigma(p_{T}) (#mu_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 42,-2.1,2.1, "Eta_muon2", false, "","#eta (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.001, "EtaError_muon2", false, "","#sigma(#eta) (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,30,-3.141593,3.141593, "Phi_muon2", false, "","#phi (#mu_{2}) " +xtag,lumi,2000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.0005, "PhiError_muon2", false, "","#sigma(#phi) (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,.0008, "QOverPError_muon2", false, "","#sigma(Q/p)_{#mu_{2}}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,300, "MET_pf",        false, "","E_{T}^{miss}(GeV) " +xtag  ,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 65,200,1500, "ST_pf_mumu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,600, "Pt_pfjet1", false, "","p_{T} (jet_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,500, "Pt_pfjet2", false, "","p_{T} (jet_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet1", false, "","#eta (jet_{1}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet2", false, "","#eta (jet_{2}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon1pfjet1", false, "","#Delta#phi (#mu_{1}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon1pfjet2", false, "","#Delta#phi (#mu_{1}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon2pfjet1", false, "","#Delta#phi (#mu_{2}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon2pfjet2", false, "","#Delta#phi (#mu_{2}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon1pfjet1", false, "","#Delta R (#mu_{1}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon1pfjet2", false, "","#Delta R (#mu_{1}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon2pfjet1", false, "","#Delta R (#mu_{2}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon2pfjet2", false, "","#Delta R (#mu_{2}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 100,0,2000, "M_bestmupfjet1_mumu", false, "","M_{#mu jet} " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,800, "M_pfjet1pfjet2", false, "","M_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
-	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,400, "MT_pfjet1pfjet2", false, "","M^{T}_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,8, "deltaR_pfjet1pfjet2", false, "","#Delta R (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
-	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.15,3.15, "deltaPhi_pfjet1pfjet2", false, "","#Delta#phi (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,40,340, "M_muon1muon2", "M_muon1HEEPele1", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,25,.-.5,24.5, "N_Vertices", "N_Vertices", false, "","N_{Vertices} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "GlobalMuonCount", "GlobalMuonCount", false, "","N_{Global #mu} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "TrackerMuonCount", "TrackerMuonCount", false, "","N_{Tracker #mu} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,12,.-.5,11.5, "PFJetCount", "PFJetCount", false, "","N_{PFJet} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,8,.-.5,7.5, "BpfJetCount", "BpfJetCount", false, "","N_{BPFJet} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,30, "EcalIso_muon1", "EcalIso_muon1", false, "","ECAL Iso_{#mu_{1}} (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,3, "HcalIso_muon1", "HcalIso_muon1", false, "","HCAL Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 35,0,3.5, "TrkIso_muon1", "TrkIso_muon1", false, "","Track Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,500, "Pt_muon1", "Pt_muon1", false, "","p_{T} (#mu_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,50, "PtError_muon1", "PtError_muon1", false, "","#sigma(p_{T}) (#mu_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 42,-2.1,2.1, "Eta_muon1", "Eta_muon1", false, "","#eta (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.001, "EtaError_muon1", "EtaError_muon1", false, "","#sigma(#eta) (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,30,-3.141593,3.141593, "Phi_muon1", "Phi_muon1", false, "","#phi (#mu_{1}) " +xtag,lumi,2000,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.0005, "PhiError_muon1", "PhiError_muon1", false, "","#sigma(#phi) (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,.0008, "QOverPError_muon1", "QOverPError_muon1", false, "","#sigma(Q/p)_{#mu_{1}}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,30, "EcalIso_muon2", "EcalIso_muon2", false, "","ECAL Iso_{#mu_{2}} (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,3, "HcalIso_muon2", "HcalIso_muon2", false, "","HCAL Iso (#mu_{2}) " +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 35,0,3.5, "TrkIso_muon2", "TrkIso_muon2", false, "","Track Iso (#mu_{2}) " +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,400, "Pt_muon2", "Pt_muon2", false, "","p_{T} (#mu_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,50, "PtError_muon2", "PtError_muon2", false, "","#sigma(p_{T}) (#mu_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 42,-2.1,2.1, "Eta_muon2", "Eta_muon2", false, "","#eta (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.001, "EtaError_muon2", "EtaError_muon2", false, "","#sigma(#eta) (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true,30,-3.141593,3.141593, "Phi_muon2", "Phi_muon2", false, "","#phi (#mu_{2}) " +xtag,lumi,2000,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.0005, "PhiError_muon2", "PhiError_muon2", false, "","#sigma(#phi) (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,.0008, "QOverPError_muon2", "QOverPError_muon2", false, "","#sigma(Q/p)_{#mu_{2}}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,300, "MET_pf", "MET_pf",        false, "","E_{T}^{miss}(GeV) " +xtag  ,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 65,200,1500, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,600, "Pt_pfjet1", "Pt_pfjet1", false, "","p_{T} (jet_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,500, "Pt_pfjet2", "Pt_pfjet2", false, "","p_{T} (jet_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet1", "Eta_pfjet1", false, "","#eta (jet_{1}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet2", "Eta_pfjet2", false, "","#eta (jet_{2}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon1pfjet1", "deltaPhi_muon1pfjet1", false, "","#Delta#phi (#mu_{1}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon1pfjet2", "deltaPhi_muon1pfjet2", false, "","#Delta#phi (#mu_{1}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon2pfjet1", "deltaPhi_muon2pfjet1", false, "","#Delta#phi (#mu_{2}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon2pfjet2", "deltaPhi_muon2pfjet2", false, "","#Delta#phi (#mu_{2}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon1pfjet1", "deltaR_muon1pfjet1", false, "","#Delta R (#mu_{1}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon1pfjet2", "deltaR_muon1pfjet2", false, "","#Delta R (#mu_{1}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon2pfjet1", "deltaR_muon2pfjet1", false, "","#Delta R (#mu_{2}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,6, "deltaR_muon2pfjet2", "deltaR_muon2pfjet2", false, "","#Delta R (#mu_{2}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 100,0,2000, "M_bestmupfjet1_mumu", "M_bestmupfjet1_mumu", false, "","M_{#mu jet} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,800, "M_pfjet1pfjet2", "M_pfjet1pfjet2", false, "","M_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
+	//fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,400, "MT_pfjet1pfjet2", "MT_pfjet1pfjet2", false, "","M^{T}_{jj}(GeV)" +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,8, "deltaR_pfjet1pfjet2", "deltaR_pfjet1pfjet2", false, "","#Delta R (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.15,3.15, "deltaPhi_pfjet1pfjet2", "deltaPhi_pfjet1pfjet2", false, "","#Delta#phi (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
 
 	//gROOT->Reset();	gROOT->ProcessLine(".q;");	
 
@@ -566,8 +607,8 @@ cut_mc += ")";
 	TString cut_st_mc = lumi+ "*weight*("+cut_st_data+")";
 
 	
-	fillHisto(cut_mass_mc, cut_mass_data,cut_mass_data_emu,  Use_emu, true, 40,0.0,2000.0, "M_bestmupfjet1_mumu", false, "","M_{#mu j} " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(cut_st_mc, cut_st_data,cut_st_data_emu, Use_emu, true, 30,200,1700, "ST_pf_mumu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
+	fillHisto(cut_mass_mc, cut_mass_data,cut_mass_data_emu,  Use_emu, true, 40,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmupfjet1_mumu", false, "","M_{#mu j} " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(cut_st_mc, cut_st_data,cut_st_data_emu, Use_emu, true, 30,200,1700, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
 
 	gROOT->Reset(); gROOT->ProcessLine(".q;");
 }
