@@ -235,6 +235,18 @@ void placeholder::Loop()
 	BRANCH(RangeCenterMassRatio_BestLQCombo);
 	BRANCH(RangeCenterTransverseMassRatio_BestLQCombo);
 	BRANCH(LowestMass_BestLQCombo);
+	BRANCH(AverageMass_BestLQCombo);
+
+	// Additions for E-Mu Selection
+
+	BRANCH(LowestMass_BestLQCombo_emuselection);
+	BRANCH(AverageMass_BestLQCombo_emuselection);
+	
+
+	BRANCH(M_HEEPele1pfjet1_emuselection); BRANCH(M_HEEPele1pfjet2_emuselection);
+	BRANCH(M_bestmuORelepfjet1_mumu_emuselection); BRANCH(M_bestmuORelepfjet2_mumu_emuselection);
+
+	
 	
 	// Trigger
 	BRANCH(LowestUnprescaledTrigger); BRANCH(Closest40UnprescaledTrigger);
@@ -1066,7 +1078,17 @@ void placeholder::Loop()
 		VRESET(RangeCenterMassRatio_BestLQCombo);
 		VRESET(RangeCenterTransverseMassRatio_BestLQCombo);
 		VRESET(LowestMass_BestLQCombo);
-
+		VRESET(AverageMass_BestLQCombo);
+	
+		// Additions for E-Mu Selection
+	
+		VRESET(LowestMass_BestLQCombo_emuselection);
+		VRESET(AverageMass_BestLQCombo_emuselection);
+		
+	
+		VRESET(M_HEEPele1pfjet1_emuselection); VRESET(M_HEEPele1pfjet2_emuselection);
+		VRESET(M_bestmuORelepfjet1_mumu_emuselection); VRESET(M_bestmuORelepfjet2_mumu_emuselection);
+	
 
 		// Recoil variables
 		VRESET(U1_Z);     VRESET(U2_Z);
@@ -1462,6 +1484,8 @@ void placeholder::Loop()
    		        ST_pf_emu = Pt_muon1 + Pt_pfjet1 + Pt_pfjet2 + Pt_HEEPele1;
 				M_muon1HEEPele1 = (muon1 + heepele1).M();
 				deltaR_muon1HEEPele1 = (heepele1).DeltaR(muon1);
+				M_HEEPele1pfjet1_emuselection = (heepele1 + pfjet1).M();
+				M_HEEPele1pfjet2_emuselection = (heepele1 + pfjet2).M();
 		}
 
 		//========================   LQ Mass Concepts ================================//
@@ -1491,6 +1515,29 @@ void placeholder::Loop()
 		LowestMass_BestLQCombo = M_bestmupfjet1_mumu;
 		if (M_bestmupfjet1_mumu > M_bestmupfjet2_mumu) LowestMass_BestLQCombo = M_bestmupfjet2_mumu;
 
+		AverageMass_BestLQCombo = 0.5*(M_bestmupfjet1_mumu + M_bestmupfjet2_mumu);
+
+		// e-mu selection for Data-Driven ttbar
+		if ((MuonCount>=1) && (PFJetCount>1) && (HEEPEleCount>=1))
+		{
+			if (abs(M_HEEPele1pfjet1_emuselection - M_muon1pfjet2) < abs(M_HEEPele1pfjet2_emuselection - M_muon1pfjet1) )
+			{
+				M_bestmuORelepfjet1_mumu_emuselection = M_HEEPele1pfjet1_emuselection;
+				M_bestmuORelepfjet2_mumu_emuselection = M_muon1pfjet2;
+			}
+
+			if (abs(M_HEEPele1pfjet1_emuselection - M_muon1pfjet2) > abs(M_HEEPele1pfjet2_emuselection - M_muon1pfjet1) )
+			{
+				M_bestmuORelepfjet1_mumu_emuselection = M_HEEPele1pfjet2_emuselection;
+				M_bestmuORelepfjet2_mumu_emuselection = M_muon1pfjet1;
+			}
+		}
+		
+		LowestMass_BestLQCombo_emuselection = M_bestmuORelepfjet1_mumu_emuselection;
+		if (M_bestmuORelepfjet1_mumu_emuselection > M_bestmuORelepfjet2_mumu_emuselection) LowestMass_BestLQCombo_emuselection = M_bestmuORelepfjet2_mumu_emuselection;
+
+		AverageMass_BestLQCombo = 0.5*( M_bestmuORelepfjet1_mumu_emuselection + M_bestmuORelepfjet2_mumu_emuselection);
+	
 
 		// Beta - Half production - minimize difference of transverse masses
 		if ((MuonCount>0) && (PFJetCount> 1))
@@ -1511,7 +1558,8 @@ void placeholder::Loop()
 				RangeCenterTransverseMassRatio_BestLQCombo = RangeTransverseMass_BestLQCombo/CenterTransverseMass_BestLQCombo;
 			}
 		}
-		
+
+
 		
 		// Nonsense for testing - test of jet masses
 		
