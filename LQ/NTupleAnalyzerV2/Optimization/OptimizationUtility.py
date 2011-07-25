@@ -9,7 +9,8 @@ import sys
 import math
 AnalysisType=sys.argv[1] 
 #FileLocation="~/neuhome/LQAnalyzerOutput/NTupleAnalyzer_V00_02_04_Default__2011_07_12_16_27_56/SummaryFiles/"
-FileLocation="/tmp/darinb/NTupleAnalyzer_V00_02_04_Default__2011_07_12_16_27_56/SummaryFiles/"
+#FileLocation="/tmp/darinb/NTupleAnalyzer_V00_02_04_Default__2011_07_12_16_27_56/SummaryFiles/"
+FileLocation="/afs/cern.ch/user/d/darinb/neuhome/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2011_07_21_16_14_42/SummaryFiles/"
 
 #print(AnalysisType)
 if AnalysisType == "":
@@ -18,60 +19,75 @@ if AnalysisType == "":
 from time import strftime
 
 ttbarscale = 165./121.
-wscale = 1.25
-zscale = 1.42
-CutVariablesMuMu=['ST_pf_mumu','M_muon1muon2'] # Which variables do you want to cut on
+wscale = 1.19
+zscale = 1.34
+CutVariablesMuMu=['ST_pf_mumu','M_muon1muon2','LowestMass_BestLQCombo'] # Which variables do you want to cut on
 
-VariableStartingPointMuMu = [250,100] # Where to start cutting on the variable 
-VariableIntervalMuMu = [5,5] # Intervals in which you will test cuts
-VariablePointsToTestMuMu = [2000,30] # Number of cutting points to test at the given interval
+VariableStartingPointMuMu = [250,100,50] # Where to start cutting on the variable 
+VariableIntervalMuMu = [10,10,10] # Intervals in which you will test cuts
+VariablePointsToTestMuMu = [85,12,80] # Number of cutting points to test at the given interval
 
-CutVariables=['ST_pf_munu','MT_muon1pfMET'] # Which variables do you want to cut on
 
-VariableInterval = [10,10] # Intervals in which you will test cuts
-VariableStartingPoint = [170,120] # Where to start cutting on the variable 
-VariablePointsToTest = [75,20] # Number of cutting points to test at the given interval
+#CutVariablesMuNu=['ST_pf_munu','MT_muon1pfMET','M_bestmupfjet_munu'] # Which variables do you want to cut on
+CutVariablesMuNu=['ST_pf_munu','MET_pf','M_bestmupfjet_munu'] # Which variables do you want to cut on
 
+#VariableStartingPointMuNu = [250,45,50] # Where to start cutting on the variable 
+#VariableIntervalMuNu = [10,5,10] # Intervals in which you will test cuts
+#VariablePointsToTestMuNu = [85,30,80] # Number of cutting points to test at the given interval
+
+VariableStartingPointMuNu = [730,140,300] # Where to start cutting on the variable 
+VariableIntervalMuNu = [10,5,10] # Intervals in which you will test cuts
+VariablePointsToTestMuNu = [30,30,40] # Number of cutting points to test at the given interval
 person = (os.popen("whoami").readlines())[0].replace('\n','')
 
 # Other variable to precut on as they appear in the root file (these are not variable cuts, they are single static cuts):
 lumi= 964.0
 
-preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(M_muon1muon2>100)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
-preselectionmunu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))'
+preselectionmumu = '((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>100)*(LowestMass_BestLQCombo>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
+preselectionmunu = '((Pt_muon1>40)*(Pt_muon2<30.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0)*(M_bestmupfjet_munu>50)'
 
+for x in range(len(CutVariablesMuNu)):
+	preselectionmunu += '*('+CutVariablesMuNu[x]+'> '+str(VariableStartingPointMuNu[x])+')'
 
-cut_mc = ''
-cut_mc += "*(";
-cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.234142999219))+";
-cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.391919924679))+";
-cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.891152608268))+";
-cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.47305139771))+";
-cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.93017858004))+";
-cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.11833150885))+";
-cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.01751788566))+";
-cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.70944803697))+";
-cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.31229365332))+";
-cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.925434484034))+";
-cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.605971483275))+";
-cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.394941952849))+";
-cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.276345990362))+";
-cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.20009735534))+";
-cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.141456188741))+";
-cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.108972760522))+";
-cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.0833670643396))+";
-cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0634614340846))+";
-cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0469071585524))+";
-cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0416480206016))+";
-cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.0329466598014))+";
-cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0330046295408))+";
-cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.033396930948))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0326118832875))+";
-cut_mc += "((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)*(0.0748840402223))";
-cut_mc += ")";
-preselectionmumu = preselectionmumu + cut_mc
-preselectionmunu = preselectionmunu + cut_mc
+cut_mc = str(lumi)+'*weight_964pileup_bugfix'
+# These are MC - driven Summer11 for the bug fix
+#cut_mc += "*(";
+#cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.133))+";
+#cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.5311))+";
+#cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.0839))+";
+#cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.7548))+";
+#cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.2326))+";
+#cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.293))+";
+#cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.0818))+";
+#cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.74354))+";
+#cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.329634))+";
+#cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.950884))+";
+#cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.65398))+";
+#cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.4212))+";
+#cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.2595))+";
+#cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.158601))+";
+#cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.100442))+";
+#cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.05945))+";
+#cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.034516))+";
+#cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.02072))+";
+#cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.01170))+";
+#cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.006946))+";
+#cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.003486))";
+#cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.00191943200042))+";
+#cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.00120128248423))+";
+#cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.000647624891971))+";
+#cut_mc += "((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)*(0.000455476442992))+";
+#cut_mc += "((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)*(0.000196385472519))+";
+#cut_mc += "((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)*(0.000101079948326))+";
+#cut_mc += "((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)*(8.14199879897e-05))+";
+#cut_mc += "((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)*(4.89354471066e-05))+";
+#cut_mc += "((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)*(3.35058351289e-05))";
+#cut_mc += ")";
+	
+preselectionmumu = preselectionmumu
+preselectionmunu = preselectionmunu
 
+logout = open(AnalysisType+"_log.txt",'w')
 
 if AnalysisType=="MuMu" or AnalysisType =="MuMu" or AnalysisType=="mumu":
 	CutVariables = CutVariablesMuMu
@@ -110,12 +126,14 @@ for x in fileinfo:
 		SigOrBG.append(1)
 	else:
 		SigOrBG.append(0)
+	
 # Get list of Leptoqark types and ALLBKG
+
 if AnalysisType=="MuNu" or AnalysisType =="Munu" or AnalysisType=="munu":
 	for x in range(len(SignalType)):
 		if "Data" in SignalType[x] or "Summer" in SignalType[x]:
 			continue
-		if "LQ" in SignalType[x] and "MuNuJJFilter" in SignalType[x]: 
+		if "LQ" in SignalType[x] and "BetaHalf" in SignalType[x]: 
 			LQList.append(SignalType[x])
 			SBList.append(SigOrBG[x])
 		if "LQ" not in SignalType[x]: 
@@ -152,16 +170,25 @@ BackgroundValues = []
 SignalValues = []
 SignifValues = []
 cuts = []
+n = 0
 for i in multi_for(map(xrange, VariablePointsToTest)):
-	cut = "1.0"
+	cuts.append('')
+for i in multi_for(map(xrange, VariablePointsToTest)):
+	#print n
+	cuts[n] += "1.0"
 	for c in range(len(i)):
-		cut += "*("+CutVariables[c] +' > ' +str((VariableStartingPoint[c])+VariableInterval[c]*i[c] )+")"
-	cuts.append(cut)
+		cuts[n]+="*("+CutVariables[c] +' > ' +str((VariableStartingPoint[c])+VariableInterval[c]*i[c] )+")"
+	#cuts.append(cut)
 	BackgroundValues.append(0.0)
 	SignalValues.append(0.0)
 	SignifValues.append(0.0)
+	#print n
+	#print cuts[n]
+	n = n + 1
 
-	print cut
+numcut = len(cuts)
+
+	#print cut
 
 for x in range(len(SignalType)):
 	if SigOrBG[x] ==1:
@@ -178,20 +205,36 @@ for x in range(len(SignalType)):
 		scalefactor = zscale
 	if 'WJets' in SignalType[x]: 
 		scalefactor = wscale
-	T = t.CopyTree(preselection + '*'+str(scalefactor))
-	h = TH1D('h','h',1,0,2)
-	
+	print "Reducing tree with preselection ... " 
+	T = t.CopyTree(preselection)
+	h = TH1F('h','h',1,0,2)
+	print "Evaluating Cuts... " 
 	for y in range(len(cuts)):
-		T.Project('h','1.0',preselection+"*"+cuts[y])
+		##print cut_mc+'*'+str(scalefactor)+"*"+cuts[y]
+		T.Project('h','1.0',cut_mc+'*'+str(scalefactor)+"*"+cuts[y])
 		BackgroundValues[y]+=(h.Integral())
-	
+		#print str(y) +' of '+ str(numcut)
 	#print BackgroundValues
 	
+num = '0123456789'
+
 
 for x in range(len(SignalType)):
 	if SigOrBG[x] ==0:
 		continue
 	print SignalType[x]
+	sig = SignalType[x]
+	mass = ''
+	for q in sig:
+		if q in num:
+			mass +=q
+	mass = float(mass)
+	print mass
+	if mass<460:
+		#print 'OK GOOD'
+		continue
+			
+	
 	BestSignif = -999.9
 	BestCut = ''
 	sfile = FileLocation+'/'+SignalType[x]+'.root'
@@ -199,19 +242,25 @@ for x in range(len(SignalType)):
 	t = f.Get("PhysicalVariables")
 	fout = TFile("/tmp/"+person+"/"+SignalType[x]+"_tmp.root","RECREATE")
 	scalefactor = 1.0
-	T = t.CopyTree(preselection + '*'+str(scalefactor))
-	h = TH1D('h','h',1,0,2)
-	
+	print "Reducing tree with preselection ... " 
+	T = t.CopyTree(preselection)
+	h = TH1F('h','h',1,0,2)
+	print "Evaluating Cuts... " 
+
 	for y in range(len(cuts)):
-		T.Project('h','1.0',preselection+"*"+cuts[y])
+		T.Project('h','1.0',cut_mc+'*'+str(scalefactor)+"*"+cuts[y])
 		SignalValues[y]=(h.Integral())
 		SignifValues[y] = SignalValues[y] / math.sqrt(BackgroundValues[y] + SignalValues[y])
+		#print str(y) +' of ' +str(numcut)
+
 		if SignifValues[y]>BestSignif:
 			BestSignif = SignifValues[y]
 			BestCut = cuts[y]
 	print BestCut
 	print BestSignif
-	
+	logout.write(SignalType[x]+'\n')
+	logout.write(BestCut+'\n\n')
+
 
 
 
