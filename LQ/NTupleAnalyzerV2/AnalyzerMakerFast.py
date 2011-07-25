@@ -55,8 +55,8 @@ for r in range(1,len(table)):
 table2= map(list,zip(*table[1:]))
 for x in range(0,len(table2)):
 	exec (table[0][x]+'='+`table2[x]`)	
-for x in range(0,len(HLTBit)):
-	HLTBit[x]=int(HLTBit[x])
+for x in range(0,len(SigOrBG)):
+	#HLTBit[x]=int(HLTBit[x])
 	SigOrBG[x]=int(SigOrBG[x])
 ###----------------------------------------------------------------------###
 
@@ -133,7 +133,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>10:
+		if len(sublist)>7:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
