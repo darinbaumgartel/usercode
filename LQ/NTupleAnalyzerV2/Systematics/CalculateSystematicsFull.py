@@ -105,8 +105,6 @@ issignal_n = []
 
 
 for s in range(len(selections)):
-	if s>0 :
-		break
 	bgtotal = 0.0
 	
 	sel = selections[s]
