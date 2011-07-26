@@ -43,29 +43,6 @@ for c in castors:
 		
 lumi = 964.0
 
-preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
-preselectionmunu = str(lumi)+'*weight*(((Pt_muon1>40)*(Pt_muon2<30.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))'
-
-selections = []
-signaluse = []
-fullsel = 0
-for x in range(len(sys.argv)):
-	if sys.argv[x] == '-i':
-		fullsel = 1
-		fullfile = sys.argv[x+1]
-if (fullsel):
-	log = open('OptimizationResultsV2.txt','r')
-	for line in log:
-		if 'LQToCMu' in line:
-			signaluse.append(line.replace('\n',''))
-			if 'BetaHalf' in line:
-				presel = preselectionmunu
-			else:
-				presel = preselectionmumu
-		if '>' in line:
-			selections.append(presel+line.replace('\n','').replace('1.0*(','*('))
-
-
 
 cut_mc = "*(";
 cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.133))+";
@@ -90,6 +67,33 @@ cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.01170
 cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.006946))+";
 cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.003486))";
 cut_mc += ")";
+
+
+preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))' + cut_mc
+preselectionmunu = str(lumi)+'*weight*(((Pt_muon1>40)*(Pt_muon2<30.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))' + cut_mc
+
+
+
+selections = []
+signaluse = []
+fullsel = 0
+for x in range(len(sys.argv)):
+	if sys.argv[x] == '-i':
+		fullsel = 1
+		fullfile = sys.argv[x+1]
+if (fullsel):
+	log = open('OptimizationResultsV2.txt','r')
+	for line in log:
+		if 'LQToCMu' in line:
+			signaluse.append(line.replace('\n',''))
+			if 'BetaHalf' in line:
+				presel = preselectionmunu
+			else:
+				presel = preselectionmumu
+		if '>' in line:
+			selections.append(presel+line.replace('\n','').replace('1.0*(','*('))
+
+
 
 ignores = []
 
