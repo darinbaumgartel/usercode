@@ -643,6 +643,8 @@ void MakePlotsMuMuSub()
 	TString filetag = "2011Data_PreSelection";
 	TString xtag = " [preselection]";
 
+	if (true){
+
 	//gROOT->Reset();	gROOT->ProcessLine(".q;");	
 	Use_emu = true;
 	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,40,340, "M_muon1muon2", "M_muon1HEEPele1", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
@@ -692,29 +694,41 @@ void MakePlotsMuMuSub()
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.15,3.15, "deltaPhi_pfjet1pfjet2", "deltaPhi_pfjet1pfjet2", false, "","#Delta#phi (j_{1}j_{2})(GeV)" +xtag,lumi,1000,ZNormalization,filetag);
 
 	//gROOT->Reset();	gROOT->ProcessLine(".q;");	
+	}	
+
+	// -------------      Full Selection      -------------- //
 
 
-	// ------------- Pre Selection - Preselection With ST>250 Cut      -------------- //
-
-	filetag = "2011Data_FullSelection_lqmumu250";
-
-	xtag = " [full selection]";
-
-	// TString cut_mass_data = cut_data + "*(M_muon1muon2>115)*(ST_pf_mumu>440)";
-// 	TString cut_mass_data_emu = cut_data_emu + "*(M_muon1HEEPele1>115)*(ST_pf_emu>440)";
-// 	TString cut_mass_mc = lumi+ "*weight*("+cut_mass_data+")";
-
-// 	TString cut_st_data = cut_data + "*(M_muon1muon2>115)*(ST_pf_mumu>250)";
-// 	TString cut_st_data_emu = cut_data_emu + "*(M_muon1HEEPele1>115)*(ST_pf_emu>250)";
-	//TString cut_st_mc = lumi+ "*weight*("+cut_st_data+")";
-
-	//TString cut_full_data = cut_data + "*(ST_pf_mumu > 320)*(M_muon1muon2 > 100)*(LowestMass_BestLQCombo > 70)";
- 	//TString cut_full_data_emu = cut_data_emu + "*(M_muon1HEEPele1>140)*(ST_pf_emu>550)";
-	//TString cut_full_mc = lumi+ "*weight*("+cut_full_data+")";
-
+	if (true){
+	Use_emu = true;
 	
-	//fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, true, 40,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmupfjet1_mumu", false, "","M_{#mu j} " +xtag,lumi,10,ZNormalization,filetag);
-	//fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, true, 30,200,1700, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
+	// LQ 250 
+	filetag = "2011Data_FullSelection_lqmumu250";
+	xtag = " [Full Selection]";
+	lq_choice = "lqmumu250";
 
+	TString cut_full_data = cut_data + "*(M_muon1muon2 > 100)*(ST_pf_mumu > 320)*(LowestMass_BestLQCombo > 70)";
+ 	TString cut_full_data_emu = cut_data_emu + "*(M_muon1HEEPele1>100)*(ST_pf_emu>320)*(LowestMass_BestLQCombo_emuselection>70)";
+	TString cut_full_mc = lumi+ "*weight_964pileup_bugfix*("+cut_full_data+")";
+	
+	
+	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, true, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", false, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, true, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
+
+	// LQ 500 
+	filetag = "2011Data_FullSelection_lqmumu500";
+	xtag = " [Full Selection]";
+	lq_choice = "lqmumu500";
+
+	TString cut_full_data = cut_data + "*(M_muon1muon2 > 140)*(ST_pf_mumu > 640)*(LowestMass_BestLQCombo > 260)";
+ 	TString cut_full_data_emu = cut_data_emu + "*(M_muon1HEEPele1>140)*(ST_pf_emu>640)*(LowestMass_BestLQCombo_emuselection>260)";
+	TString cut_full_mc = lumi+ "*weight_964pileup_bugfix*("+cut_full_data+")";
+	
+	
+	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, true, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", false, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, true, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
+
+
+	}
 	gROOT->Reset(); gROOT->ProcessLine(".q;");
 }
