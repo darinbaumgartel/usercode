@@ -47,7 +47,11 @@ if filetype not in ['CSV','csv']:
 
 
 f = os.popen('cat LQDataTemp.csv').readlines()
-
+munu = 0
+if "MuNu" in XLSFile:
+	munu = 1
+	print "Changes will be made to accomodate the MuNu channel cross sections"
+	
 info = []
 start = 0
 for x in f:
@@ -109,13 +113,20 @@ f.write('\n#include "roostats_cl95.C" \n\nvoid MakeLimits()\n{\n\nLimitResult Va
 
 beginline = 'Value = roostats_clm('+str(lumi)+','+str(lumierror)+','
 
+numpseudo = 25
+for x in rang(len(sys.argv)):
+	if sys.argv[x]=='-n':
+		numpseudo = sys.argv[x+1]
+numpseudo = str(numpseudo)
+
+
 for x in range(len(name)):
 	thisinfo = []
 	thisinfo.append(sig[x])
 	thisinfo.append(sigerr[x])
 	thisinfo.append(bg[x])
 	thisinfo.append(bgerr[x])
-	thisinfo.append('20')
+	thisinfo.append(numpseudo)
 	thisinfo.append('1')
 	thisline = (beginline + str(thisinfo).replace('[','').replace(']','') + ');//'+name[x]).replace('\n','')
 	thisline = thisline.replace('\'','') + '\n'
@@ -165,9 +176,9 @@ if todo:
 
 if todo:
 	print '\n\n Running Observed Limits. This may take some time and TCanvas Windows may flash on screen.\n\n'
-	os.system('root -l RunObservation > ObservationLog.txt ')
+	os.system('root -b RunObservation > ObservationLog.txt ')
 	print '\n\n Running Expected Limits. This may take some time and TCanvas Windows may flash on screen.\n\n'
-	os.system('root -l RunExpectation > ExpectationLog.txt ')
+	os.system('root -b RunExpectation > ExpectationLog.txt ')
 
 observedlimits = []
 expectedlimits = []
@@ -263,6 +274,18 @@ for line in PlotTemp.readlines():
 		line ='Double_t y_2sigma['+ `len(shademasses)`+']={' + shade2sigmastring+'};\n'
 	if 'numbershade' in line:
 		line = line.replace('numbershade',`len(shademasses)`)
+	if (munu==1) and ('Double_t xsTh' in line or 'Double_t y_pdf[' in line) :
+		contents = line.split('{')[-1]
+		contents = contents.split('}')[0]
+		contents = contents.split(',')
+		for x in contents:
+			line = line.replace(x,x+'/2.0')
+	if (munu==1):
+		line = line.replace('beta^{2}#times','beta(1-#beta)#times')
+		line = line.replace('beta=1','beta=1/2')
+		line = line.replace('316,316','270,270')
+	if 'TGraph *xsData_vs_m_' in line:
+		line = line.replace('numberofpoints',str(len(name)))
 	PlotWrite.write(line)
 PlotWrite.close()
 PlotTemp.close()
