@@ -210,10 +210,10 @@ void makePlots()
 
  // arrays of LQ masses for theoretical cross section
  //Double_t mTh[9] = {100, 150, 200, 250, 300, 350, 400,450,500};
- Double_t mTh[8] = { 150, 200, 250, 300, 350, 400,450,500};
+ Double_t mTh[15] = { 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850};
  // array of theoretical cross-sections for different leptoquark masses
  //Double_t xsTh[9] = {386, 53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463};
- Double_t xsTh[8] = { 53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463};
+ Double_t xsTh[15] = { 53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732};
   
  // filename for the final plot (NB: changing the name extension changes the file format)
  string fileName = "BetaSquaredSigmaPlot.eps";
@@ -224,19 +224,19 @@ void makePlots()
  string title = ";M_{LQ} (GeV);#beta^{2}#times#sigma [pb]";
 
  // integrated luminosity
- string lint = "#intLdt=IntLumiValue pb^{-1}";
+ string lint = "IntLumiValue pb^{-1}";
 
  // region excluded by Tevatron limits
- Double_t x_shaded[5] = {200,316,316,200,200};// CHANGED FOR LQ2
- Double_t y_shaded[5] = {0.01,0.01,100,100,0.01};// CHANGED FOR LQ2
+ Double_t x_shaded[5] = {250,316,316,250,250};// CHANGED FOR LQ2
+ Double_t y_shaded[5] = {0.000001,0.000001,500,500,0.000001};// CHANGED FOR LQ2
 
  // PDF uncertainty band
  //Double_t x_pdf[12] = {100	 ,	150	 ,	200 	,	250	, 300	,	350	,	350	, 300	, 250, 200, 150, 100};
  //Double_t y_pdf[12] = {445.5 ,	61.4 ,	13.7 	,	4.1	, 1.43,	0.57,	0.38, 0.98, 2.9, 10.0, 45.2, 330.3};
  //Double_t x_pdf[18] = {100		,	150		,	200		,	250	,	300		,	350		,	400	,  450 	 ,  500  , 500  , 450 	,	400	,	350		,	300		,	250	, 200		, 150		, 100		};
  //Double_t y_pdf[18] = {445.5	,	61.4	,	13.7	,	4.1	,	1.43	, 0.57	,	.25	, .1167	 ,	.058 , .034	,	.072	, .16	,	0.38	, 0.98	, 2.9	, 10.0	, 45.2	, 330.3	};
- Double_t x_pdf[16] = {	150		,	200		,	250	,	300		,	350		,	400	,  450 	 ,  500  , 500  , 450 	,	400	,	350		,	300		,	250	, 200		, 150		};
- Double_t y_pdf[16] = {	61.4	,	13.7	,	4.1	,	1.43	, 0.57	,	.25	, .1167	 ,	.058 , .034	,	.072	, .16	,	0.38	, 0.98	, 2.9	, 10.0	, 45.2	};
+ Double_t x_pdf[28] = {	150		,	200		,	250	,	300		,	350		,	400	,  450 	 ,  500, 600,	650,	700,	750,	800,	850,	850,	800,	750,	700,	650,	600  , 500  , 450 	,	400	,	350		,	300		,	250	, 200		, 150		};
+ Double_t y_pdf[28] = {	61.4	,	13.7	,	4.1	,	1.43	, 0.57	,	.25	, .1167	 ,	.058,0.01561,	0.00866,	0.00491,	0.00284,	0.001677,	0.001008,	0.000456,	0.000803,	0.00144,	0.00263,	0.00486,	0.00919 , .034	,	.072	, .16	,	0.38	, 0.98	, 2.9	, 10.0	, 45.2	};
  
  Double_t x_shademasses[1] = {1};
  Double_t y_1sigma[1] = {1};
@@ -281,7 +281,7 @@ void makePlots()
  TCanvas *c = new TCanvas("c","",800,800);
  c->cd();
  
- TH2F *bg = new TH2F("bg",title.c_str(), 100, 200., 500., 100, 0.01, 100.);
+ TH2F *bg = new TH2F("bg",title.c_str(), 500, 250., 850., 500., 0.000001, 500.);
  bg->SetStats(kFALSE);
  bg->SetTitleOffset(1.,"X");
  bg->SetTitleOffset(1.15,"Y");
@@ -306,7 +306,7 @@ void makePlots()
  gPad->RedrawAxis();
 
 
- TGraph *grshade = new TGraph(16,x_pdf,y_pdf);
+ TGraph *grshade = new TGraph(28,x_pdf,y_pdf);
  grshade->SetFillColor(kGreen);
  //grshade->SetFillStyle(2);
  grshade->Draw("f");
@@ -319,7 +319,7 @@ void makePlots()
  gStyle->SetPadLeftMargin(0.14);
  gROOT->ForceStyle();
 
- TGraph *xsTh_vs_m = new TGraph(8, mTh, xsTh);
+ TGraph *xsTh_vs_m = new TGraph(16, mTh, xsTh);
  xsTh_vs_m->SetLineWidth(2);
  xsTh_vs_m->SetLineColor(kRed);
  xsTh_vs_m->SetFillColor(kGreen);
@@ -328,7 +328,7 @@ void makePlots()
  xsTh_vs_m->SetMarkerColor(kRed);
  xsTh_vs_m->Draw("C");
 
- TGraph *xsData_vs_m_expected = new TGraph(13, mData, xsUp_expected);
+ TGraph *xsData_vs_m_expected = new TGraph(numberofpoints, mData, xsUp_expected);
  xsData_vs_m_expected->SetMarkerStyle(23);
  xsData_vs_m_expected->SetMarkerColor(kBlue);
  xsData_vs_m_expected->SetLineColor(kBlue);
@@ -337,7 +337,7 @@ void makePlots()
  xsData_vs_m_expected->SetMarkerSize(1.5);
  xsData_vs_m_expected->Draw("CP");
 
- TGraph *xsData_vs_m_observed = new TGraph(13, mData, xsUp_observed);
+ TGraph *xsData_vs_m_observed = new TGraph(numberofpoints, mData, xsUp_observed);
  xsData_vs_m_observed->SetMarkerStyle(22);
  xsData_vs_m_observed->SetMarkerColor(kBlack);
  xsData_vs_m_observed->SetLineColor(kBlack);
@@ -364,8 +364,8 @@ void makePlots()
  l1.SetTextSize(0.04);
  l1.SetTextFont(42);
  l1.SetNDC();
- l1.DrawLatex(0.2,0.3,"CMS");
- l1.DrawLatex(0.2,0.2,lint.c_str());
+ l1.DrawLatex(0.6,0.25,"CMS Preliminary");
+ l1.DrawLatex(0.6,0.17,lint.c_str());
 
 //  TLatex l2;
 //  l2.SetTextAlign(12);
