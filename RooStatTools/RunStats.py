@@ -114,7 +114,7 @@ f.write('\n#include "roostats_cl95.C" \n\nvoid MakeLimits()\n{\n\nLimitResult Va
 beginline = 'Value = roostats_clm('+str(lumi)+','+str(lumierror)+','
 
 numpseudo = 25
-for x in rang(len(sys.argv)):
+for x in range(len(sys.argv)):
 	if sys.argv[x]=='-n':
 		numpseudo = sys.argv[x+1]
 numpseudo = str(numpseudo)
