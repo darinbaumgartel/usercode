@@ -118,7 +118,7 @@ for x in range(len(sys.argv)):
 	if sys.argv[x]=='-n':
 		numpseudo = sys.argv[x+1]
 numpseudo = str(numpseudo)
-
+print "Using psuedoexperimemtns:  " +numpseudo 
 
 for x in range(len(name)):
 	thisinfo = []
