@@ -339,8 +339,8 @@ void placeholder::Loop()
 		{
 			for(unsigned int iPU = 0; iPU != PileUpInteractions->size(); ++iPU)
 			{
-				if (abs(PileUpOriginBX->at(iPU)) <= 1) N_WeightedPileUpInteractions += (1.0*(PileUpInteractions->at(iPU)))/3.0;
-				if (abs(PileUpOriginBX->at(iPU)) == 0) N_PileUpInteractions += (1.0*(PileUpInteractions->at(iPU)));
+				if (TMath::Abs(PileUpOriginBX->at(iPU)) <= 1) N_WeightedPileUpInteractions += (1.0*(PileUpInteractions->at(iPU)))/3.0;
+				if (TMath::Abs(PileUpOriginBX->at(iPU)) == 0) N_PileUpInteractions += (1.0*(PileUpInteractions->at(iPU)));
 			}	
 		}
 		
@@ -1131,7 +1131,7 @@ void placeholder::Loop()
 		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 		{
 			ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
-			MetJetDphi = abs(ThisPFJet.DeltaPhi(pfMET));
+			MetJetDphi = TMath::Abs(ThisPFJet.DeltaPhi(pfMET));
 			bool consider = true;
 			
 			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
@@ -1160,7 +1160,7 @@ void placeholder::Loop()
 			CaloJetRawCount += 1.0;
 			ST_calo_hadronic += (*CaloJetPt)[ijet];
 			ThisCaloJet.SetPtEtaPhiM((*CaloJetPt)[ijet],(*CaloJetEta)[ijet],(*CaloJetPhi)[ijet],0);
-			MetJetDphi = abs(ThisCaloJet.DeltaPhi(caloMET));
+			MetJetDphi = TMath::Abs(ThisCaloJet.DeltaPhi(caloMET));
 			if (MetJetDphi < deltaPhi_METClosestCaloJet) deltaPhi_METClosestCaloJet = MetJetDphi;
 			if (MetJetDphi > deltaPhi_METFurthestCaloJet) deltaPhi_METFurthestCaloJet = MetJetDphi;	
 		}
@@ -1177,7 +1177,7 @@ void placeholder::Loop()
 		{
 			ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
 			if (ThisPFJet.Pt()<10.0) continue;
-			MetJetDphi = abs(ThisPFJet.DeltaPhi(pfMET));
+			MetJetDphi = TMath::Abs(ThisPFJet.DeltaPhi(pfMET));
 			bool consider = true;
 			
 			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
@@ -1204,7 +1204,7 @@ void placeholder::Loop()
 			ThisCaloJet.SetPtEtaPhiM((*CaloJetPt)[ijet],(*CaloJetEta)[ijet],(*CaloJetPhi)[ijet],0);
 			if (ThisCaloJet.Pt()<10.0) continue;
 
-			MetJetDphi = abs(ThisCaloJet.DeltaPhi(caloMET));
+			MetJetDphi = TMath::Abs(ThisCaloJet.DeltaPhi(caloMET));
 
 			if (MetJetDphi < deltaPhi_METClosestPT10CaloJet) deltaPhi_METClosestPT10CaloJet = MetJetDphi;
 			if (MetJetDphi > deltaPhi_METFurthestPT10CaloJet) deltaPhi_METFurthestPT10CaloJet = MetJetDphi;	
@@ -1493,21 +1493,21 @@ void placeholder::Loop()
 		// DiMuon, minimizing differene between mu-jet masses
 		if ((MuonCount>1) && (PFJetCount> 1))
 		{
-			if (abs(M_muon1pfjet1 - M_muon2pfjet2) < abs(M_muon1pfjet2 - M_muon2pfjet1) )
+			if (TMath::Abs(M_muon1pfjet1 - M_muon2pfjet2) < TMath::Abs(M_muon1pfjet2 - M_muon2pfjet1) )
 			{
 				M_bestmupfjet1_mumu = M_muon1pfjet1;
 				M_bestmupfjet2_mumu = M_muon2pfjet2;
-				RangeMass_BestLQCombo = abs(M_muon1pfjet1 - M_muon2pfjet2);
-				CenterMass_BestLQCombo = abs(M_muon1pfjet1 + M_muon2pfjet2)/2.0;
+				RangeMass_BestLQCombo = TMath::Abs(M_muon1pfjet1 - M_muon2pfjet2);
+				CenterMass_BestLQCombo = TMath::Abs(M_muon1pfjet1 + M_muon2pfjet2)/2.0;
 				RangeCenterMassRatio_BestLQCombo = RangeMass_BestLQCombo/CenterMass_BestLQCombo;
 			}
 
-			if (abs(M_muon1pfjet1 - M_muon2pfjet2) > abs(M_muon1pfjet2 - M_muon2pfjet1) )
+			if (TMath::Abs(M_muon1pfjet1 - M_muon2pfjet2) > TMath::Abs(M_muon1pfjet2 - M_muon2pfjet1) )
 			{
 				M_bestmupfjet1_mumu = M_muon2pfjet1;
 				M_bestmupfjet2_mumu = M_muon1pfjet2;
-				RangeMass_BestLQCombo = abs(M_muon2pfjet1 - M_muon1pfjet2);
-				CenterMass_BestLQCombo = abs(M_muon2pfjet1 + M_muon1pfjet2)/2.0;
+				RangeMass_BestLQCombo = TMath::Abs(M_muon2pfjet1 - M_muon1pfjet2);
+				CenterMass_BestLQCombo = TMath::Abs(M_muon2pfjet1 + M_muon1pfjet2)/2.0;
 				RangeCenterMassRatio_BestLQCombo = RangeMass_BestLQCombo/CenterMass_BestLQCombo;
 			}
 		}
@@ -1520,13 +1520,13 @@ void placeholder::Loop()
 		// e-mu selection for Data-Driven ttbar
 		if ((MuonCount>=1) && (PFJetCount>1) && (HEEPEleCount>=1))
 		{
-			if (abs(M_HEEPele1pfjet1_emuselection - M_muon1pfjet2) < abs(M_HEEPele1pfjet2_emuselection - M_muon1pfjet1) )
+			if (TMath::Abs(M_HEEPele1pfjet1_emuselection - M_muon1pfjet2) < TMath::Abs(M_HEEPele1pfjet2_emuselection - M_muon1pfjet1) )
 			{
 				M_bestmuORelepfjet1_mumu_emuselection = M_HEEPele1pfjet1_emuselection;
 				M_bestmuORelepfjet2_mumu_emuselection = M_muon1pfjet2;
 			}
 
-			if (abs(M_HEEPele1pfjet1_emuselection - M_muon1pfjet2) > abs(M_HEEPele1pfjet2_emuselection - M_muon1pfjet1) )
+			if (TMath::Abs(M_HEEPele1pfjet1_emuselection - M_muon1pfjet2) > TMath::Abs(M_HEEPele1pfjet2_emuselection - M_muon1pfjet1) )
 			{
 				M_bestmuORelepfjet1_mumu_emuselection = M_HEEPele1pfjet2_emuselection;
 				M_bestmuORelepfjet2_mumu_emuselection = M_muon1pfjet1;
@@ -1542,19 +1542,19 @@ void placeholder::Loop()
 		// Beta - Half production - minimize difference of transverse masses
 		if ((MuonCount>0) && (PFJetCount> 1))
 		{
-			if (abs(MT_muon1pfjet1 - MT_pfjet2pfMET) < abs(MT_muon1pfjet2 - MT_pfjet1pfMET) )
+			if (TMath::Abs(MT_muon1pfjet1 - MT_pfjet2pfMET) < TMath::Abs(MT_muon1pfjet2 - MT_pfjet1pfMET) )
 			{
 				M_bestmupfjet_munu= M_muon1pfjet1;
-				RangeTransverseMass_BestLQCombo = abs(MT_muon1pfjet1 - MT_pfjet2pfMET);
-				CenterTransverseMass_BestLQCombo = abs(MT_muon1pfjet1 + MT_pfjet2pfMET) / 2.0 ;
+				RangeTransverseMass_BestLQCombo = TMath::Abs(MT_muon1pfjet1 - MT_pfjet2pfMET);
+				CenterTransverseMass_BestLQCombo = TMath::Abs(MT_muon1pfjet1 + MT_pfjet2pfMET) / 2.0 ;
 				RangeCenterTransverseMassRatio_BestLQCombo = RangeTransverseMass_BestLQCombo/CenterTransverseMass_BestLQCombo;
 			}
 
-			if (abs(MT_muon1pfjet1 - MT_pfjet2pfMET) > abs(MT_muon1pfjet2 - MT_pfjet1pfMET) )
+			if (TMath::Abs(MT_muon1pfjet1 - MT_pfjet2pfMET) > TMath::Abs(MT_muon1pfjet2 - MT_pfjet1pfMET) )
 			{
 				M_bestmupfjet_munu= M_muon1pfjet2;
-				RangeTransverseMass_BestLQCombo = abs(MT_muon1pfjet2 - MT_pfjet1pfMET);
-				CenterTransverseMass_BestLQCombo = abs(MT_muon1pfjet2 + MT_pfjet1pfMET) / 2.0 ;
+				RangeTransverseMass_BestLQCombo = TMath::Abs(MT_muon1pfjet2 - MT_pfjet1pfMET);
+				CenterTransverseMass_BestLQCombo = TMath::Abs(MT_muon1pfjet2 + MT_pfjet1pfMET) / 2.0 ;
 				RangeCenterTransverseMassRatio_BestLQCombo = RangeTransverseMass_BestLQCombo/CenterTransverseMass_BestLQCombo;
 			}
 		}
