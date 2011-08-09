@@ -101,7 +101,7 @@ void fillHisto(TString lq_choice, TString cut_mc, TString cut_data,  TString cut
 	{
 		// Make histograms for second LQ mass in event and add to first
 		TString var2 = "M_bestmupfjet2_mumu";
-		TString var2_emu = "M_bestmuORelepfjet1_mumu_emuselection";
+		TString var2_emu = "M_bestmuORelepfjet2_mumu_emuselection";
 		TH1F* h2_zjets = new TH1F("h2_zjets","",nBins,xLow,xMax);
 		TH1F* h2_wjets = new TH1F("h2_wjets","",nBins,xLow,xMax);
 		TH1F* h2_vvjets = new TH1F("h2_vvjets","",nBins,xLow,xMax);
@@ -115,7 +115,7 @@ void fillHisto(TString lq_choice, TString cut_mc, TString cut_data,  TString cut
 		wjets->Draw(var2+">>h2_wjets",cut_mc);
 		if (!Use_emu) {ttbar->Draw(var2+">>h2_ttbar",cut_mc);}
 		else if (Use_emu) {data->Draw(var2_emu+">>h2_ttbar",cut_data_emu);}
-		ttbar->Draw(var2+">>h2_ttbar",cut_mc);
+		//ttbar->Draw(var2+">>h2_ttbar",cut_mc);
 		vvjets->Draw(var2+">>h2_vvjets",cut_mc);
 		singtop->Draw(var2+">>h2_singtop",cut_mc);
 		qcd->Draw(var2+">>h2_qcd",cut_mc);
@@ -525,7 +525,7 @@ void MakePlotsMuMuSub()
 	cut_data += "*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1))";
 
 	//----------Declare what lqmumu variable you'd like to display----
-	TString lq_choice = "lqmumu250";
+	TString lq_choice = "lqmumu400";
 
 	//---------emu stuff--------
 	bool Use_emu = false;
@@ -572,7 +572,7 @@ cut_mc += "((N_PileUpInteractions > 23.5)*(0.000602006464283))";
 cut_mc += ")";
 
 
-	float ZNormalization = 1.00;
+	float ZNormalization = 0.98;
 	TString filetag = " ";
 	TString xtag = " ";
 
@@ -613,9 +613,9 @@ cut_mc += ")";
 	cut_mc += "*(ST_pf_mumu>250.0)";
 	cut_data_emu += "*(ST_pf_emu>250.0)";
 	TString filetag = "2011Data_PreSelection";
-	TString xtag = " [preselection]";
+	TString xtag = " [Preselection]";
 
-	if (true){
+	if (false){
 
 	//gROOT->Reset();	gROOT->ProcessLine(".q;");	
 	Use_emu = true;
@@ -628,9 +628,9 @@ cut_mc += ")";
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,30, "EcalIso_muon1", "EcalIso_muon1", false, "","ECAL Iso_{#mu_{1}} (GeV) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,3, "HcalIso_muon1", "HcalIso_muon1", false, "","HCAL Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 35,0,3.5, "TrkIso_muon1", "TrkIso_muon1", false, "","Track Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
-	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,500, "Pt_muon1", "Pt_HEEPele", false, "","p_{T} (#mu_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, false, true, 50,0,500, "Pt_muon1", "Pt_HEEPele", false, "","p_{T} (#mu_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,50, "PtError_muon1", "PtError_muon1", false, "","#sigma(p_{T}) (#mu_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 42,-2.1,2.1, "Eta_muon1", "Eta_muon1", false, "","#eta (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, false, true, 48,-2.4,2.4, "Eta_muon1", "Eta_muon1", false, "","#eta (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.001, "EtaError_muon1", "EtaError_muon1", false, "","#sigma(#eta) (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,30,-3.141593,3.141593, "Phi_muon1", "Phi_muon1", false, "","#phi (#mu_{1}) " +xtag,lumi,2000,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.0005, "PhiError_muon1", "PhiError_muon1", false, "","#sigma(#phi) (#mu_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
@@ -638,9 +638,9 @@ cut_mc += ")";
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,30, "EcalIso_muon2", "EcalIso_muon2", false, "","ECAL Iso_{#mu_{2}} (GeV) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,3, "HcalIso_muon2", "HcalIso_muon2", false, "","HCAL Iso (#mu_{2}) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 35,0,3.5, "TrkIso_muon2", "TrkIso_muon2", false, "","Track Iso (#mu_{2}) " +xtag,lumi,10,ZNormalization,filetag);
-	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,0,400, "Pt_muon2", "Pt_muon2", false, "","p_{T} (#mu_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, false, true, 40,0,400, "Pt_muon2", "Pt_muon2", false, "","p_{T} (#mu_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,50, "PtError_muon2", "PtError_muon2", false, "","#sigma(p_{T}) (#mu_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 42,-2.1,2.1, "Eta_muon2", "Eta_muon2", false, "","#eta (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, false, true, 48,-2.4,2.4, "Eta_muon2", "Eta_muon2", false, "","#eta (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.001, "EtaError_muon2", "EtaError_muon2", false, "","#sigma(#eta) (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,30,-3.141593,3.141593, "Phi_muon2", "Phi_muon2", false, "","#phi (#mu_{2}) " +xtag,lumi,2000,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,.0005, "PhiError_muon2", "PhiError_muon2", false, "","#sigma(#phi) (#mu_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
@@ -649,8 +649,8 @@ cut_mc += ")";
 	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 65,200,1500, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
 	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,600, "Pt_pfjet1", "Pt_pfjet1", false, "","p_{T} (jet_{1}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
 	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,500, "Pt_pfjet2", "Pt_pfjet2", false, "","p_{T} (jet_{2}) (GeV) " +xtag,lumi,10,ZNormalization,filetag);
-	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet1", "Eta_pfjet1", false, "","#eta (jet_{1}) " +xtag,lumi,100,ZNormalization,filetag);
-	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet2", "Eta_pfjet2", false, "","#eta (jet_{2}) " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet1", "Eta_pfjet1", false, "","#eta (jet_{1}) " +xtag,lumi,1000,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 40,-3.0,3.0, "Eta_pfjet2", "Eta_pfjet2", false, "","#eta (jet_{2}) " +xtag,lumi,1000,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon1pfjet1", "deltaPhi_muon1pfjet1", false, "","#Delta#phi (#mu_{1}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon1pfjet2", "deltaPhi_muon1pfjet2", false, "","#Delta#phi (#mu_{1}, j_{2}) " +xtag,lumi,100,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 63,-3.15,3.15, "deltaPhi_muon2pfjet1", "deltaPhi_muon2pfjet1", false, "","#Delta#phi (#mu_{2}, j_{1}) " +xtag,lumi,100,ZNormalization,filetag);
@@ -675,26 +675,26 @@ cut_mc += ")";
 	Use_emu = true;
 	
 	// LQ 250 
-	filetag = "2011Data_FullSelection_lqmumu250";
+	filetag = "2011Data_FullSelection_lqmumu400";
 	xtag = " [Full Selection]";
-	lq_choice = "lqmumu250";
+	lq_choice = "lqmumu400";
 
-	TString cut_full_data = cut_data + "*(M_muon1muon2 > 100)*(ST_pf_mumu > 320)*(LowestMass_BestLQCombo > 70)";
- 	TString cut_full_data_emu = cut_data_emu + "*(M_muon1HEEPele1>100)*(ST_pf_emu>320)*(LowestMass_BestLQCombo_emuselection>70)";
-	TString cut_full_mc = lumi+ "*weight_964pileup_bugfix*("+cut_full_data+")";
+	TString cut_full_data = cut_data + "*(M_muon1muon2 > 140)*(ST_pf_mumu > 520)*(LowestMass_BestLQCombo > 150)";
+ 	TString cut_full_data_emu = cut_data_emu + "*(M_muon1HEEPele1>140)*(ST_pf_emu>520)*(LowestMass_BestLQCombo_emuselection>150)";
+	TString cut_full_mc = cut_mc +     "*(M_muon1muon2 > 140)*(ST_pf_mumu > 520)*(LowestMass_BestLQCombo > 150)";
 	
 	
 	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, true, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", false, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
 	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, true, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
 
 	// LQ 500 
-	filetag = "2011Data_FullSelection_lqmumu500";
+	filetag = "2011Data_FullSelection_lqmumu550";
 	xtag = " [Full Selection]";
-	lq_choice = "lqmumu500";
+	lq_choice = "lqmumu550";
 
-	TString cut_full_data = cut_data + "*(M_muon1muon2 > 140)*(ST_pf_mumu > 640)*(LowestMass_BestLQCombo > 260)";
- 	TString cut_full_data_emu = cut_data_emu + "*(M_muon1HEEPele1>140)*(ST_pf_emu>640)*(LowestMass_BestLQCombo_emuselection>260)";
-	TString cut_full_mc = lumi+ "*weight_964pileup_bugfix*("+cut_full_data+")";
+	TString cut_full_data = cut_data + "*(M_muon1muon2 > 140)*(ST_pf_mumu > 740)*(LowestMass_BestLQCombo > 350)";
+ 	TString cut_full_data_emu = cut_data_emu + "*(M_muon1HEEPele1>140)*(ST_pf_emu>740)*(LowestMass_BestLQCombo_emuselection>350)";
+	TString cut_full_mc = cut_mc + "*(M_muon1muon2 > 140)*(ST_pf_mumu > 740)*(LowestMass_BestLQCombo > 350)";
 	
 	
 	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, true, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", false, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
