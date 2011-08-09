@@ -1607,7 +1607,7 @@ void placeholder::Loop()
 		//std::cout<<M_AllCaloJet<<"   "<<M_AllPFJet<<std::endl;
 		if (Pt_muon1 < 40.0 && Pt_genmuon1 < 40.0 ) continue;
 		if (Pt_pfjet1 < 30.0 && Pt_pfjet2 < 30.0 && Pt_genjet1 < 30.0 && Pt_genjet2 < 30.0 ) continue;
-		if (Pt_muon2 < 30.0 && Pt_genmuon2 < 30.0 && Pt_genMET < 40.0 && MET_pf < 40.0) continue; 
+	//	if (Pt_muon2 < 30.0 && Pt_genmuon2 < 30.0 && Pt_genMET < 40.0 && MET_pf < 40.0) continue; 
 
 		tree->Fill();			 // FILL FINAL TREE
 
