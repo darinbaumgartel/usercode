@@ -2,15 +2,18 @@ import os
 import sys
 from ROOT import *
 
-castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2011_07_21_00_08_14/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleUp0p4_2011_07_21_05_45_22/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleDown0p4_2011_07_21_05_34_49/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleUp0p1_2011_07_21_05_46_48/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleDown0p1_2011_07_21_05_35_58/SummaryFiles'
+castors = [
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_PreApproval_2011_07_27_05_59_49/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleUp_0p04_PreApproval_2011_07_27_15_57_32/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleDown_0p04_PreApproval_2011_07_27_16_17_48/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleUp_0p01_PreApproval_2011_07_27_16_19_28/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleDown_0p01_PreApproval_2011_07_27_16_19_49/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetSmear_0p10_PreApproval_2011_07_27_16_43_07/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuSmear_0p04_PreApproval_2011_07_27_16_42_28/SummaryFiles'
 ]
 
 normtag = 'StandardSelections'
-scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown']
+scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown','JetSmear','MuSmear']
 tags = []
 tags.append(normtag)
 for x in scaletags:
@@ -44,33 +47,33 @@ for c in castors:
 lumi = 964.0
 
 
-cut_mc = "*(";
-cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.133))+";
-cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.5311))+";
-cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.0839))+";
-cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.7548))+";
-cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.2326))+";
-cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.293))+";
-cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.0818))+";
-cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.74354))+";
-cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.329634))+";
-cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.950884))+";
-cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.65398))+";
-cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.4212))+";
-cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.2595))+";
-cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.158601))+";
-cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.100442))+";
-cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.05945))+";
-cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.034516))+";
-cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.02072))+";
-cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.01170))+";
-cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.006946))+";
-cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.003486))";
-cut_mc += ")";
+#cut_mc = "*(";
+#cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.133))+";
+#cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.5311))+";
+#cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.0839))+";
+#cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.7548))+";
+#cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.2326))+";
+#cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.293))+";
+#cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.0818))+";
+#cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.74354))+";
+#cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.329634))+";
+#cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.950884))+";
+#cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.65398))+";
+#cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.4212))+";
+#cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.2595))+";
+#cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.158601))+";
+#cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.100442))+";
+#cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.05945))+";
+#cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.034516))+";
+#cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.02072))+";
+#cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.01170))+";
+#cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.006946))+";
+#cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.003486))";
+#cut_mc += ")";
 
 
-preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))' + cut_mc
-preselectionmunu = str(lumi)+'*weight*(((Pt_muon1>40)*(Pt_muon2<30.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))' + cut_mc
+preselectionmumu = str(lumi)+'*weight_964pileup_bugfix*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))' 
+preselectionmunu = str(lumi)+'*weight_964pileup_bugfix*(((Pt_muon1>40)*(Pt_muon2<30.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))' 
 
 
 
@@ -93,7 +96,7 @@ if (fullsel):
 		if '>' in line:
 			selections.append(presel+line.replace('\n','').replace('1.0*(','*('))
 
-
+print selections
 
 ignores = []
 
@@ -106,9 +109,11 @@ issignal_n = []
 
 for s in range(len(selections)):
 	bgtotal = 0.0
-	
+	#if s<9:
+		 #continue;
 	sel = selections[s]
 	use = signaluse[s]
+	
 	if 'BetaHalf' in use:
 		ignores = ['TTBar','WJet']
 	else:
@@ -125,6 +130,12 @@ for s in range(len(selections)):
 				continue
 			cfiles.append(prefix+'://'+c+'/'+x.replace('\n',''))
 		for x in cfiles:
+			scalefactor = '*1.0'
+			if 'TTBar' in x:
+				scalefactor = '*1.01'
+			if 'WJets' in x:
+				scalefactor = '*0.89'	
+			
 			#if "BetaHalf" in x:
 				#continue
 			if 'LQToCMu' in x and use not in  x: 
@@ -132,7 +143,7 @@ for s in range(len(selections)):
 			f = TFile.Open(x)
 			t = f.Get("PhysicalVariables")
 			h = TH1D('h','h',2,-1,3)
-			t.Project('h','1.0',sel)
+			t.Project('h','1.0',sel+scalefactor)
 			n = h.Integral()
 			rootfile = (x.split('/')[-1]).replace('.root','')
 			opt_n.append(use)
@@ -180,10 +191,14 @@ for t in tags:
 		exec('summary_int_'+t+'_sig_var.append(0.0)')
 		exec('summary_int_'+t+'_bg_var.append(0.0)')
 for o in range(len(opts)):
-	if 'BetaHalf' in opts[0]:
+	if 'BetaHalf' in opts[o]:
 		ignores = ['TTBar','WJets']
+		ignores = []
+
 	else:
-		ignores = ['TTBar','ZJetsMG']
+		ignores = ['TTBar','ZJetsMG','DiBoson']
+		ignores = []
+
 	summary_opts.append(opts[o])
 	for i in R:		
 		if opt_n[i] != opts[o]:
