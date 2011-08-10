@@ -1,0 +1,60 @@
+LQToCMu_M_250
+1.0*(ST_pf_mumu > 320)*(M_muon1muon2 > 100)*(LowestMass_BestLQCombo > 70)
+
+LQToCMu_M_350
+1.0*(ST_pf_mumu > 450)*(M_muon1muon2 > 110)*(LowestMass_BestLQCombo > 130)
+
+LQToCMu_M_400
+1.0*(ST_pf_mumu > 520)*(M_muon1muon2 > 140)*(LowestMass_BestLQCombo > 150)
+
+LQToCMu_M_450
+1.0*(ST_pf_mumu > 610)*(M_muon1muon2 > 140)*(LowestMass_BestLQCombo > 170)
+
+LQToCMu_M_500
+1.0*(ST_pf_mumu > 640)*(M_muon1muon2 > 140)*(LowestMass_BestLQCombo > 260)
+
+LQToCMu_M_550
+1.0*(ST_pf_mumu > 740)*(M_muon1muon2 > 140)*(LowestMass_BestLQCombo > 350)
+
+LQToCMu_M_600
+1.0*(ST_pf_mumu > 770)*(M_muon1muon2 > 140)*(LowestMass_BestLQCombo > 350)
+
+LQToCMu_M_650
+1.0*(ST_pf_mumu > 850)*(M_muon1muon2 > 140)*(LowestMass_BestLQCombo > 350)
+
+LQToCMu_M_750
+1.0*(ST_pf_mumu > 850)*(M_muon1muon2 > 110)*(LowestMass_BestLQCombo > 510)
+
+LQToCMu_M_850
+1.0*(ST_pf_mumu > 850)*(M_muon1muon2 > 110)*(LowestMass_BestLQCombo > 510)
+
+LQToCMu_BetaHalf_M_250
+1.0*(ST_pf_munu > 440)*(MET_pf > 90)*(M_bestmupfjet_munu > 120)
+
+LQToCMu_BetaHalf_M_350
+1.0*(ST_pf_munu > 540)*(MET_pf > 125)*(M_bestmupfjet_munu > 280)
+
+LQToCMu_BetaHalf_M_400
+1.0*(ST_pf_munu > 600)*(MET_pf > 135)*(M_bestmupfjet_munu > 310)
+
+LQToCMu_BetaHalf_M_450
+1.0*(ST_pf_munu > 730)*(MET_pf > 145)*(M_bestmupfjet_munu > 310)
+
+LQToCMu_BetaHalf_M_500
+1.0*(ST_pf_munu > 740)*(MET_pf > 190)*(M_bestmupfjet_munu > 380)
+
+LQToCMu_BetaHalf_M_550
+1.0*(ST_pf_munu > 870)*(MET_pf > 195)*(M_bestmupfjet_munu > 380)
+
+LQToCMu_BetaHalf_M_600
+1.0*(ST_pf_munu > 960)*(MET_pf > 185)*(M_bestmupfjet_munu > 350)
+
+LQToCMu_BetaHalf_M_650
+1.0*(ST_pf_munu > 910)*(MET_pf > 160)*(M_bestmupfjet_munu > 510)
+
+LQToCMu_BetaHalf_M_750
+1.0*(ST_pf_munu > 930)*(MET_pf > 175)*(M_bestmupfjet_munu > 510)
+
+LQToCMu_BetaHalf_M_850
+1.0*(ST_pf_munu > 960)*(MET_pf > 175)*(M_bestmupfjet_munu > 510)
+
