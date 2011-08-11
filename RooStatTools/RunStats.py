@@ -281,7 +281,7 @@ for line in PlotTemp.readlines():
 		for x in contents:
 			line = line.replace(x,x+'/2.0')
 	if (munu==1):
-		line = line.replace('beta^{2}#times','beta(1-#beta)#times')
+		line = line.replace('beta^{2}#times','#frac{1}{2}beta(1-#beta)#times')
 		line = line.replace('beta=1','beta=1/2')
 		line = line.replace('316,316','270,270')
 	if 'TGraph *xsData_vs_m_' in line:

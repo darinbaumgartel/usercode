@@ -221,7 +221,7 @@ void makePlots()
  string fileName3 = "BetaSquaredSigmaPlot.png";
   
  // axes labels for the final plot
- string title = ";M_{LQ} (GeV);#beta^{2}#times#sigma [pb]";
+ string title = ";M_{LQ} (GeV);#beta^{2}#times#sigma (pb)";
 
  // integrated luminosity
  string lint = "IntLumiValue pb^{-1}";
