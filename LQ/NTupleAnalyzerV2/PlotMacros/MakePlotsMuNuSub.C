@@ -31,7 +31,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	TCanvas *c1 = new TCanvas("c1","",800,800);
 	TPad *pad1 = new TPad("pad1","The pad 60% of the height",0.0,0.4,1.0,1.0,0);
 	TPad *pad2 = new TPad("pad2","The pad 20% of the height",0.0,0.2,1.0,0.4,0);
-	TPad *pad2r = new TPad("pad2r","The pad 20% of the height",0.0,0.0,1.0,0.2,0);
+	TPad *pad2r = new TPad("pad2r","The ptad 20% of the height",0.0,0.0,1.0,0.2,0);
    //pad2->SetFillStyle(4000); //will be transparent
    //pad2r->SetFillStyle(4000); //will be transparent
 
@@ -370,8 +370,12 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 		//std::cout<<"Chi^2 for this distribution is:  "<< chi2<<std::endl;
 	}
-	h_comp->GetYaxis()->SetTitle("Poisson N(#sigma) Diff");
-
+	h_comp->GetYaxis()->SetTitle("N(#sigma) Diff.");
+	h_comp->GetYaxis()->SetTitleFont(132);
+	h_comp->GetYaxis()->SetTitleSize(.13);
+	h_comp->GetYaxis()->SetLabelSize(.08);
+	h_comp->GetXaxis()->SetLabelSize(.08);	
+	h_comp->GetYaxis()->SetTitleOffset(.25);
 
 	TLine *line0 = new TLine(xLow,0,xMax,0);
 	TLine *line2u = new TLine(xLow,2,xMax,2);
@@ -392,8 +396,13 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	
 	pad2r->cd();
 
-	h_compr->GetYaxis()->SetTitle("Fractional Diff");
-
+	h_compr->GetYaxis()->SetTitle("Frac. Diff.");
+	h_compr->GetYaxis()->SetTitleFont(132);
+	h_compr->GetYaxis()->SetTitleSize(.13);
+	h_compr->GetYaxis()->SetLabelSize(.08);
+	h_compr->GetXaxis()->SetLabelSize(.08);	
+	h_compr->GetYaxis()->SetTitleOffset(.25);
+	
    //TGaxis *axis = new TGaxis(xMax,-2,xMax,2,-2,2,50510,"+L");
    //axis->SetLabelColor(kRed);
 //axis->Draw();
@@ -405,6 +414,9 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	h_compr->SetMarkerColor(kRed);
 	h_compr->SetMarkerStyle(1);
 	h_compr->SetMarkerSize(0.0);
+
+
+
 
 	h_compr->Draw("ep");
 	line0->Draw("SAME");
@@ -435,7 +447,7 @@ void MakePlotsMuNuSub()
 	// Cut Conditions
 
 	//------Choose which lq mass you want here----
-	TString lq_choice = "lqmunu250";
+	TString lq_choice = "lqmunu400";
 
 
 	TString lumi ="1143"  ;
@@ -454,6 +466,7 @@ void MakePlotsMuNuSub()
 	cut_data +="*(abs(deltaPhi_muon1pfMET)>.8)";
 	cut_data +="*(FailIDPFThreshold<25.0)";
 	cut_data +="*(MT_muon1pfMET>50.0)";
+	 //cut_data +="*(PFJetCount>2.5)";
 
 	//  cut_data +="*(Phi_muon1>.3)";
 	//  cut_data +="*(Phi_muon1>.3)";
@@ -514,7 +527,7 @@ cut_mc += "((N_PileUpInteractions > 23.5)*(0.000602006464283))";
 cut_mc += ")";
 
 
-	float WNormalization = 1.00;
+	float WNormalization = 0.86;
 	TString filetag ="";
 	TString xtag ="";
 
@@ -527,8 +540,8 @@ cut_mc += ")";
 		std::cout<<"\n\n W Normalization is unity. Program will calculate W rescaling factor and exit.\n\n"<<std::endl;
 		filetag ="2011Data_NormalizationSelection";
 		xtag =" [W Normalization Condition]";
-		TString NormCondition ="*(ST_pf_munu>250)*(MT_muon1pfMET>70)*(MT_muon1pfMET<90)";
-		fillHisto(lq_choice, cut_mc + NormCondition, cut_data+NormCondition, true, 60,70,90,"MT_muon1pfMET", false,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,1000,WNormalization,filetag);	
+		TString NormCondition ="*(ST_pf_munu>250)*(MT_muon1pfMET>50)*(MT_muon1pfMET<110)";
+		fillHisto(lq_choice, cut_mc + NormCondition, cut_data+NormCondition, true, 60,50,110,"MT_muon1pfMET", false,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,1000,WNormalization,filetag);	
 		gROOT->Reset();	gROOT->ProcessLine(".q;");
 	}
 
@@ -634,23 +647,23 @@ cut_mc += ")";
 	if (true){
 
 	// LQ 250
-	filetag = "2011Data_FullSelection_lqmunu250";
+	filetag = "2011Data_FullSelection_lqmunu400";
 	xtag = " [Full Selection]";
-	lq_choice = "lqmunu250";
+	lq_choice = "lqmunu400";
 
-	TString cut_full_data = cut_data +"*(ST_pf_munu > 440)*(MET_pf > 90)*(M_bestmupfjet_munu > 120)";
-	TString cut_full_mc = lumi+"*weight_964pileup_bugfix*("+cut_full_data+")";
+	TString cut_full_data = cut_data +"*(ST_pf_munu > 600)*(MET_pf > 135)*(M_bestmupfjet_munu > 310)";
+	TString cut_full_mc = cut_mc +"*(ST_pf_munu > 600)*(MET_pf > 135)*(M_bestmupfjet_munu > 310)";
 
 	fillHisto(lq_choice, cut_full_mc, cut_full_data, true, 25,0.0,2000.0,"M_bestmupfjet_munu", false,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
 	fillHisto(lq_choice,  cut_full_mc, cut_full_data, true, 25,250,2250,"ST_pf_munu", false,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
 
 	// LQ 500
-	filetag = "2011Data_FullSelection_lqmunu500";
+	filetag = "2011Data_FullSelection_lqmunu550";
 	xtag = " [Full Selection]";
-	lq_choice = "lqmunu500";
+	lq_choice = "lqmunu550";
 
-	TString cut_full_data = cut_data +"*(ST_pf_munu > 740)*(MET_pf > 190)*(M_bestmupfjet_munu > 380)";
-	TString cut_full_mc = lumi+"*weight_964pileup_bugfix*("+cut_full_data+")";
+	TString cut_full_data = cut_data +"*(ST_pf_munu > 870)*(MET_pf > 195)*(M_bestmupfjet_munu > 380)";
+	TString cut_full_mc = cut_mc+"*(ST_pf_munu > 870)*(MET_pf > 195)*(M_bestmupfjet_munu > 380)";
 
 	fillHisto(lq_choice, cut_full_mc, cut_full_data, true, 25,0.0,2000.0,"M_bestmupfjet_munu", false,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
 	fillHisto(lq_choice,  cut_full_mc, cut_full_data, true, 25,250,2250,"ST_pf_munu", false,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
