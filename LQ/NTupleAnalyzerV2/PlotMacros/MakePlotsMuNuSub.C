@@ -6,7 +6,7 @@
 #include <iomanip>
 #include"CMSStyle.C"
 
-void fillHisto(TString lq_choice, TString cut_mc, TString cut_data,  bool drawHistograms,
+void fillHisto(TString lq_choice, TString cut_mc, TString cut_data,  bool drawSub,
 int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileName,TString title, TString Luminosity,Double_t extrascalefactor,Double_t wnorm,TString tag)
 {
 	CMSStyle();
@@ -28,16 +28,19 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 		return;
 	}
 
-	TCanvas *c1 = new TCanvas("c1","",800,800);
-	TPad *pad1 = new TPad("pad1","The pad 60% of the height",0.0,0.4,1.0,1.0,0);
-	TPad *pad2 = new TPad("pad2","The pad 20% of the height",0.0,0.2,1.0,0.4,0);
-	TPad *pad2r = new TPad("pad2r","The ptad 20% of the height",0.0,0.0,1.0,0.2,0);
+	if (drawSub) TCanvas *c1 = new TCanvas("c1","",800,800);
+	if (!drawSub) TCanvas *c1 = new TCanvas("c1","",800,480);
+
+	if (drawSub) TPad *pad1 = new TPad("pad1","The pad 60% of the height",0.0,0.4,1.0,1.0,0);
+	if (!drawSub) TPad *pad1 = new TPad("pad1","The pad 60% of the height",0.0,0.0,1.0,1.0,0);	
+	if (drawSub) TPad *pad2 = new TPad("pad2","The pad 20% of the height",0.0,0.2,1.0,0.4,0);
+	if (drawSub) TPad *pad2r = new TPad("pad2r","The ptad 20% of the height",0.0,0.0,1.0,0.2,0);
    //pad2->SetFillStyle(4000); //will be transparent
    //pad2r->SetFillStyle(4000); //will be transparent
 
 	pad1->Draw();
-	pad2->Draw();
-	pad2r->Draw();
+	if (drawSub) pad2->Draw();
+	if (drawSub) pad2r->Draw();
 
 	pad1->cd();
 	pad1->SetLogy();
@@ -284,7 +287,7 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	leg->Draw("SAME");
 	c1->SetLogy();
 
-	H_data->SetMinimum(.1);
+	H_data->SetMinimum(.01);
 	H_data->SetMaximum(1.2*extrascalefactor*(H_data->GetMaximum()));
 
 	TLatex* txt =new TLatex((xMax-xLow)*.02+xLow,.3*H_data->GetMaximum(),"CMS 2011 Preliminary");
@@ -310,118 +313,118 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	varname +="_";
 	varname += str;
 	//std::cout<<varname<<std::endl;
-
-	pad2->cd();
-
-	TH1F* h_comp = new TH1F("h_comp","",nBins,xLow,xMax);
-	TH1F* h_compr = new TH1F("h_compr","",nBins,xLow,xMax);	
-
-
-	if (true)
-	{
-
-		TH1F* h_bg = new TH1F("h_bg","",nBins,xLow,xMax);
-		h_bg->Sumw2();
-		h_bg->Add(h_zjets);
-		h_bg->Add(h_wjets);
-		h_bg->Add(h_vvjets);
-		h_bg->Add(h_ttbar);
-		h_bg->Add(h_singtop);
-		h_bg->Add(h_qcd);
-
-		int nbinsx = h_bg->GetXaxis()->GetNbins();
-
-		int ibin = 0;
-
-		float chi2 = 0.0;
-
-		float ndat = 0.0;
-		float nbg = 0.0;
-		float err_nbg = 0.0;
-		float err_total = 0.0;
-
-		float datmean = 0.0;
-		float mcmean = 0.0;
-
-		float xminl = 0;
-		float xmaxl = 0;
-
-		//std::cout<<" Starting bin analysis" <<std::endl;
-		for (ibin=0;ibin<=nbinsx;ibin++)
+    if (drawSub) {
+		pad2->cd();
+	
+		TH1F* h_comp = new TH1F("h_comp","",nBins,xLow,xMax);
+		TH1F* h_compr = new TH1F("h_compr","",nBins,xLow,xMax);	
+	
+	
+		if (true)
 		{
-			ndat = 1.0*(h_data->GetBinContent(ibin));
-			nbg = 1.0*(h_bg->GetBinContent(ibin));
-			datmean += 1.0*(h_data->GetBinContent(ibin))*h_data->GetBinCenter(ibin);
-			err_nbg = 1.0*(h_bg->GetBinError(ibin));
-			err_total = sqrt(  pow(err_nbg,2.0) + ndat );
-
-			mcmean += 1.0*(h_bg->GetBinContent(ibin))*h_bg->GetBinCenter(ibin);
-			if (ndat!=0)   chi2 += pow((ndat -nbg),2.0)/pow(ndat,0.5);
-			//if (nbg>.0010) std::cout<<h_data->GetBinCenter(ibin)<<"  "<<nbg<<" "<<"  "<<ndat/nbg<<"  "<<(ndat-nbg)/sqrt(ndat)<<std::endl;
-			h_comp ->SetBinContent(ibin,0.0 );
-			h_compr ->SetBinContent(ibin,0.0 );
-			if (ndat!=0 && nbg != 0) h_comp ->SetBinContent(ibin, (ndat - nbg)/err_total );
-			if (ndat!=0 && nbg != 0) h_compr ->SetBinContent(ibin, (ndat - nbg)/nbg );
-			if (ndat!=0 && nbg != 0) h_compr ->SetBinError(ibin, (err_total)/nbg );
-
-			//if ((ndat!=0)&&(abs((ndat - nbg)/sqrt(ndat))>7.99 )) h_comp ->SetBinContent(ibin, 7.95*(ndat>nbg) - 7.95*(ndat<nbg));
-
+	
+			TH1F* h_bg = new TH1F("h_bg","",nBins,xLow,xMax);
+			h_bg->Sumw2();
+			h_bg->Add(h_zjets);
+			h_bg->Add(h_wjets);
+			h_bg->Add(h_vvjets);
+			h_bg->Add(h_ttbar);
+			h_bg->Add(h_singtop);
+			h_bg->Add(h_qcd);
+	
+			int nbinsx = h_bg->GetXaxis()->GetNbins();
+	
+			int ibin = 0;
+	
+			float chi2 = 0.0;
+	
+			float ndat = 0.0;
+			float nbg = 0.0;
+			float err_nbg = 0.0;
+			float err_total = 0.0;
+	
+			float datmean = 0.0;
+			float mcmean = 0.0;
+	
+			float xminl = 0;
+			float xmaxl = 0;
+	
+			//std::cout<<" Starting bin analysis" <<std::endl;
+			for (ibin=0;ibin<=nbinsx;ibin++)
+			{
+				ndat = 1.0*(h_data->GetBinContent(ibin));
+				nbg = 1.0*(h_bg->GetBinContent(ibin));
+				datmean += 1.0*(h_data->GetBinContent(ibin))*h_data->GetBinCenter(ibin);
+				err_nbg = 1.0*(h_bg->GetBinError(ibin));
+				err_total = sqrt(  pow(err_nbg,2.0) + ndat );
+	
+				mcmean += 1.0*(h_bg->GetBinContent(ibin))*h_bg->GetBinCenter(ibin);
+				if (ndat!=0)   chi2 += pow((ndat -nbg),2.0)/pow(ndat,0.5);
+				//if (nbg>.0010) std::cout<<h_data->GetBinCenter(ibin)<<"  "<<nbg<<" "<<"  "<<ndat/nbg<<"  "<<(ndat-nbg)/sqrt(ndat)<<std::endl;
+				h_comp ->SetBinContent(ibin,0.0 );
+				h_compr ->SetBinContent(ibin,0.0 );
+				if (ndat!=0 && nbg != 0) h_comp ->SetBinContent(ibin, (ndat - nbg)/err_total );
+				if (ndat!=0 && nbg != 0) h_compr ->SetBinContent(ibin, (ndat - nbg)/nbg );
+				if (ndat!=0 && nbg != 0) h_compr ->SetBinError(ibin, (err_total)/nbg );
+	
+				//if ((ndat!=0)&&(abs((ndat - nbg)/sqrt(ndat))>7.99 )) h_comp ->SetBinContent(ibin, 7.95*(ndat>nbg) - 7.95*(ndat<nbg));
+	
+			}
+	
+			//std::cout<<"Chi^2 for this distribution is:  "<< chi2<<std::endl;
 		}
+		h_comp->GetYaxis()->SetTitle("N(#sigma) Diff.");
+		h_comp->GetYaxis()->SetTitleFont(132);
+		h_comp->GetYaxis()->SetTitleSize(.17);
+		h_comp->GetYaxis()->SetLabelSize(.11);
+		h_comp->GetXaxis()->SetLabelSize(.11);	
+		h_comp->GetYaxis()->SetTitleOffset(.25);
+	
+		TLine *line0 = new TLine(xLow,0,xMax,0);
+		TLine *line2u = new TLine(xLow,2,xMax,2);
+		TLine *line2d = new TLine(xLow,-2,xMax,-2);
+	
+		h_comp->SetMinimum(-8);
+		h_comp->SetMaximum(8);
+		h_comp->SetMarkerStyle(21);
+		h_comp->SetMarkerSize(0.5);
+		//h_comp->SetMarkerSize(0.0);
+	
+	
+		h_comp->Draw("p");
+		line0->Draw("SAME");
+		line2u->Draw("SAME");
+		line2d->Draw("SAME");
+		
+		
+		pad2r->cd();
+	
+		h_compr->GetYaxis()->SetTitle("Frac. Diff.");
+		h_compr->GetYaxis()->SetTitleFont(132);
+		h_compr->GetYaxis()->SetTitleSize(.17);
+		h_compr->GetYaxis()->SetLabelSize(.11);
+		h_compr->GetXaxis()->SetLabelSize(.11);	
+		h_compr->GetYaxis()->SetTitleOffset(.25);
+		
+	   //TGaxis *axis = new TGaxis(xMax,-2,xMax,2,-2,2,50510,"+L");
+	   //axis->SetLabelColor(kRed);
+	//axis->Draw();
+	
+		h_compr->SetMinimum(-2);
+		h_compr->SetMaximum(2);
+		h_compr->SetLineColor(kRed);
+		h_compr->SetLineWidth(2);
+		h_compr->SetMarkerColor(kRed);
+		h_compr->SetMarkerStyle(1);
+		h_compr->SetMarkerSize(0.0);
+	
+	
+	
+	
+		h_compr->Draw("ep");
+		line0->Draw("SAME");
 
-		//std::cout<<"Chi^2 for this distribution is:  "<< chi2<<std::endl;
 	}
-	h_comp->GetYaxis()->SetTitle("N(#sigma) Diff.");
-	h_comp->GetYaxis()->SetTitleFont(132);
-	h_comp->GetYaxis()->SetTitleSize(.13);
-	h_comp->GetYaxis()->SetLabelSize(.08);
-	h_comp->GetXaxis()->SetLabelSize(.08);	
-	h_comp->GetYaxis()->SetTitleOffset(.25);
-
-	TLine *line0 = new TLine(xLow,0,xMax,0);
-	TLine *line2u = new TLine(xLow,2,xMax,2);
-	TLine *line2d = new TLine(xLow,-2,xMax,-2);
-
-	h_comp->SetMinimum(-8);
-	h_comp->SetMaximum(8);
-	h_comp->SetMarkerStyle(21);
-	h_comp->SetMarkerSize(0.5);
-	//h_comp->SetMarkerSize(0.0);
-
-
-	h_comp->Draw("p");
-	line0->Draw("SAME");
-	line2u->Draw("SAME");
-	line2d->Draw("SAME");
-	
-	
-	pad2r->cd();
-
-	h_compr->GetYaxis()->SetTitle("Frac. Diff.");
-	h_compr->GetYaxis()->SetTitleFont(132);
-	h_compr->GetYaxis()->SetTitleSize(.13);
-	h_compr->GetYaxis()->SetLabelSize(.08);
-	h_compr->GetXaxis()->SetLabelSize(.08);	
-	h_compr->GetYaxis()->SetTitleOffset(.25);
-	
-   //TGaxis *axis = new TGaxis(xMax,-2,xMax,2,-2,2,50510,"+L");
-   //axis->SetLabelColor(kRed);
-//axis->Draw();
-
-	h_compr->SetMinimum(-2);
-	h_compr->SetMaximum(2);
-	h_compr->SetLineColor(kRed);
-	h_compr->SetLineWidth(2);
-	h_compr->SetMarkerColor(kRed);
-	h_compr->SetMarkerStyle(1);
-	h_compr->SetMarkerSize(0.0);
-
-
-
-
-	h_compr->Draw("ep");
-	line0->Draw("SAME");
-
-
 
 	c1->Print("PlotsMuNuSub/"+varname+"_"+tag+".png");
 	c1->Print("PlotsMuNuSub/"+varname+"_"+tag+".pdf");
@@ -492,42 +495,75 @@ void MakePlotsMuNuSub()
 	//  cut_data +="*(MT_muon1pfMET>125.0)";
 	//cut_data +="*(MT_muon1pfMET<110.0)";
 	//cut_data +="*(MT_muon1pfMET>50.0)";
+	//cut_data +="*(N_Vertices> 5.5)";
 
 	TString cut_mc = lumi+"*weight*("+cut_data+")";
 	cut_data += "*(LowestUnprescaledTriggerPass>0.5)";
 
 
 // These are MC - driven Summer11 for the bug fix
+//cut_mc += "*(";
+//cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.137148419144))+";
+//cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.570685400523))+";
+//cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.14449974737))+";
+//cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.8163157224))+";
+//cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.270776812))+";
+//cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.29783559215))+";
+//cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.05828090818))+";
+//cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.70525206573))+";
+//cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.28872517493))+";
+//cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.914713614527))+";
+//cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.625159994865))+";
+//cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.400496981648))+";
+//cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.245671305417))+";
+//cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.149501993628))+";
+//cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.0943735268094))+";
+//cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.055714218504))+";
+//cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.032273131211))+";
+//cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0193368300632))+";
+//cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0109074260718))+";
+//cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.00646596430331))+";
+//cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.00324352812525))+";
+//cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.00178440502281))+";
+//cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.00111645018356))+";
+//cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.000602006464283))+";
+//cut_mc += "((N_PileUpInteractions > 23.5)*(0.000602006464283))";
+//cut_mc += ")";
+
+
+
 cut_mc += "*(";
-cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.137148419144))+";
-cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.570685400523))+";
-cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.14449974737))+";
-cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.8163157224))+";
-cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.270776812))+";
-cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.29783559215))+";
-cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.05828090818))+";
-cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.70525206573))+";
-cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.28872517493))+";
-cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.914713614527))+";
-cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.625159994865))+";
-cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.400496981648))+";
-cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.245671305417))+";
-cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.149501993628))+";
-cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.0943735268094))+";
-cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.055714218504))+";
-cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.032273131211))+";
-cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0193368300632))+";
-cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0109074260718))+";
-cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.00646596430331))+";
-cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.00324352812525))+";
-cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.00178440502281))+";
-cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.00111645018356))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.000602006464283))+";
-cut_mc += "((N_PileUpInteractions > 23.5)*(0.000602006464283))";
+cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
+cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
+cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
+cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
+cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
+cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
+cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
+cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
+cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
+cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
+cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
+cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
+cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
+cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
+cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
+cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
+cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
+cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
+cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
+cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
+cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
+cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
+cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
+cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))";
+cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
 cut_mc += ")";
 
 
-	float WNormalization = 0.86;
+
+
+	float WNormalization = 1.00;
 	TString filetag ="";
 	TString xtag ="";
 
@@ -570,7 +606,19 @@ cut_mc += ")";
 	TString filetag ="2011Data_PreSelection";
 	TString xtag =" [Preselection]";
 
+
+
 	if (true) {
+		
+	//fillHisto(lq_choice, cut_mc, cut_data ,true,25,.-.5,24.5,"N_PileUpInteractions", false,"","N_{PileUpInteractions}" +xtag,lumi,100,WNormalization,filetag);		
+	//fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,10,"METRatio_pfcalo", false,"","METRatio_pfcalo " +xtag,lumi,100,WNormalization,filetag);
+	//fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,10,"METRatio_lqpf", false,"","METRatio_lqpf " +xtag,lumi,100,WNormalization,filetag);
+	//fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,10,"METRatio_lqcalo", false,"","METRatio_lqcalo " +xtag,lumi,100,WNormalization,filetag);
+	//fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,10,"METRatio_lqpf", false,"","METRatio_lqpf " +xtag,lumi,100,WNormalization,filetag);
+	//fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,10,"METRatio_lqpf", false,"","METRatio_lqpf " +xtag,lumi,100,WNormalization,filetag);
+	//fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,500,"RangeTransverseMass_BestLQCombo", false,"","RangeTransverseMass_BestLQCombo " +xtag,lumi,100,WNormalization,filetag);
+	//fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,2.5,"RangeCenterTransverseMassRatio_BestLQCombo", false,"","RangeCenterTransverseMassRatio_BestLQCombo " +xtag,lumi,100,WNormalization,filetag);
+
 	
 	//fillHisto(lq_choice, cut_mc, cut_data, true, 50,-.5,49.5,"PFJetNeutralMultiplicity_pfjet1", false,"","Neutral Mult. (Jet 1) " +xtag,lumi,100,WNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, true, 25,0,1,"PFJetNeutralHadronEnergyFraction_pfjet1", false,"","Neutral Had Fraction (Jet 1) " +xtag,lumi,1000,WNormalization,filetag);
@@ -641,7 +689,7 @@ cut_mc += ")";
 	}
 
 
-	//// -------------    Full Selection      -------------- //
+	////// -------------    Full Selection      -------------- //
 
 
 	if (true){
@@ -654,9 +702,12 @@ cut_mc += ")";
 	TString cut_full_data = cut_data +"*(ST_pf_munu > 600)*(MET_pf > 135)*(M_bestmupfjet_munu > 310)";
 	TString cut_full_mc = cut_mc +"*(ST_pf_munu > 600)*(MET_pf > 135)*(M_bestmupfjet_munu > 310)";
 
-	fillHisto(lq_choice, cut_full_mc, cut_full_data, true, 25,0.0,2000.0,"M_bestmupfjet_munu", false,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
-	fillHisto(lq_choice,  cut_full_mc, cut_full_data, true, 25,250,2250,"ST_pf_munu", false,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
-
+	fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"M_bestmupfjet_munu", false,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
+	fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 25,250,2250,"ST_pf_munu", false,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
+	//fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 25,-3.141593,3.141593,"deltaPhi_pfjet1pfMET", false,""," #Delta#phi (j_{1},MET)" +xtag,lumi,50,WNormalization,filetag);	
+	//fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 25,-3.141593,3.141593,"deltaPhi_pfjet2pfMET", false,""," #Delta#phi (j_{2},MET)" +xtag,lumi,50,WNormalization,filetag);	
+	fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 50,0,1000,"MT_muon1pfMET", false,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,100,WNormalization,filetag);
+	
 	// LQ 500
 	filetag = "2011Data_FullSelection_lqmunu550";
 	xtag = " [Full Selection]";
@@ -665,8 +716,13 @@ cut_mc += ")";
 	TString cut_full_data = cut_data +"*(ST_pf_munu > 870)*(MET_pf > 195)*(M_bestmupfjet_munu > 380)";
 	TString cut_full_mc = cut_mc+"*(ST_pf_munu > 870)*(MET_pf > 195)*(M_bestmupfjet_munu > 380)";
 
-	fillHisto(lq_choice, cut_full_mc, cut_full_data, true, 25,0.0,2000.0,"M_bestmupfjet_munu", false,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
-	fillHisto(lq_choice,  cut_full_mc, cut_full_data, true, 25,250,2250,"ST_pf_munu", false,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
+	fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"M_bestmupfjet_munu", false,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
+	fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 25,250,2250,"ST_pf_munu", false,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
+
+	//fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 25,-3.141593,3.141593,"deltaPhi_pfjet1pfMET", false,""," #Delta#phi (j_{1},MET)" +xtag,lumi,50,WNormalization,filetag);
+	//fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 25,-3.141593,3.141593,"deltaPhi_pfjet2pfMET", false,""," #Delta#phi (j_{2},MET)" +xtag,lumi,50,WNormalization,filetag);	
+	fillHisto(lq_choice,  cut_full_mc, cut_full_data, false, 40,0,2200,"MT_muon1pfMET", false,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,10,WNormalization,filetag);
+	
 
 	}
 	gROOT->Reset(); gROOT->ProcessLine(".q;");
