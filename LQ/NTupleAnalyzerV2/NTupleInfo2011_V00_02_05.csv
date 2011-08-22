@@ -1,4 +1,8 @@
 SignalType,Xsections,N_orig,Group,SigOrBG,MassOfLQ,RescalingInfo,CastorDirectory
+SingleMu__Run2011A-PromptReco-v4,1,1,SingleMuData,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_424-V00-02-05-2011DATA-160404-170044_20110717_030031
+SingleMu__Run2011A-May10ReReco,1,1,SingleMuData,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_424-V00-02-05-2011DATA-160404-170044_20110717_030031
+SingleMu__Run2011A-PromptReco-v6,1,1,SingleMuData,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_424-V00-02-05-2011DATA-170053-173439_20110819_210521
+SingleMu__Run2011A-05Aug2011,1,1,SingleMuData,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_424-V00-02-05-2011DATA-170053-173439_20110819_210521
 TTJets,165,3627909,TTBar,0,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_TTBarJets_MG_20110716_002523
 T_TuneZ2_t-channel,42.6,3716180,SingleTop,0,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_SingleTop_MG_20110716_003259
 T_TuneZ2_s-channel,2.97,239175,SingleTop,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_SingleTop_MG_20110801_165639
@@ -6,7 +10,8 @@ T_TuneZ2_tW-channel-DR,5.3,814390,SingleTop,0,0,0,/castor/cern.ch/user/b/barfuss
 Tbar_TuneZ2_t-channel,22,1944826,SingleTop,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_SingleTop_MG_20110725_212856
 Tbar_TuneZ2_s-channel,1.63,137980,SingleTop,0,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_SingleTop_MG_20110716_003259
 Tbar_TuneZ2_tW-channel-DR,5.3,809984,SingleTop,0,0,0,/castor/cern.ch/user/b/barfuss/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_SingleTop_MG_20110716_003259
-WJetsToLNu,31314,76606619,WJets,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_WJets_MG_20110715_205025
+WJetsToLNu_TuneZ2,31314,76606619,WJets,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_WJets_MG_20110715_205025
+WJetsToLNu_300_HT,54.68,4069040,WJets_HighHT,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_WJets_HT300_MG_20110821_003434
 WW,43,4120269,DiBoson,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_DiBoson_PYTHIA_20110725_222014
 ZZ,5.9,4083188,DiBoson,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_DiBoson_PYTHIA_20110725_222014
 WZ,18.2,4158612,DiBoson,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_DiBoson_PYTHIA_20110725_222014
@@ -18,7 +23,6 @@ QCD_Pt-50to80_MuPt5Enriched,140039,9747189,QCDMu,0,0,0,/castor/cern.ch/user/d/da
 QCD_Pt-80to120_MuPt5Enriched,28509.9,6980435,QCDMu,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_QCDMuEnriched_PYTHIA_20110716_160703
 QCD_Pt-120to150_MuPt5Enriched,4522.95,7212388,QCDMu,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_QCDMuEnriched_PYTHIA_20110716_160703
 QCD_Pt-150_MuPt5Enriched,2870.5,3721921,QCDMu,0,0,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_QCDMuEnriched_PYTHIA_20110716_160703
-SingleMu__Run2011A,1,1,SingleMuData,2,-1,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_2011_Data_42X/RootNtuple_2011_Data_424-V00-02-05-2011DATA-160404-170044_20110717_030031
 LQToCMu_M-250_7TeV-pythia6__Summer11,3.47,50388,LQToCMu_M_250,1,250,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_LQToCMu_BetaOne_20110715_234554
 LQToCMu_M-350_7TeV-pythia6__Summer11,0.477,56279,LQToCMu_M_350,1,350,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_LQToCMu_BetaOne_20110715_234554
 LQToCMu_M-400_7TeV-pythia6__Summer11,0.205,58680,LQToCMu_M_400,1,400,0,/castor/cern.ch/user/d/darinb/LQ/RootNtuple_Summer2011MC/RootNtuple-V00-02-05-Summer11MC_LQToCMu_BetaOne_20110715_234554
