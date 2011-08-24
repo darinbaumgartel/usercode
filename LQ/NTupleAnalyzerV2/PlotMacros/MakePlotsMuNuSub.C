@@ -111,8 +111,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 	// Rescaling Routine and Event number Readout
 	
 	h_wjets->Scale(wnorm);
-	h_zjets->Scale(0.98);
-	h_ttbar->Scale(1.01);
+	h_zjets->Scale(1.01);
+	h_ttbar->Scale(1.00);
 
 
 	Double_t Nd = h_data->Integral();
@@ -453,7 +453,7 @@ void MakePlotsMuNuSub()
 	TString lq_choice = "lqmunu400";
 
 
-	TString lumi ="1143"  ;
+	TString lumi ="2000"  ;
 	TString cut_data ="(Pt_muon1>40)*(MET_pf>45.0)";
 	cut_data +="*(Pt_muon2<15)";
 	////  TString cut_data ="(Pt_muon1>30)*(Pt_muon2>30)";
@@ -556,14 +556,14 @@ cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.05434
 cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
 cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
 cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))";
+cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
 cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
 cut_mc += ")";
 
 
 
 
-	float WNormalization = 1.00;
+	float WNormalization = 0.89;
 	TString filetag ="";
 	TString xtag ="";
 
@@ -576,8 +576,8 @@ cut_mc += ")";
 		std::cout<<"\n\n W Normalization is unity. Program will calculate W rescaling factor and exit.\n\n"<<std::endl;
 		filetag ="2011Data_NormalizationSelection";
 		xtag =" [W Normalization Condition]";
-		TString NormCondition ="*(ST_pf_munu>250)*(MT_muon1pfMET>50)*(MT_muon1pfMET<110)";
-		fillHisto(lq_choice, cut_mc + NormCondition, cut_data+NormCondition, true, 60,50,110,"MT_muon1pfMET", false,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,1000,WNormalization,filetag);	
+		TString NormCondition ="*(ST_pf_munu>250)*(MT_muon1pfMET>50)*(MT_muon1pfMET>80)";
+		fillHisto(lq_choice, cut_mc + NormCondition, cut_data+NormCondition, true, 60,50,110,"MT_muon1pfMET", false,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,10000,WNormalization,filetag);	
 		gROOT->Reset();	gROOT->ProcessLine(".q;");
 	}
 
