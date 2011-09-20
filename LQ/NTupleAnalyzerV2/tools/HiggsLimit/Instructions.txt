@@ -1,0 +1,68 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Once you have a FinalCards.txt file, you can use this for running the sigma*BR (M) single channel limits or the Beta(M) single channel and combined limits. 
+
+
+COMBINATION
+
+1) Go to the Combination directory. 
+
+2) You can edit the method used for the combination in RunStatsCombo.py
+
+   a) The limit setting method is at the top : "METHOD = .... "
+   b) The beta test values are at the top: " betas = [ 0.01,0.03 ....]"
+
+3) When you are happy with (2), you can run the tool:
+
+   python ComboBatcher.py -cards FinalCards.txt -tag exampletag
+
+   Here, 'FinalCards.txt' is the text file containing your card info, and "exampletag" 
+   is a tag name which will be used in naming the log files. 
+   
+   Running this will submit many batch jobs (one per beta value per channel), and 
+   return Log files which look like "ComboLog_exampletag_6548654548.txt"
+   
+4) Aggregate the results. All of the log files contain information which you can
+   turn into hand plot information with using the ComboBatchSkimmer.py:
+   
+      python ComboBatchSkimmer.py exampletag
+      
+   This will return information for the plot macro. e.g.:  
+   
+     Double_t beta_comb[77] = {0.24, 0.25, 0.26, 0.27, 0.28, ..... };
+
+     Double_t masses_comb[77] = {520, 521, 526, 527, 527,  ..... };
+
+     Double_t beta_one[79] = {0.22, 0.23, 0.24, 0.25, 0.26,  ..... };
+
+     Double_t masses_one[79] = {251, 262, 266, 278, 286, 313,  ..... };
+
+     Double_t beta_half[48] = {0.25, 0.26, 0.27, 0.29, 0.3,  ..... };
+  
+     Double_t masses_half[48] = {542, 547, 550, 552, 556, 556,  ..... };
+
+5) Make the plot. Take the output arrays from step 4, put them in MakeComboPlot.C, 
+   and run :
+   
+     root -b MakeComboPlot.C
+     
+     
