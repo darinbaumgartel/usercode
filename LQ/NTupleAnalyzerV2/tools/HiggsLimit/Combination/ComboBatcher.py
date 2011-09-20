@@ -64,7 +64,7 @@ for x in betas:
 #		line = line.replace('-o /dev/null','' )
 		line = line.replace('-R "pool>10000" -o /dev/null -e /dev/null','' )
 
-		line = line.replace('2nd','1nh')
+#		line = line.replace('2nd','1nh')
 		print line
 		os.system(line)
 		os.system('sleep .3')
