@@ -157,7 +157,7 @@ for h in limits:
 	sig1up.append(b[3])
 	sig2up.append(b[4])
 
-med = mean
+med = median
 up2 = sig2up
 up1 = sig1up
 down2 = sig2down

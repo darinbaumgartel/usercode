@@ -7,4 +7,4 @@ cp MYPWD/RunStatsCombo.py .
 cp MYPWD/combineCards.py .
 python RunStatsCombo.py --do_combo MYOPTIONS
 sleep 5
-cp ComboLog*txt /afs/cern.ch/user/d/darinb/scratch0/LimitCombinationHiggs/CMSSW_4_1_3/src
+cp ComboLog*txt MYDIR
