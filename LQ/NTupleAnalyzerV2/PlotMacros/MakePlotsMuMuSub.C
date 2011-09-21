@@ -531,7 +531,7 @@ void MakePlotsMuMuSub()
 
 	// -------- PF ---------
 
-	TString lumi = "1143"  ;
+	TString lumi = "2000"  ;
 	TString cut_data = "(Pt_muon1>40)*(Pt_muon2>40)";
 	cut_data += "*(Pt_pfjet1>30)*(Pt_pfjet2>30)";
 	cut_data += "*(M_muon1muon2>50)";
@@ -610,13 +610,13 @@ cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.05434
 cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
 cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
 cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))";
+cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
 cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
 cut_mc += ")";
 
 
 
-	float ZNormalization = 1.00;
+	float ZNormalization = 1.01;
 	TString filetag = " ";
 	TString xtag = " ";
 
@@ -632,7 +632,7 @@ cut_mc += ")";
 		TString NormCondition = "*(ST_pf_mumu>250)*(M_muon1muon2>80)*(M_muon1muon2<100)";
 
 		Use_emu = false;
-		fillHisto(lq_choice, cut_mc + NormCondition, cut_data+NormCondition, cut_data_emu, Use_emu , true, 20,80,100, "M_muon1muon2", "M_muon1muon2", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10,ZNormalization,filetag);	
+		fillHisto(lq_choice, cut_mc + NormCondition, cut_data+NormCondition, cut_data_emu, Use_emu , true, 20,80,100, "M_muon1muon2", "M_muon1muon2", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10000,ZNormalization,filetag);	
 		gROOT->Reset();	gROOT->ProcessLine(".q;");
 	}
 

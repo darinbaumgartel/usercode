@@ -357,8 +357,8 @@ int nBins, float xLow, float xMax, TString var, bool writeoutput, TString fileNa
 
 
 
-	//c1->Print("PlotsMuNuSubQCDEstimation/"+varname+"_"+tag+".png");
-	//c1->Print("PlotsMuNuSubQCDEstimation/"+varname+"_"+tag+".pdf");
+	c1->Print("PlotsMuNuSubQCDEstimation/"+varname+"_"+tag+".png");
+	c1->Print("PlotsMuNuSubQCDEstimation/"+varname+"_"+tag+".pdf");
 
 	
 	TIter next(gDirectory->GetList());
@@ -380,7 +380,7 @@ void MakePlotsMuNuSubQCDEstimation()
 
 	// Cut Conditions
 
-	TString lumi ="1143"  ;
+	TString lumi ="2000"  ;
 	TString cut_data ="(Pt_muon1>40)";
 	cut_data +="*(Pt_muon2<15)";
 	//cut_data += "*(TrackerkIsoSumPT_muon1 < 3.0)";
@@ -424,38 +424,37 @@ void MakePlotsMuNuSubQCDEstimation()
 	TString cut_mc = lumi+"*weight*("+cut_data+")";
 
 
+
 cut_mc += "*(";
-cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.137148419144))+";
-cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.570685400523))+";
-cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.14449974737))+";
-cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.8163157224))+";
-cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.270776812))+";
-cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.29783559215))+";
-cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.05828090818))+";
-cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.70525206573))+";
-cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.28872517493))+";
-cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.914713614527))+";
-cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.625159994865))+";
-cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.400496981648))+";
-cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.245671305417))+";
-cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.149501993628))+";
-cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.0943735268094))+";
-cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.055714218504))+";
-cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.032273131211))+";
-cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0193368300632))+";
-cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0109074260718))+";
-cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.00646596430331))+";
-cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.00324352812525))+";
-cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.00178440502281))+";
-cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.00111645018356))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.000602006464283))+";
-cut_mc += "((N_PileUpInteractions > 23.5)*(0.000602006464283))";
+cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
+cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
+cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
+cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
+cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
+cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
+cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
+cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
+cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
+cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
+cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
+cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
+cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
+cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
+cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
+cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
+cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
+cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
+cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
+cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
+cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
+cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
+cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
+cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
+cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
 cut_mc += ")";
 
 
-
-
-	float WNormalization = 0.86;
+	float WNormalization = 0.89;
 	TString filetag ="";
 	TString xtag ="";
 
@@ -469,17 +468,20 @@ cut_mc += ")";
 	TString filetag ="2011Data_LowMET";
 	TString xtag =" [MET<10, No Isolation]";
 		
-	//cut_mc = cut_mc_store + "*(MET_pf<10.0)";
-	//cut_data = cut_data_store + "*(MET_pf<10.0)";
-	//fillHisto(cut_mc, cut_data, true, 80,0,40000,"TrackerkIsoSumPT_muon1", false,"","Track Iso (#mu 1)" +xtag,lumi,10,WNormalization,filetag)
+	cut_mc = cut_mc_store + "*(MET_pf<10.0)";
+	cut_data = cut_data_store + "*(MET_pf<10.0)";
+	fillHisto(cut_mc, cut_data, true, 80,0,400,"TrackerkIsoSumPT_muon1", false,"","Track Iso (#mu 1)" +xtag,lumi,10,WNormalization,filetag);
 	
-	//TString filetag ="2011Data_HighMET";
-	//TString xtag =" [MET>10, No Isolation]";
+	gROOT->Reset(); gROOT->ProcessLine(".q;");
+	
+	
+	TString filetag ="2011Data_HighMET";
+	TString xtag =" [MET>10, No Isolation]";
 		
-	//cut_mc = cut_mc_store + "*(MET_pf>10.0)";
-	//cut_data = cut_data_store + "*(MET_pf>10.0)";
+	cut_mc = cut_mc_store + "*(MET_pf>10.0)";
+	cut_data = cut_data_store + "*(MET_pf>10.0)";
 
-	//fillHisto(cut_mc, cut_data, true, 80,0,400,"TrackerkIsoSumPT_muon1", false,"","Track Iso (#mu 1)" +xtag,lumi,10,WNormalization,filetag);
+	fillHisto(cut_mc, cut_data, true, 80,0,400,"TrackerkIsoSumPT_muon1", false,"","Track Iso (#mu 1)" +xtag,lumi,10,WNormalization,filetag);
 
 
 

@@ -17,7 +17,7 @@ def num2str(num, precision):
 	return "%0.*f" % (precision, num)
 
 
-print '----------  evaluating mumu   ----------\n\n'
+print '\n----------  evaluating mumu   ----------\n\n'
 for n in range(tmumu.GetEntries()):
 	tmumu.GetEntry(n)
 	line = ' '
@@ -52,7 +52,7 @@ for n in range(tmumu.GetEntries()):
 	print line
 
 
-print '----------  evaluating munu   ----------\n\n'
+print '\n----------  evaluating munu   ----------\n\n'
 for n in range(tmunu.GetEntries()):
 	tmunu.GetEntry(n)
 	line = ' '
@@ -77,3 +77,51 @@ for n in range(tmunu.GetEntries()):
 	line += num2str(tmunu.MET_pf,2)	
 	line += ' \\\\  '
 	print line
+	
+	
+myevents = []
+print '\n----------  events for mumu   ----------\n\n'
+for n in range(tmumu.GetEntries()):
+	tmumu.GetEntry(n)
+	line = str(tmumu.run_number) +':'+ str(tmumu.ls_number) +':'+ str(tmumu.event_number)
+	myevents.append(line)
+	print line
+
+
+print '\n----------  events for  munu   ----------\n\n'
+for n in range(tmunu.GetEntries()):
+	tmunu.GetEntry(n)
+	line = str(tmunu.run_number) +':'+ str(tmunu.ls_number) +':'+ str(tmunu.event_number)
+	myevents.append(line)
+	print line
+	
+print '\n\n'
+
+datasets = []
+
+datasets.append(['/SingleMu/Run2011A-May10ReReco-v1/RECO',160329,163869]) 
+datasets.append(['/SingleMu/Run2011A-PromptReco-v4/RECO',165071,168437])
+datasets.append(['/SingleMu/Run2011A-05Aug2011-v1/RECO',170053,172619])
+datasets.append(['/SingleMu/Run2011A-PromptReco-v6/RECO',172620,173688])
+
+crabinfo = []
+for ev in myevents:
+	run = int(ev.split(':')[0])
+	#print run
+	for d in datasets:
+		if run > d[1] and run < d[2]:
+			dset = d[0]
+	crabinfo.append(ev + ',' + dset)
+	
+import os
+f = open('makegetevents.sh','w')
+f.write('#!/bin/sh\n\n')
+for x in crabinfo:
+	cdir = x.split(',')[0]
+	cdir = 'dir'+cdir.replace(':','_')
+	f.write('rm -r '+cdir+'\nmkdir '+cdir+'\ncd '+cdir+'\n')
+	f.write('edmPickEvents.py "'+x.split(',')[1]+'" '+x.split(',')[0]+' --crab\n')
+	f.write('crab -create -cfg pickevents_crab.config\ncrab -submit\ncd - \n\n')
+	
+f.close()
+os.system('chmod 777 makegetevents.sh')

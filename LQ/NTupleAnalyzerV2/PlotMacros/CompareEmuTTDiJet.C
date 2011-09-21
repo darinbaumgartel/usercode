@@ -104,10 +104,10 @@ void fillHisto(TString cut_mc, TString cut_data,  TString cut_data_emu,  bool Us
 
 
 	if (!Use_emu) {h_ttbar->Scale(1.00);}
-	else if (Use_emu) {h_ttbar->Scale(0.6284);}
+	else if (Use_emu) {h_ttbar->Scale(1.00);}
 	
 	//====Here I added a piece to scale the data by .6284, since that is the emu part
-	h_data->Scale(0.6284);
+	h_data->Scale(0.47);
 
 
 	Double_t Nd = h_data->Integral();
@@ -329,8 +329,8 @@ void CompareEmuTTDiJet()
 
 
 	//
-	TString lumi = "964"  ;
-	TString cut_data = "(Pt_muon1>40)*(Pt_muon2>30)";
+	TString lumi = "2000"  ;
+	TString cut_data = "(Pt_muon1>40)*(Pt_muon2>40)";
 	cut_data += "*(Pt_pfjet1>30)*(Pt_pfjet2>30)";
 	cut_data += "*(M_muon1muon2>50)";
 	cut_data += "*(deltaR_muon1muon2>0.3)";
@@ -338,15 +338,17 @@ void CompareEmuTTDiJet()
 
 	//---------emu stuff--------
 	bool Use_emu = false;
-	TString cut_data_emu = "(Pt_muon1>40)*(Pt_HEEPele1>30)";
+	TString cut_data_emu = "(Pt_muon1>40)*(Pt_HEEPele1>40)";
 	cut_data_emu += "*(Pt_pfjet1>30)*(Pt_pfjet2>30)";
 	cut_data_emu += "*(M_muon1HEEPele1>50)";
 	cut_data_emu += "*(deltaR_muon1HEEPele1>0.3)";
 	cut_data_emu += "*((abs(Eta_muon1)<2.1)||(abs(Eta_HEEPele1)<2.1))";
+	cut_data += "*(LowestUnprescaledTriggerPass>0.5)";
+	cut_data_emu += "*(LowestUnprescaledTriggerPass>0.5)";	
 
 	//cut_data += "*((M_muon1muon2>80)*(M_muon1muon2<100))";
 
-	TString cut_mc = lumi+ "*weight_964pileup_bugfix*("+cut_data+")";
+	TString cut_mc = lumi+ "*weight*("+cut_data+")";
 //cut_mc += "*(";
 //cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.185626207798))+";
 //cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.42583555701))+";
@@ -375,8 +377,37 @@ void CompareEmuTTDiJet()
 //cut_mc += "((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)*(0.0445172018043))";
 //cut_mc += ")";
 
+cut_mc += "*(";
+cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
+cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
+cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
+cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
+cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
+cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
+cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
+cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
+cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
+cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
+cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
+cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
+cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
+cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
+cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
+cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
+cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
+cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
+cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
+cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
+cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
+cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
+cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
+cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
+cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
+cut_mc += ")";
 
-        float ZNormalization = 1.03; // 1.00;
+
+
+        float ZNormalization = 1.01; // 1.00;
 	TString filetag = " ";
 	TString xtag = " ";
 
@@ -395,7 +426,7 @@ void CompareEmuTTDiJet()
 	//This is due to the fact that here we actually need the DATA itself to match emu cuts, with Monte Carlo being entirely dimuon
 
 	//Also: The second ST is used for the variable var_data which is passed into the Draw function for h_data in the fillHisto function
-	fillHisto(cut_mc, cut_data_emu, cut_data_emu, Use_emu, true, 65,200,1500, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
+	fillHisto(cut_mc, cut_data_emu, cut_data_emu, Use_emu, true, 80,200,1000, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,50,ZNormalization,filetag);
 
 
 

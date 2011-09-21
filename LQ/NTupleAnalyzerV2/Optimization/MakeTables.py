@@ -3,7 +3,7 @@ import sys
 from ROOT import *
 import math
 
-castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_PreApproval_2011_07_27_05_59_49/SummaryFiles/']
+castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_PostLP_2fb_2011_08_24_05_33_55/SummaryFiles/']
 
 normtag = 'StandardSelections'
 scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown']
@@ -33,7 +33,7 @@ for c in castors:
 			os.system('stager_get -M '+x)
 		
 		
-lumi = 964.0
+lumi = 2000.0
 
 presel = 0
 if 'presel' in str(sys.argv):
@@ -46,10 +46,10 @@ if 'ttbaremu' in  str(sys.argv):
 #preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
 #preselectionmunu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))'
 
-preselectionmumu = str(lumi)+'*weight_964pileup_bugfix*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
+preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
 #preselectionemu = str(lumi)+'*weight*(LowestUnprescaledTriggerPass>0.5)*((Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(deltaR_muon1HEEPele1>0.3)*(M_muon1HEEPele1>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))'
-preselectionmunu = str(lumi)+'*weight_964pileup_bugfix*(((Pt_muon1>40)*(Pt_muon2<30.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))'
-preselectionenu = '0.6284*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(M_muon1HEEPele1>50)*(deltaR_muon1HEEPele1>0.3)*((abs(Eta_muon1)<2.1)||(abs(Eta_HEEPele1)<2.1))';
+preselectionmunu = str(lumi)+'*weight*(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))'
+preselectionenu = '0.47*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(M_muon1HEEPele1>50)*(deltaR_muon1HEEPele1>0.3)*((abs(Eta_muon1)<2.1)||(abs(Eta_HEEPele1)<2.1))';
 
 
 #*(ST_pf_munu > 380)*(MT_muon1pfMET > 110)*(M_bestmupfjet_munu > 130)
@@ -88,8 +88,37 @@ preselectionenu = '0.6284*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfje
 #cut_mc += "((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)*(3.35058351289e-05))";
 #cut_mc += ")";
 
-#preselectionmumu += cut_mc
-#preselectionmunu += cut_mc
+cut_mc = "*(";
+cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
+cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
+cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
+cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
+cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
+cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
+cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
+cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
+cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
+cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
+cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
+cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
+cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
+cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
+cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
+cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
+cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
+cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
+cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
+cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
+cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
+cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
+cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
+cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
+cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
+cut_mc += ")";
+
+
+preselectionmumu += cut_mc
+preselectionmunu += cut_mc
 
 # Final Selection
 
@@ -107,6 +136,8 @@ DataNames =  ''
 
 
 for x in cfiles:
+	if 'HighHT' in x:
+		continue
 	if 'LQToCMu' in x:
 		if 'BetaHalf' in x:
 			BetaHalfSignals.append(x)
@@ -120,6 +151,8 @@ for x in cfiles:
 			Backgrounds.append(x)	
 			BackgroundNames.append(x.split('/')[-1].replace('.root',''))
 for x in cfiles:
+	if 'HighHT' in x:
+		continue	
 	if 'SingleMuData' in x:
 		Backgrounds.append(x)	
 		BackgroundNames.append(x.split('/')[-1].replace('.root',''))
@@ -174,10 +207,12 @@ for n in range(len(BetaOneSignals)):
 		headerline = 'LQ Mass'
 	f = TFile.Open(BetaOneSignals[n])
 	t = f.Get("PhysicalVariables")
-	h = TH1D('h','h',2,-1,3)
+	h = TH1D('h','h',1,-1,3)
+	h.Sumw2()
 	t.Project('h','1.0',preselectionmumu+fullsel)
-	I = h.Integral()
-	E = I / math.sqrt(1.0*h.GetEntries())
+	#h.Sumw2()
+	I = h.GetBinContent(1)
+	E = h.GetBinError(1)
 	f.Close()
 	del t
 	tableline += BetaOneSignalNames[n]+' , '+str(I) +' , +- , '+ str(E)
@@ -192,15 +227,18 @@ for n in range(len(BetaOneSignals)):
 		thispreselection = preselectionmumu
 		f = TFile.Open(Backgrounds[m])
 		t = f.Get("PhysicalVariables")
-		h = TH1D('h','h',2,-1,3)
+		h = TH1D('h','h',1,-1,3)
+		h.Sumw2()
+	
 		scalefactor = 1.0
 		if 'WJets' in Backgrounds[m]:
-			scalefactor = 0.94
+			scalefactor = 0.89
 		if 'ZJets' in Backgrounds[m]:
-			scalefactor = 1.03
+			scalefactor = 1.01
 		if 'TTBar' in Backgrounds[m] and emu==0:
-			scalefactor = (1.00)
+			scalefactor = (1.03)
 		if 'TTBar' in Backgrounds[m] and emu==1:
+			thisfullsel = thisfullsel.replace('ST_pf_mumu','ST_pf_emu')			
 			thisfullsel = thisfullsel.replace('ST_pf_mumu','ST_pf_emu')
 			thisfullsel = thisfullsel.replace('muon1muon2','muon1HEEPele1')
 			thisfullsel = thisfullsel.replace('LowestMass_BestLQCombo','LowestMass_BestLQCombo_emuselection')
@@ -213,7 +251,9 @@ for n in range(len(BetaOneSignals)):
 			del t
 			f = TFile.Open(datfile)
 			t = f.Get("PhysicalVariables")
-			h = TH1D('h','h',2,-1,3)
+			h = TH1D('h','h',1,-1,3)
+			h.Sumw2()
+
 			trigger = "*(LowestUnprescaledTriggerPass>0.5)"
 
 		if 'SingleMuData' in Backgrounds[m]:
@@ -222,9 +262,9 @@ for n in range(len(BetaOneSignals)):
 		if 'SingleMuData' in Backgrounds[m]:
 			I = 1.0*(h.GetEntries())
 		else:
-			I = scalefactor*(h.Integral())
+			I = scalefactor*(h.GetBinContent(1))
 		if I>0.001:
-			E = I / math.sqrt(1.0*h.GetEntries())
+			E = scalefactor*(h.GetBinError(1))
 		else:
 			E=0.0
 		if 'SingleMuData' not in Backgrounds[m]:
@@ -265,10 +305,11 @@ for n in range(len(BetaHalfSignals)):
 		headerline = 'LQ Mass'
 	f = TFile.Open(BetaHalfSignals[n])
 	t = f.Get("PhysicalVariables")
-	h = TH1D('h','h',2,-1,3)
+	h = TH1D('h','h',1,-1,3)
+	h.Sumw2()
 	t.Project('h','1.0',preselectionmunu+fullsel)
-	I = h.Integral()
-	E = I / math.sqrt(1.0*h.GetEntries())
+	I = h.GetBinContent(1)
+	E = h.GetBinError(1)
 	f.Close()
 	del t
 	tableline += BetaHalfSignalNames[n]+' , '+str(I) +' , +- , '+ str(E)
@@ -279,14 +320,16 @@ for n in range(len(BetaHalfSignals)):
 		trigger = ""
 		f = TFile.Open(Backgrounds[m])
 		t = f.Get("PhysicalVariables")
-		h = TH1D('h','h',2,-1,3)
+		h = TH1D('h','h',1,-1,3)
+		h.Sumw2()
+	
 		scalefactor = 1.0
 		if 'WJets' in Backgrounds[m]:
-			scalefactor = 0.94
+			scalefactor = 0.89
 		if 'ZJets' in Backgrounds[m]:
-			scalefactor = 1.03
+			scalefactor = 1.01
 		if 'TTBar' in Backgrounds[m]:
-			scalefactor = (1.01)
+			scalefactor = (1.03)
 		if 'SingleMuData' in Backgrounds[m]:
 			trigger = "*(LowestUnprescaledTriggerPass>0.5)"
 
@@ -294,9 +337,9 @@ for n in range(len(BetaHalfSignals)):
 		if 'SingleMuData' in Backgrounds[m]:
 			I = 1.0*(h.GetEntries())
 		else:
-			I = scalefactor*(h.Integral())
+			I = scalefactor*(h.GetBinContent(1))
 		if I>0.001:
-			E = I / math.sqrt(1.0*h.GetEntries())
+			E = scalefactor*(h.GetBinError(1))
 		else:
 			E=0.0
 		if 'SingleMuData' not in Backgrounds[m]:

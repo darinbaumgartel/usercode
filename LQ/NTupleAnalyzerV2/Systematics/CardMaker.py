@@ -1,7 +1,7 @@
 import os
 import sys
 
-f = open('OutputSysCards.csv','r')
+f = open('OutputSysCards.txt','r')
 
 cardinfo = []
 for line in f:
