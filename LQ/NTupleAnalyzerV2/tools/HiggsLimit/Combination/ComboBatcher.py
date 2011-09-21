@@ -47,7 +47,7 @@ for x in betas:
 		os.system('sed \'s/RunStatsCombo/RunStatsComboBatcher_'+str(n)+'/g\' '+sub + ' > '+sub.replace('.','_'+str(n)+'.'))
 		os.system('sed -i \'s/MYPWD/'+mypwd.replace('/','\/')+'/g\' '+sub.replace('.','_'+str(n)+'.') )
 
-		opts = '-cards '+cardfile + '-tag '+tagname
+		opts = '-cards '+cardfile + ' -tag '+tagname
 		os.system ('sed -i \'s/MYOPTIONS/'+(opts.replace('-','\-')).replace(' ','\ ')+'/g\' '+sub.replace('.','_'+str(n)+'.') )
 		
 	fcom = open('combosub_alljobs.sh','r')
