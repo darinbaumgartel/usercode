@@ -1,0 +1,11 @@
+First add the TMVA package.
+
+   cp -r /afs/cern.ch/sw/lcg/app/releases/ROOT/5.27.06/x86_64-slc5-gcc43-opt/root/tmva/ .
+   
+Backup needed files:
+
+    cp tmva/test/TMVAClassification.C tmva/test/TMVAClassification_BAK.C
+
+Run the preparation with :
+
+	python TMVAPrep.py 
