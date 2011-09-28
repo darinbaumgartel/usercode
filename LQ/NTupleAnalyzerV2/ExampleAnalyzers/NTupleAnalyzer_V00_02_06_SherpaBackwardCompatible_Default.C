@@ -72,15 +72,16 @@ Double_t F_U2Prime(Double_t P)
 int CustomHeepID(double e_pt, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso )
 {
 	int isgood = 1;
-	
+
+	if (e_pt<20.0) isgood = 0;
 	if (e_eta > 1.442 && e_eta < 1.560) isgood = 0;
 	if (e_eta > 2.50) isgood = 0;
-	isgood *= e_ecaldriven;
-	isgood *= (fabs(e_dphi_sc) < 0.09);
-	isgood *= (e_hoe < 0.05);
+	if (!e_ecaldriven) isgood = 0;
+	if (fabs(e_dphi_sc) > 0.09) isgood = 0;
+	if (e_hoe > 0.05) isgood = 0;
 	
-	bool barrel = (e_eta > 1.442);
-	bool endcap = (e_eta > 1.560 && e_eta < 2.5);
+	bool barrel = (fabs(e_eta) > 1.442);
+	bool endcap = (fabs(e_eta) > 1.560 && fabs(e_eta) < 2.5);
 	
 	if (barrel)
 	{
@@ -102,8 +103,10 @@ int CustomHeepID(double e_pt, double e_eta, bool e_ecaldriven , double e_dphi_sc
 	
 	
 	return isgood;
+	
+	
 }
-
+			
 
 // Boolean switches for Recoil and Smearing corrections, False by default.
 bool DoRecoilCorrections = false;
