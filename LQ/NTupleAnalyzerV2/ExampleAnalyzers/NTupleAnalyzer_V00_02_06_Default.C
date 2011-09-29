@@ -69,36 +69,37 @@ Double_t F_U2Prime(Double_t P)
 	return gRandom->Gaus(newU2,newsU2);
 }
 
-int CustomHeepID(double e_pt, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso )
+int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso )
 {
 	int isgood = 1;
 
-	if (e_pt<20.0) isgood = 0;
-	if (e_eta > 1.442 && e_eta < 1.560) isgood = 0;
-	if (e_eta > 2.50) isgood = 0;
+	if (e_pt_real<25.0) isgood = 0;
+	if (e_pt<25.0) isgood = 0;
+	if (fabs(e_eta) > 1.442 && fabs(e_eta) < 1.560) isgood = 0;
+	if (fabs(e_eta) > 2.50) isgood = 0;
 	if (!e_ecaldriven) isgood = 0;
 	if (fabs(e_dphi_sc) > 0.09) isgood = 0;
 	if (e_hoe > 0.05) isgood = 0;
 	
-	bool barrel = (fabs(e_eta) > 1.442);
+	bool barrel = (fabs(e_eta) < 1.442);
 	bool endcap = (fabs(e_eta) > 1.560 && fabs(e_eta) < 2.5);
 	
 	if (barrel)
 	{
-		isgood *= (fabs(e_deta_sc) < 0.005);
-		isgood *= (( e_e1x5_over_5x5 > 0.83)||( e_e2x5_over_5x5 > 0.94 ));
-		isgood *= ( e_em_had1iso < ( 2.0 + 0.03*e_pt ));
-		isgood *= (e_trkiso < 7.5); 
+		if (fabs(e_deta_sc) > 0.005) isgood = 0;
+		if (( e_e1x5_over_5x5 > 0.83)&&( e_e2x5_over_5x5 > 0.94 )) isgood = 0;
+		if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0;
+		if (e_trkiso > 7.5) isgood = 0;
 	}
 	
 	if (endcap)
 	{
-		isgood *= (fabs(e_deta_sc) < 0.007);
-		isgood *= (fabs(e_sigmann) < 0.03);
-		if (e_pt < 50.0) isgood *= ( e_em_had1iso <  2.5 );
-		if (e_pt >= 50.0) isgood *= ( e_em_had1iso < ( 2.5 + 0.03*(e_pt-50.0) ));
-		isgood *= ( e_had2iso < 0.5 );		
-		isgood *= (e_trkiso < 15.0); 
+		if (fabs(e_deta_sc)> 0.007) isgood = 0;
+		if (fabs(e_sigmann) > 0.03) isgood = 0;
+		if ((e_pt < 50.0) && ( e_em_had1iso >  2.5 )) isgood = 0;
+		if ((e_pt >= 50.0) && ( e_em_had1iso > ( 2.5 + 0.03*(e_pt-50.0) ))) isgood = 0;
+		if ( e_had2iso > 0.5 ) isgood = 0;
+		if (e_trkiso > 15.0) 	isgood = 0;
 	}
 	
 	
@@ -571,6 +572,7 @@ void placeholder::Loop()
 		vector<int> v_idx_ele_final;
 		for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
 		{
+			double e_pt_real = ElectronPt->at(iele);
 			double e_pt = ElectronPtHeep->at(iele);
 			double e_eta = ElectronSCEta->at(iele);
 			bool e_ecaldriven = ElectronHasEcalDrivenSeed->at(iele);
@@ -588,7 +590,7 @@ void placeholder::Loop()
 			//std::cout<<CustomHeepID(e_pt, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso )<<std::endl;
 
 			//			if ( ElectronPt->at(iele) < 15.0 ) continue;
-			if  (CustomHeepID(e_pt, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso ) && ElectronOverlaps->at(iele) == 0 )
+			if  (CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso ) && ElectronOverlaps->at(iele) == 0 )
 			{
 				v_idx_ele_final.push_back(iele);
 			}
@@ -606,7 +608,7 @@ void placeholder::Loop()
 
 		for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
 		{
-			
+			double e_pt_real = ElectronPt->at(iele);			
 			double e_pt = ElectronPtHeep->at(iele);
 			double e_eta = ElectronSCEta->at(iele);
 			bool e_ecaldriven = ElectronHasEcalDrivenSeed->at(iele);
@@ -621,7 +623,7 @@ void placeholder::Loop()
 			double e_had2iso = ElectronHcalIsoD2DR03->at(iele);
 			double e_trkiso = ElectronTrkIsoPAT->at(iele);
 		  
-		  if ( CustomHeepID(e_pt, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso )  && ElectronOverlaps->at(iele) == 0 )  
+		  if ( CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso )  && ElectronOverlaps->at(iele) == 0 )  
 		    {		      
 		      v_idx_ele_good_final.push_back(iele);  
 		    }
