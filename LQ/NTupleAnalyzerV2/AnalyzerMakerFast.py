@@ -17,6 +17,10 @@ print '          Precauationary cleanup... please ignore\n'
 os.system('rm RootProcess* *part*.C *part*.h *part*.d *part*.so sub*csh ')
 neucopy = False 
 
+newjetsacle = '1.0'
+newmusacle = '1.0'
+newjetres = '0.0'
+newmures = '0.0'
 
 StagerCheck = 0
 a = sys.argv
@@ -33,6 +37,16 @@ for x in range(len(a)):
 		tagname = a[x+1]
 	if 'neucopy' in a[x] or 'NEUCOPY' in a[x] or 'NEUcopy' in a[x] or 'NEUCopy' in a[x]:
 		neucopy = True
+	if a[x] == '--jetsacle':
+		newjetscale = a[x+1]
+	if a[x] == '--musacle':
+		newmuscale = a[x+1]
+	if a[x] == '--jetres':
+		newjetres = a[x+1]
+	if a[x] == '--mures':
+		newmures = a[x+1]
+
+
 
 if cfile == '' or hfile == '' or ifile == '':
 	print 'Must specify input .C, .h, and .csv files, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv -c NTupleAnalyzer.C -h NTupleAnalyzer.h\n\n   Exiting   \n\n'
@@ -133,7 +147,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>7:
+		if len(sublist)>10:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
@@ -167,6 +181,13 @@ for x in range(len(SignalType)):
 		s1 = s1.replace('desired_luminosity', str(float(1.0)))
 		s1 = s1.replace('FILEINPUT', path + '/' + dirList[0] )
 		s1 = s1.replace('MassOfLQ', str(float(MassOfLQ[x])))
+		
+		s1 = s1.replace('Double_t JetRescaleFactor = 1.00;','Double_t JetRescaleFactor = '+newjetscale+';\n')
+		s1 = s1.replace('Double_t MuonRescaleFactor = 1.00;','Double_t JetRescaleFactor = '+newmuscale+';\n')
+		s1 = s1.replace('Double_t JetSmearFactor = 0.0;','Double_t JetRescaleFactor = '+newjetres+';\n')
+		s1 = s1.replace('Double_t MuonSmearFactor = 0.0;','Double_t JetRescaleFactor = '+newmures+';\n')
+		
+
 	
 		if SignalType[x][0] == 'W' and 'Jets' in SignalType[x][0]:
 			s1 = s1.replace('IsItWMC', 'true')
