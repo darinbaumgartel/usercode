@@ -108,6 +108,19 @@ MakeClass-style analyzer code.
       --stager_check   < Checks Stage status of all files and stages unstaged files>
 
 
+        NEW!! Options for systematics:
+      
+	--jetsacle 1.04   [ 4% positive jet energy scaling, default is 1.00 ]
+	--jetsacle 0.96   [ 4% negative jet energy scaling, default is 1.00 ]
+
+    --musacle 1.01    [ 4% negative muon momentum scaling, default is 1.00 ]
+    --musacle 0.99    [ 4% negative muon momentum scaling, default is 1.00 ]
+
+    --jetres 0.10     [ 10% jet resolution smearing, default is 0.0 ]
+    --mures  0.04     [10% muon resolution smearing, default is 0.0 ]
+
+
+
 6) Gather your analyzer output and run whatever you would like. 
    With the analyzer output .root files, you can easily hadd the files
    into a more coherent structure, e.g. 
