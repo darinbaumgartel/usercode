@@ -17,8 +17,8 @@ print '          Precauationary cleanup... please ignore\n'
 os.system('rm RootProcess* *part*.C *part*.h *part*.d *part*.so sub*csh ')
 neucopy = False 
 
-newjetsacle = '1.0'
-newmusacle = '1.0'
+newjetscale = '1.0'
+newmuscale = '1.0'
 newjetres = '0.0'
 newmures = '0.0'
 
@@ -37,9 +37,9 @@ for x in range(len(a)):
 		tagname = a[x+1]
 	if 'neucopy' in a[x] or 'NEUCOPY' in a[x] or 'NEUcopy' in a[x] or 'NEUCopy' in a[x]:
 		neucopy = True
-	if a[x] == '--jetsacle':
+	if a[x] == '--jetscale':
 		newjetscale = a[x+1]
-	if a[x] == '--musacle':
+	if a[x] == '--muscale':
 		newmuscale = a[x+1]
 	if a[x] == '--jetres':
 		newjetres = a[x+1]
@@ -147,7 +147,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>10:
+		if len(sublist)>8:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
@@ -183,9 +183,9 @@ for x in range(len(SignalType)):
 		s1 = s1.replace('MassOfLQ', str(float(MassOfLQ[x])))
 		
 		s1 = s1.replace('Double_t JetRescaleFactor = 1.00;','Double_t JetRescaleFactor = '+newjetscale+';\n')
-		s1 = s1.replace('Double_t MuonRescaleFactor = 1.00;','Double_t JetRescaleFactor = '+newmuscale+';\n')
-		s1 = s1.replace('Double_t JetSmearFactor = 0.0;','Double_t JetRescaleFactor = '+newjetres+';\n')
-		s1 = s1.replace('Double_t MuonSmearFactor = 0.0;','Double_t JetRescaleFactor = '+newmures+';\n')
+		s1 = s1.replace('Double_t MuonRescaleFactor = 1.00;','Double_t MuonRescaleFactor = '+newmuscale+';\n')
+		s1 = s1.replace('Double_t JetSmearFactor = 0.0;','Double_t JetSmearFactor = '+newjetres+';\n')
+		s1 = s1.replace('Double_t MuonSmearFactor = 0.0;','Double_t MuonSmearFactor = '+newmures+';\n')
 		
 
 	

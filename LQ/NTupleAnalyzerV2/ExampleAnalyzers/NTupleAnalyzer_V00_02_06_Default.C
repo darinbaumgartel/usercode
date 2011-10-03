@@ -12,6 +12,7 @@
 #include "TRandom2.h"
 #include "TRandom3.h"
 #include "JSONFilterFunction.h"
+#include "ResidualModifier.h"
 
 #define BRANCH(bname) Double_t bname = -99999.12345; tree->Branch(#bname,& bname," bname /D ");
 #define VRESET(vname) vname = -99999.12345;
@@ -178,7 +179,7 @@ void placeholder::Loop()
 	BRANCH(Events_AfterLJ); BRANCH(Events_Orig);
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
-	BRANCH(weight_964pileup_gen); BRANCH(weight_964pileup_bugfix);
+	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb);
 
 
 	// PFMET
@@ -325,6 +326,7 @@ void placeholder::Loop()
 
 	for (Long64_t jentry=0; jentry<nentries;jentry++)
 	{
+
 		Long64_t ientry = LoadTree(jentry);
 		if (ientry < 0) break;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -386,50 +388,46 @@ void placeholder::Loop()
 		
 		weight_964pileup_gen = weight; 
 		
-		weight_964pileup_bugfix = weight;
+		weight_pileup2fb = weight;
 
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5))    weight_964pileup_bugfix *=((0.133068262644));
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5))     weight_964pileup_bugfix *=((0.531177727826));
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5))     weight_964pileup_bugfix *=((1.08393607934));
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5))     weight_964pileup_bugfix *=((1.75485574706));
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5))     weight_964pileup_bugfix *=((2.23265146857));
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5))     weight_964pileup_bugfix *=((2.29302545029));
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5))     weight_964pileup_bugfix *=((2.08187693395));
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5))     weight_964pileup_bugfix *=((1.74354004493));
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5))     weight_964pileup_bugfix *=((1.32963414181));
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5))     weight_964pileup_bugfix *=((0.950884829018));
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5))    weight_964pileup_bugfix *=((0.653989809522));
-		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5))    weight_964pileup_bugfix *=((0.421230072952));
-		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5))    weight_964pileup_bugfix *=((0.259599212011));
-		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5))    weight_964pileup_bugfix *=((0.158601185413));
-		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5))    weight_964pileup_bugfix *=((0.100442489896));
-		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5))    weight_964pileup_bugfix *=((0.0594521650904));
-		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5))    weight_964pileup_bugfix *=((0.0345162335823));
-		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5))    weight_964pileup_bugfix *=((0.0207204183018));
-		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5))    weight_964pileup_bugfix *=((0.0117033339315));
-		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5))    weight_964pileup_bugfix *=((0.00694640146464));
-		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5))    weight_964pileup_bugfix *=((0.00348689915421));
-		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5))    weight_964pileup_bugfix *=((0.00191943200042));
-		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5))    weight_964pileup_bugfix *=((0.00120128248423));
-		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5))    weight_964pileup_bugfix *=((0.000647624891971));
-		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5))    weight_964pileup_bugfix *=((0.000455476442992));
-		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5))    weight_964pileup_bugfix *=((0.000196385472519));
-		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5))    weight_964pileup_bugfix *=((0.000101079948326));
-		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5))    weight_964pileup_bugfix *=((8.14199879897e-05));
-		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5))    weight_964pileup_bugfix *=((4.89354471066e-05));
-		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5))    weight_964pileup_bugfix *=((3.35058351289e-05));
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5))    weight_pileup2fb *=  (0.0752233034121);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5))     weight_pileup2fb *=  (0.361994702942);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5))     weight_pileup2fb *=  (0.787119271271);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5))     weight_pileup2fb *=  (1.31779962348);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5))     weight_pileup2fb *=  (1.76293927848);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5))     weight_pileup2fb *=  (1.99059826007);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5))     weight_pileup2fb *=  (2.00731349758);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5))     weight_pileup2fb *=  (1.82730847106);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5))     weight_pileup2fb *=  (1.56802352509);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5))     weight_pileup2fb *=  (1.26852456276);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5))    weight_pileup2fb *=  (0.993808726427);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5))   weight_pileup2fb *=  (0.760786688881);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5))   weight_pileup2fb *=  (0.566015549542);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5))   weight_pileup2fb *=  (0.41722578577);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5))   weight_pileup2fb *=  (0.303388545407);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5))   weight_pileup2fb *=  (0.220634364549);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5))   weight_pileup2fb *=  (0.155308189438);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5))   weight_pileup2fb *=  (0.110585960196);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5))   weight_pileup2fb *=  (0.0776646451932);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5))   weight_pileup2fb *=  (0.0543492223545);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5))   weight_pileup2fb *=  (0.037244740125);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5))   weight_pileup2fb *=  (0.0259826507587);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5))   weight_pileup2fb *=  (0.0175412449088);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5))   weight_pileup2fb *=  (0.0118325534711);
+		if (N_PileUpInteractions > 23.5)                                   weight_pileup2fb *=  (0.00);
+
 		
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5))   weight_964pileup_gen *=  ((0.185626207798));
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5))   weight_964pileup_gen *=  ((0.42583555701));
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5))   weight_964pileup_gen *=  ((0.983425220588));
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5))   weight_964pileup_gen *=  ((1.60756198475));
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5))   weight_964pileup_gen *=  ((2.06101780086));
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5))   weight_964pileup_gen *=  ((2.20045322833));
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5))   weight_964pileup_gen *=  ((2.03181596181));
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5))   weight_964pileup_gen *=  ((1.66526505721));
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5))   weight_964pileup_gen *=  ((1.23451631687));
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5))   weight_964pileup_gen *=  ((0.83971609875));
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5))   weight_964pileup_gen *=  ((0.52995300733));
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5))    weight_964pileup_gen *=  ((0.185626207798));
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5))     weight_964pileup_gen *=  ((0.42583555701));
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5))     weight_964pileup_gen *=  ((0.983425220588));
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5))     weight_964pileup_gen *=  ((1.60756198475));
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5))     weight_964pileup_gen *=  ((2.06101780086));
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5))     weight_964pileup_gen *=  ((2.20045322833));
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5))     weight_964pileup_gen *=  ((2.03181596181));
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5))     weight_964pileup_gen *=  ((1.66526505721));
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5))     weight_964pileup_gen *=  ((1.23451631687));
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5))     weight_964pileup_gen *=  ((0.83971609875));
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5))    weight_964pileup_gen *=  ((0.52995300733));
 		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5))   weight_964pileup_gen *=  ((0.332814874864));
 		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5))   weight_964pileup_gen *=  ((0.224446370555));
 		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5))   weight_964pileup_gen *=  ((0.156753261452));
@@ -535,14 +533,22 @@ void placeholder::Loop()
 				}
 				
 				if (!consider) continue;
-				double NewJetPT =  ScaleObject((*PFJetPt)[ijet],JetRescaleFactor); 
-				NewJetPT =  SmearObject(NewJetPT,JetSmearFactor); 
+				double NewJetRescalingFactor = 1.0+NewJesUncertainty((JetRescaleFactor - 1.0), (*PFJetPtRaw)[ijet], (*PFJetEta)[ijet]);
+				
+				double NewJetPT = (*PFJetPt)[ijet];
+				if (JetRescaleFactor != 1.00) NewJetPT = NewJetPT + ((ScaleObject((*PFJetPtRaw)[ijet],NewJetRescalingFactor)) - ((*PFJetPtRaw)[ijet])) ; 
+				if (JetSmearFactor != 0.0) NewJetPT =  NewJetPT + (SmearObject((*PFJetPtRaw)[ijet],JetSmearFactor) - (*PFJetPtRaw)[ijet]); 
+								
 				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
-				(*PFJetPt)[ijet] = NewJetPT ;	
+				
+				//std::cout<<JetRescaleFactor<<"  "<<NewJetRescalingFactor<<" || "<< NewJetPT <<"  "<<(*PFJetPt)[ijet]<<" || "<< (*PFMET)[0]<<"  "<<JetAdjustedMET.Pt()<<std::endl;
 
+				(*PFJetPt)[ijet] = NewJetPT ;	
+				
+				
 			}
 		}
-		
+		//std::cout<<" ------------------------------------------------ " <<std::endl;
 		(*PFMET)[0] = JetAdjustedMET.Pt();
 		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
 
