@@ -534,6 +534,7 @@ void placeholder::Loop()
 				
 				if (!consider) continue;
 				double NewJetRescalingFactor = 1.0+NewJesUncertainty((JetRescaleFactor - 1.0), (*PFJetPtRaw)[ijet], (*PFJetEta)[ijet]);
+				if (JetRescaleFactor < 1.0) NewJetRescalingFactor = 2.0 - NewJetRescalingFactor;
 				
 				double NewJetPT = (*PFJetPt)[ijet];
 				if (JetRescaleFactor != 1.00) NewJetPT = NewJetPT + ((ScaleObject((*PFJetPtRaw)[ijet],NewJetRescalingFactor)) - ((*PFJetPtRaw)[ijet])) ; 
