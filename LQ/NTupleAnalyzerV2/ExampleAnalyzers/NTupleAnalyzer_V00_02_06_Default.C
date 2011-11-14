@@ -301,6 +301,7 @@ void placeholder::Loop()
 	BRANCH(LowestUnprescaledTrigger); BRANCH(Closest40UnprescaledTrigger);
 	BRANCH(LowestUnprescaledTriggerPass); BRANCH(Closest40UnprescaledTriggerPass);
 	BRANCH(HLTIsoMu24Pass);
+	BRANCH(HLTMu40TriggerPass);
 	
 	//===================================================================================================
 	//===================================================================================================
@@ -333,10 +334,8 @@ void placeholder::Loop()
 	Long64_t nbytes = 0, nb = 0;
 
 	//nentries=10000;  /// TEST>>>>>> COMMENT THIS ALWAYS
-
 	for (Long64_t jentry=0; jentry<nentries;jentry++)
 	{
-
 		Long64_t ientry = LoadTree(jentry);
 		if (ientry < 0) break;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -426,42 +425,22 @@ void placeholder::Loop()
 		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5))   weight_pileup2fb *=  (0.0118325534711);
 		if (N_PileUpInteractions > 23.5)                                   weight_pileup2fb *=  (0.00);
 
-		
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5))    weight_964pileup_gen *=  ((0.185626207798));
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5))     weight_964pileup_gen *=  ((0.42583555701));
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5))     weight_964pileup_gen *=  ((0.983425220588));
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5))     weight_964pileup_gen *=  ((1.60756198475));
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5))     weight_964pileup_gen *=  ((2.06101780086));
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5))     weight_964pileup_gen *=  ((2.20045322833));
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5))     weight_964pileup_gen *=  ((2.03181596181));
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5))     weight_964pileup_gen *=  ((1.66526505721));
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5))     weight_964pileup_gen *=  ((1.23451631687));
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5))     weight_964pileup_gen *=  ((0.83971609875));
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5))    weight_964pileup_gen *=  ((0.52995300733));
-		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5))   weight_964pileup_gen *=  ((0.332814874864));
-		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5))   weight_964pileup_gen *=  ((0.224446370555));
-		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5))   weight_964pileup_gen *=  ((0.156753261452));
-		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5))   weight_964pileup_gen *=  ((0.107016604049));
-		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5))   weight_964pileup_gen *=  ((0.0797487370731));
-		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5))   weight_964pileup_gen *=  ((0.0591346986699));
-		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5))   weight_964pileup_gen *=  ((0.0437285788856));
-		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5))   weight_964pileup_gen *=  ((0.0314714756899));
-		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5))   weight_964pileup_gen *=  ((0.0272704760569));
-		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5))   weight_964pileup_gen *=  ((0.0210989861712));
-		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5))   weight_964pileup_gen *=  ((0.0207102970854));
-		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5))   weight_964pileup_gen *=  ((0.0205646801805));
-		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5))   weight_964pileup_gen *=  ((0.0197259419363));
-		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5))   weight_964pileup_gen *=  ((0.0445172018043));
+
 
 		//========================     Trigger Scanning  ================================//
 
 		string hltmu ("HLT_Mu");
 		string hltisomu ("HLT_IsoMu24");
+		string eta2p1 ("eta2p1");
+		string hltmu40 ("HLT_Mu40_v");
+		string hltmu40eta2p1 ("HLT_Mu40_eta2p1_v");
 
 		LowestUnprescaledTrigger = -1.;
 		LowestUnprescaledTriggerPass = -1.;
 		Closest40UnprescaledTrigger = -1.;
 		Closest40UnprescaledTrigger = -1.;
+		HLTMu40TriggerPass = -1.;
+		
 		
 		vector <double> SingleMuThresholds;
 		vector <int> SingleMuPrescales;
@@ -481,8 +460,7 @@ void placeholder::Loop()
 		for(unsigned int iHLT = 0; iHLT != HLTInsideDatasetTriggerNames->size(); ++iHLT)
 		{
 			string thishlt = HLTInsideDatasetTriggerNames->at(iHLT);
-			
-			bool isSingleMuTrigger = (thishlt.compare(0,6,hltmu)==0) && (thishlt.length()>7) && (thishlt.length()<13);
+			bool isSingleMuTrigger = (thishlt.compare(0,6,hltmu)==0) && (thishlt.length()>7) && (thishlt.length()<20);
 			if (!isSingleMuTrigger) continue;
 
 			string onesplace,tensplace;	
@@ -496,6 +474,11 @@ void placeholder::Loop()
 			SingleMuThresholds.push_back(triggervalue);
 			SingleMuPrescales.push_back(HLTInsideDatasetTriggerPrescales->at(iHLT));
 			SingleMuPasses.push_back(HLTInsideDatasetTriggerDecisions->at(iHLT));
+			
+			if ((!(thishlt.compare(0,10,hltmu40)==0))&&(!(thishlt.compare(0,17,hltmu40eta2p1)==0))) continue;
+			
+			if (( HLTInsideDatasetTriggerPrescales->at(iHLT) == 1) && HLTMu40TriggerPass < 1.0) HLTMu40TriggerPass = HLTInsideDatasetTriggerDecisions->at(iHLT);
+			
 		}
 		
 		for(unsigned int iHLTmu = 0; iHLTmu !=SingleMuThresholds.size(); ++iHLTmu)
@@ -728,7 +711,7 @@ void placeholder::Loop()
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
-				MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&                             // Disable for EWK
+				MuonTrackerIsoSumPT->at(imuon) < 3.0 &&                             // Disable for EWK
 				//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 
