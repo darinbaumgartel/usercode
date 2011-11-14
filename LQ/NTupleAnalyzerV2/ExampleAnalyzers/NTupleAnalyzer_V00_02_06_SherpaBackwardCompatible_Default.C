@@ -40,6 +40,13 @@ Double_t SmearObject(Double_t PT, Double_t fraction)
 	return (rr->Gaus(PT,fraction*PT));
 }
 
+Double_t GetRecoGenJetScaleFactor(Double_t RecoPT,Double_t GenPT, Double_t SmearFactor)
+{
+	Double_t deltaPT = ((RecoPT-GenPT)*SmearFactor);
+	return (RecoPT+deltaPT)/RecoPT;
+}
+
+
 TLorentzVector PropagatePTChangeToMET(Double_t MET, Double_t METPhi, Double_t PTCorr, Double_t PTOrig, Double_t Phi)
 {
 	Double_t yMET = MET*sin(METPhi) - ( (PTCorr - PTOrig)*sin(Phi)  );
@@ -512,6 +519,8 @@ void placeholder::Loop()
 		{
 			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 			{
+				if (PFJetPt->at(ijet) < 15.0) continue;
+			
 				bool consider = true;
 				TLorentzVector ThisPFJet;
 				Double_t JetLepDR;
@@ -536,15 +545,58 @@ void placeholder::Loop()
 				double NewJetRescalingFactor = 1.0+NewJesUncertainty((JetRescaleFactor - 1.0), (*PFJetPtRaw)[ijet], (*PFJetEta)[ijet]);
 				if (JetRescaleFactor < 1.0) NewJetRescalingFactor = 2.0 - NewJetRescalingFactor;
 				
+				
 				double NewJetPT = (*PFJetPt)[ijet];
+				double NewJetETA = (*PFJetEta)[ijet];
+
 				if (JetRescaleFactor != 1.00) NewJetPT = NewJetPT + ((ScaleObject((*PFJetPtRaw)[ijet],NewJetRescalingFactor)) - ((*PFJetPtRaw)[ijet])) ; 
-				if (JetSmearFactor != 0.0) NewJetPT =  NewJetPT + (SmearObject((*PFJetPtRaw)[ijet],JetSmearFactor) - (*PFJetPtRaw)[ijet]); 
-								
+				
+			
+				int closestgenjet = -1;
+				Double_t SmallestDeltaR = 9999.9999;
+				Double_t ClosestGenJetPT = 99999.9999;
+				for(unsigned int igenjet = 0; igenjet != GenJetPt->size(); ++igenjet)
+				{
+					TLorentzVector thisGenJet;
+					thisGenJet.SetPtEtaPhiM(GenJetPt->at(igenjet),GenJetEta->at(igenjet),GenJetPhi->at(igenjet),0);
+					Double_t ThisGenJetDR = fabs((thisGenJet).DeltaR(ThisPFJet));
+					if (ThisGenJetDR<SmallestDeltaR) 
+					{
+						SmallestDeltaR = ThisGenJetDR;
+						closestgenjet = igenjet;
+						ClosestGenJetPT = GenJetPt->at(igenjet);
+					}
+				}
+			
+				Double_t Standard_rescale = 0.0;
+				if (SmallestDeltaR<0.5) Standard_rescale = 0.1;
+				
+				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
+				NewJetPT *=JetAdjustmentFactor;
+
+				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+
+				//std::cout<<SmallestDeltaR<<"   "<<ClosestGenJetPT<<"   "<<(*PFJetPt)[ijet]<<"   "<<NewJetPT<<"        "<<(*PFMET)[0]<<"   "<<JetAdjustedMET.Pt()<<std::endl;
+		
+				if (JetSmearFactor > 0.0){
+
+					Double_t JetEta = fabs(PFJetEta->at(ijet));
+					Double_t Systematic_rescale = 0.2;
+					
+					if ((JetEta >1.5) && (JetEta<2.0)) Systematic_rescale = 0.25;
+					if (JetEta >2.0) Systematic_rescale = 0.3;
+					
+					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Systematic_rescale);
+					NewJetPT *=JetAdjustmentFactorSys;
+				
+				}
+				
 				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
 				
-				//std::cout<<JetRescaleFactor<<"  "<<NewJetRescalingFactor<<" || "<< NewJetPT <<"  "<<(*PFJetPt)[ijet]<<" || "<< (*PFMET)[0]<<"  "<<JetAdjustedMET.Pt()<<std::endl;
+				//std::cout<<SmallestDeltaR<<"   "<<ClosestGenJetPT<<"   "<<(*PFJetPt)[ijet]<<"   "<<NewJetPT<<"        "<<(*PFMET)[0]<<"   "<<JetAdjustedMET.Pt()<<std::endl;
 
 				(*PFJetPt)[ijet] = NewJetPT ;	
+				(*PFJetEta)[ijet] = NewJetETA ;	
 				
 				
 			}
