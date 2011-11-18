@@ -12,8 +12,8 @@ MakeClass-style analyzer code.
 
 1) Check out the package. If you haven't already: 
 
-   cmsrel CMSSW_4_1_5
-   cd CMSSW_4_1_5/src
+   cmsrel CMSSW_4_2_8
+   cd CMSSW_4_2_8/src
    cmsenv
    cvs co -d NTupleAnalyzerV2 UserCode/baumgartel/LQ/NTupleAnalyzerV2
 
@@ -75,7 +75,7 @@ MakeClass-style analyzer code.
 
    B) The FAST method (recommended). Run the analyzer, specifying the C, h and CSV files:
 
-         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_ForLP
+         python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv -t FirstRun_ALL2011
 
       The Fast method splits jobs up to a maximum of 15 root files for 
       faster processing. It automatically submits the jobs and checks
@@ -144,39 +144,27 @@ MakeClass-style analyzer code.
 ---------------------------------------------------------------------------------------------------------------
 
 Extra hints: Running analysis with no scaling, 4% JES, 1% MES, 10% JetRes, 4% MuRes
+UPDATE: JetRes replaced with more advanced procedure. any jetres > 0.0 will initiated this procedure, i.e. --jetres 1
 
 # Normal Samples
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_2fb
+python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv --autorun -t StandardSelections_4p7fb
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_2fb_JetScaleUp --jetscale 1.04
+python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv --autorun -t StandardSelections_4p7fb_JETRESFIX_JetScaleUp --jetscale 1.04
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_2fb_JetScaleDown --jetscale 0.96
+python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv --autorun -t StandardSelections_4p7fb_JETRESFIX_JetScaleDown --jetscale 0.96
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_2fb_MuScaleUp --muscale 1.01
+python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv --autorun -t StandardSelections_4p7fb_JETRESFIX_MuScaleUp --muscale 1.01
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_2fb_MuScaleDown --jetscale 0.99
+python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv --autorun -t StandardSelections_4p7fb_JETRESFIX_MuScaleDown --muscale 0.99
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_2fb_JetScaleUp --jetres 0.10
+python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv --autorun -t StandardSelections_4p7fb_JETRESFIX_JetSmear --jetres 1.0
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_05_Default.h -i NTupleInfo2011_V00_02_05.csv -t StandardSelections_2fb_JetScaleDown --mures 0.04
+python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_Default.h -i NTupleInfo2011_V00_02_06.csv --autorun -t StandardSelections_4p7fb_JETRESFIX_MuSmear --mures 0.04
 
 
 
-#Sherpa Additions
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.h -i NTupleInfo2011_V00_02_05_SherpaCompatible.csv -t StandardSelection_SherpaAddon_2fb
 
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.h -i NTupleInfo2011_V00_02_05_SherpaCompatible.csv -t StandardSelection_SherpaAddon_2fb_JetScaleUp --jetscale 1.04
-
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.h -i NTupleInfo2011_V00_02_05_SherpaCompatible.csv -t StandardSelection_SherpaAddon_2fb_JetScaleDown --jetscale 0.96
-
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.h -i NTupleInfo2011_V00_02_05_SherpaCompatible.csv -t StandardSelection_SherpaAddon_2fb_MuScaleUp --muscale 1.01
-
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.h -i NTupleInfo2011_V00_02_05_SherpaCompatible.csv -t StandardSelection_SherpaAddon_2fb_MuScaleDown --jetscale 0.99
-
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.h -i NTupleInfo2011_V00_02_05_SherpaCompatible.csv -t StandardSelection_SherpaAddon_2fb_JetScaleUp --jetres 0.10
-
-python AnalyzerMakerFast.py -c ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.C -h ExampleAnalyzers/NTupleAnalyzer_V00_02_06_SherpaBackwardCompatible_Default.h -i NTupleInfo2011_V00_02_05_SherpaCompatible.csv -t StandardSelection_SherpaAddon_2fb_JetScaleDown --mures 0.04
 
 
