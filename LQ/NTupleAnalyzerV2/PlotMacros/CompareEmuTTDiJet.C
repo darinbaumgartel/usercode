@@ -264,7 +264,13 @@ void fillHisto(TString cut_mc, TString cut_data,  TString cut_data_emu,  bool Us
 
 		//std::cout<<"Chi^2 for this distribution is:  "<< chi2<<std::endl;
 	}
-	h_comp->GetYaxis()->SetTitle("Poisson N(#sigma) Diff");
+	//h_comp->GetYaxis()->SetTitle("Poisson N(#sigma) Diff");
+	h_comp->GetYaxis()->SetTitle("N(#sigma) Diff.");
+	h_comp->GetYaxis()->SetTitleFont(132);
+	h_comp->GetYaxis()->SetTitleSize(.17);
+	h_comp->GetYaxis()->SetLabelSize(.11);
+	h_comp->GetXaxis()->SetLabelSize(.11);	
+	h_comp->GetYaxis()->SetTitleOffset(.25);
 
 
 	TLine *line0 = new TLine(xLow,0,xMax,0);
@@ -286,7 +292,14 @@ void fillHisto(TString cut_mc, TString cut_data,  TString cut_data_emu,  bool Us
 	
 	pad2r->cd();
 
-	h_compr->GetYaxis()->SetTitle("Fractional Diff");
+	//h_compr->GetYaxis()->SetTitle("Fractional Diff");
+	h_compr->GetYaxis()->SetTitle("Frac. Diff.");
+	h_compr->GetYaxis()->SetTitleFont(132);
+	h_compr->GetYaxis()->SetTitleSize(.17);
+	h_compr->GetYaxis()->SetLabelSize(.11);
+	h_compr->GetXaxis()->SetLabelSize(.11);	
+	h_compr->GetYaxis()->SetTitleOffset(.25);
+		
 
    //TGaxis *axis = new TGaxis(xMax,-2,xMax,2,-2,2,50510,"+L");
    //axis->SetLabelColor(kRed);
@@ -323,7 +336,7 @@ void CompareEmuTTDiJet()
 {
 
 	// Load files and trees:
-	 gROOT->ProcessLine(".x LoadCastorFiles.C");
+	 gROOT->ProcessLine(".x LoadCastorFiles_SherpaHCP.C");
 
 	// -------- PF ---------
 
