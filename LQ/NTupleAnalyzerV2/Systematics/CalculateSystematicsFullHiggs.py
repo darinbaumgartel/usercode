@@ -2,23 +2,70 @@ import os
 import sys
 from ROOT import *
 
-castors = [
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_PostLP_2fb_2011_08_24_05_33_55/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_ForLP_2011_08_09_22_42_53/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleUp_0p04_ForLP_2011_08_10_03_58_37/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleDown_0p04_ForLP_2011_08_10_04_20_57/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleUp_0p01_ForLP_2011_08_10_04_05_41/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleDown_0p01_ForLP_2011_08_10_04_24_33/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetSmear_0p10_ForLP_2011_08_10_03_58_26/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuSmear_0p04_ForLP_2011_08_10_04_28_17/SummaryFiles'
-]
-TTScale = 1.03;
+#castors = [
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_PostLP_2fb_2011_08_24_05_33_55/SummaryFiles',
+##'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_ForLP_2011_08_09_22_42_53/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleUp_0p04_ForLP_2011_08_10_03_58_37/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleDown_0p04_ForLP_2011_08_10_04_20_57/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleUp_0p01_ForLP_2011_08_10_04_05_41/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleDown_0p01_ForLP_2011_08_10_04_24_33/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetSmear_0p10_ForLP_2011_08_10_03_58_26/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuSmear_0p04_ForLP_2011_08_10_04_28_17/SummaryFiles'
+#]
+
+
+#castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_2011_10_04_15_37_02/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetScaleUp_2011_10_03_20_50_18/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetScaleDown_2011_10_08_00_36_55/SummaryFiles',
+##'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetScaleDown_2011_10_03_20_54_43/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_MuScaleUp_2011_10_03_21_50_50/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_MuScaleDown_2011_10_03_21_53_21/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetSmear_2011_10_05_20_00_46/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_MuSmear_2011_10_03_23_45_46/SummaryFiles']
+
+castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_2011_11_02_01_10_04/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_JetScaleUp_2011_11_02_01_41_37/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_JetScaleDown_2011_11_02_02_14_47/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuScaleUp_2011_11_02_02_43_41/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuScaleDown_2011_11_02_03_31_43/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuScaleDown_2011_11_08_16_31_17/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_JetSmear_2011_11_02_12_48_04/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuSmear_2011_11_02_13_21_25/SummaryFiles']
+
+
+KeepFiles = ['LQToCMu_BetaHalf_M_250.root',
+'LQToCMu_BetaHalf_M_350.root',
+'LQToCMu_BetaHalf_M_400.root',
+'LQToCMu_BetaHalf_M_450.root',
+'LQToCMu_BetaHalf_M_500.root',
+'LQToCMu_BetaHalf_M_550.root',
+'LQToCMu_BetaHalf_M_600.root',
+'LQToCMu_BetaHalf_M_650.root',
+'LQToCMu_BetaHalf_M_750.root',
+'LQToCMu_BetaHalf_M_850.root',
+'LQToCMu_M_250.root',
+'LQToCMu_M_350.root',
+'LQToCMu_M_400.root',
+'LQToCMu_M_450.root',
+'LQToCMu_M_500.root',
+'LQToCMu_M_550.root',
+'LQToCMu_M_600.root',
+'LQToCMu_M_650.root',
+'LQToCMu_M_750.root',
+'LQToCMu_M_850.root',
+'DiBoson.root',
+'SingleTop.root',
+'TTBar.root',
+'WJets_Sherpa.root',
+'ZJets_Sherpa.root'] 
+
+TTScale = 0.97;
 TTDDScale = 0.47;
-WScale = 0.89;
-ZScale = 1.01;
+WScale = 1.26;
+ZScale = 8.723;
 
 
-normtag = 'StandardSelections'
+normtag = 'StandardSelections_2fb_JETRESFIX_2011'
 scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown','JetSmear','MuSmear']
 #scaletags = ['JetScaleUp']
 tags = []
@@ -83,38 +130,38 @@ cut_mc = ''
 #cut_mc += ")";
 
 
-cut_mc += "*(";
-cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
-cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
-cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
-cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
-cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
-cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
-cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
-cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
-cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
-cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
-cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
-cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
-cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
-cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
-cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
-cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
-cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
-cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
-cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
-cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
-cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
-cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
-cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
-cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
-cut_mc += ")";
+#cut_mc += "*(";
+#cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
+#cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
+#cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
+#cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
+#cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
+#cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
+#cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
+#cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
+#cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
+#cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
+#cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
+#cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
+#cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
+#cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
+#cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
+#cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
+#cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
+#cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
+#cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
+#cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
+#cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
+#cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
+#cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
+#cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
+#cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
+#cut_mc += ")";
 
 
 
-preselectionmumu = str(lumi)+'*weight*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))' + cut_mc
-preselectionmunu = str(lumi)+'*weight*(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))' +cut_mc
+preselectionmumu = str(lumi)+'*weight_pileup2fb*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))' + cut_mc
+preselectionmunu = str(lumi)+'*weight_pileup2fb*(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))' +cut_mc
 preselectionemu = '0.47*(LowestUnprescaledTriggerPass>0.5)*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(M_muon1HEEPele1>50)*(deltaR_muon1HEEPele1>0.3)*((abs(Eta_muon1)<2.1)||(abs(Eta_HEEPele1)<2.1))';
 
 
@@ -158,10 +205,19 @@ pfiles = []
 for c in castors:
 	files = os.popen(lsqry+' '+c).readlines()
 	for x in files:
-		if 'SingleMuData' in x or 'HighHT' in x:
+		#if 'SingleMuData' in x or 'HighHT' in x:
+			#continue
+		tocontinue = 1
+		for k in KeepFiles:
+			if k in x:
+				tocontinue = 0
+		if tocontinue:
 			continue
 		pfiles.append(prefix+'://'+c+'/'+x.replace('\n',''))
 
+#for x in pfiles:
+	#print x
+#exit()
 
 person = os.popen('whoami').readlines()[0].replace('\n','')
 tmp = '/tmp/'+person+'/tmpfiles/'
@@ -225,8 +281,14 @@ for s in range(len(selections)):
 		files = os.popen(lsqry+' '+c).readlines()
 		cfiles = []
 		for x in files:
-			if 'SingleMuData' in x  or 'HighHT' in x:
-				continue
+			#if 'SingleMuData' in x  or 'HighHT' in x:				
+				#continue
+			tocontinue = 1
+			for k in KeepFiles:
+				if k in x:
+					tocontinue = 0
+			if tocontinue:
+				continue				
 			cfiles.append(prefix+'://'+c+'/'+x.replace('\n',''))
 		for x in cfiles:
 			sel = selections[s]
@@ -307,8 +369,8 @@ for s in range(len(selections)):
 			else:
 				issignal_n.append('bg')
 			#print rootfile +(25-len(rootfile))*' '+ str(n) 
-			print use + '   ' + rootfile + (30 - len(rootfile))*' ' +tag+(30 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)
-			flogV.write(use + '   ' + rootfile + (30 - len(rootfile))*' ' +tag+(30 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)+'\n')
+			print use + '   ' + rootfile + (35 - len(rootfile))*' ' +tag+(40 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)
+			flogV.write(use + '   ' + rootfile + (35 - len(rootfile))*' ' +tag+(40 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)+'\n')
 			f.Close()
 			del t
 flogV.close()			
@@ -375,10 +437,10 @@ print hline
 for o in range(len(opts)):
 	line = opts[o] + '\t'
 	for t in tags:
-		if 'Standard' in t:
-			exec('line += str(float(summary_int_StandardSelections_sig_var['+str(o)+']) )+"\t"')
-		if 'Standard' not in t:
-			exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) - float(summary_int_StandardSelections_sig_var['+str(o)+']) )+"\t"')
+		if t==normtag:
+			exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) )+"\t"')
+		if t!=normtag:
+			exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) - float(summary_int_'+normtag+'_sig_var['+str(o)+']) )+"\t"')
 	print line
 	fout.write(line+'\n')
 
@@ -393,10 +455,10 @@ print hline
 for o in range(len(opts)):
 	line = opts[o] + '\t'
 	for t in tags:
-		if 'Standard'  in t:
-			exec('line += str(float(summary_int_StandardSelections_bg_var['+str(o)+']) )+"\t"')
-		if 'Standard' not in t:
-			exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) - float(summary_int_StandardSelections_bg_var['+str(o)+']) )+"\t"')
+		if t==normtag:
+			exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) )+"\t"')
+		if t!=normtag:
+			exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) - float(summary_int_'+normtag+'_bg_var['+str(o)+']) )+"\t"')
 	print line
 	fout.write(line+'\n')
 

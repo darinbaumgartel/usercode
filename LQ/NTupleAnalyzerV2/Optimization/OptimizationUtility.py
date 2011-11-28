@@ -18,30 +18,32 @@ if AnalysisType == "":
 	sys.exit(0)
 from time import strftime
 
-ttbarscale = 1.01
-wscale = 1.24
+ttbarscale = 0.97
+wscale = 1.29
 zscale = 8.723
 
-ErrorFactorMuMu = 0.25
-ErrorFactorMuNu = 0.9
+ErrorFactorMuMu = 0.28
+ErrorFactorMuNu = 0.56
 
 CutVariablesMuMu=['ST_pf_mumu','M_muon1muon2','LowestMass_BestLQCombo'] # Which variables do you want to cut on
 
 VariableStartingPointMuMu = [250,100,100] # Where to start cutting on the variable 
 VariableIntervalMuMu = [10,10,10] # Intervals in which you will test cuts
-VariablePointsToTestMuMu = [85,12,90] # Number of cutting points to test at the given interval
+VariablePointsToTestMuMu = [90,12,90] # Number of cutting points to test at the given interval
 
 
 #CutVariablesMuNu=['ST_pf_munu','MT_muon1pfMET','M_bestmupfjet_munu'] # Which variables do you want to cut on
-CutVariablesMuNu=['ST_pf_munu','MET_pf','M_bestmupfjet_munu'] # Which variables do you want to cut on
+CutVariablesMuNu=['ST_pf_munu','MET_pf','M_bestmupfjet_munu','Pt_muon1'] # Which variables do you want to cut on
 
 #VariableStartingPointMuNu = [250,45,50] # Where to start cutting on the variable 
 #VariableIntervalMuNu = [10,5,10] # Intervals in which you will test cuts
 #VariablePointsToTestMuNu = [85,30,80] # Number of cutting points to test at the given interval
 
-VariableStartingPointMuNu = [250,100,100] # Where to start cutting on the variable 
-VariableIntervalMuNu = [10,10,10] # Intervals in which you will test cuts
-VariablePointsToTestMuNu = [85,20,90] # Number of cutting points to test at the given interval
+VariableStartingPointMuNu = [390,70,80,60] # Where to start cutting on the variable 
+VariableIntervalMuNu = [10,10,20,10] # Intervals in which you will test cuts
+VariablePointsToTestMuNu = [64,14,38,19] # Number of cutting points to test at the given interval
+#VariableIntervalMuNu = [30,30,50,40] # Intervals in which you will test cuts
+#VariablePointsToTestMuNu = [20,6,15,5] # Number of cutting points to test at the given interval
 person = (os.popen("whoami").readlines())[0].replace('\n','')
 
 # Other variable to precut on as they appear in the root file (these are not variable cuts, they are single static cuts):
@@ -51,8 +53,11 @@ preselectionmunu = '((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(P
 
 for x in range(len(CutVariablesMuNu)):
 	preselectionmunu += '*('+CutVariablesMuNu[x]+'> '+str(VariableStartingPointMuNu[x])+')'
+for x in range(len(CutVariablesMuMu)):
+	preselectionmumu += '*('+CutVariablesMuMu[x]+'> '+str(VariableStartingPointMuMu[x])+')'
 
-cut_mc = str(lumi)+'*weight_pileup2fb'
+
+cut_mc = 'weight_pileup2fb*'+str(lumi)
 # These are MC - driven Summer11 for the bug fix
 #cut_mc += "*(";
 #cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.133))+";
@@ -112,14 +117,13 @@ KeepFiles = ['LQToCMu_BetaHalf_M_250.root',
 'TTBar.root',
 'WJets_Sherpa.root',
 'ZJets_Sherpa.root']	
-	
-preselectionmumu = preselectionmumu
-preselectionmunu = preselectionmunu
+
 
 logout = open(AnalysisType+"_log.txt",'w')
 logoutSB = open(AnalysisType+"_SB_log.txt",'w')
 logoutSSB = open(AnalysisType+"_SSB_log.txt",'w')
 logoutSSBdB2 = open(AnalysisType+"_SSBdB2_log.txt",'w')
+logoutSSBdem3 = open(AnalysisType+"_SSBdem3_log.txt",'w')
 
 BGErrorFactor = 0.0
 
@@ -217,7 +221,7 @@ SignifValues = []
 SignifValuesSSB = []
 SignifValuesSB = []
 SignifValuesSSBdB2 = []
-
+SignifValuesSSBdem3 = []
 cuts = []
 n = 0
 for i in multi_for(map(xrange, VariablePointsToTest)):
@@ -231,13 +235,18 @@ for i in multi_for(map(xrange, VariablePointsToTest)):
 	BackgroundValues.append(0.0)
 	SignalValues.append(0.0)
 	SignifValues.append(0.0)
+	SignifValuesSB.append(0.0)
+	SignifValuesSSB.append(0.0)
+	SignifValuesSSBdB2.append(0.0)
+	SignifValuesSSBdem3.append(0.0)
+
 	#print n
 	#print cuts[n]
 	n = n + 1
 
 numcut = len(cuts)
 
-	#print cut
+import time
 
 for x in range(len(SignalType)):
 	if SigOrBG[x] ==1:
@@ -255,12 +264,15 @@ for x in range(len(SignalType)):
 	if 'WJets' in SignalType[x]: 
 		scalefactor = wscale
 	print "Reducing tree with preselection ... " 
+	print preselection
 	T = t.CopyTree(preselection)
 	h = TH1F('h','h',1,0,2)
-	print "Evaluating Cuts... " 
+	print "Evaluating Cuts... "
 	for y in range(len(cuts)):
-		T.Project('h','1.0',cut_mc+'*'+str(scalefactor)+"*"+cuts[y])
+		T.Project('h','1',cut_mc+'*'+str(scalefactor)+"*"+cuts[y])
 		BackgroundValues[y]+=(h.Integral())
+		if y%50000==0:
+			print str(y)+'  '+str(len(cuts))
 	del t
 	del T
 	del h
@@ -282,11 +294,13 @@ for x in range(len(SignalType)):
 	BestSignifSB = -999.9
 	BestSignifSSB = -999.9
 	BestSignifSSBdB2 = -999.9
+	BestSignifSSBdem3 = -999.9
 
 	BestCut = ''
 	BestCutSB = ''
 	BestCutSSB = ''
 	BestCutSSBdB2 = ''
+	BestCutSSBdem3 = ''
 
 	sfile = FileLocation+'/'+SignalType[x]+'.root'
 	f = TFile.Open(sfile)
@@ -299,13 +313,16 @@ for x in range(len(SignalType)):
 	print "Evaluating Cuts... " 
 
 	for y in range(len(cuts)):
+		if y%50000==0:
+			print str(y)+'  '+str(len(cuts))		
 		T.Project('h','1.0',cut_mc+'*'+str(scalefactor)+"*"+cuts[y])
 		SignalValues[y]=(h.Integral())
-		SignifValues[y] = SignalValues[y] / math.sqrt(BackgroundValues[y] + SignalValues[y])
+		SignifValues[y] = SignalValues[y] / math.sqrt(BackgroundValues[y] + SignalValues[y] + 0.0001)
 		
-		SignifValuesSSB[y] = SignalValues[y] / math.sqrt(BackgroundValues[y] + SignalValues[y])
-		SignifValuesSB[y] = SignalValues[y] / math.sqrt(BackgroundValues[y] )
-		SignifValuesSSBdB2[y] = SignalValues[y] / math.sqrt( BackgroundValues[y] + BGErrorFactor*BackgroundValues[y]*BackgroundValues[y] +  SignalValues[y])
+		SignifValuesSSB[y] = SignalValues[y] / math.sqrt(BackgroundValues[y] + SignalValues[y]+ 0.0001)
+		SignifValuesSB[y] = SignalValues[y] / math.sqrt(BackgroundValues[y] + 0.0001)
+		SignifValuesSSBdB2[y] = SignalValues[y] / math.sqrt( BackgroundValues[y] + BGErrorFactor*BGErrorFactor*BackgroundValues[y]*BackgroundValues[y] +  SignalValues[y]+ 0.0001)
+		SignifValuesSSBdem3[y] = ((SignalValues[y] + BackgroundValues[y])>3.0)*(SignalValues[y] / math.sqrt( BackgroundValues[y] +  SignalValues[y]+ 0.0001))
 		
 		if SignifValues[y]>BestSignif:
 			BestSignif = SignifValues[y]
@@ -323,6 +340,11 @@ for x in range(len(SignalType)):
 			BestSignifSSBdB2 = SignifValuesSSBdB2[y]
 			BestCutSSBdB2 = cuts[y]
 			
+			
+		if SignifValuesSSBdem3[y]>BestSignifSSBdem3:
+			BestSignifSSBdem3 = SignifValuesSSBdem3[y]
+			BestCutSSBdem3 = cuts[y]
+			
 	del T
 	del t
 	del h
@@ -339,9 +361,12 @@ for x in range(len(SignalType)):
 	logoutSSB.write(BestCutSSB+'\n\n')	
 
 	logoutSSBdB2.write(SignalType[x]+'\n')
+	logoutSSBdem3.write(SignalType[x]+'\n')
 	logoutSSBdB2.write(BestCutSSBdB2+'\n\n')	
+	logoutSSBdem3.write(BestCutSSBdem3+'\n\n')	
 
 logoutSB.close()
 logoutSSB.close()
 logoutSSBdB2.close()
+logoutSSBdem3.close()
 logout.close()
