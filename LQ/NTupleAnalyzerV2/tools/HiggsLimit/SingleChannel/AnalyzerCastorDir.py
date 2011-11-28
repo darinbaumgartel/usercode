@@ -11,8 +11,9 @@ cdir = sys.argv[1]
 
 person = (os.popen('whoami').readlines())[0].replace('\n','')
 tmpdir1 = '/tmp/' + person+'/'+cdir.split('/')[-1]
-os.system('rm -r '+tmpdir1)
-os.system('mkdir '+tmpdir1)
+if nodo == 1:
+	os.system('rm -r '+tmpdir1)
+	os.system('mkdir '+tmpdir1)
 
 cdirinfo = os.popen('nsls '+cdir).readlines() 
 
@@ -76,7 +77,8 @@ limits = []
 
 masses = []
 for x in mainfiles:
-	m = x.split('LQ')[-1]
+	print x
+	m = x.split('_')[-1]
 	m = m.split('.')[0]
 	masses.append(m)
 	
