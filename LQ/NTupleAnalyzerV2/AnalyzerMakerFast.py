@@ -51,7 +51,9 @@ for x in range(len(a)):
 if cfile == '' or hfile == '' or ifile == '':
 	print 'Must specify input .C, .h, and .csv files, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv -c NTupleAnalyzer.C -h NTupleAnalyzer.h\n\n   Exiting   \n\n'
 	sys.exit()
-
+#if  ifile == '':
+	#print 'Must specify input  .csv file, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv \n\n   Exiting   \n\n'
+	#sys.exit()
 ### This portion reads the NTupleInfo.csv file and gets the information ###
 import csv
 csvfile = open(ifile,'r')
@@ -123,6 +125,9 @@ bjobs = []
 
 
 for x in range(len(SignalType)):
+	
+	#cfile=Analyzer[x]+'.C'
+	#hfile=Analyzer[x]+'.h'
 	
 	print 'Preparing '+ SignalType[x]
 	path = CastorDirectory[x]	
@@ -248,6 +253,8 @@ f_sub.close()
 os.system('chmod 777 sub*.csh')
 
 subjobs = ''
+if '--autorun' in sys.argv:
+	subjobs='y'
 while subjobs != 'y' and subjobs != 'n':
 	subjobs = raw_input('\n\n  Would you like to automatically submit and check jobs now? (answer y/n):  ')
 if subjobs == 'n':
