@@ -55,14 +55,13 @@ if nodo==0:
 			do = 1
 		os.system('sleep 10')
 	os.system('sleep 10')
-print '4'
-#os.system('sleep 200')
+
 hadds = []
 for x in tmpdirs:
-	if '--munu' in sys.argv:
+	if '--betahalf' in sys.argv:
 		if 'BetaHalf' not in x:
 			continue
-	if '--munu' not in sys.argv:
+	if '--betahalf' not in sys.argv:
 		if 'BetaHalf'  in x:
 			continue
 	hadds.append('hadd '+x+'.root'+' '+x+'/*root')
@@ -109,22 +108,20 @@ obs = []
 	
 for x in mainfiles:
 	conf = 'conf'
-	if '--munu' not in sys.argv:
-		conf += 'mumu_'
-		thistag = cdir.split('MuMu')[-1]
-		thistype = '_LQToCMu_M_'	+ (x.replace('.root','')).split('_')[-1]
-	if '--munu' in sys.argv:
-		conf += 'munu_'
-		thistag = cdir.split('MuNu')[-1]	
-		thistype = '_LQToCMu_BetaHalf_M_'	+ (x.replace('.root','')).split('_')[-1]
+	if '--betahalf' not in sys.argv:
+		conf += 'betaone_'
+		thistag = cdir.split('BetaOne')[-1]
+		thistype = '_LQ_M_'	+ (x.replace('.root','')).split('_')[-1]
+	if '--betahalf' in sys.argv:
+		conf += 'betahalf_'
+		thistag = cdir.split('BetaHalf')[-1]	
+		thistype = '_LQ_BetaHalf_M_'	+ (x.replace('.root','')).split('_')[-1]
 		
 	conf += thistag
 	conf += thistype
 	conf+= '.cfg'
 	conf = conf.replace('/','_')
-	#confmumu_CLSFullRun1_LQToCMu_M_250.cfg
-	
-	#combinegeneric = 'combine -v 0 -M HybridNew --rule CLs --frequentist config.cfg --grid=AllOutput.root { --expectedFromGrid 0.5 }'
+
 
 	comcommands = []
 	comcommands.append( combiner(conf,x,-1) )
@@ -155,83 +152,6 @@ for x in mainfiles:
 	sig1up.append(finalcoms[4])
 	sig2up.append(finalcoms[5])
 	
-	
-	#print x
-	#theselimits = []
-	#check = (os.popen('du '+x).readlines())
-	#check = check[0].split('\t')
-	#check = float(check[0])
-	#if check<9:
-		#limits.append(theselimits)
-		#continue
-
-	#f = TFile.Open(x)
-	#t = f.Get("limit")
-	#N = (t.GetEntries())
-	#for iev in range(0,N) :
-		#t.GetEntry(iev)
-		#lim = t.limit
-		#theselimits.append(lim)
-	#f.Close()
-	#del t
-	#limits.append(theselimits)
-	#print theselimits
-
-
-#mean = []
-#median = []
-#sig1up = []
-#sig1down = []
-#sig2up = []
-#sig2down = []
-
-#def lmean(v):
-	#tot = sum(v)
-	#tot = tot/float(len(v))
-	#return tot
-#def lband(v):
-	#v.sort()
-	#length = len(v)
-	#b0 = int(round(.0275*length))
-	#b1 = int(round(.16*length))
-	#b2 = int(round(.5*length))
-	#b3 = int(round(.84*length))
-	#b4 = int(round(.975*length))
-	#if b0==length:
-		#b0 = length-1
-	#if b1==length:
-		#b1 = length-1
-	#if b2==length:
-		#b2 = length-1	
-	#if b3==length:
-		#b3 = length-1
-	#if b4==length:
-		#b4 = length-1
-	#b0 = v[b0]
-	#b1 = v[b1]
-	#b2 = v[b2]
-	#b3 = v[b3]
-	#b4 = v[b4]
-	#band = [b0,b1,b2,b3,b4]
-	#return band
-
-#n = 0
-#for h in limits:
-	##print masses[n]
-	#n = n +1
-	##print "starting ... "
-	##print h
-	#h.sort()
-	#if len(h)==0:
-		#h = [0,0]
-	#m = lmean(h)
-	#b = lband(h)
-	#mean.append(m)
-	#sig2down.append(b[0])
-	#sig1down.append(b[1])
-	#median.append(b[2])
-	#sig1up.append(b[3])
-	#sig2up.append(b[4])
 
 med = median
 up2 = sig2up
@@ -250,7 +170,7 @@ excurve = 'Double_t xsUp_expected[10] = {'
 obcurve = 'Double_t xsUp_observed[10] = {'  
 
 fac = 1.0
-if "--munu" in str(sys.argv):
+if "--betahalf" in str(sys.argv):
 	fac = 0.5
 sigma = []
 for x in range(len(mTh)):
