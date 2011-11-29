@@ -111,11 +111,11 @@ for x in mainfiles:
 	if '--betahalf' not in sys.argv:
 		conf += 'betaone_'
 		thistag = cdir.split('BetaOne')[-1]
-		thistype = '_LQ_M_'	+ (x.replace('.root','')).split('_')[-1]
+		thistype = 'LQ_M_'	+ (x.replace('.root','')).split('_')[-1]
 	if '--betahalf' in sys.argv:
 		conf += 'betahalf_'
 		thistag = cdir.split('BetaHalf')[-1]	
-		thistype = '_LQ_BetaHalf_M_'	+ (x.replace('.root','')).split('_')[-1]
+		thistype = 'LQ_BetaHalf_M_'	+ (x.replace('.root','')).split('_')[-1]
 		
 	conf += thistag
 	conf += thistype
