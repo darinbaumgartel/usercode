@@ -122,11 +122,24 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
    
    This will give an array of cross-section limit that you can copy and paste into your standard plot macros.
 
+5) Make the Single Channel Plots. 
+
+   Step (4) Should have given you some C++ arrays. These can be inserted in a couple standard plot macros. 
+   
+   For Muon Channel:
+
+       NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/BR_Sigma_MuMu_vsMass.C
+       NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/BR_Sigma_MuNu_vsMass.C
+
+   For the Electron channels:
+       NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/BR_Sigma_EE_vsMass.C
+       NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/BR_Sigma_ENu_vsMass.C       
+       
+    Of course, edit the legends/labels as needed, but the theory curve etc should be good for our 2011 mass points.
     
-       
-       
-       
-       
+    
+6) Channel combinations - Coming soon ...
+
        
        
        
