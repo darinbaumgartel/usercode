@@ -179,7 +179,7 @@ void setTDRStyle() {
   tdrStyle->cd();
 }
 
-void makePlots()
+void makePlotsBH()
 {
  // **********************************************
  // *            Input parameters                *
@@ -215,8 +215,9 @@ Double_t mData[10] = {250, 350, 400, 450, 500, 550, 600, 650, 750, 850};
  Double_t xsTh[15] = { 53.3/2.0, 11.9/2.0, 3.47/2.0, 1.21/2.0, 0.477/2.0, .205/2.0,.0949/2.0,.0463/2.0,.0236/2.0,.0124/2.0,.00676/2.0,.00377/2.0,.00215/2.0,.00124/2.0,.000732/2.0};
   
  // filename for the final plot (NB: changing the name extension changes the file format)
- string fileName2 = "BR_Sigma_MuNu_2000.pdf";
- string fileName3 = "BR_Sigma_MuNu_2000.png";
+ string fileName2 = "BR_Sigma_MuNu.pdf";
+ string fileName3 = "BR_Sigma_MuNu.png";
+ string fileName1 = "BR_Sigma_MuNu.eps";
   
  // axes labels for the final plot
  string title = ";M_{LQ} (GeV);2#beta(1-#beta)#times#sigma (pb)";
@@ -226,7 +227,7 @@ Double_t mData[10] = {250, 350, 400, 450, 500, 550, 600, 650, 750, 850};
 
  // region excluded by Tevatron limits
  Double_t x_shaded[5] = {250,270,270,250,250};// CHANGED FOR LQ2
- Double_t y_shaded[5] = {0.0001,0.0001,500,500,0.0001};// CHANGED FOR LQ2
+ Double_t y_shaded[5] = {0.0001,0.0001,50,50,0.0001};// CHANGED FOR LQ2
 
 
  Double_t x_pdf[28] = {	150		,	200		,	250	,	300		,	350		,	400	,  450 	 ,  500, 600,	650,	700,	750,	800,	850,	850,	800,	750,	700,	650,	600  , 500  , 450 	,	400	,	350		,	300		,	250	, 200		, 150		};
@@ -235,12 +236,21 @@ Double_t mData[10] = {250, 350, 400, 450, 500, 550, 600, 650, 750, 850};
 Double_t x_shademasses[20]={250, 350, 400, 450, 500, 550, 600, 650, 750, 850, 850, 750, 650, 600, 550, 500, 450, 400, 350, 250};
 
 
-// Systematics Cut Off at 600
-
-Double_t y_1sigma[20]={1.14899278216 , 0.0687352374177 , 0.0258398107906 , 0.015449767247 , 0.00914124533312 , 0.00621567471013 , 0.00546195052894 , 0.00407567753763 , 0.00347540025525 , 0.00308450273564 , 0.00955128283927 , 0.0106299735622 , 0.0139039523941 , 0.0171257452864 , 0.0184917806412 , 0.0282538105102 , 0.0708682230741 , 0.124152618006 , 0.283287214906 , 2.25420682246 }; 
 
 
-Double_t y_2sigma[20]={0.829890996844 , 0.0376244974351 , 0.015078850271 , 0.00959896727954 , 0.0063337822068 , 0.00478518232388 , 0.00409130250856 , 0.00395009274597 , 0.00337668268882 , 0.00299725143289 , 0.0244358217301 , 0.0245225448804 , 0.0254186961729 , 0.0336608185921 , 0.032102202093 , 0.0571049035534 , 0.156232197987 , 0.278864377629 , 0.541098968521 , 3.19380895838 }; 
+
+
+Double_t xsUp_expected[10] = {0.4791029 , 0.07685901 , 0.047661475 , 0.027974622 , 0.0183771645 , 0.01357944 , 0.010671316 , 0.0084540222 , 0.00650006275 , 0.005674281 }; 
+
+
+Double_t xsUp_observed[10] = {0.4791029 , 0.079165305 , 0.05208025 , 0.03019627845 , 0.0193638175 , 0.01597661 , 0.013432238 , 0.0121299412 , 0.00885373225 , 0.007964892 }; 
+
+
+Double_t y_1sigma[20]={0.3671954 , 0.060672015 , 0.036527925 , 0.0214402825 , 0.01343007895 , 0.0103447886 , 0.008158208 , 0.0066064128 , 0.00497014425 , 0.0044608446 , 0.008000943 , 0.00914123025 , 0.011694462 , 0.014782226 , 0.019049094 , 0.025985412 , 0.0375689171 , 0.0645082725 , 0.10639008 , 0.6251205 }; 
+
+
+Double_t y_2sigma[20]={0.26526415 , 0.045145665 , 0.026388625 , 0.015037854 , 0.01033279415 , 0.0080975258 , 0.006695442 , 0.0057030064 , 0.00439228875 , 0.0038398524 , 0.0110026554 , 0.0125442825 , 0.0162536764 , 0.019890034 , 0.02612992 , 0.0356868825 , 0.0501219095 , 0.0828918525 , 0.13477158 , 0.7918887 }; 
+
 
 
  //// **********************************************
@@ -259,11 +269,6 @@ Double_t y_2sigma[20]={0.829890996844 , 0.0376244974351 , 0.015078850271 , 0.009
 ////// MEDIAN
 
 
-Double_t xsUp_expected[10] = {1.60250358555 , 0.145105947608 , 0.0538673397939 , 0.0335565022186 , 0.0145697224703 , 0.0109544141558 , 0.00865524208227 , 0.00712004343568 , 0.00607012584336 , 0.00539464885416 }; // Sys Cutoff 600
-
-
-Double_t xsUp_observed[10] = {1.467832555,0.155123262,0.076475045,0.050261064,0.031306208,0.019967488,0.01695979,0.0139276618,0.0102408737,0.008976516};// lnN stats
-
 
  // set ROOT style
 //  myStyle();
@@ -274,7 +279,7 @@ Double_t xsUp_observed[10] = {1.467832555,0.155123262,0.076475045,0.050261064,0.
  TCanvas *c = new TCanvas("c","",800,800);
  c->cd();
  
- TH2F *bg = new TH2F("bg",title.c_str(), 500, 250., 850., 500., 0.0001, 500.);
+ TH2F *bg = new TH2F("bg",title.c_str(), 500, 250., 850., 500., 0.0001, 50.);
  bg->SetStats(kFALSE);
  bg->SetTitleOffset(1.,"X");
  bg->SetTitleOffset(1.15,"Y");
@@ -289,22 +294,19 @@ Double_t xsUp_observed[10] = {1.467832555,0.155123262,0.076475045,0.050261064,0.
  pl->Draw();
 
  TGraph *exshade1 = new TGraph(20,x_shademasses,y_1sigma);
- exshade1->SetFillColor(kCyan);
- //exshade1->SetFillStyle(3144);
-
+ exshade1->SetFillColor(kGreen);
  TGraph *exshade2 = new TGraph(20,x_shademasses,y_2sigma);
- exshade2->SetFillColor(kCyan-5);
- //exshade2->SetFillStyle(3005);
+ exshade2->SetFillColor(kYellow);
 
- exshade2->Draw("F");
- exshade1->Draw("F");
+ exshade2->Draw("f");
+ exshade1->Draw("f");
 
  gPad->RedrawAxis();
 
 
- TGraph *grshade = new TGraph(28,x_pdf,y_pdf);
- grshade->SetFillColor(kGreen);
- //grshade->SetFillStyle(2);
+ TGraph *grshade = new TGraph(29,x_pdf,y_pdf);
+ grshade->SetFillColor(kCyan-6);
+ grshade->SetFillStyle(3001);
  grshade->Draw("f");
 
 
@@ -317,29 +319,31 @@ Double_t xsUp_observed[10] = {1.467832555,0.155123262,0.076475045,0.050261064,0.
 
  TGraph *xsTh_vs_m = new TGraph(16, mTh, xsTh);
  xsTh_vs_m->SetLineWidth(2);
- xsTh_vs_m->SetLineColor(kRed);
- xsTh_vs_m->SetFillColor(kGreen);
- xsTh_vs_m->SetMarkerSize(1.);
+ xsTh_vs_m->SetLineColor(kBlue);
+ xsTh_vs_m->SetFillColor(kCyan-6);
+  xsTh_vs_m->SetMarkerSize(0.00001);
  xsTh_vs_m->SetMarkerStyle(22);
- xsTh_vs_m->SetMarkerColor(kRed);
+ grshade->SetFillStyle(1001); 
+ xsTh_vs_m->SetMarkerStyle(22);
+ xsTh_vs_m->SetMarkerColor(kBlue);
  xsTh_vs_m->Draw("C");
 
  TGraph *xsData_vs_m_expected = new TGraph(10, mData, xsUp_expected);
- xsData_vs_m_expected->SetMarkerStyle(23);
- xsData_vs_m_expected->SetMarkerColor(kBlue);
- xsData_vs_m_expected->SetLineColor(kBlue);
+ xsData_vs_m_expected->SetMarkerStyle(0);
+ xsData_vs_m_expected->SetMarkerColor(kBlack);
+ xsData_vs_m_expected->SetLineColor(kBlack);
  xsData_vs_m_expected->SetLineWidth(2);
- xsData_vs_m_expected->SetLineStyle(2);
- xsData_vs_m_expected->SetMarkerSize(1.5);
+ xsData_vs_m_expected->SetLineStyle(7);
+ xsData_vs_m_expected->SetMarkerSize(0.001);
  xsData_vs_m_expected->Draw("CP");
 
  TGraph *xsData_vs_m_observed = new TGraph(10, mData, xsUp_observed);
- xsData_vs_m_observed->SetMarkerStyle(22);
+ xsData_vs_m_observed->SetMarkerStyle(21);
  xsData_vs_m_observed->SetMarkerColor(kBlack);
  xsData_vs_m_observed->SetLineColor(kBlack);
  xsData_vs_m_observed->SetLineWidth(2);
  xsData_vs_m_observed->SetLineStyle(1);
- xsData_vs_m_observed->SetMarkerSize(1.5);
+ xsData_vs_m_observed->SetMarkerSize(1);
  xsData_vs_m_observed->Draw("CP");
  
  float mtest = 250.0;
@@ -348,7 +352,7 @@ Double_t xsUp_observed[10] = {1.467832555,0.155123262,0.076475045,0.050261064,0.
  while (mtest<850){
 	 xrat = xsData_vs_m_expected->Eval(mtest)/xsTh_vs_m->Eval(mtest);
 	 orat = xsData_vs_m_observed->Eval(mtest)/xsTh_vs_m->Eval(mtest);
-	 std::cout<<mtest<<"   "<<xrat<<"    "<<orat<<std::endl;
+	 std::cout<<mtest<<"   "<<xrat<<"    "<<orat<<"   "<<"   "<<xsData_vs_m_observed->Eval(mtest)<<"   "<<xsTh_vs_m->Eval(mtest)<<std::endl;
 	 mtest = mtest + 1.0;
 
 	}
@@ -386,6 +390,7 @@ Double_t xsUp_observed[10] = {1.467832555,0.155123262,0.076475045,0.050261064,0.
 
 
  c->SetLogy();
+ c->SaveAs((fileName1).c_str());
  c->SaveAs((fileName2).c_str());
  c->SaveAs((fileName3).c_str());
 
