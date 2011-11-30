@@ -86,7 +86,7 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 	if (fabs(e_eta) > 1.442 && fabs(e_eta) < 1.560) isgood = 0;
 	if (fabs(e_eta) > 2.50) isgood = 0;
 	if (!e_ecaldriven) isgood = 0;
-	if (fabs(e_dphi_sc) > 0.09) isgood = 0;
+	if (fabs(e_dphi_sc) > 0.06) isgood = 0;
 	if (e_hoe > 0.05) isgood = 0;
 	
 	bool barrel = (fabs(e_eta) < 1.442);
@@ -97,7 +97,7 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 		if (fabs(e_deta_sc) > 0.005) isgood = 0;
 		if (( e_e1x5_over_5x5 > 0.83)&&( e_e2x5_over_5x5 > 0.94 )) isgood = 0;
 		if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0;
-		if (e_trkiso > 7.5) isgood = 0;
+		if (e_trkiso > 5) isgood = 0;
 	}
 	
 	if (endcap)
@@ -106,8 +106,8 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 		if (fabs(e_sigmann) > 0.03) isgood = 0;
 		if ((e_pt < 50.0) && ( e_em_had1iso >  2.5 )) isgood = 0;
 		if ((e_pt >= 50.0) && ( e_em_had1iso > ( 2.5 + 0.03*(e_pt-50.0) ))) isgood = 0;
-		if ( e_had2iso > 0.5 ) isgood = 0;
-		if (e_trkiso > 15.0) 	isgood = 0;
+		//if ( e_had2iso > 0.5 ) isgood = 0;
+		if (e_trkiso > 5.0) 	isgood = 0;
 	}
 	
 	
@@ -186,7 +186,7 @@ void placeholder::Loop()
 	BRANCH(Events_AfterLJ); BRANCH(Events_Orig);
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
-	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb);
+	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb);
 
 
 	// PFMET
@@ -398,6 +398,8 @@ void placeholder::Loop()
 		weight_964pileup_gen = weight; 
 		
 		weight_pileup2fb = weight;
+		
+		weight_pileup4p7fb = weight;
 
 		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5))    weight_pileup2fb *=  (0.0752233034121);
 		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5))     weight_pileup2fb *=  (0.361994702942);
@@ -425,6 +427,43 @@ void placeholder::Loop()
 		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5))   weight_pileup2fb *=  (0.0118325534711);
 		if (N_PileUpInteractions > 23.5)                                   weight_pileup2fb *=  (0.00);
 
+		
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup4p7fb *=(0.0248405096357);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup4p7fb *=(0.195212673179);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup4p7fb *=(0.432670796326);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup4p7fb *=(0.739526760889);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup4p7fb *=(1.02450575856);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup4p7fb *=(1.23400870719);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup4p7fb *=(1.36271859493);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup4p7fb *=(1.40866927293);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup4p7fb *=(1.41520890878);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup4p7fb *=(1.39607922424);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup4p7fb *=(1.38069476671);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup4p7fb *=(1.37142807267);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup4p7fb *=(1.36237007165);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup4p7fb *=(1.36445046998);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup4p7fb *=(1.37017239991);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup4p7fb *=(1.3727177286);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup4p7fb *=(1.36299530075);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup4p7fb *=(1.3573672273);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup4p7fb *=(1.33658653928);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup4p7fb *=(1.3078266535);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup4p7fb *=(1.27371711897);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup4p7fb *=(1.22983589961);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pileup4p7fb *=(1.18580429681);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pileup4p7fb *=(1.13114134262);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pileup4p7fb *=(1.05646026004);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pileup4p7fb *=(1.00134002191);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pileup4p7fb *=(0.912102258004);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pileup4p7fb *=(0.849851792798);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pileup4p7fb *=(0.794745315159);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pileup4p7fb *=(0.760974060445);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pileup4p7fb *=(0.639751878464);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pileup4p7fb *=(0.559140815319);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pileup4p7fb *=(0.52359600166);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup4p7fb *=(0.442699031782);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup4p7fb *=(0.816367883043);
+		if (N_PileUpInteractions > 34.5) weight_pileup4p7fb *= 0.0;
 
 
 		//========================     Trigger Scanning  ================================//
