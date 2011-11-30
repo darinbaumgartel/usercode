@@ -184,8 +184,10 @@ void fillHisto(TString lq_choice, TString cut_mc, TString cut_data,  TString cut
 	// ******************************************************************************************************************************* //
 	// Rescaling Routine and Event number Readout
 
+	h_zjets->Scale(5.94);
+
 	h_zjets->Scale(znorm);
-	h_wjets->Scale(0.86);
+	h_wjets->Scale(1.24);
 	if (Use_emu) {h_ttbar->Scale(0.47);}
 
 
@@ -326,7 +328,7 @@ void fillHisto(TString lq_choice, TString cut_mc, TString cut_data,  TString cut
 	leg->SetTextFont(132);
 	leg->SetFillColor(0);
 	leg->SetBorderSize(0);
-	leg->AddEntry(H_data,"Data 2011, "+Luminosity+" pb^{-1}");
+	leg->AddEntry(H_data,"Data 2011, 2.0 fb^{-1}");
 	leg->AddEntry(H_zjets,"Z/#gamma* + jets");
 	if (!Use_emu) leg->AddEntry(H_ttbar,"t#bar{t}");
 	if (Use_emu) leg->AddEntry(H_ttbar,"t#bar{t} + VV [Data Driven e-#mu]");
@@ -368,7 +370,7 @@ void fillHisto(TString lq_choice, TString cut_mc, TString cut_data,  TString cut
 	leg->Draw("SAME");
 	c1->SetLogy();
 
-	H_data->SetMinimum(.1);
+	H_data->SetMinimum(.01);
 	H_data->SetMaximum(1.2*extrascalefactor*(H_data->GetMaximum()));
 
 	TLatex* txt =new TLatex((xMax-xLow)*.02+xLow,.3*H_data->GetMaximum(), "CMS 2011 Preliminary");
@@ -527,7 +529,7 @@ void MakePlotsMuMuSub()
 {
 
 	// Load files and trees:
-	 gROOT->ProcessLine(".x LoadCastorFiles.C");
+	 gROOT->ProcessLine(".x LoadCastorFiles_SherpaHCP.C");
 
 	// -------- PF ---------
 
@@ -552,7 +554,7 @@ void MakePlotsMuMuSub()
 
 	//cut_data += "*((M_muon1muon2>80)*(M_muon1muon2<100))";
 
-	TString cut_mc = lumi+ "*weight*("+cut_data+")";
+	TString cut_mc = lumi+ "*weight_pileup2fb*("+cut_data+")";
 
 	cut_data += "*(LowestUnprescaledTriggerPass>0.5)";
 	cut_data_emu += "*(LowestUnprescaledTriggerPass>0.5)";
@@ -586,37 +588,37 @@ void MakePlotsMuMuSub()
 //cut_mc += ")";
 
 
-cut_mc += "*(";
-cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
-cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
-cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
-cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
-cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
-cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
-cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
-cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
-cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
-cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
-cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
-cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
-cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
-cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
-cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
-cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
-cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
-cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
-cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
-cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
-cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
-cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
-cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
-cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
-cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
-cut_mc += ")";
+//cut_mc += "*(";
+//cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
+//cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
+//cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
+//cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
+//cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
+//cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
+//cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
+//cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
+//cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
+//cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
+//cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
+//cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
+//cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
+//cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
+//cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
+//cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
+//cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
+//cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
+//cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
+//cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
+//cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
+//cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
+//cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
+//cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
+//cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
+//cut_mc += ")";
 
 
 
-	float ZNormalization = 1.01;
+	float ZNormalization = 1.47;
 	TString filetag = " ";
 	TString xtag = " ";
 
@@ -659,16 +661,18 @@ cut_mc += ")";
 	TString filetag = "2011Data_PreSelection";
 	TString xtag = " [Preselection]";
 
-	if (true){
+	if (false){
 
 	//gROOT->Reset();	gROOT->ProcessLine(".q;");	
 	Use_emu = true;
 	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,40,340, "M_muon1muon2", "M_muon1HEEPele1", false, "","M_{#mu#mu}(GeV) " +xtag,lumi,10,ZNormalization,filetag);
+		//gROOT->Reset();	gROOT->ProcessLine(".q;");	
+
 	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,25,.-.5,24.5, "N_Vertices", "N_Vertices", false, "","N_{Vertices} " +xtag,lumi,100,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "GlobalMuonCount", "GlobalMuonCount", false, "","N_{Global #mu} " +xtag,lumi,100,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "TrackerMuonCount", "TrackerMuonCount", false, "","N_{Tracker #mu} " +xtag,lumi,100,ZNormalization,filetag);
-	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,12,.-.5,11.5, "PFJetCount", "PFJetCount", false, "","N_{PFJet} " +xtag,lumi,100,ZNormalization,filetag);
-	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,8,.-.5,7.5, "BpfJetCount", "BpfJetCount", false, "","N_{BPFJet} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,12,.-.5,11.5, "PFJetCount", "PFJetCount", false, "","N_{PFJet} " +xtag,lumi,100,ZNormalization,filetag);
+	fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,8,.-.5,7.5, "BpfJetCount", "BpfJetCount", false, "","N_{BPFJet} " +xtag,lumi,100,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,0,30, "EcalIso_muon1", "EcalIso_muon1", false, "","ECAL Iso_{#mu_{1}} (GeV) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,3, "HcalIso_muon1", "HcalIso_muon1", false, "","HCAL Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
 	//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 35,0,3.5, "TrkIso_muon1", "TrkIso_muon1", false, "","Track Iso (#mu_{1}) " +xtag,lumi,10,ZNormalization,filetag);
@@ -731,7 +735,10 @@ cut_mc += ")";
 	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", false, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
 	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
 
-	// LQ 500 
+	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, false, false, 60,900,9000, "M_muon1muon2pfjet1pfjet2", "M_muon1muon2pfjet1pfjet2", false, "","M_{#mu#mujj} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
+
+
+	//// LQ 500 
 	filetag = "2011Data_FullSelection_lqmumu550";
 	xtag = " [Full Selection]";
 	lq_choice = "lqmumu550";
@@ -744,6 +751,7 @@ cut_mc += ")";
 	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", false, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
 	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", false, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
 
+	fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, false, false, 30,0,3000, "M_muon1muon2pfjet1pfjet2", "M_muon1muon2pfjet1pfjet2", false, "","M_{#mu#mujj} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
 
 	}
 	gROOT->Reset(); gROOT->ProcessLine(".q;");
