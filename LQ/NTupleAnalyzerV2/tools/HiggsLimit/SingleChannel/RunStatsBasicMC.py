@@ -53,7 +53,7 @@ from array import array
 beta_combo = []
 m_combo = []
 dif_combo = []
-
+cr = '  \n'
 
 fullcards = open('FinalCards.txt','r')
 mycards = []

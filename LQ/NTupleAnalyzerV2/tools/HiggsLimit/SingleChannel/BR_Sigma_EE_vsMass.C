@@ -188,7 +188,7 @@ void makePlots()
  bool systematics = true; // does nothing at the moment
 
  // total integrated luminosity (in pb-1)
- Double_t L_int = 2000;
+ Double_t L_int = 4700;
  // relative uncertainty on the integrated luminosity (0.1 = 10% uncertainty)
  Double_t Sigma_L_int = 0.11;
 
@@ -224,7 +224,7 @@ Double_t mData[10] = {250, 350, 400, 450, 500, 550, 600, 650, 750, 850};
  string title = ";M_{LQ} (GeV);#beta^{2}#times#sigma (pb)";
 
  // integrated luminosity
- string lint = "2.0 fb^{-1}";
+ string lint = "4.7 fb^{-1}";
 
  // region excluded by Tevatron limits
  Double_t x_shaded[5] = {250,316,316,250,250};// CHANGED FOR LQ2
@@ -370,7 +370,7 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  //legend->SetFillStyle(0);
  legend->SetTextFont(42);
  legend->SetMargin(0.15);
- legend->SetHeader("LQ#bar{LQ} #rightarrow #mu q #mu q");
+ legend->SetHeader("LQ#bar{LQ} #rightarrow #e q #e q");
  legend->AddEntry(pl,"D#oslash exclusion (1 fb^{-1}, #beta=1)","f");
  legend->AddEntry(xsTh_vs_m,"#beta^{2}#times #sigma_{theory} with theory unc., (#beta=1)","lf");
  legend->AddEntry(xsData_vs_m_expected, "Expected 95% C.L. upper limit","lp");

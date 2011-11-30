@@ -7,7 +7,10 @@ typea = sys.argv[2]
 #dostring = 'combine -v 0 -d conf'+typea+'_'+inputa+'.cfg -M MarkovChainMC -t 50 --tries 70 -s -1 -H ProfileLikelihood '
 #dostring = 'combine -v 0 -M HybridNew --rule CLs  --testStat LHC conf'+typea+'_'+inputa+'.cfg  -H ProfileLikelihood -t 50 -T 1 -s -1'
 
-dostring = 'combine -v 0 -M HybridNew --rule CLs  --testStat LEP conf'+typea+'_'+inputa+'.cfg -t 1 -s -1 -H ProfileLikelihood '
+#dostring = 'combine -v 0 -M HybridNew --rule CLs  --testStat LEP conf'+typea+'_'+inputa+'.cfg -t 1 -s -1 -H ProfileLikelihood '
+
+dostring = 'combine -v 0 -M HybridNew --rule CLs --testStat LEP conf'+typea+'_'+inputa+'.cfg --clsAcc=0 -s -1 -T 100 -i 10 -H MarkovChainMC --saveToys --saveHybridResult '
+
 
 #combine -M HybridNew --rule CLs --testStat LEP confmunuMCMC1000PseudoRMaxOverRideFixedV4_LQ600.cfg -t 3 -s -1
 out = os.popen(dostring).readlines()

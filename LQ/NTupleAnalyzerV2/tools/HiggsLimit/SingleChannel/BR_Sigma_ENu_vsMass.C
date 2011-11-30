@@ -179,7 +179,7 @@ void setTDRStyle() {
   tdrStyle->cd();
 }
 
-void makePlots()
+void makePlotsBH()
 {
  // **********************************************
  // *            Input parameters                *
@@ -188,7 +188,7 @@ void makePlots()
  bool systematics = true; // does nothing at the moment
 
  // total integrated luminosity (in pb-1)
- Double_t L_int = 2000;
+ Double_t L_int = 4700;
  // relative uncertainty on the integrated luminosity (0.1 = 10% uncertainty)
  Double_t Sigma_L_int = 0.11;
 
@@ -211,53 +211,49 @@ Double_t mData[10] = {250, 350, 400, 450, 500, 550, 600, 650, 750, 850};
  //Double_t mTh[9] = {100, 150, 200, 250, 300, 350, 400,450,500};
  Double_t mTh[15] = { 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850};
  // array of theoretical cross-sections for different leptoquark masses
- //Double_t xsTh[9] = {386, 53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463};
- Double_t xsTh[15] = { 53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732};
+ //Double_t xsTh[9] = {386/2.0, 53.3/2.0, 11.9/2.0, 3.47/2.0, 1.21/2.0, 0.477/2.0, .205/2.0,.0949/2.0,.0463/2.0};
+ Double_t xsTh[15] = { 53.3/2.0, 11.9/2.0, 3.47/2.0, 1.21/2.0, 0.477/2.0, .205/2.0,.0949/2.0,.0463/2.0,.0236/2.0,.0124/2.0,.00676/2.0,.00377/2.0,.00215/2.0,.00124/2.0,.000732/2.0};
   
  // filename for the final plot (NB: changing the name extension changes the file format)
- string fileName2 = "BR_Sigma_MuMu.pdf";
- string fileName3 = "BR_Sigma_MuMu.png";
- string fileName1 = "BR_Sigma_MuMu.eps";
-
+ string fileName2 = "BR_Sigma_MuNu.pdf";
+ string fileName3 = "BR_Sigma_MuNu.png";
+ string fileName1 = "BR_Sigma_MuNu.eps";
   
  // axes labels for the final plot
- string title = ";M_{LQ} (GeV);#beta^{2}#times#sigma (pb)";
+ string title = ";M_{LQ} (GeV);2#beta(1-#beta)#times#sigma (pb)";
 
  // integrated luminosity
- string lint = "2.0 fb^{-1}";
+ string lint = "4.7 fb^{-1}";
 
  // region excluded by Tevatron limits
- Double_t x_shaded[5] = {250,316,316,250,250};// CHANGED FOR LQ2
+ Double_t x_shaded[5] = {250,270,270,250,250};// CHANGED FOR LQ2
  Double_t y_shaded[5] = {0.0001,0.0001,50,50,0.0001};// CHANGED FOR LQ2
 
- // PDF uncertainty band
- //Double_t x_pdf[12] = {100	 ,	150	 ,	200 	,	250	, 300	,	350	,	350	, 300	, 250, 200, 150, 100};
- //Double_t y_pdf[12] = {445.5 ,	61.4 ,	13.7 	,	4.1	, 1.43,	0.57,	0.38, 0.98, 2.9, 10.0, 45.2, 330.3};
- //Double_t x_pdf[18] = {100		,	150		,	200		,	250	,	300		,	350		,	400	,  450 	 ,  500  , 500  , 450 	,	400	,	350		,	300		,	250	, 200		, 150		, 100		};
- //Double_t y_pdf[18] = {445.5	,	61.4	,	13.7	,	4.1	,	1.43	, 0.57	,	.25	, .1167	 ,	.058 , .034	,	.072	, .16	,	0.38	, 0.98	, 2.9	, 10.0	, 45.2	, 330.3	};
+
  Double_t x_pdf[28] = {	150		,	200		,	250	,	300		,	350		,	400	,  450 	 ,  500, 600,	650,	700,	750,	800,	850,	850,	800,	750,	700,	650,	600  , 500  , 450 	,	400	,	350		,	300		,	250	, 200		, 150		};
- Double_t y_pdf[28] = {	61.4	,	13.7	,	4.1	,	1.43	, 0.57	,	.25	, .1167	 ,	.058,0.01561,	0.00866,	0.00491,	0.00284,	0.001677,	0.001008,	0.000456,	0.000803,	0.00144,	0.00263,	0.00486,	0.00919 , .034	,	.072	, .16	,	0.38	, 0.98	, 2.9	, 10.0	, 45.28	};
- 
+ Double_t y_pdf[28] = {	61.4	/2.0,	13.7	/2.0,	4.1	/2.0,	1.43	/2.0, 0.57	/2.0,	.25	/2.0, .1167	 /2.0,	.058/2.0,0.01561/2.0,	0.00866/2.0,	0.00491/2.0,	0.00284/2.0,	0.001677/2.0,	0.001008/2.0,	0.000456/2.0,	0.000803/2.0,	0.00144/2.0,	0.00263/2.0,	0.00486/2.0,	0.00919 /2.0, .034	/2.0,	.072	/2.0, .16	/2.0,	0.38	/2.0, 0.98	/2.0, 2.9	/2.0, 10.0	/2.0, 45.2	/2.0};
  
 Double_t x_shademasses[20]={250, 350, 400, 450, 500, 550, 600, 650, 750, 850, 850, 750, 650, 600, 550, 500, 450, 400, 350, 250};
 
 
 
 
-Double_t xsUp_expected[10] = {0.1442826 , 0.0327699 , 0.01930895 , 0.013634283 , 0.009994318 , 0.007099588 , 0.0061989212 , 0.00543902164 , 0.003250542 , 0.00303089724 }; 
 
 
-Double_t xsUp_observed[10] = {0.1320682 , 0.02664522 , 0.0161704 , 0.013236652 , 0.011248585 , 0.010426008 , 0.0085645436 , 0.0087776572 , 0.0034295295 , 0.00318575184 }; 
+Double_t xsUp_expected[10] = {0.4791029 , 0.07685901 , 0.047661475 , 0.027974622 , 0.0183771645 , 0.01357944 , 0.010671316 , 0.0084540222 , 0.00650006275 , 0.005674281 }; 
 
 
-Double_t y_1sigma[20]={0.1139201 , 0.02367351 , 0.0152438 , 0.01014481 , 0.00788952 , 0.005441216 , 0.00486142 , 0.00427974924 , 0.0027735645 , 0.00257148672 , 0.00424789848 , 0.0045987425 , 0.0075351016 , 0.0087680772 , 0.010122276 , 0.014249751 , 0.018323292 , 0.0275315 , 0.04403664 , 0.1774558 }; 
+Double_t xsUp_observed[10] = {0.4791029 , 0.079165305 , 0.05208025 , 0.03019627845 , 0.0193638175 , 0.01597661 , 0.013432238 , 0.0121299412 , 0.00885373225 , 0.007964892 }; 
 
 
-Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.005533776 , 0.004693568 , 0.0038878712 , 0.00345898384 , 0.0025823005 , 0.00233103936 , 0.00591927408 , 0.0063552065 , 0.0102769576 , 0.0120242304 , 0.0138898508 , 0.018592228 , 0.025362974 , 0.03592215 , 0.05578515 , 0.218263 }; 
+Double_t y_1sigma[20]={0.3671954 , 0.060672015 , 0.036527925 , 0.0214402825 , 0.01343007895 , 0.0103447886 , 0.008158208 , 0.0066064128 , 0.00497014425 , 0.0044608446 , 0.008000943 , 0.00914123025 , 0.011694462 , 0.014782226 , 0.019049094 , 0.025985412 , 0.0375689171 , 0.0645082725 , 0.10639008 , 0.6251205 }; 
+
+
+Double_t y_2sigma[20]={0.26526415 , 0.045145665 , 0.026388625 , 0.015037854 , 0.01033279415 , 0.0080975258 , 0.006695442 , 0.0057030064 , 0.00439228875 , 0.0038398524 , 0.0110026554 , 0.0125442825 , 0.0162536764 , 0.019890034 , 0.02612992 , 0.0356868825 , 0.0501219095 , 0.0828918525 , 0.13477158 , 0.7918887 }; 
 
 
 
- // **********************************************
+ //// **********************************************
  // *  Don't change anything below this point!   *
  // **********************************************
 
@@ -269,10 +265,8 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
 
  Int_t size = sizeof(S_eff)/sizeof(*S_eff);
 
- // Upper Limits can be entered manually here when the call to CLA.C is commented below
- // Array of 95% CL upper limits on the cross section
-//  Double_t xsUp[3] = {0.23722, 0.166074, 0.10131};
 
+////// MEDIAN
 
 
 
@@ -310,7 +304,7 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  gPad->RedrawAxis();
 
 
- TGraph *grshade = new TGraph(28,x_pdf,y_pdf);
+ TGraph *grshade = new TGraph(29,x_pdf,y_pdf);
  grshade->SetFillColor(kCyan-6);
  grshade->SetFillStyle(3001);
  grshade->Draw("f");
@@ -327,9 +321,10 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  xsTh_vs_m->SetLineWidth(2);
  xsTh_vs_m->SetLineColor(kBlue);
  xsTh_vs_m->SetFillColor(kCyan-6);
- xsTh_vs_m->SetMarkerSize(0.00001);
+  xsTh_vs_m->SetMarkerSize(0.00001);
  xsTh_vs_m->SetMarkerStyle(22);
  grshade->SetFillStyle(1001); 
+ xsTh_vs_m->SetMarkerStyle(22);
  xsTh_vs_m->SetMarkerColor(kBlue);
  xsTh_vs_m->Draw("C");
 
@@ -351,18 +346,16 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  xsData_vs_m_observed->SetMarkerSize(1);
  xsData_vs_m_observed->Draw("CP");
  
- 
-  float mtest = 250.0;
+ float mtest = 250.0;
  float xrat = 0.0;
  float orat = 0.0;
  while (mtest<850){
 	 xrat = xsData_vs_m_expected->Eval(mtest)/xsTh_vs_m->Eval(mtest);
 	 orat = xsData_vs_m_observed->Eval(mtest)/xsTh_vs_m->Eval(mtest);
-	 std::cout<<mtest<<"   "<<xrat<<"    "<<orat<<std::endl;
+	 std::cout<<mtest<<"   "<<xrat<<"    "<<orat<<"   "<<"   "<<xsData_vs_m_observed->Eval(mtest)<<"   "<<xsTh_vs_m->Eval(mtest)<<std::endl;
 	 mtest = mtest + 1.0;
 
 	}
- 
  
  TLegend *legend = new TLegend(.37,.65,.94,.92);
  legend->SetBorderSize(1);
@@ -370,9 +363,9 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  //legend->SetFillStyle(0);
  legend->SetTextFont(42);
  legend->SetMargin(0.15);
- legend->SetHeader("LQ#bar{LQ} #rightarrow #mu q #mu q");
- legend->AddEntry(pl,"D#oslash exclusion (1 fb^{-1}, #beta=1)","f");
- legend->AddEntry(xsTh_vs_m,"#beta^{2}#times #sigma_{theory} with theory unc., (#beta=1)","lf");
+ legend->SetHeader("LQ #bar{LQ} #rightarrow #e q #nu q");
+ legend->AddEntry(pl,"D#oslash exclusion (1 fb^{-1}, #beta=1/2)","f");
+ legend->AddEntry(xsTh_vs_m,"2#beta(1-#beta)#times #sigma_{theory} with theory unc., (#beta=1/2)","lf");
  legend->AddEntry(xsData_vs_m_expected, "Expected 95% C.L. upper limit","lp");
  legend->AddEntry(xsData_vs_m_observed, "Observed 95% C.L. upper limit","lp");
  legend->Draw();
@@ -384,6 +377,7 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  l1.SetNDC();
  l1.DrawLatex(0.25,0.29,"CMS Preliminary");
  l1.DrawLatex(0.25,0.23,lint.c_str());
+
 //  TLatex l2;
 //  l2.SetTextAlign(12);
 //  l2.SetTextSize(0.037);
