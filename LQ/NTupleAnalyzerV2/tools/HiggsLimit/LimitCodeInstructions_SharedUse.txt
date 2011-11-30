@@ -126,6 +126,8 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
 
    Step (4) Should have given you some C++ arrays. These can be inserted in a couple standard plot macros. 
    
+   In the plots, you can replace the relevant arrays around line 240. 
+   
    For Muon Channel:
 
        NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/BR_Sigma_MuMu_vsMass.C
