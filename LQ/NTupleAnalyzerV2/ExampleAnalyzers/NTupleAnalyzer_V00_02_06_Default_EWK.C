@@ -428,43 +428,42 @@ void placeholder::Loop()
 		if (N_PileUpInteractions > 23.5)                                   weight_pileup2fb *=  (0.00);
 
 		
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup4p7fb *=(0.0196731565572);
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup4p7fb *=(0.195399330292);
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup4p7fb *=(0.430966978677);
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup4p7fb *=(0.73646462398);
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup4p7fb *=(1.02418311439);
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup4p7fb *=(1.2377627943);
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup4p7fb *=(1.36607528129);
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup4p7fb *=(1.42406461192);
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup4p7fb *=(1.44293126093);
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup4p7fb *=(1.44522180871);
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup4p7fb *=(1.44680390895);
-		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup4p7fb *=(1.45540561707);
-		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup4p7fb *=(1.47236035231);
-		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup4p7fb *=(1.49354734691);
-		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup4p7fb *=(1.52226051225);
-		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup4p7fb *=(1.54763397975);
-		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup4p7fb *=(1.56834698994);
-		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup4p7fb *=(1.58085292349);
-		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup4p7fb *=(1.58087980016);
-		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup4p7fb *=(1.57063876111);
-		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup4p7fb *=(1.54770541788);
-		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup4p7fb *=(1.50322376245);
-		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pileup4p7fb *=(1.45081762123);
-		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pileup4p7fb *=(1.39085977185);
-		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pileup4p7fb *=(1.32050731802);
-		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pileup4p7fb *=(1.24011037359);
-		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pileup4p7fb *=(1.15924512432);
-		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pileup4p7fb *=(1.06193569458);
-		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pileup4p7fb *=(0.978045170078);
-		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pileup4p7fb *=(0.905247484036);
-		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pileup4p7fb *=(0.815564522288);
-		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pileup4p7fb *=(0.721687664425);
-		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pileup4p7fb *=(0.641765904129);
-		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup4p7fb *=(0.598173871387);
-		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup4p7fb *=(1.02679374255);
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup4p7fb *=(0.0248405096357);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup4p7fb *=(0.195212673179);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup4p7fb *=(0.432670796326);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup4p7fb *=(0.739526760889);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup4p7fb *=(1.02450575856);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup4p7fb *=(1.23400870719);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup4p7fb *=(1.36271859493);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup4p7fb *=(1.40866927293);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup4p7fb *=(1.41520890878);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup4p7fb *=(1.39607922424);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup4p7fb *=(1.38069476671);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup4p7fb *=(1.37142807267);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup4p7fb *=(1.36237007165);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup4p7fb *=(1.36445046998);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup4p7fb *=(1.37017239991);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup4p7fb *=(1.3727177286);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup4p7fb *=(1.36299530075);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup4p7fb *=(1.3573672273);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup4p7fb *=(1.33658653928);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup4p7fb *=(1.3078266535);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup4p7fb *=(1.27371711897);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup4p7fb *=(1.22983589961);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pileup4p7fb *=(1.18580429681);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pileup4p7fb *=(1.13114134262);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pileup4p7fb *=(1.05646026004);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pileup4p7fb *=(1.00134002191);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pileup4p7fb *=(0.912102258004);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pileup4p7fb *=(0.849851792798);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pileup4p7fb *=(0.794745315159);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pileup4p7fb *=(0.760974060445);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pileup4p7fb *=(0.639751878464);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pileup4p7fb *=(0.559140815319);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pileup4p7fb *=(0.52359600166);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup4p7fb *=(0.442699031782);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup4p7fb *=(0.816367883043);
 		if (N_PileUpInteractions > 34.5) weight_pileup4p7fb *= 0.0;
-
 
 
 		//========================     Trigger Scanning  ================================//
@@ -751,14 +750,14 @@ void placeholder::Loop()
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
-				MuonTrackerIsoSumPT->at(imuon) < 3.0 &&                             // Disable for EWK
-				//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
-				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
+				//MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&
+				((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;
+				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;
 
 			bool PassPOGTight =
 				MuonStationMatches->at(imuon) > 1 && 
 				fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
-				MuonGlobalChi2 ->at(imuon) < 10.0 &&                         /// Disable for EWK
+				//MuonGlobalChi2 ->at(imuon) < 10.0 &&
 				MuonPixelHitCount ->at(imuon) >=1 &&
 				MuonGlobalTrkValidHits->at(imuon)>=1 ;
 
@@ -840,7 +839,7 @@ void placeholder::Loop()
 
 			if ( fabs(jetEta) > 3.0 ) continue;
 
-			if (PFJetPassLooseID->at(ijet) != 1) continue;        // Disable for EWK
+			//if (PFJetPassLooseID->at(ijet) != 1) continue;
 			//if (PFJetPassTightID->at(ijet) != 1) continue;
 
 			v_idx_pfjet_prefinal.push_back(ijet);
@@ -1774,7 +1773,7 @@ void placeholder::Loop()
 
 		
 		//std::cout<<M_AllCaloJet<<"   "<<M_AllPFJet<<std::endl;
-		if (Pt_muon1 < 25.0 && Pt_muon2 < 25.0 ) continue;
+		if (Pt_muon1 < 20.0 && Pt_muon2 < 20.0 ) continue;
 		if (Pt_pfjet1 < 25.0 && Pt_pfjet2 < 25.0  ) continue;
 	//	if (Pt_muon2 < 30.0 && Pt_genmuon2 < 30.0 && Pt_genMET < 40.0 && MET_pf < 40.0) continue; 
 
