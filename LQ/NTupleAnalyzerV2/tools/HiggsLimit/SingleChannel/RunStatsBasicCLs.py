@@ -2,21 +2,11 @@ import os
 import sys
 import subprocess
 import matplotlib.pyplot
-# Check the root version
  
 ESTIMATIONMETHOD = ' -M Asymptotic '
-METHOD = '-M HybridNew --rule CLs --frequentist CONFIGURATION --clsAcc=0 -s -1 -T 100 -i 50 --singlePoint SINGLEPOINT --saveToys --saveHybridResult'
+METHOD = '-M HybridNew --rule CLs --frequentist CONFIGURATION --clsAcc=0 -s -1 -T 70 -i 50 --singlePoint SINGLEPOINT --saveToys --saveHybridResult'
 person = (os.popen('whoami').readlines())[0].replace('\n','')
 
-
-rootinfo = os.popen('root -b -q').readlines()
-hostinfo = os.popen('hostname').readline()
-hostinfo = str(hostinfo)
-
-rootinfo2 = str(rootinfo)
-
-rootinfo = rootinfo[4].split()[2].split('/')[0]
-rootinfo = float(rootinfo)
 
 do_BetaOne = 0
 do_BetaHalf = 0 
@@ -35,12 +25,19 @@ numdo = 1
 queue = '1nd'
 launcher = 'launcherCLs.py'
 iters = 1
+if 'CLSLimits' not in os.listdir('.'):
+	os.system('mkdir CLSLimits')
+if 'ShellScriptsForBatch' not in os.listdir('.'):
+	os.system('mkdir ShellScriptsForBatch')
+os.system('rfmkdir /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits'+cdir)
+
 for x in range(len(sys.argv)):
 	if sys.argv[x] == '-c':
 		cdir = sys.argv[x+1]
-		os.system('rfmkdir /castor/cern.ch/user/d/darinb/CLSLimits/BetaOne'+cdir)
-		os.system('rfmkdir /castor/cern.ch/user/d/darinb/CLSLimits/BetaHalf'+cdir)
-		os.system('mkdir '+cdir)
+		os.system('rfmkdir /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaOne'+cdir)
+		os.system('rfmkdir /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaHalf'+cdir)
+		os.system('mkdir CLSLimits/BetaOne'+cdir)
+		os.system('mkdir CLSLimits/BetaHalf'+cdir)
 	if sys.argv[x] == '-n':
 		numdo = int(sys.argv[x+1])
 	if sys.argv[x] == '-q':
@@ -73,7 +70,7 @@ if do_BetaOne == 1:
 		if 'BetaHalf' in name[x]:
 			continue
 		print 'Calculating limit for: ' + name[x]
-		f = open('confbetaone_'+cdir+'_'+name[x]+'.cfg','w')
+		f = open('CLSLimits/BetaOne'+cdir+'/confbetaone_'+cdir+'_'+name[x]+'.cfg','w')
 		count = 0
 		print name[x]
 		for l in mycards:
@@ -86,25 +83,29 @@ if do_BetaOne == 1:
 					count = 1
 				else:
 					count = 0
-		os.system('rfmkdir /castor/cern.ch/user/d/darinb/CLSLimits/BetaOne'+cdir+'/'+name[x])
+	
 		f.close()
+
+		os.system('rfmkdir /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaOne'+cdir+'/'+name[x])
+		os.system('rfcp CLSLimits/BetaOne'+cdir+'/confbetaone_'+cdir+'_'+name[x]+'.cfg /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaOne'+cdir+'/')
+		os.system('mkdir CLSLimits/BetaOne'+cdir+'/'+name[x])
 
 		mdir = (os.popen('pwd').readlines())[0]
 		mdir = mdir.replace('\n','')
-		fsub = open('subbetaone_'+cdir+name[x]+'.csh','w')
+		fsub = open('ShellScriptsForBatch/subbetaone_'+cdir+name[x]+'.csh','w')
 		fsub.write('#!/bin/csh'+ cr)
 		fsub.write('cd ' + mdir+ cr)
 		fsub.write('eval `scramv1 runtime -csh`'+ cr)
 		fsub.write('cd -'+ cr)
-		fsub.write('cp '+mdir+'/confbetaone_'+cdir+'_'+name[x]+ '.cfg . '+ cr)
+		fsub.write('cp '+mdir+'/CLSLimits/BetaOne'+cdir+'/confbetaone_'+cdir+'_'+name[x]+ '.cfg . '+ cr)
 		fsub.write('SUBCOMMAND'+'\n')
-		fsub.write('cp log*.txt '+mdir+'/'+cdir+'/'+ cr +cr +cr)
-		fsub.write('rfcp log*.txt /castor/cern.ch/user/d/darinb/CLSLimits/BetaOne'+cdir+'/'+ cr +cr +cr)
-		fsub.write('rfcp *root /castor/cern.ch/user/d/darinb/CLSLimits/BetaOne'+cdir+'/'+name[x]+'/'+ cr +cr +cr)			
+		if '--castor_only' not in sys.argv:
+			fsub.write('cp *root '+mdir+'/CLSLimits/BetaOne'+cdir+'/'+name[x]+'/'+ cr +cr )					
+		fsub.write('rfcp *root /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaOne'+cdir+'/'+name[x]+'/'+ cr +cr )			
 		fsub.close()
 		
 		
-		EstimationInformation = os.popen('combine '+ESTIMATIONMETHOD+' confbetaone_'+cdir+'_'+name[x]+'.cfg ').readlines()
+		EstimationInformation = os.popen('combine '+ESTIMATIONMETHOD+' CLSLimits/BetaOne'+cdir+'/confbetaone_'+cdir+'_'+name[x]+'.cfg ').readlines()
 		
 		expectedlines = []
 		for line in EstimationInformation:
@@ -127,8 +128,6 @@ if do_BetaOne == 1:
 			thisr = vstart*1.03**(float(nindex))
 			rvalues.append(thisr)
 			nindex +=1
-		#for n in range(100):
-			#rvalues.append(vstart+n*interval)
 		strRvalues = []
 		for r in rvalues:
 			strRvalues.append(str(round(r,5)))
@@ -137,13 +136,11 @@ if do_BetaOne == 1:
 		for r in strRvalues:
 			command = 'combine '+METHOD.replace('SINGLEPOINT',r).replace('CONFIGURATION','confbetaone_'+cdir+'_'+name[x]+'.cfg')
 			strR = r.replace('.','_')
-			os.system('cat subbetaone_'+cdir+name[x]+'.csh | sed  \'s/SUBCOMMAND/'+command+'/g\'  > subbetaone_'+strR+'_'+cdir+name[x]+'.csh')
-			os.system('chmod 777 *csh')
+			os.system('cat ShellScriptsForBatch/subbetaone_'+cdir+name[x]+'.csh | sed  \'s/SUBCOMMAND/'+command+'/g\'  > ShellScriptsForBatch/subbetaone_'+strR+'_'+cdir+name[x]+'.csh')
+			os.system('chmod 777 ShellScriptsForBatch/subbetaone_'+strR+'_'+cdir+name[x]+'.csh')
 
 			for nn in range(numdo):
-				os.system('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobbetaone'+str(nn)+'_'+name[x]+' < subbetaone_'+strR+'_'+cdir+name[x]+'.csh')
-				#print('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobbetaone'+str(nn)+'_'+name[x]+' < subbetaone_'+strR+'_'+cdir+name[x]+'.csh')
-
+				os.system('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobbetaone'+str(nn)+'_R_'+strR+'_'+name[x]+' < ShellScriptsForBatch/subbetaone_'+strR+'_'+cdir+name[x]+'.csh')
 
 
 if do_BetaHalf == 1:
@@ -152,7 +149,7 @@ if do_BetaHalf == 1:
 		if 'BetaHalf' not in name[x]:
 			continue		
 		print 'Calculating limit for: ' + name[x]			
-		f = open('confbetahalf_'+cdir+'_'+name[x]+'.cfg','w')
+		f = open('CLSLimits/BetaHalf'+cdir+'/confbetahalf_'+cdir+'_'+name[x]+'.cfg','w')
 		count = 0
 		print name[x]
 		for l in mycards:
@@ -167,27 +164,29 @@ if do_BetaHalf == 1:
 					count = 1
 				else:
 					count = 0
-		os.system('rfmkdir /castor/cern.ch/user/d/darinb/CLSLimits/BetaHalf'+cdir+'/'+name[x])
-
 		f.close()
-					
+
+		os.system('rfmkdir /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaHalf'+cdir+'/'+name[x])
+		os.system('rfcp CLSLimits/BetaHalf'+cdir+'/confbetahalf_'+cdir+'_'+name[x]+'.cfg /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaHalf'+cdir+'/')
+	
+		os.system('mkdir CLSLimits/BetaHalf'+cdir+'/'+name[x])
 
 		mdir = (os.popen('pwd').readlines())[0]
 		mdir = mdir.replace('\n','')
-		fsub = open('subbetahalf_'+cdir+name[x]+'.csh','w')
+		fsub = open('ShellScriptsForBatch/subbetahalf_'+cdir+name[x]+'.csh','w')
 		fsub.write('#!/bin/csh'+ cr)
 		fsub.write('cd ' + mdir+ cr)
 		fsub.write('eval `scramv1 runtime -csh`'+ cr)
 		fsub.write('cd -'+ cr)
-		fsub.write('cp '+mdir+'/confbetahalf_'+cdir+'_'+name[x]+ '.cfg . '+ cr)
+		fsub.write('cp '+mdir+'/CLSLimits/BetaHalf'+cdir+'/confbetahalf_'+cdir+'_'+name[x]+ '.cfg . '+ cr)
 		fsub.write('SUBCOMMAND'+'\n')
-		fsub.write('cp log*.txt '+mdir+'/'+cdir+'/'+ cr +cr +cr)
-		fsub.write('rfcp log*.txt /castor/cern.ch/user/d/darinb/CLSLimits/BetaHalf'+cdir+'/'+ cr +cr +cr)
-		fsub.write('rfcp *root /castor/cern.ch/user/d/darinb/CLSLimits/BetaHalf'+cdir+'/'+name[x]+'/'+ cr +cr +cr)			
+		if '--castor_only' not in sys.argv:
+			fsub.write('cp *root '+mdir+'/CLSLimits/BetaHalf'+cdir+'/'+name[x]+'/'+ cr +cr )					
+		fsub.write('rfcp *root /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaHalf'+cdir+'/'+name[x]+'/'+ cr +cr )			
 		fsub.close()
 		
 		
-		EstimationInformation = os.popen('combine '+ESTIMATIONMETHOD+' confbetahalf_'+cdir+'_'+name[x]+'.cfg ').readlines()
+		EstimationInformation = os.popen('combine '+ESTIMATIONMETHOD+' CLSLimits/BetaHalf'+cdir+'/confbetahalf_'+cdir+'_'+name[x]+'.cfg ').readlines()
 		
 		expectedlines = []
 		for line in EstimationInformation:
@@ -211,14 +210,6 @@ if do_BetaHalf == 1:
 			thisr = vstart*1.03**(float(nindex))
 			rvalues.append(thisr)
 			nindex += 1
-		#for n in range(100):
-			#rvalues.append(vstart+n*interval)		
-		#vstart = round((min(values)/3.0),5)
-		#vstop = round((max(values)*3.0),5)
-		#rvalues = []
-		#interval = abs(vstop-vstart)/70.0
-		#for n in range(100):
-			#rvalues.append(vstart+n*interval)
 		strRvalues = []
 		for r in rvalues:
 			strRvalues.append(str(round(r,5)))
@@ -227,9 +218,10 @@ if do_BetaHalf == 1:
 		for r in strRvalues:
 			command = 'combine '+METHOD.replace('SINGLEPOINT',r).replace('CONFIGURATION','confbetahalf_'+cdir+'_'+name[x]+'.cfg')
 			strR = r.replace('.','_')
-			os.system('cat subbetahalf_'+cdir+name[x]+'.csh | sed  \'s/SUBCOMMAND/'+command+'/g\'  > subbetahalf_'+strR+'_'+cdir+name[x]+'.csh')
-			os.system('chmod 777 *csh')
+			os.system('cat ShellScriptsForBatch/subbetahalf_'+cdir+name[x]+'.csh | sed  \'s/SUBCOMMAND/'+command+'/g\'  > ShellScriptsForBatch/subbetahalf_'+strR+'_'+cdir+name[x]+'.csh')
+			os.system('chmod 777 ShellScriptsForBatch/subbetahalf_'+strR+'_'+cdir+name[x]+'.csh')
 
 			for nn in range(numdo):
-				os.system('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobbetahalf'+str(nn)+'_'+name[x]+' < subbetahalf_'+strR+'_'+cdir+name[x]+'.csh')
-				#print('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobbetahalf'+str(nn)+'_'+name[x]+' < subbetahalf_'+strR+'_'+cdir+name[x]+'.csh')
+				os.system('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobbetahalf'+str(nn)+'_R_'+strR+'_'+name[x]+' < ShellScriptsForBatch/subbetahalf_'+strR+'_'+cdir+name[x]+'.csh')
+
+os.system('rm higgsCombineTest*root')
