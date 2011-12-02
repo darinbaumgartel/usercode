@@ -83,7 +83,7 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
 
 	  cd NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/
 
-      python RunStatsBasicCLs.py --do_BetaOne --do_BetaHalf -q 8nh -n 2 -c MyFirstRun
+      python RunStatsBasicCLs.py --do_BetaOne --do_BetaHalf -q 8nh -n 3 -c MyFirstRun
 
       About the options:
       
@@ -92,12 +92,16 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
       -c MyFirstRun              :  Specifies the output log files and castor directories of root files will be
                                     labeled "StandardExample". Choose whatever name you want. 
       -n 2                       :  2 jobs per mass point per channel per cross-section test
-
+      --castor_only              :  This will copy root files only to castor, not locally.
+                                    * Use this if you don't have at least 200MB
+                                      free space in your working area for root
+                                      files *   
     b) What does the script do? 
     
        - It Looks at FinalCards.txt and splits up all the cards for each channel/mass. 
        - It uses a quick method (Asymptotic CLs) to estimate the range of possible cross-sections to scan.
        - It splits up everything into many jobs and launches them. 
+       - Resulting root files are copied to castor and locally for step (5)
        
     c) Why "-n 2"? Doesn't CLs require many many jobs? 
     
@@ -115,10 +119,14 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
     These root files contain all the toy information, and will be used to calculate limits. This is automated with 
     another pythong script. So check that your castor directories are full, and run once for each channel:
     
-    e.g.
-           python AnalyzerCastorDirectoryCLs.py /castor/cern.ch/user/d/darinb/BetaOneMyFirstRun/ 
-           python AnalyzerCastorDirectoryCLs.py /castor/cern.ch/user/d/darinb/BetaHalfMyFirstRun/ --betahalf
-           
+    e.g. Locally
+           python AnalyzerDirectoryForCLs.py /castor/cern.ch/user/d/darinb/CLSLimits/BetaOneMyFirstRun/ 
+           python AnalyzerDirectoryForCLs.py /castor/cern.ch/user/d/darinb/CLSLimits/BetaHalfMyFirstRun/ --betahalf
+
+    e.g. With Castor
+
+           python AnalyzerDirectoryForCLs.py CLSLimits/BetaOneMyFirstRun/ 
+           python AnalyzerDirectoryForCLs.py CLSLimits/BetaHalfMyFirstRun/ --betahalf           
    
    This will give an array of cross-section limit that you can copy and paste into your standard plot macros.
 
