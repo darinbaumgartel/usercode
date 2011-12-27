@@ -77,37 +77,38 @@ Double_t F_U2Prime(Double_t P)
 	return gRandom->Gaus(newU2,newsU2);
 }
 
-int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso )
+int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso, double e_losthits )
 {
 	int isgood = 1;
 
-	if (e_pt_real<25.0) isgood = 0;
-	if (e_pt<25.0) isgood = 0;
-	if (fabs(e_eta) > 1.442 && fabs(e_eta) < 1.560) isgood = 0;
-	if (fabs(e_eta) > 2.50) isgood = 0;
-	if (!e_ecaldriven) isgood = 0;
-	if (fabs(e_dphi_sc) > 0.06) isgood = 0;
-	if (e_hoe > 0.05) isgood = 0;
-	
-	bool barrel = (fabs(e_eta) < 1.442);
-	bool endcap = (fabs(e_eta) > 1.560 && fabs(e_eta) < 2.5);
+	if (e_pt_real<35.0) isgood = 0; // OK
+	if (e_pt<35.0) isgood = 0; // OK
+	//if (fabs(e_eta) > 1.442 && fabs(e_eta) < 1.560) isgood = 0;
+	if (fabs(e_eta) > 2.50) isgood = 0; //OK
+	if (!e_ecaldriven) isgood = 0; //OK
+	if (fabs(e_dphi_sc) > 0.06) isgood = 0; //OK
+	if (e_hoe > 0.05) isgood = 0; //OK
+	if (e_losthits != 0) isgood = 0;
+	//bool barrel = (fabs(e_eta) < 1.442);
+	bool barrel = (fabs(e_eta) < 1.560); //OK
+	bool endcap = (fabs(e_eta) > 1.560 && fabs(e_eta) < 2.5); //OK
 	
 	if (barrel)
 	{
-		if (fabs(e_deta_sc) > 0.005) isgood = 0;
-		if (( e_e1x5_over_5x5 > 0.83)&&( e_e2x5_over_5x5 > 0.94 )) isgood = 0;
-		if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0;
-		if (e_trkiso > 5) isgood = 0;
+		if (fabs(e_deta_sc) > 0.005) isgood = 0; // OK
+		if (( e_e1x5_over_5x5 > 0.83)&&( e_e2x5_over_5x5 > 0.94 )) isgood = 0; // OK
+		if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0; //OK
+		if (e_trkiso > 5) isgood = 0; //OK
 	}
 	
 	if (endcap)
 	{
-		if (fabs(e_deta_sc)> 0.007) isgood = 0;
-		if (fabs(e_sigmann) > 0.03) isgood = 0;
-		if ((e_pt < 50.0) && ( e_em_had1iso >  2.5 )) isgood = 0;
-		if ((e_pt >= 50.0) && ( e_em_had1iso > ( 2.5 + 0.03*(e_pt-50.0) ))) isgood = 0;
+		if (fabs(e_deta_sc)> 0.007) isgood = 0; //OK
+		if (fabs(e_sigmann) > 0.03) isgood = 0; //OK
+		if ((e_pt < 50.0) && ( e_em_had1iso >  2.5 )) isgood = 0; //OK
+		if ((e_pt >= 50.0) && ( e_em_had1iso > ( 2.5 + 0.03*(e_pt-50.0) ))) isgood = 0; // OK
 		//if ( e_had2iso > 0.5 ) isgood = 0;
-		if (e_trkiso > 5.0) 	isgood = 0;
+		if (e_trkiso > 5.0) 	isgood = 0; // OK
 	}
 	
 	
@@ -186,7 +187,7 @@ void placeholder::Loop()
 	BRANCH(Events_AfterLJ); BRANCH(Events_Orig);
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
-	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb);
+	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb); BRANCH(weight_pileup2011B); BRANCH(weight_pileup2011A); BRANCH(weight_pileup4p7fb_higgs)
 
 
 	// PFMET
@@ -234,8 +235,8 @@ void placeholder::Loop()
 	BRANCH(Pt_AllCaloJet);	BRANCH(Pt_AllPFJet);
 	BRANCH(MetDirComp_AllCaloJet);	BRANCH(MetDirComp_AllPFJet);
 	BRANCH(MetDirCompOverMET_AllCaloJet);	BRANCH(MetDirCompOverMET_AllPFJet);
-
-
+	BRANCH(JetMatchMuon1); BRANCH(JetMatchMuon2);
+ 
 	// Transverse Mass Combinations
 	BRANCH(MT_muon1pfMET);
 	BRANCH(MT_pfjet1pfMET); BRANCH(MT_pfjet2pfMET);
@@ -395,11 +396,15 @@ void placeholder::Loop()
 			}	
 		}
 		
-		weight_964pileup_gen = weight; 
 		
 		weight_pileup2fb = weight;
 		
 		weight_pileup4p7fb = weight;
+		weight_pileup4p7fb_higgs = weight;
+
+		weight_pileup2011A = weight;
+		
+		weight_pileup2011B = weight;
 
 		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5))    weight_pileup2fb *=  (0.0752233034121);
 		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5))     weight_pileup2fb *=  (0.361994702942);
@@ -464,6 +469,117 @@ void placeholder::Loop()
 		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup4p7fb *=(0.598173871387);
 		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup4p7fb *=(1.02679374255);
 		if (N_PileUpInteractions > 34.5) weight_pileup4p7fb *= 0.0;
+
+		if ((N_PileUpInteractions>-0.5)*(N_PileUpInteractions<0.5)) weight_pileup4p7fb_higgs *= (0.014303450 );
+		if ((N_PileUpInteractions>0.5)*(N_PileUpInteractions<1.5)) weight_pileup4p7fb_higgs *= (0.148914600 );
+		if ((N_PileUpInteractions>1.5)*(N_PileUpInteractions<2.5)) weight_pileup4p7fb_higgs *= (0.342742300 );
+		if ((N_PileUpInteractions>2.5)*(N_PileUpInteractions<3.5)) weight_pileup4p7fb_higgs *= (0.610077800 );
+		if ((N_PileUpInteractions>3.5)*(N_PileUpInteractions<4.5)) weight_pileup4p7fb_higgs *= (0.881386800 );
+		if ((N_PileUpInteractions>4.5)*(N_PileUpInteractions<5.5)) weight_pileup4p7fb_higgs *= (1.102893000 );
+		if ((N_PileUpInteractions>5.5)*(N_PileUpInteractions<6.5)) weight_pileup4p7fb_higgs *= (1.255616000 );
+		if ((N_PileUpInteractions>6.5)*(N_PileUpInteractions<7.5)) weight_pileup4p7fb_higgs *= (1.345269000 );
+		if ((N_PileUpInteractions>7.5)*(N_PileUpInteractions<8.5)) weight_pileup4p7fb_higgs *= (1.396842000 );
+		if ((N_PileUpInteractions>8.5)*(N_PileUpInteractions<9.5)) weight_pileup4p7fb_higgs *= (1.431426000 );
+		if ((N_PileUpInteractions>9.5)*(N_PileUpInteractions<10.5)) weight_pileup4p7fb_higgs *= (1.466321000 );
+		if ((N_PileUpInteractions>10.5)*(N_PileUpInteractions<11.5)) weight_pileup4p7fb_higgs *= (1.511987000 );
+		if ((N_PileUpInteractions>11.5)*(N_PileUpInteractions<12.5)) weight_pileup4p7fb_higgs *= (1.572500000 );
+		if ((N_PileUpInteractions>12.5)*(N_PileUpInteractions<13.5)) weight_pileup4p7fb_higgs *= (1.645584000 );
+		if ((N_PileUpInteractions>13.5)*(N_PileUpInteractions<14.5)) weight_pileup4p7fb_higgs *= (1.736351000 );
+		if ((N_PileUpInteractions>14.5)*(N_PileUpInteractions<15.5)) weight_pileup4p7fb_higgs *= (1.833339000 );
+		if ((N_PileUpInteractions>15.5)*(N_PileUpInteractions<16.5)) weight_pileup4p7fb_higgs *= (1.934649000 );
+		if ((N_PileUpInteractions>16.5)*(N_PileUpInteractions<17.5)) weight_pileup4p7fb_higgs *= (2.034955000 );
+		if ((N_PileUpInteractions>17.5)*(N_PileUpInteractions<18.5)) weight_pileup4p7fb_higgs *= (2.127016000 );
+		if ((N_PileUpInteractions>18.5)*(N_PileUpInteractions<19.5)) weight_pileup4p7fb_higgs *= (2.211426000 );
+		if ((N_PileUpInteractions>19.5)*(N_PileUpInteractions<20.5)) weight_pileup4p7fb_higgs *= (2.282289000 );
+		if ((N_PileUpInteractions>20.5)*(N_PileUpInteractions<21.5)) weight_pileup4p7fb_higgs *= (2.322883000 );
+		if ((N_PileUpInteractions>21.5)*(N_PileUpInteractions<22.5)) weight_pileup4p7fb_higgs *= (2.350057000 );
+		if ((N_PileUpInteractions>22.5)*(N_PileUpInteractions<23.5)) weight_pileup4p7fb_higgs *= (2.361952000 );
+		if ((N_PileUpInteractions>23.5)*(N_PileUpInteractions<24.5)) weight_pileup4p7fb_higgs *= (2.350979000 );
+		if ((N_PileUpInteractions>24.5)*(N_PileUpInteractions<25.5)) weight_pileup4p7fb_higgs *= (2.314393000 );
+		if ((N_PileUpInteractions>25.5)*(N_PileUpInteractions<26.5)) weight_pileup4p7fb_higgs *= (2.267422000 );
+		if ((N_PileUpInteractions>26.5)*(N_PileUpInteractions<27.5)) weight_pileup4p7fb_higgs *= (2.176294000 );
+		if ((N_PileUpInteractions>27.5)*(N_PileUpInteractions<28.5)) weight_pileup4p7fb_higgs *= (2.099417000 );
+		if ((N_PileUpInteractions>28.5)*(N_PileUpInteractions<29.5)) weight_pileup4p7fb_higgs *= (2.034581000 );
+		if ((N_PileUpInteractions>29.5)*(N_PileUpInteractions<30.5)) weight_pileup4p7fb_higgs *= (1.918498000 );
+		if ((N_PileUpInteractions>30.5)*(N_PileUpInteractions<31.5)) weight_pileup4p7fb_higgs *= (1.776173000 );
+		if ((N_PileUpInteractions>31.5)*(N_PileUpInteractions<32.5)) weight_pileup4p7fb_higgs *= (1.651888000 );
+		if ((N_PileUpInteractions>32.5)*(N_PileUpInteractions<33.5)) weight_pileup4p7fb_higgs *= (1.609676000 );
+		if ((N_PileUpInteractions>33.5)*(N_PileUpInteractions<34.5)) weight_pileup4p7fb_higgs *= (1.470914000 );
+		if (N_PileUpInteractions>34.5) weight_pileup4p7fb_higgs *= 0.000000000 ;
+
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup2011B *=(0.00131573357575);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup2011B *=(0.0198727041317);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup2011B *=(0.0661623409037);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup2011B *=(0.166388520711);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup2011B *=(0.330422419256);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup2011B *=(0.551853005828);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup2011B *=(0.812401387851);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup2011B *=(1.0876898499);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup2011B *=(1.36112666526);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup2011B *=(1.61986239723);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup2011B *=(1.85857471348);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup2011B *=(2.07583022795);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup2011B *=(2.27073458079);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup2011B *=(2.43879630527);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup2011B *=(2.58972279802);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup2011B *=(2.7104762223);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup2011B *=(2.80323038109);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup2011B *=(2.86580045174);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup2011B *=(2.89395216121);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup2011B *=(2.8945268421);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup2011B *=(2.86535465266);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup2011B *=(2.79167002202);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pileup2011B *=(2.70003386131);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pileup2011B *=(2.59214839811);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pileup2011B *=(2.46339776265);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pileup2011B *=(2.31490544385);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pileup2011B *=(2.1648847143);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pileup2011B *=(1.9837396241);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pileup2011B *=(1.82737557193);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pileup2011B *=(1.69157837089);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pileup2011B *=(1.52412087763);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pileup2011B *=(1.34875616702);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pileup2011B *=(1.19943409544);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup2011B *=(1.11798841681);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup2011B *=(1.91912739641);
+		if (N_PileUpInteractions > 34.5) weight_pileup2011B *= 0.0;
+
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup2011A *=(0.0462294709045);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup2011A *=(0.449017084862);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup2011A *=(0.95496408116);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup2011A *=(1.54742236648);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup2011A *=(1.99350537074);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup2011A *=(2.16591787484);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup2011A *=(2.07253064588);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup2011A *=(1.79716874247);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup2011A *=(1.44879640373);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup2011A *=(1.10390353315);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup2011A *=(0.805940525344);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup2011A *=(0.56963353603);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup2011A *=(0.392561321337);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup2011A *=(0.264739490683);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup2011A *=(0.176134312968);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup2011A *=(0.115357340197);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup2011A *=(0.074618085727);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup2011A *=(0.047710687865);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup2011A *=(0.0301416687552);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup2011A *=(0.0188683583314);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup2011A *=(0.011694470133);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup2011A *=(0.00713547685162);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pileup2011A *=(0.00432221446709);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pileup2011A *=(0.00259823843652);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pileup2011A *=(0.00154531071684);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pileup2011A *=(0.00090805400071);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pileup2011A *=(0.0005303976563);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pileup2011A *=(0.000303095137964);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pileup2011A *=(0.00017379704299);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pileup2011A *=(9.99256986151e-05);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pileup2011A *=(5.57817765096e-05);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pileup2011A *=(3.04991209629e-05);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pileup2011A *=(1.67068817976e-05);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup2011A *=(9.56164451078e-06);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup2011A *=(7.31897654042e-06);
+		if (N_PileUpInteractions > 34.5) weight_pileup2011A *= 0.0;
 
 
 
@@ -544,13 +660,13 @@ void placeholder::Loop()
 		JetAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
 		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
 
-	//	if (!isData)
-	//	{
-	//		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
-	//		{
-	//		(*PFJetPt)[ijet]  = (*PFJetPt)[ijet] * PFJetL1OffsetJEC->at(ijet)/PFJetL1FastJetJEC->at(ijet);
-	//		}
-	//	}
+		if (!isData)
+		{
+			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
+			{
+			(*PFJetPt)[ijet]  = (*PFJetPt)[ijet];// * PFJetL1OffsetJEC->at(ijet)/PFJetL1FastJetJEC->at(ijet);
+			}
+		}
 		
 		if (!isData)
 		{
@@ -682,11 +798,13 @@ void placeholder::Loop()
 			double e_em_had1iso = ElectronHcalIsoD1DR03->at(iele);
 			double e_had2iso = ElectronHcalIsoD2DR03->at(iele);
 			double e_trkiso = ElectronTrkIsoPAT->at(iele);
+			int e_missinghits = ElectronMissingHits->at(iele);
+
 						
 			//std::cout<<CustomHeepID(e_pt, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso )<<std::endl;
 
 			//			if ( ElectronPt->at(iele) < 15.0 ) continue;
-			if  (CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso ) && ElectronOverlaps->at(iele) == 0 )
+			if  (CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso, e_missinghits ) && ElectronOverlaps->at(iele) == 0 )
 			{
 				v_idx_ele_final.push_back(iele);
 			}
@@ -718,8 +836,10 @@ void placeholder::Loop()
 			double e_em_had1iso = ElectronHcalIsoD1DR03->at(iele);
 			double e_had2iso = ElectronHcalIsoD2DR03->at(iele);
 			double e_trkiso = ElectronTrkIsoPAT->at(iele);
+			int e_missinghits = ElectronMissingHits->at(iele);
+
 		  
-		  if ( CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso )  && ElectronOverlaps->at(iele) == 0 )  
+		  if ( CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso, e_missinghits )  && ElectronOverlaps->at(iele) == 0 )  
 		    {		      
 		      v_idx_ele_good_final.push_back(iele);  
 		    }
@@ -963,6 +1083,8 @@ void placeholder::Loop()
 		VRESET(Pt_genneutrino); VRESET(Phi_genneutrino); VRESET(Eta_genneutrino);
 		VRESET(Pt_Z_gen);       VRESET(Pt_W_gen);
 		VRESET(Phi_Z_gen);      VRESET(Phi_W_gen);
+		VRESET(JetMatchMuon1);  VRESET(JetMatchMuon2);
+
 
 		// Recoil variables
 		VRESET(U1_Z_gen); VRESET(U2_Z_gen);
@@ -986,6 +1108,138 @@ void placeholder::Loop()
 			Phi_genneutrino = 0;
 			Phi_genMET = 0;
 			Eta_genMET = 0;
+			
+			int LQIndex1 = -1;
+			int LQIndex2 = -1;
+
+			int LQIndex1_jet, LQIndex1_lepton, LQIndex2_jet, LQIndex2_lepton;
+			TLorentzVector v_LQIndex1_jet, v_LQIndex1_lepton, v_LQIndex2_jet, v_LQIndex2_lepton;
+
+
+			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
+			{
+				int pdgId = GenParticlePdgId->at(ip);
+				int motherIndex = GenParticleMotherIndex->at(ip);
+				if ( TMath::Abs(pdgId) == 42 ) {
+					if ((LQIndex1 != -1)&&(LQIndex2 == -1)) LQIndex2 = ip;
+					if (LQIndex1 == -1) LQIndex1 = ip;
+				}	
+			}
+
+			int Lepton1_ismuon = 0;
+			int Lepton2_ismuon = 0;
+			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
+			{
+				int pdgId = GenParticlePdgId->at(ip);
+				int motherIndex = GenParticleMotherIndex->at(ip);
+				if ( motherIndex == LQIndex1 ) {
+					if (( TMath::Abs(pdgId) == 13 ) || ( TMath::Abs(pdgId) == 14 )) {
+						LQIndex1_lepton = ip;
+						v_LQIndex1_lepton.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0);
+						if ( TMath::Abs(pdgId) == 13 ) Lepton1_ismuon = 1 ; 
+					}
+					else{
+						LQIndex1_jet = ip;
+						v_LQIndex1_jet.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0);
+					}
+				}	
+
+				if ( motherIndex == LQIndex2 ) {
+					if (( TMath::Abs(pdgId) == 13 ) || ( TMath::Abs(pdgId) == 14 )) {
+						LQIndex2_lepton = ip;
+						v_LQIndex2_lepton.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0);
+						if ( TMath::Abs(pdgId) == 13 ) Lepton2_ismuon = 1 ; 
+						
+					}
+					else{
+						LQIndex2_jet = ip;
+						v_LQIndex2_jet.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0);
+					}
+				}	
+			}
+
+			
+			int RecoJet1MatchedToJet1 = 0;
+			int RecoJet2MatchedToJet1 = 0;
+			int RecoMu1MatchedToLepton1 = 0;
+			int RecoMu2MatchedToLepton1 = 0;
+
+			int RecoJet1MatchedToJet2 = 0;
+			int RecoJet2MatchedToJet2 = 0;
+			int RecoMu1MatchedToLepton2 = 0;
+			int RecoMu2MatchedToLepton2 = 0;
+			
+			TLorentzVector reco_muon1, reco_muon2, reco_jet1, reco_jet2;
+			
+			if (MuonCount>=1) reco_muon1.SetPtEtaPhiM(MuonPt->at(v_idx_muon_final[0]),MuonEta->at(v_idx_muon_final[0]),MuonPhi->at(v_idx_muon_final[0]),0);
+			if (MuonCount>=2) reco_muon2.SetPtEtaPhiM(MuonPt->at(v_idx_muon_final[1]),MuonEta->at(v_idx_muon_final[1]),MuonPhi->at(v_idx_muon_final[1]),0);
+			if (PFJetCount>=1) reco_jet1.SetPtEtaPhiM(PFJetPt->at(v_idx_pfjet_final[0]),PFJetEta->at(v_idx_pfjet_final[0]),PFJetPhi->at(v_idx_pfjet_final[0]),0);
+			if (PFJetCount>=2) reco_jet2.SetPtEtaPhiM(PFJetPt->at(v_idx_pfjet_final[1]),PFJetEta->at(v_idx_pfjet_final[1]),PFJetPhi->at(v_idx_pfjet_final[1]),0);
+
+			float dR_l1_rl1 = 19 ; float  dR_l1_rl2 = 29 ; float  dR_l2_rl1 = 39 ; float  dR_l2_rl2 = 49 ; float  dR_j1_rj1 = 59 ; float  dR_j1_rj2 = 69 ; float  dR_j2_rj1 = 79 ; float  dR_j2_rj2 = 89; 
+
+			if ( (v_LQIndex1_lepton.Pt()>1) && (v_LQIndex1_jet.Pt()>1) && (v_LQIndex2_lepton.Pt()>1) && (v_LQIndex2_jet.Pt()>1) ){
+				if (MuonCount>=1 ) { 
+					dR_l1_rl1 = reco_muon1.DeltaR(v_LQIndex1_lepton);
+					dR_l2_rl1 = reco_muon1.DeltaR(v_LQIndex2_lepton);
+				}	
+				if (MuonCount>=2 ) { 
+					dR_l1_rl2 = reco_muon2.DeltaR(v_LQIndex1_lepton);
+					dR_l2_rl2 = reco_muon2.DeltaR(v_LQIndex2_lepton);
+				}	
+				if (PFJetCount>=1 ) { 
+					dR_j1_rj1 = reco_jet1.DeltaR(v_LQIndex1_jet);
+					dR_j2_rj1 = reco_jet1.DeltaR(v_LQIndex2_jet);
+				}	
+				if (PFJetCount>=2 ) { 
+					dR_j1_rj2 = reco_jet2.DeltaR(v_LQIndex1_jet);
+					dR_j2_rj2 = reco_jet2.DeltaR(v_LQIndex2_jet);
+				}	
+			}
+
+
+			if ( ( dR_l1_rl1 < dR_l1_rl2 ) &&  (dR_l1_rl1 < 0.5 ) ) RecoMu1MatchedToLepton1 = 1;
+			if ( ( dR_l1_rl1 > dR_l1_rl2 ) &&  (dR_l1_rl2 < 0.5 ) ) RecoMu2MatchedToLepton1 = 1;
+			
+			if ( ( dR_l2_rl1 < dR_l2_rl2 ) &&  (dR_l2_rl1 < 0.5 ) ) RecoMu1MatchedToLepton2 = 1;
+			if ( ( dR_l2_rl1 > dR_l2_rl2 ) &&  (dR_l2_rl2 < 0.5 ) ) RecoMu2MatchedToLepton2 = 1;			
+
+			if ( ( dR_j1_rj1 < dR_j1_rj2 ) &&  (dR_j1_rj1 < 0.5 ) ) RecoJet1MatchedToJet1 = 1;
+			if ( ( dR_j1_rj1 > dR_j1_rj2 ) &&  (dR_j1_rj2 < 0.5 ) ) RecoJet2MatchedToJet1 = 1;
+			
+			if ( ( dR_j2_rj1 < dR_j2_rj2 ) &&  (dR_j2_rj1 < 0.5 ) ) RecoJet1MatchedToJet2 = 1;
+			if ( ( dR_j2_rj1 > dR_j2_rj2 ) &&  (dR_j2_rj2 < 0.5 ) ) RecoJet2MatchedToJet2 = 1;	
+			
+			int JetMatchedToRecoMuon1, JetMatchedToRecoMuon2;
+			
+			int LQPair1Muon, LQPair2Muon, LQPair1Jet, LQPair2Jet;
+
+
+			LQPair1Muon = ( 1*RecoMu1MatchedToLepton1 + 2*RecoMu2MatchedToLepton1  ); 
+			LQPair2Muon = ( 1*RecoMu1MatchedToLepton2 + 2*RecoMu2MatchedToLepton2  ); 
+			
+			LQPair1Jet = ( 1*RecoJet1MatchedToJet1 + 2*RecoJet2MatchedToJet1  ); 
+			LQPair2Jet = ( 1*RecoJet1MatchedToJet2 + 2*RecoJet2MatchedToJet2  ); 
+
+			
+			if ( LQPair1Muon == 1 ) JetMatchedToRecoMuon1 = LQPair1Jet;
+			if ( LQPair2Muon == 1 ) JetMatchedToRecoMuon1 = LQPair2Jet;
+
+			if ( LQPair1Muon == 2 ) JetMatchedToRecoMuon2 = LQPair1Jet;
+			if ( LQPair2Muon == 2 ) JetMatchedToRecoMuon2 = LQPair2Jet;
+
+			if ((LQPair1Muon == 3)||(LQPair2Muon == 3)||(LQPair1Jet == 3)||(LQPair2Jet == 3)) std::cout<<"ALERT"<<std::endl;
+			
+			JetMatchMuon1 = JetMatchedToRecoMuon1;
+			JetMatchMuon2 = JetMatchedToRecoMuon2;
+			
+			//std::cout<<LQIndex1<<":"<<GenParticlePdgId->at(LQIndex1)<<"   "<<LQIndex1_lepton<<":"<<GenParticlePdgId->at(LQIndex1_lepton)<<"   "<<LQIndex1_jet<<":"<<GenParticlePdgId->at(LQIndex1_jet)<<std::endl;
+			//std::cout<<LQIndex2<<":"<<GenParticlePdgId->at(LQIndex2)<<"   "<<LQIndex2_lepton<<":"<<GenParticlePdgId->at(LQIndex2_lepton)<<"   "<<LQIndex2_jet<<":"<<GenParticlePdgId->at(LQIndex2_jet)<<std::endl;
+			//std::cout<<JetMatchedToRecoMuon1<<std::endl;
+
+			//std::cout<<JetMatchedToRecoMuon2<<std::endl;
+			//std::cout<<dR_l1_rl1<<" "<<dR_l1_rl2<<" "<<dR_l2_rl1<<" "<<dR_l2_rl2<<" "<<dR_j1_rj1<<" "<<dR_j1_rj2<<" "<<dR_j2_rj1<<" "<<dR_j2_rj2<<std::endl;
+			//std::cout<<" -----------------------------------------------------------------" <<std::endl;			
 
 			for(unsigned int ijet = 0; ijet < GenJetPt->size(); ++ijet)
 			{
@@ -998,6 +1252,7 @@ void placeholder::Loop()
 
 				int pdgId = GenParticlePdgId->at(ip);
 				int motherIndex = GenParticleMotherIndex->at(ip);
+				
 								 // ISR
 				if ( motherIndex == -1 ) continue;
 				//std::cout<<"a"<<"  "<<motherIndex<<std::endl;
@@ -1005,11 +1260,9 @@ void placeholder::Loop()
 				//std::cout<<"b"<<"  "<<pdgIdMother<<std::endl;
 
 				//muon
-								 // && TMath::Abs(pdgIdMother) == 23 ) {
 				if ( TMath::Abs(pdgId) == 13 )
 				{
 					//				std::cout<<GenParticlePt -> at (ip)<<"   "<<GenParticlePhi-> at (ip)<<std::endl;
-
 					if (Pt_genmuon1==0)
 					{
 						Pt_genmuon1 = GenParticlePt -> at (ip);
@@ -1037,8 +1290,8 @@ void placeholder::Loop()
 						Eta_genneutrino = GenParticleEta-> at (ip);
 					}
 				}
-
 			}
+			
 			
 			Pt_genjet1 = -1.0;
 			Pt_genjet2 = -1.0;
@@ -1056,6 +1309,8 @@ void placeholder::Loop()
 					genjet1.SetPtEtaPhiM(Pt_genjet1,GenJetEta->at(ijet),GenJetPhi->at(ijet),0);					
 				}
 			}
+
+
 				
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
@@ -1077,6 +1332,12 @@ void placeholder::Loop()
 			
 			ST_gen_mumu = Pt_genjet1 + Pt_genjet2 + Pt_genmuon1 + Pt_genmuon2;
 			ST_gen_munu = Pt_genjet1 + Pt_genjet2 + Pt_genmuon1 + Pt_genMET;
+
+			
+
+			
+
+
 			
 			//std::cout<<Pt_genmuon1<<"  "<<Pt_genmuon2<<std::endl;
 			//std::cout<<Pt_genjet1<<"  "<<Pt_genjet2<<std::endl;
@@ -1728,6 +1989,8 @@ void placeholder::Loop()
 			}
 		}
 
+		if (JetMatchMuon1 == 1) std::cout<<M_muon1pfjet1<<std::endl;
+		if (JetMatchMuon2 == 2) std::cout<<M_muon1pfjet2<<std::endl;
 
 		
 		// Nonsense for testing - test of jet masses
@@ -1774,8 +2037,9 @@ void placeholder::Loop()
 
 		
 		//std::cout<<M_AllCaloJet<<"   "<<M_AllPFJet<<std::endl;
-		if (Pt_muon1 < 25.0 && Pt_muon2 < 25.0 ) continue;
-		if (Pt_pfjet1 < 25.0 && Pt_pfjet2 < 25.0  ) continue;
+		if ((Pt_muon2 < 40.0 ) && (Pt_HEEPele1<40) && ( MET_pf < 45.0) ) continue;
+		if ( Pt_pfjet2 < 30.0  ) continue;
+		if (ST_pf_mumu < 250.0 && ST_pf_munu < 250.0 && ST_pf_emu < 250.0) continue;
 	//	if (Pt_muon2 < 30.0 && Pt_genmuon2 < 30.0 && Pt_genMET < 40.0 && MET_pf < 40.0) continue; 
 
 		tree->Fill();			 // FILL FINAL TREE
