@@ -1228,7 +1228,7 @@ void placeholder::Loop()
 			if ( LQPair1Muon == 2 ) JetMatchedToRecoMuon2 = LQPair1Jet;
 			if ( LQPair2Muon == 2 ) JetMatchedToRecoMuon2 = LQPair2Jet;
 
-			if ((LQPair1Muon == 3)||(LQPair2Muon == 3)||(LQPair1Jet == 3)||(LQPair2Jet == 3)) std::cout<<"ALERT"<<std::endl;
+			//if ((LQPair1Muon == 3)||(LQPair2Muon == 3)||(LQPair1Jet == 3)||(LQPair2Jet == 3)) std::cout<<"ALERT"<<std::endl;
 			
 			JetMatchMuon1 = JetMatchedToRecoMuon1;
 			JetMatchMuon2 = JetMatchedToRecoMuon2;
@@ -1988,10 +1988,6 @@ void placeholder::Loop()
 				RangeCenterTransverseMassRatio_BestLQCombo = RangeTransverseMass_BestLQCombo/CenterTransverseMass_BestLQCombo;
 			}
 		}
-
-		if (JetMatchMuon1 == 1) std::cout<<M_muon1pfjet1<<std::endl;
-		if (JetMatchMuon2 == 2) std::cout<<M_muon1pfjet2<<std::endl;
-
 		
 		// Nonsense for testing - test of jet masses
 		
