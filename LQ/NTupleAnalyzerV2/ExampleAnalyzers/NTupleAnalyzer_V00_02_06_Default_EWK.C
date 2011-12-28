@@ -301,6 +301,7 @@ void placeholder::Loop()
 	BRANCH(LowestUnprescaledTrigger); BRANCH(Closest40UnprescaledTrigger);
 	BRANCH(LowestUnprescaledTriggerPass); BRANCH(Closest40UnprescaledTriggerPass);
 	BRANCH(HLTIsoMu24Pass);
+	BRANCH(HLTIsoMu30Pass);
 	BRANCH(HLTMu40TriggerPass);
 	
 	//===================================================================================================
@@ -549,7 +550,11 @@ void placeholder::Loop()
 		//========================     Trigger Scanning  ================================//
 
 		string hltmu ("HLT_Mu");
-		string hltisomu ("HLT_IsoMu24");
+		string hltisomu24 ("HLT_IsoMu24");
+		string hltisomu30 ("HLT_IsoMu30");
+		string hltisomu ("HLT_IsoMu");
+
+
 		string eta2p1 ("eta2p1");
 		string hltmu40 ("HLT_Mu40_v");
 		string hltmu40eta2p1 ("HLT_Mu40_eta2p1_v");
@@ -570,12 +575,27 @@ void placeholder::Loop()
 		{
 			string thishlt = HLTInsideDatasetTriggerNames->at(iHLT);
 			
-			bool isSingleMuTrigger = (thishlt.compare(0,11,hltisomu)==0) && (thishlt.length()>7) && (thishlt.length()<19);
+			bool isSingleMuTrigger = (thishlt.compare(0,11,hltisomu24)==0) && (thishlt.length()>7) && (thishlt.length()<22);
 			if (!isSingleMuTrigger) continue;			
 			//std::cout<<thishlt<<"   "<<HLTInsideDatasetTriggerPrescales->at(iHLT)<<std::endl;
 			HLTIsoMu24Pass = HLTInsideDatasetTriggerDecisions->at(iHLT);
 
 		}
+
+		HLTIsoMu30Pass = 0;
+		for(unsigned int iHLT = 0; iHLT != HLTInsideDatasetTriggerNames->size(); ++iHLT)
+		{
+			string thishlt = HLTInsideDatasetTriggerNames->at(iHLT);
+			
+			bool isSingleMuTrigger = (thishlt.compare(0,11,hltisomu30)==0) && (thishlt.length()>7) && (thishlt.length()<22);
+			if (!isSingleMuTrigger) continue;			
+			//std::cout<<thishlt<<"   "<<HLTInsideDatasetTriggerDecisions->at(iHLT)<<std::endl;
+			//std::cout<<thishlt<<"   "<<HLTInsideDatasetTriggerPrescales->at(iHLT)<<std::endl;
+			HLTIsoMu30Pass = HLTInsideDatasetTriggerDecisions->at(iHLT);
+
+		}
+
+
 		for(unsigned int iHLT = 0; iHLT != HLTInsideDatasetTriggerNames->size(); ++iHLT)
 		{
 			string thishlt = HLTInsideDatasetTriggerNames->at(iHLT);
@@ -688,7 +708,7 @@ void placeholder::Loop()
 				if (SmallestDeltaR<0.5) Standard_rescale = 0.1;
 				
 				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
-				NewJetPT *=JetAdjustmentFactor;
+				//NewJetPT *=JetAdjustmentFactor;
 
 				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
 
@@ -831,7 +851,7 @@ void placeholder::Loop()
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
 				//MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&
-				((MuonEcalIso->at(imuon) + MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.20;
+				//((MuonEcalIso->at(imuon) + MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.20;
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;
 
 			bool PassPOGTight =
@@ -911,7 +931,9 @@ void placeholder::Loop()
 				if (CurrentLepton.DeltaR(CurrentPFJet) < .5) IsLepton = true;
 			}
 
-			if (PFJetMuonEnergyFraction->at(ijet) > .8) IsLepton = true;
+			//if (PFJetMuonEnergyFraction->at(ijet) > .8) IsLepton = true;
+
+			if (IsLepton) continue;
 
 			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)&&(!IsLepton)) FailIDPFThreshold = PFJetPt->at(ijet);
 
