@@ -727,7 +727,7 @@ void placeholder::Loop()
 				Double_t Standard_rescale = 0.0;
 				if (SmallestDeltaR<0.5) Standard_rescale = 0.1;
 				
-				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
+				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPtRaw->at(ijet),ClosestGenJetPT,Standard_rescale);
 				NewJetPT *=JetAdjustmentFactor;
 
 				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
@@ -742,7 +742,7 @@ void placeholder::Loop()
 					if ((JetEta >1.5) && (JetEta<2.0)) Systematic_rescale = 0.25;
 					if (JetEta >2.0) Systematic_rescale = 0.3;
 					
-					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Systematic_rescale);
+					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPtRaw->at(ijet),ClosestGenJetPT,Systematic_rescale);
 					NewJetPT *=JetAdjustmentFactorSys;
 				
 				}
