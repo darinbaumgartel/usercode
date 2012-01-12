@@ -162,12 +162,14 @@ void placeholder::Loop()
 	BRANCH(PFJetNeutralMultiplicity_pfjet1);         BRANCH(PFJetNeutralHadronEnergyFraction_pfjet1);
 	BRANCH(PFJetNeutralEmEnergyFraction_pfjet1);     BRANCH(PFJetChargedMultiplicity_pfjet1);
 	BRANCH(PFJetChargedHadronEnergyFraction_pfjet1); BRANCH(PFJetChargedEmEnergyFraction_pfjet1);
+	BRANCH(PFJetTrackAssociatedVertex_pfjet1);
 
 	// PFJet 2
 	BRANCH(Phi_pfjet2); BRANCH(Eta_pfjet2); BRANCH(Pt_pfjet2); BRANCH(BDisc_pfjet2);
 	BRANCH(PFJetNeutralMultiplicity_pfjet2);         BRANCH(PFJetNeutralHadronEnergyFraction_pfjet2);
 	BRANCH(PFJetNeutralEmEnergyFraction_pfjet2);     BRANCH(PFJetChargedMultiplicity_pfjet2);
 	BRANCH(PFJetChargedHadronEnergyFraction_pfjet2); BRANCH(PFJetChargedEmEnergyFraction_pfjet2);
+	BRANCH(PFJetTrackAssociatedVertex_pfjet2);
 
 	// Electron (If any)
 	BRANCH(Pt_ele1);
@@ -188,6 +190,7 @@ void placeholder::Loop()
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
 	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb); BRANCH(weight_pileup2011B); BRANCH(weight_pileup2011A); BRANCH(weight_pileup4p7fb_higgs)
+	BRANCH(pass_HBHENoiseFilter);
 
 
 	// PFMET
@@ -379,7 +382,7 @@ void placeholder::Loop()
 
 		N_Vertices = 1.0*(VertexZ->size());
 		
-		
+		pass_HBHENoiseFilter =1.0*passHBHENoiseFilter;
 		
 		//========================     PileUp Methodology   ================================//
 		
@@ -1808,6 +1811,8 @@ void placeholder::Loop()
 			PFJetChargedMultiplicity_pfjet1= PFJetChargedMultiplicity->at(v_idx_pfjet_final[0]);
 			PFJetChargedHadronEnergyFraction_pfjet1= PFJetChargedHadronEnergyFraction->at(v_idx_pfjet_final[0]);
 			PFJetChargedEmEnergyFraction_pfjet1= PFJetChargedEmEnergyFraction->at(v_idx_pfjet_final[0]);
+			PFJetTrackAssociatedVertex_pfjet1 = PFJetBestVertexTrackAssociationIndex->at(v_idx_pfjet_final[0]);
+
 
 			// Pt/Eta/Phi
 			Pt_pfjet1 = PFJetPt->at(v_idx_pfjet_final[0]);
@@ -1839,6 +1844,7 @@ void placeholder::Loop()
 			PFJetChargedMultiplicity_pfjet2= PFJetChargedMultiplicity->at(v_idx_pfjet_final[1]);
 			PFJetChargedHadronEnergyFraction_pfjet2= PFJetChargedHadronEnergyFraction->at(v_idx_pfjet_final[1]);
 			PFJetChargedEmEnergyFraction_pfjet2= PFJetChargedEmEnergyFraction->at(v_idx_pfjet_final[1]);
+			PFJetTrackAssociatedVertex_pfjet2 = PFJetBestVertexTrackAssociationIndex->at(v_idx_pfjet_final[1]);
 
 			// Other Variables
 			pfjet2.SetPtEtaPhiM(Pt_pfjet2,Eta_pfjet2,Phi_pfjet2,0);

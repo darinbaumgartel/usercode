@@ -187,7 +187,7 @@ void placeholder::Loop()
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
 	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb); BRANCH(weight_pileup2011B); BRANCH(weight_pileup2011A);
-
+	BRANCH(pass_HBHENoiseFilter);
 
 	// PFMET
 	BRANCH(MET_pf); BRANCH(Phi_MET_pf);
@@ -379,7 +379,8 @@ void placeholder::Loop()
 
 		N_Vertices = 1.0*(VertexZ->size());
 		
-		
+		pass_HBHENoiseFilter =1.0*passHBHENoiseFilter;
+	
 		
 		//========================     PileUp Methodology   ================================//
 		
@@ -850,7 +851,7 @@ void placeholder::Loop()
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
-				//MuonTrackerkIsoSumPT->at(imuon) < 3.0 &&
+				//MuonTrackerIsoSumPT->at(imuon) < 3.0 &&
 				//((MuonEcalIso->at(imuon) + MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.20;
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;
 
@@ -870,11 +871,12 @@ void placeholder::Loop()
 			checkPT=false;
 
 			v_idx_muon_final.push_back(imuon);
+			if ((v_idx_muon_final.size())==2) break;
 		}						 // loop over muons
 
 		MuonCount = 1.0*v_idx_muon_final.size();
 
-		if ( MuonCount < 1 ) continue;
+		if ( MuonCount <= 1 ) continue;
 		TLorentzVector muon = muons[0];
 
 		//========================    CaloJet Flags Conditions   ================================//
@@ -925,9 +927,9 @@ void placeholder::Loop()
 			CurrentPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
 
 			bool IsLepton = false;
-			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
+			for(unsigned int imuon = 0; imuon <2; ++imuon)
 			{
-				CurrentLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
+				CurrentLepton = muons[imuon];
 				if (CurrentLepton.DeltaR(CurrentPFJet) < .5) IsLepton = true;
 			}
 
@@ -993,7 +995,7 @@ void placeholder::Loop()
 
 				thisdeltar = thismu.DeltaR(thisjet);
 
-				if (thisdeltar < 0.5)		jetstoremove.push_back(jetindex);
+				//if (thisdeltar < 0.5)		jetstoremove.push_back(jetindex);
 			}
 		}
 
