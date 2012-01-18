@@ -189,13 +189,16 @@ void placeholder::Loop()
 	BRANCH(Events_AfterLJ); BRANCH(Events_Orig);
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
-	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb); BRANCH(weight_pileup2011B); BRANCH(weight_pileup2011A); BRANCH(weight_pileup4p7fb_higgs)
-	BRANCH(pass_HBHENoiseFilter);
+	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb); BRANCH(weight_pileup2011B); BRANCH(weight_pileup2011A); BRANCH(weight_pileup4p7fb_higgs);
+	
+	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_EcalMaskedCellDRFilter); BRANCH(pass_passBeamHaloFilterLoose); 
+	BRANCH(pass_passBeamHaloFilterTight); BRANCH(pass_CaloBoundaryDRFilter);
 
 
 	// PFMET
 	BRANCH(MET_pf); BRANCH(Phi_MET_pf);
 	BRANCH(MET_lq); BRANCH(METRatio_pfcalo); BRANCH(METRatio_lqpf); BRANCH(METRatio_lqcalo);
+	BRANCH(MET_pfsig);
 
 	// Event Flags
 	BRANCH(FailIDCaloThreshold); BRANCH(FailIDPFThreshold);
@@ -306,7 +309,7 @@ void placeholder::Loop()
 	BRANCH(LowestUnprescaledTriggerPass); BRANCH(Closest40UnprescaledTriggerPass);
 	BRANCH(HLTIsoMu24Pass);
 	BRANCH(HLTMu40TriggerPass);
-	
+
 	//===================================================================================================
 	//===================================================================================================
 
@@ -344,7 +347,7 @@ void placeholder::Loop()
 		if (ientry < 0) break;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-				//if (jentry>2) break;  // comment this!!! testing only !
+		//if (jentry>5) break;  // comment this!!! testing only !
 
 		// Important Event Informations
 		run_number = run;
@@ -383,6 +386,13 @@ void placeholder::Loop()
 		N_Vertices = 1.0*(VertexZ->size());
 		
 		pass_HBHENoiseFilter =1.0*passHBHENoiseFilter;
+		pass_isBPTX0 = 1.0*isBPTX0 ; 
+		pass_EcalMaskedCellDRFilter = 1.0*passEcalMaskedCellDRFilter ; 
+		pass_CaloBoundaryDRFilter = 1.0*passCaloBoundaryDRFilter ; 
+		pass_passBeamHaloFilterLoose = 1.0*passBeamHaloFilterLoose ; 
+		pass_passBeamHaloFilterTight = 1.0*passBeamHaloFilterTight ;
+
+		
 		
 		//========================     PileUp Methodology   ================================//
 		
@@ -662,7 +672,7 @@ void placeholder::Loop()
 		TLorentzVector JetAdjustedMET;
 		JetAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
 		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
-
+		//std::cout<<(*PFJetPt)[0]<<"  "<<(*PFJetPtRaw)[0]<<std::endl;
 		if (!isData)
 		{
 			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
@@ -670,13 +680,16 @@ void placeholder::Loop()
 			(*PFJetPt)[ijet]  = (*PFJetPt)[ijet];// * PFJetL1OffsetJEC->at(ijet)/PFJetL1FastJetJEC->at(ijet);
 			}
 		}
+
 		
 		if (!isData)
 		{
 			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 			{
-				if (PFJetPt->at(ijet) < 15.0) continue;
-			
+				if (PFJetPt->at(ijet) < 25.0) continue;
+				if (PFJetPassLooseID->at(ijet) != 1) continue;		
+				if ( fabs(PFJetEta->at(ijet)) > 3.0 ) continue;
+	
 				bool consider = true;
 				TLorentzVector ThisPFJet;
 				Double_t JetLepDR;
@@ -726,8 +739,12 @@ void placeholder::Loop()
 			
 				Double_t Standard_rescale = 0.0;
 				if (SmallestDeltaR<0.5) Standard_rescale = 0.1;
-				
-				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPtRaw->at(ijet),ClosestGenJetPT,Standard_rescale);
+				//if ((SmallestDeltaR<0.5)&&(ijet==0)) std::cout<<ClosestGenJetPT<<std::endl;
+				//if ((SmallestDeltaR<0.5)&&(ijet==0)) difreg += ((ClosestGenJetPT - (PFJetPt->at(ijet)))*(ClosestGenJetPT - (PFJetPt->at(ijet))));
+				//if ((SmallestDeltaR<0.5)&&(ijet==0)) difraw += ((ClosestGenJetPT - (PFJetPtRaw->at(ijet)))*(ClosestGenJetPT - (PFJetPtRaw->at(ijet))));
+
+				//if ((SmallestDeltaR<0.5)&&(ijet==0)) std::cout<<difreg<<"  "<<difraw<<std::endl;
+				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
 				NewJetPT *=JetAdjustmentFactor;
 
 				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
@@ -742,7 +759,7 @@ void placeholder::Loop()
 					if ((JetEta >1.5) && (JetEta<2.0)) Systematic_rescale = 0.25;
 					if (JetEta >2.0) Systematic_rescale = 0.3;
 					
-					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPtRaw->at(ijet),ClosestGenJetPT,Systematic_rescale);
+					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Systematic_rescale);
 					NewJetPT *=JetAdjustmentFactorSys;
 				
 				}
@@ -757,10 +774,13 @@ void placeholder::Loop()
 				
 			}
 		}
-		//std::cout<<" ------------------------------------------------ " <<std::endl;
+		//std::cout<<(*PFJetPt)[0]<<"  "<<(*PFJetPtRaw)[0]<<std::endl;
+
 		(*PFMET)[0] = JetAdjustedMET.Pt();
 		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
+		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
 
+		//std::cout<<" ------------------------------------------------ " <<std::endl;
 		//========================     Muon Rescaling / Smearing Sequence   ================================//
 
 		TLorentzVector MuAdjustedMET;
@@ -1522,6 +1542,7 @@ void placeholder::Loop()
 		VRESET(U1_Z);     VRESET(U2_Z);
 		VRESET(U1_W);     VRESET(U2_W);
 		VRESET(UdotMu);   VRESET(UdotMu_overmu);
+		VRESET(MET_pfsig);
 		
 		// Additional Counts
 		PFJetRawCount = 0.0;   CaloJetRawCount=0.0;
@@ -1538,6 +1559,7 @@ void placeholder::Loop()
 		//========================     MET Basics  ================================//
 
 		MET_pf = PFMET->at(0);
+		MET_pfsig = PFMETSig->at(0);
 		pfMET.SetPtEtaPhiM(MET_pf,0.0,PFMETPhi->at(0),0.0);
 		caloMET.SetPtEtaPhiM(CaloMET->at(0),0.0,CaloMETPhi->at(0),0.0);
 		double MET_calo = CaloMET->at(0);
