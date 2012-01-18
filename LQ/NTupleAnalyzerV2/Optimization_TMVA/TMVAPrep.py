@@ -3,8 +3,14 @@ import sys
 
 from TMVASetup import *
 
+if 'castor' not in directory:
+	dircontents = os.listdir(directory)
+else:
+	dircontents_bare = os.popen('nsls '+directory).readlines()
+	dircontents = []
+	for x in dircontents_bare:
+		dircontents.append(x.replace('\n',''))
 
-dircontents = os.listdir(directory)
 longdircontents = []
 for x in range(len(dircontents)):
 	longdircontents.append( directory + '/'+dircontents[x])
@@ -41,9 +47,12 @@ for stype in signaltags:
 		os.system('chmod 777 tmvarun_opt_'+signal+'.sh')
 		for line in f:
 			if 'TString fname' in line:
+				starter = ''
+				if 'castor' in directory:
+					starter = 'rfio://'
 				line2 = line + '\n'
 				for n in range(len(dircontents)):
-					line2 += (line.replace('fname','fname_'+dircontents[n].replace('.root',''))).replace('./tmva_class_example.root',longdircontents[n]) + '\n'
+					line2 += (line.replace('fname','fname_'+dircontents[n].replace('.root',''))).replace('./tmva_class_example.root',starter+longdircontents[n]) + '\n'
 				line = line2
 				
 			if 'TFile *input' in line or 'Using input file' in line:
@@ -80,6 +89,7 @@ for stype in signaltags:
 			if 'factory->SetBackgroundWeightExpression("weight");' in line:
 				line2 = line.replace('weight',weightexpression)
 				line2 += line2.replace('Background','Signal') 
+				line=line2
 				
 			if 'TCut mycuts' in line:
 				line = 'TCut mycuts = "' +preselections[N]+ '";\n'
@@ -117,7 +127,17 @@ for stype in signaltags:
 			
 			if 'FitMethod=GA' in line:
 				line = line.replace(':CutRangeMin[0]=-10:CutRangeMax[0]=10','')
-	
+				line = line.replace('PopSize=400','PopSize=1000')
+				line = line.replace('VarProp[1]=FMax','Seed=0')
+				line = line.replace('Steps=30','Steps=50')
+
+			if '"!H:!V:NTrees=400' in line:
+				line = line.replace('NTrees=400','NTrees=2000')
+				line = line.replace('MaxDepth=3','MaxDepth=4')
+
+			if ":NSmoothSig[0]=20:NSmoothBkg[0]" in line:
+				line = line.replace(':NSmoothSig[0]=20:NSmoothBkg[0]=20','')
+				
 		#newline = ''
 		#replaceit = 0
 		#for aline in line.split('\n'):
@@ -195,7 +215,7 @@ for stype in signaltags:
 
 			if 'TString fname' in line:
 				
-				line = line.replace('./tmva_example.root',datafile)
+				line = line.replace('./tmva_example.root',starter + datafile)
 				
 			if 'theTree->SetBranchAddress' in line:
 				line = '//'+line
