@@ -6,11 +6,12 @@ import math
 print 'ROOT loaded.'
 
 # FILL OUT INFORMATION BELOW ------------------------------------------------------------------------------------------------------------------
-discriminatingvariables = ['MET_pf','Pt_muon1','ST_pf_munu','M_bestmupfjet_munu'] # Discriminating variables, in order, used for the TMVA
-method = 'Likelihood'  # METHOD Used
+#discriminatingvariables = ['MET_pf','Pt_muon1','ST_pf_munu','M_bestmupfjet_munu']
+discriminatingvariables = ['ST_pf_munu','M_bestmupfjet_munu','MT_muon1pfMET','MET_pf','Pt_muon1','Pt_pfjet2']# Discriminating variables, in order, used for the TMVA
+methods = ['Likelihood']  # METHOD Used
 
 fdir = '~/neuhome/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan17_TEST_2012_01_17_18_23_52/SummaryFiles/' # Where your root files are kept
-tag = 'MVABetaHalf'  # Tag to name your new directory of root files. DO NOT LEAVE BLANK
+tag = 'MVABetaHalfV3'  # Tag to name your new directory of root files. DO NOT LEAVE BLANK
 
 # Your preselection. Filter some events. It's fun.
 preselection = '(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))'
@@ -113,7 +114,7 @@ def UpdateFileWithMVA(a_file,a_meth,a_SigType):
 	FOut = TFile.Open(a_file.replace('.root','new.root'),"RECREATE")
 
 	TOut = TIn.CopyTree('0')
-	TOut.Branch(method+a_SigType, MVAOutput, method+a_SigType+'/D') 
+	TOut.Branch(a_meth+a_SigType, MVAOutput, a_meth+a_SigType+'/D') 
 	N = TIn.GetEntries()
 	
 	for n in range(N):
@@ -131,15 +132,15 @@ def UpdateFileWithMVA(a_file,a_meth,a_SigType):
 	FOut.Close()
 	os.system('mv '+a_file.replace('.root','new.root')+ ' '+a_file)
 
-
-for Signal in Signals:
-	SignalFile = fdir + Signal + '.root'
-	UpdateFileWithMVA(SignalFile,method,Signal)
-	UpdateFileWithMVA(DataFile,method,Signal)
-	
-	for Background in Backgrounds:
-		BackgroundFile = fdir + Background + '.root'
-		UpdateFileWithMVA(BackgroundFile,method,Signal)
+for method in methods:
+	for Signal in Signals:
+		SignalFile = fdir + Signal + '.root'
+		UpdateFileWithMVA(SignalFile,method,Signal)
+		UpdateFileWithMVA(DataFile,method,Signal)
+		
+		for Background in Backgrounds:
+			BackgroundFile = fdir + Background + '.root'
+			UpdateFileWithMVA(BackgroundFile,method,Signal)
 
 print 'Finished modifying root files! Moving MVA-Modified Root Files to a mirrored directory of the original: '
 print 'Using Directory '+fdirout
