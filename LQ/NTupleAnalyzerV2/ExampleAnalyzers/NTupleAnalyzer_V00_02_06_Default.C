@@ -141,6 +141,7 @@ void placeholder::Loop()
 	BRANCH(MuonCount); BRANCH(EleCount); BRANCH(HEEPEleCount); BRANCH(PFJetCount); BRANCH(BpfJetCount);
 	BRANCH(GlobalMuonCount); BRANCH(TrackerMuonCount);
 	BRANCH(PFJetRawCount);   BRANCH(CaloJetRawCount);
+	BRANCH(GlobalMuonCount10GeV);
 
 	// Leading muon 1
 	BRANCH(TrkD0_muon1);     BRANCH(NHits_muon1);   BRANCH(TrkDZ_muon1);   BRANCH(ChiSq_muon1);
@@ -148,13 +149,17 @@ void placeholder::Loop()
 	BRANCH(Phi_muon1);    BRANCH(Eta_muon1);     BRANCH(Pt_muon1);      BRANCH(Charge_muon1);
 	BRANCH(QOverPError_muon1); BRANCH(PhiError_muon1);    BRANCH(EtaError_muon1);     BRANCH(PtError_muon1); 
 	BRANCH(TrackerIsoSumPT_muon1);
-
+	BRANCH(DeltaPtOverPt_muon1); 
+	BRANCH(BackToBackCompatibility_muon1); BRANCH(CosmicCompatibility_muon1);
+	
 	// Leading muon 2
 	BRANCH(TrkD0_muon2);     BRANCH(NHits_muon2);   BRANCH(TrkDZ_muon2);   BRANCH(ChiSq_muon2);
 	BRANCH(TrkIso_muon2); BRANCH(EcalIso_muon2); BRANCH(HcalIso_muon2); BRANCH(RelIso_muon2);
 	BRANCH(Phi_muon2);    BRANCH(Eta_muon2);     BRANCH(Pt_muon2);      BRANCH(Charge_muon2);
 	BRANCH(QOverPError_muon2); BRANCH(PhiError_muon2);    BRANCH(EtaError_muon2);     BRANCH(PtError_muon2); 
 	BRANCH(TrackerIsoSumPT_muon2);
+	BRANCH(DeltaPtOverPt_muon2); 
+	BRANCH(BackToBackCompatibility_muon2); BRANCH(CosmicCompatibility_muon2);
 
 
 	// PFJet 1
@@ -193,12 +198,14 @@ void placeholder::Loop()
 	BRANCH(weight_pileup4p7fb_Fall11); BRANCH(weight_pileup4p7fb_Fall11Poisson);
 	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_EcalMaskedCellDRFilter); BRANCH(pass_passBeamHaloFilterLoose); 
 	BRANCH(pass_passBeamHaloFilterTight); BRANCH(pass_CaloBoundaryDRFilter);
+	BRANCH(pass_isTrackingFailure);
 
 
 	// PFMET
 	BRANCH(MET_pf); BRANCH(Phi_MET_pf);
 	BRANCH(MET_lq); BRANCH(METRatio_pfcalo); BRANCH(METRatio_lqpf); BRANCH(METRatio_lqcalo);
 	BRANCH(MET_pfsig);
+	BRANCH(MET_pf_charged);
 
 	// Event Flags
 	BRANCH(FailIDCaloThreshold); BRANCH(FailIDPFThreshold);
@@ -275,7 +282,7 @@ void placeholder::Loop()
 	BRANCH(deltaPhi_genmuon1genMET);  
 	BRANCH(deltaPhi_genjet1genMET); BRANCH(deltaPhi_genjet2genMET);
 	BRANCH(ST_gen_mumu); BRANCH(ST_gen_munu);
-
+	BRANCH(HT_genMG);
 
 	// Recoil variables
 	BRANCH(U1_Z_gen); BRANCH(U2_Z_gen);
@@ -392,8 +399,7 @@ void placeholder::Loop()
 		pass_CaloBoundaryDRFilter = 1.0*passCaloBoundaryDRFilter ; 
 		pass_passBeamHaloFilterLoose = 1.0*passBeamHaloFilterLoose ; 
 		pass_passBeamHaloFilterTight = 1.0*passBeamHaloFilterTight ;
-
-		
+		pass_isTrackingFailure = 1.00*(1.0-1.0*isTrackingFailure);		
 		
 		//========================     PileUp Methodology   ================================//
 		
@@ -487,55 +493,86 @@ void placeholder::Loop()
 		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup4p7fb *=(1.02679374255);
 		if (N_PileUpInteractions > 34.5) weight_pileup4p7fb *= 0.0;
 		
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup4p7fb_Fall11 *=(0.0);
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup4p7fb_Fall11 *=(0.00757023986225);
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup4p7fb_Fall11 *=(0.0654373611689);
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup4p7fb_Fall11 *=(0.335042425093);
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup4p7fb_Fall11 *=(1.2921802621);
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup4p7fb_Fall11 *=(2.09939157167);
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup4p7fb_Fall11 *=(2.13309535727);
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup4p7fb_Fall11 *=(1.83714502005);
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup4p7fb_Fall11 *=(1.59258525422);
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup4p7fb_Fall11 *=(1.5275580656);
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup4p7fb_Fall11 *=(1.38471292201);
-		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup4p7fb_Fall11 *=(1.27323414986);
-		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup4p7fb_Fall11 *=(1.17538484163);
-		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup4p7fb_Fall11 *=(0.994964714875);
-		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup4p7fb_Fall11 *=(0.687910180491);
-		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup4p7fb_Fall11 *=(0.359554846216);
-		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup4p7fb_Fall11 *=(0.14188514715);
-		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup4p7fb_Fall11 *=(0.0469616747528);
-		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup4p7fb_Fall11 *=(0.01409136429);
-		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup4p7fb_Fall11 *=(0.0047463391743);
-		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup4p7fb_Fall11 *=(0.001238265912);
-		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup4p7fb_Fall11 *=(8.86188991083e-05);
-		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 999.5)) weight_pileup4p7fb_Fall11 *=(0.0);
 
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0);
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup4p7fb_Fall11Poisson *=(0.00305296401399);
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0420662131869);
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup4p7fb_Fall11Poisson *=(0.287133715442);
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup4p7fb_Fall11Poisson *=(1.3227926378);
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup4p7fb_Fall11Poisson *=(2.36253894793);
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup4p7fb_Fall11Poisson *=(2.48717046836);
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup4p7fb_Fall11Poisson *=(2.13904871112);
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup4p7fb_Fall11Poisson *=(1.81335740412);
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup4p7fb_Fall11Poisson *=(1.67142925793);
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup4p7fb_Fall11Poisson *=(1.46474314667);
-		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup4p7fb_Fall11Poisson *=(1.31527820738);
-		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup4p7fb_Fall11Poisson *=(1.20113411337);
-		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup4p7fb_Fall11Poisson *=(1.01391828017);
-		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup4p7fb_Fall11Poisson *=(0.70727528396);
-		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup4p7fb_Fall11Poisson *=(0.376829576858);
-		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup4p7fb_Fall11Poisson *=(0.150829462755);
-		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0503667175905);
-		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0152610662088);
-		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup4p7fb_Fall11Poisson *=(0.00516062928641);
-		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0013467478293);
-		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup4p7fb_Fall11Poisson *=(9.51557023572e-05);
-		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 999.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0);
-
-
+		
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup4p7fb_Fall11 *=(0.843858276261);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup4p7fb_Fall11 *=(1.21267078891);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup4p7fb_Fall11 *=(1.21189459664);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup4p7fb_Fall11 *=(1.21167985903);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup4p7fb_Fall11 *=(1.21776784391);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup4p7fb_Fall11 *=(1.23143389745);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup4p7fb_Fall11 *=(1.25437544899);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup4p7fb_Fall11 *=(1.28424153304);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup4p7fb_Fall11 *=(1.31712513665);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup4p7fb_Fall11 *=(1.34184122494);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup4p7fb_Fall11 *=(1.34608029022);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup4p7fb_Fall11 *=(1.31560205914);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup4p7fb_Fall11 *=(1.24387533968);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup4p7fb_Fall11 *=(1.13846512743);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup4p7fb_Fall11 *=(1.00600518205);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup4p7fb_Fall11 *=(0.863671383021);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup4p7fb_Fall11 *=(0.721656465218);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup4p7fb_Fall11 *=(0.590024412178);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup4p7fb_Fall11 *=(0.471896008715);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup4p7fb_Fall11 *=(0.370597491307);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup4p7fb_Fall11 *=(0.285234707918);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup4p7fb_Fall11 *=(0.216832931095);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pileup4p7fb_Fall11 *=(0.162128194702);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pileup4p7fb_Fall11 *=(0.120218779841);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pileup4p7fb_Fall11 *=(0.0881187293534);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pileup4p7fb_Fall11 *=(0.0644643359921);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pileup4p7fb_Fall11 *=(0.0469744789312);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pileup4p7fb_Fall11 *=(0.0342992812186);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pileup4p7fb_Fall11 *=(0.0250398205171);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pileup4p7fb_Fall11 *=(0.0182607370463);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pileup4p7fb_Fall11 *=(0.0134378980502);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pileup4p7fb_Fall11 *=(0.0099284587114);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pileup4p7fb_Fall11 *=(0.00743196208246);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup4p7fb_Fall11 *=(0.00557995416958);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup4p7fb_Fall11 *=(0.00825128153847);
+		if ((N_PileUpInteractions > 34.5 )*(N_PileUpInteractions < 999.5)) weight_pileup4p7fb_Fall11 *=(0.0);
+		
+		
+		
+		
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pileup4p7fb_Fall11Poisson *=(0.196069228593);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pileup4p7fb_Fall11Poisson *=(0.489051912056);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pileup4p7fb_Fall11Poisson *=(0.779062840424);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pileup4p7fb_Fall11Poisson *=(1.03841816377);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pileup4p7fb_Fall11Poisson *=(1.24661735341);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pileup4p7fb_Fall11Poisson *=(1.38578747471);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pileup4p7fb_Fall11Poisson *=(1.46259076621);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pileup4p7fb_Fall11Poisson *=(1.4952848937);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pileup4p7fb_Fall11Poisson *=(1.49971162446);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pileup4p7fb_Fall11Poisson *=(1.46822090327);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pileup4p7fb_Fall11Poisson *=(1.42387772124);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pileup4p7fb_Fall11Poisson *=(1.35904516712);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pileup4p7fb_Fall11Poisson *=(1.27112503952);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pileup4p7fb_Fall11Poisson *=(1.16015230167);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pileup4p7fb_Fall11Poisson *=(1.03432485952);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pileup4p7fb_Fall11Poisson *=(0.905166277784);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pileup4p7fb_Fall11Poisson *=(0.767149057736);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pileup4p7fb_Fall11Poisson *=(0.632805220344);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pileup4p7fb_Fall11Poisson *=(0.511067351923);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pileup4p7fb_Fall11Poisson *=(0.402945553799);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pileup4p7fb_Fall11Poisson *=(0.310223531156);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pileup4p7fb_Fall11Poisson *=(0.232827196683);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pileup4p7fb_Fall11Poisson *=(0.172597293049);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pileup4p7fb_Fall11Poisson *=(0.125368093896);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0892816218319);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0625836571652);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0435953730624);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0296399021213);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0199911466255);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0133779370817);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pileup4p7fb_Fall11Poisson *=(0.00883210632105);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pileup4p7fb_Fall11Poisson *=(0.00574004420523);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0036904599782);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pileup4p7fb_Fall11Poisson *=(0.00235285475103);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0029413555232);
+		if ((N_PileUpInteractions > 34.5)*(N_PileUpInteractions < 999.5)) weight_pileup4p7fb_Fall11Poisson *=(0.0);
+		
+		
 		if ((N_PileUpInteractions>-0.5)*(N_PileUpInteractions<0.5)) weight_pileup4p7fb_higgs *= (0.014303450 );
 		if ((N_PileUpInteractions>0.5)*(N_PileUpInteractions<1.5)) weight_pileup4p7fb_higgs *= (0.148914600 );
 		if ((N_PileUpInteractions>1.5)*(N_PileUpInteractions<2.5)) weight_pileup4p7fb_higgs *= (0.342742300 );
@@ -932,11 +969,13 @@ void placeholder::Loop()
 		// SubRoutine for Muon Counts
 		GlobalMuonCount = 0.0;
 		TrackerMuonCount = 0.0;
+		GlobalMuonCount10GeV = 0.0;
 		
 		for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 		{
 			if (MuonIsGlobal  ->at(imuon) == 1) GlobalMuonCount += 1.0;
 			if (MuonIsTracker ->at(imuon) == 1) TrackerMuonCount += 1.0;
+			if ((MuonIsGlobal->at(imuon) == 1) && (MuonPt->at(imuon) > 10.0)) GlobalMuonCount10GeV += 1.0;
 			
 			Double_t muonPt = MuonPt->at(imuon);
 			Double_t muonEta = MuonEta->at(imuon);
@@ -947,7 +986,8 @@ void placeholder::Loop()
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
-				MuonTrackerIsoSumPT->at(imuon) < 3.0 &&                             // Disable for EWK
+				//fabs(MuonRelIso->at(imuon)) < 0.1 &&
+				(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
 				//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 
@@ -1160,6 +1200,7 @@ void placeholder::Loop()
 		VRESET(Pt_Z_gen);       VRESET(Pt_W_gen);
 		VRESET(Phi_Z_gen);      VRESET(Phi_W_gen);
 		VRESET(JetMatchMuon1);  VRESET(JetMatchMuon2);
+		VRESET(HT_genMG);
 
 
 		// Recoil variables
@@ -1286,7 +1327,8 @@ void placeholder::Loop()
 			if ( ( dR_j2_rj1 < dR_j2_rj2 ) &&  (dR_j2_rj1 < 0.5 ) ) RecoJet1MatchedToJet2 = 1;
 			if ( ( dR_j2_rj1 > dR_j2_rj2 ) &&  (dR_j2_rj2 < 0.5 ) ) RecoJet2MatchedToJet2 = 1;	
 			
-			int JetMatchedToRecoMuon1, JetMatchedToRecoMuon2;
+			int JetMatchedToRecoMuon1 = -1;
+			int JetMatchedToRecoMuon2 = -1;
 			
 			int LQPair1Muon, LQPair2Muon, LQPair1Jet, LQPair2Jet;
 
@@ -1317,11 +1359,16 @@ void placeholder::Loop()
 			//std::cout<<dR_l1_rl1<<" "<<dR_l1_rl2<<" "<<dR_l2_rl1<<" "<<dR_l2_rl2<<" "<<dR_j1_rj1<<" "<<dR_j1_rj2<<" "<<dR_j2_rj1<<" "<<dR_j2_rj2<<std::endl;
 			//std::cout<<" -----------------------------------------------------------------" <<std::endl;			
 
+
+			HT_genMG = 0.0;
 			for(unsigned int ijet = 0; ijet < GenJetPt->size(); ++ijet)
 			{
+				HT_genMG += GenJetPt->at(ijet);
 				if (ijet ==0) Pt_genjet1 = GenJetPt->at(ijet);
 				if (ijet ==1) Pt_genjet2 = GenJetPt->at(ijet);
 			}
+
+			//std::cout<<HT_genMG<<std::endl;
 
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
@@ -1480,6 +1527,8 @@ void placeholder::Loop()
 		VRESET(Phi_muon1);    VRESET(Eta_muon1);     VRESET(Pt_muon1);      VRESET(Charge_muon1);
 		VRESET(QOverPError_muon1); VRESET(PhiError_muon1);    VRESET(EtaError_muon1);     VRESET(PtError_muon1); 
 		VRESET(TrackerIsoSumPT_muon1);
+		VRESET(DeltaPtOverPt_muon1); 
+		VRESET(BackToBackCompatibility_muon1); VRESET(CosmicCompatibility_muon1);
 
 
 		// Leading muon 2
@@ -1488,6 +1537,8 @@ void placeholder::Loop()
 		VRESET(Phi_muon2);    VRESET(Eta_muon2);     VRESET(Pt_muon2);      VRESET(Charge_muon2);
 		VRESET(QOverPError_muon2); VRESET(PhiError_muon2);    VRESET(EtaError_muon2);     VRESET(PtError_muon2); 
 		VRESET(TrackerIsoSumPT_muon2);
+		VRESET(DeltaPtOverPt_muon2); 
+		VRESET(BackToBackCompatibility_muon2); VRESET(CosmicCompatibility_muon2);
 
 
 		// PFJet 1
@@ -1513,6 +1564,7 @@ void placeholder::Loop()
 		// PFMET
 		VRESET(MET_pf); VRESET(Phi_MET_pf);
 		VRESET(MET_lq); VRESET(METRatio_pfcalo); VRESET(METRatio_lqpf); VRESET(METRatio_lqcalo);
+		VRESET(MET_pf_charged);
 
 
 		// Delta Phi Variables
@@ -1755,6 +1807,7 @@ void placeholder::Loop()
 
 			pfMET.SetPtEtaPhiM(V_MetPrime.Pt(),0,V_MetPrime.Phi(),0);
 			MET_pf = pfMET.Pt();
+			MET_pf_charged = PFMETCharged->at(0);
 
 		}
 
@@ -1797,12 +1850,15 @@ void placeholder::Loop()
             EtaError_muon1  = MuonEtaError->at(v_idx_muon_final[0]);
             PtError_muon1 = MuonPtError->at(v_idx_muon_final[0]);
 
+			BackToBackCompatibility_muon1 = MuonBackToBackCompatibility->at(v_idx_muon_final[0]);
+			CosmicCompatibility_muon1 = MuonCosmicCompatibility->at(v_idx_muon_final[0]);
 
 
 			// muon Pt/Eta/Phi
 			Pt_muon1 = MuonPt->at(v_idx_muon_final[0]);
 			Phi_muon1 = MuonPhi->at(v_idx_muon_final[0]);
 			Eta_muon1 = MuonEta->at(v_idx_muon_final[0]);
+			DeltaPtOverPt_muon1 = PtError_muon1/Pt_muon1;
 
 			// Other Variables
 			muon1.SetPtEtaPhiM(Pt_muon1,Eta_muon1,Phi_muon1,0);
@@ -1847,13 +1903,17 @@ void placeholder::Loop()
             PhiError_muon2  = MuonPhiError->at(v_idx_muon_final[1]);
             EtaError_muon2  = MuonEtaError->at(v_idx_muon_final[1]);
             PtError_muon2 = MuonPtError->at(v_idx_muon_final[1]);
-			
+
+			BackToBackCompatibility_muon2 = MuonBackToBackCompatibility->at(v_idx_muon_final[1]);
+			CosmicCompatibility_muon2 = MuonCosmicCompatibility->at(v_idx_muon_final[1]);
 			
 
 			// muon Pt/Eta/Phi
 			Pt_muon2 = MuonPt->at(v_idx_muon_final[1]);
 			Phi_muon2 = MuonPhi->at(v_idx_muon_final[1]);
 			Eta_muon2 = MuonEta->at(v_idx_muon_final[1]);
+			DeltaPtOverPt_muon2 = PtError_muon2/Pt_muon2;
+
 
 			// Other Variables
 			muon2.SetPtEtaPhiM(Pt_muon2,Eta_muon2,Phi_muon2,0);
@@ -2123,7 +2183,9 @@ void placeholder::Loop()
 		if ((Pt_muon2 < 40.0 ) && (Pt_HEEPele1<40) && ( MET_pf < 45.0) ) continue;
 		if ( Pt_pfjet2 < 30.0  ) continue;
 		if (ST_pf_mumu < 250.0 && ST_pf_munu < 250.0 && ST_pf_emu < 250.0) continue;
-	//	if (Pt_muon2 < 30.0 && Pt_genmuon2 < 30.0 && Pt_genMET < 40.0 && MET_pf < 40.0) continue; 
+		if (HT_genMG > MyCustomHTCut) continue;
+		//if ((Pt_muon2 < 40.0 ) && (Pt_HEEPele1<40) && ( Pt_pfjet2 < 30.0 ) ) continue;
+
 
 		tree->Fill();			 // FILL FINAL TREE
 
