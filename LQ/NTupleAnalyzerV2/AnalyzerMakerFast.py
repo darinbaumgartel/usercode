@@ -152,7 +152,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>8:
+		if len(sublist)>6:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
@@ -186,6 +186,8 @@ for x in range(len(SignalType)):
 		s1 = s1.replace('desired_luminosity', str(float(1.0)))
 		s1 = s1.replace('FILEINPUT', path + '/' + dirList[0] )
 		s1 = s1.replace('MassOfLQ', str(float(MassOfLQ[x])))
+		s1 = s1.replace('MyCustomHTCut', str(float(HTRemoveIfGreater[x])))
+
 		
 		s1 = s1.replace('Double_t JetRescaleFactor = 1.00;','Double_t JetRescaleFactor = '+newjetscale+';\n')
 		s1 = s1.replace('Double_t MuonRescaleFactor = 1.00;','Double_t MuonRescaleFactor = '+newmuscale+';\n')
@@ -204,20 +206,22 @@ for x in range(len(SignalType)):
 		if SignalType[x][0] != 'Z' or 'Spring11' in CastorDirectory[x] or 'ALPGEN' in CastorDirectory[x]:
 			s1 = s1.replace('IsItSpring11ZAlpgen', 'false')
 	
-		ScaleFacs =  (RescalingInfo[x]).replace('[','').replace(']','').replace(' ','')
-		ScaleFacs = ScaleFacs.split(';')
-
-		eFac = 1.0
-		muFac = 1.0
-		tauFac = 1.0
-		if len(ScaleFacs)>1:
-			eFac = ScaleFacs[0]
-			muFac = ScaleFacs[1]
-			tauFac = ScaleFacs[2]
 		
-		s1 = s1.replace('electron_rescalevalue',str(eFac))
-		s1 = s1.replace('muon_rescalevalue',str(muFac))
-		s1 = s1.replace('tau_rescalevalue',str(tauFac))
+	
+		#ScaleFacs =  (RescalingInfo[x]).replace('[','').replace(']','').replace(' ','')
+		#ScaleFacs = ScaleFacs.split(';')
+
+		#eFac = 1.0
+		#muFac = 1.0
+		#tauFac = 1.0
+		#if len(ScaleFacs)>1:
+			#eFac = ScaleFacs[0]
+			#muFac = ScaleFacs[1]
+			#tauFac = ScaleFacs[2]
+		
+		#s1 = s1.replace('electron_rescalevalue',str(eFac))
+		#s1 = s1.replace('muon_rescalevalue',str(muFac))
+		#s1 = s1.replace('tau_rescalevalue',str(tauFac))
 
 		
 	#	os.system('rm NTupleAnalyzer_'+SignalType[x]+'.*')
@@ -263,10 +267,9 @@ if subjobs == 'n':
 	print '  root -l RootProcesses_TTJetspart1of4  (or whatever RootProcesses file you have available)\n\n'
 	sys.exit()
 
-os.system('./sub_AllAnalyzer.csh')
+os.system('./sub_AllAnalyzer.csh')   ##FIXME
 
-
-
+	
 done = 0
 print '\n Waiting for job completion. Status as follows: \n\n'
 while done!=1:
@@ -288,7 +291,7 @@ for x in bjobs:
 	if x.replace(c2file.replace('.C','')+'_','') not in castorinfo:
 		ok = 0
 		print (x +' is missing from castor directory.')	
-
+		
 if ok == 1:
 	print ('Castor directory check OK. All files present. Copying castor files to temp.\n\n')
 
@@ -298,24 +301,99 @@ os.system
 thistemp = '/tmp/'+person+'/'+c2file.replace('.C','')+'_'+tagname+'_'+now
 os.system('mkdir '+thistemp)
 
+
 print ('Waiting for file transfers to complete\n\n')
 
 for x in castorinfo:
-	os.system('sleep .3')
-	os.system('rfcp '+thiscastor+'/'+x.replace('\n','')+' '+thistemp+'&')
-
+	os.system('sleep .1')
+	os.system('rfcp '+thiscastor+'/'+x.replace('\n','')+' '+thistemp+' &')
 ok = 0
+oldduinfo = ''
+duinfo = '-'
+timeoutcount = 0
 while ok!=1:
 	unfin = 0
 	ok = 1
 	tempinfo =  os.popen('ls -1 '+thistemp).readlines()
 	tempinfo = str(tempinfo)
-	os.system('sleep 20')
+	os.system('sleep 30')
+	os.system('sleep 30')
+
+	os.system('sleep 300')
+
+	waiting = 1
+	while waiting != 0:
+		os.system('sleep 30')
+		print "Running recovery on "+str(len(os.popen('bjobs').readlines()))+" bjobs. "
+		if len(os.popen('bjobs').readlines()) == 0:
+			waiting = 0
+		
+
+	fsubs = open('resub_tmp.csh','w')
+	frfcps = open('rfcp_tmp.csh','w')
+	fsubs.write('#!/bin/csh\n\n')
+	frfcps.write('#!/bin/csh\n\n')
+
+	castorinfo = os.popen('nsls '+thiscastor).readlines()
+
+	
 	for x in bjobs:
 		if x.replace(c2file.replace('.C','')+'_','') not in tempinfo:
+			print 'Missing '+x.replace(c2file.replace('.C','')+'_','') 
 			unfin += 1
 			ok = 0
-	print 'Waiting on '+str(unfin)+' files to transfer.\n' 
+			filegrep = x.replace(c2file.replace('.C','')+'_','')
+			filegrep = filegrep.replace('-','_')
+			for rr in range(3):
+				filegrep = filegrep.replace('__','_')
+				
+			filegrep = filegrep.replace('_',' | grep  ')
+			filegrep = 'cat sub_AllAnalyzer.csh | grep '+filegrep
+			
+			#resubinfo = os.popen('cat sub_AllAnalyzer.csh | grep '+x.replace(c2file.replace('.C','')+'_','') ).readlines()
+			resubinfo = os.popen( filegrep ).readlines()
+
+			rfcpcoms = []
+			
+			
+			if (x.replace(c2file.replace('.C','')+'_','')  in str(castorinfo)): 
+				if (x.replace(c2file.replace('.C','')+'_','') not in str(tempinfo)) :
+					for y in castorinfo:
+						if x.replace(c2file.replace('.C','')+'_','') in y:
+							rfcpcoms.append('rfcp '+thiscastor+'/'+y.replace('\n','')+' '+thistemp+' &')
+			for com in resubinfo:
+				fsubs.write(com+'\n')
+			for rfcpcom in rfcpcoms:
+				frfcps.write(rfcpcom+'\n')
+				
+	fsubs.close()
+	frfcps.close()
+	os.system("chmod 777 resub*csh rfcp*csh")
+	os.system("./resub_tmp.csh")
+
+
+	#sys.exit()   ##  FIXME
+
+	done = 0
+	print '\n Waiting for job completion. Status as follows: \n\n'
+	while done!=1:
+		os.system('sleep 30')
+		jobinfo = os.popen('bjobs').readlines()
+		jobinfo = len(jobinfo)
+		jobsleft = jobinfo -1
+		if jobsleft == -1:
+			done = 1
+		if jobsleft>=0:
+			print  str(jobsleft) +' jobs remaining.'
+	os.system('sleep 60')
+	os.system("./rfcp_tmp.csh")
+
+			
+	duinfo = (os.popen('du -s '+thistemp).readlines())[0]
+	if duinfo != oldduinfo:
+		ok = 0
+	oldduinfo = duinfo
+	#print 'Waiting on '+str(unfin)+' files to transfer.\n' 
 
 print ('\n\n Analysis and transfer complete. Grouping files for easier use. Please wait !')
 os.system('sleep 300')
