@@ -4,7 +4,7 @@ import subprocess
 import matplotlib.pyplot
  
 ESTIMATIONMETHOD = ' -M Asymptotic '
-METHOD = '-M HybridNew --rule CLs --frequentist CONFIGURATION --clsAcc=0 -s -2 -T 75 -i 50 --singlePoint SINGLEPOINT --saveToys --saveHybridResult'
+METHOD = '-M HybridNew --rule CLs --frequentist CONFIGURATION --clsAcc=0 -s -1 -T 50 -i 40 --singlePoint SINGLEPOINT --saveToys --saveHybridResult'
 person = (os.popen('whoami').readlines())[0].replace('\n','')
 
 masses = []
@@ -23,7 +23,6 @@ if 'just_observed' in str(sys.argv):
 	do_observedonly = 1	
 numdo = 1	
 queue = '1nd'
-launcher = 'launcherCLs.py'
 iters = 1
 if 'CLSLimits' not in os.listdir('.'):
 	os.system('mkdir CLSLimits')
@@ -43,8 +42,6 @@ for x in range(len(sys.argv)):
 		numdo = int(sys.argv[x+1])
 	if sys.argv[x] == '-q':
 		queue = str(sys.argv[x+1])
-	if sys.argv[x] == '-l':
-		launcher = str(sys.argv[x+1])	
 	if sys.argv[x] == '--iters':
 		iters = int(sys.argv[x+1])		
 	if '--Asymptotic_Only' in sys.argv[x]:
@@ -151,7 +148,7 @@ if do_BetaOne == 1:
 						thisrval = float(thisrval)
 						if thisrval>effrmax:
 							effrmax = thisrval
-				rmax = effrmax*25.0
+				rmax = effrmax*15.0
 				EstimationInformation = [' r < 0.0000']
 				breaker = True
 			rmax = rmax/5.0
@@ -270,7 +267,7 @@ if do_BetaHalf == 1:
 						thisrval = float(thisrval)
 						if thisrval>effrmax:
 							effrmax = thisrval
-				rmax = effrmax*25.0
+				rmax = effrmax*15.0
 				EstimationInformation = [' r < 0.0000']
 				breaker = True
 			rmax = rmax/5.0
