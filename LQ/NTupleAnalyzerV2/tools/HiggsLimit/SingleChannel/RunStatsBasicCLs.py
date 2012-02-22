@@ -7,8 +7,8 @@ import math
 import random
  #betas = [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,0.99999]
 #betas = [.3,0.5]
-betas = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.99]
- 
+#betas = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.99]
+betas = [0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.18,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.82,0.84,0.86,0.88,0.90,0.92,0.94,0.96,0.98,0.9995]
 ESTIMATIONMETHOD = ' -M Asymptotic '
 METHOD = '-M HybridNew --rule CLs --frequentist CONFIGURATION --clsAcc=0 -s -1 -T 70 -i 70 --singlePoint SINGLEPOINT --saveToys --saveHybridResult'
 person = (os.popen('whoami').readlines())[0].replace('\n','')
@@ -102,6 +102,21 @@ Combo68down = []
 Combo68up = []
 ComboExp = []
 
+ComboBetaOneObs = []
+ComboBetaOne95down = []
+ComboBetaOne68down = []
+ComboBetaOneExp = []
+ComboBetaOne68up = []
+ComboBetaOne95up = []
+
+
+ComboBetaHalfObs = []
+ComboBetaHalf95down = []
+ComboBetaHalf68down = []
+ComboBetaHalfExp = []
+ComboBetaHalf68up = []
+ComboBetaHalf95up = []
+						
 if do_BetaOne == 1:
 	for x in range(len(name)):
 		if 'BetaHalf' in name[x]:
@@ -383,7 +398,18 @@ if do_combo == 1:
 		for x in combocards:
 			if m in x:
 				pair.append(x)
+		if 'BetaHalf' in pair[0]:
+			bcard = pair[0]
+			ocard = pair[1]
+		if 'BetaHalf' not in pair[0]:
+			bcard = pair[1]
+			ocard = pair[0]			
+
 		os.system('combineCards.py '+pair[0]+ ' '+pair[1]+ '  > TMPComboCards/combocard_COMBO_M_'+m+'.cfg ' )
+		os.system('combineCards.py '+bcard+' > TMPComboCards/combocard_COMBO_BetaHalf_M_'+m+'.cfg ' )
+		os.system('combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' )
+
+
 		print pair
 	for m in uniquecardmasses:
 		combocards.append('TMPComboCards/combocard_COMBO_M_'+m+'.cfg')
@@ -398,6 +424,21 @@ if do_combo == 1:
 		ComboExp.append([])
 		Combo68up.append([])
 		Combo95up.append([])
+
+		ComboBetaOneObs.append([])
+		ComboBetaOne95down.append([])
+		ComboBetaOne68down.append([])
+		ComboBetaOneExp.append([])
+		ComboBetaOne68up.append([])
+		ComboBetaOne95up.append([])
+		
+
+		ComboBetaHalfObs.append([])
+		ComboBetaHalf95down.append([])
+		ComboBetaHalf68down.append([])
+		ComboBetaHalfExp.append([])
+		ComboBetaHalf68up.append([])
+		ComboBetaHalf95up.append([])
 						
 								
 		betaval = str(beta).replace('.','_')
@@ -410,54 +451,69 @@ if do_combo == 1:
 			newcard = ('CLSLimits/Combo'+cdir+'/combocard_COMBO_M_'+uniquecardmasses[x]+'.cfg').replace('COMBO','beta_'+betaval+'_COMBO')
 			newcastorcard = ( '/castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/Combo'+cdir+'/combocard_COMBO_M_'+uniquecardmasses[x]+'.cfg').replace('COMBO','beta_'+betaval+'_COMBO')
 
+			newcard_BetaOne = ('CLSLimits/Combo'+cdir+'/combocard_COMBO_BetaOne_M_'+uniquecardmasses[x]+'.cfg').replace('COMBO_BetaOne','beta_'+betaval+'_COMBO_BetaOne')
+			newcastorcard_BetaOne = ( '/castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/Combo'+cdir+'/combocard_COMBO_BetaOne_M_'+uniquecardmasses[x]+'.cfg').replace('COMBO_BetaOne','beta_'+betaval+'_COMBO_BetaOne')
 			
-			ftmp = open(newcard,'w')
-			fnorm = open('TMPComboCards/combocard_COMBO_M_'+str(uniquecardmasses[x])+'.cfg','r')
+			newcard_BetaHalf = ('CLSLimits/Combo'+cdir+'/combocard_COMBO_BetaHalf_M_'+uniquecardmasses[x]+'.cfg').replace('COMBO_BetaHalf','beta_'+betaval+'_COMBO_BetaHalf')
+			newcastorcard_BetaHalf = ( '/castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/Combo'+cdir+'/combocard_COMBO_BetaHalf_M_'+uniquecardmasses[x]+'.cfg').replace('COMBO_BetaHalf','beta_'+betaval+'_COMBO_BetaHalf')
 			
-			betahalfplace = 99
-			betaoneplace = 99
-			for line in fnorm:
-
-				if ('LQ' in line and 'process' in line):
-					linesplit = line.split()
-					for place in range(len(linesplit)):
-						if 'LQ' in linesplit[place] and 'BetaHalf' in linesplit[place]:
-							betahalfplace = place
-						if 'LQ' in linesplit[place] and 'BetaHalf' not in linesplit[place]:
-							betaoneplace = place
-							
-				if ( 'rate' in line):
-
-					linesplit = line.split()
-					linesplit2 = []
-					for place in range(len(linesplit)):
-						arg = linesplit[place]
-						if betahalfplace == place:
-							arg = str(float(arg)*beta*(1.0-beta)*4.0)
-						
-						if betaoneplace == place:						
-							arg = str(float(arg)*beta*beta)
-						linesplit2.append(arg)
-					line2 = ''
-					for xpart in linesplit2:
-						line2 += xpart + '    '
-					line2 += '\n'
-					line = line2
-				if  'stat' in line and 'sig' in line and 'gmN' in line:
-					linesplit = line.split()
-					for nsp in range(len(linesplit)):
-						if 'BetaHalf' not in line and nsp == betaoneplace+1:
-							repsold =  str(linesplit[nsp+1])
-							repsnew = str(float(repsold)*beta*beta)
-							line = line.replace(repsold,repsnew)
-						if 'BetaHalf' in line and nsp == betahalfplace+1:
-							repsold =  str(linesplit[nsp+1])
-							repsnew = str(float(repsold)*beta*(1.0-beta)*4.0)
-							line = line.replace(repsold,repsnew)
-				ftmp.write(line)
-			ftmp.close()
+			ctypes = ['','_BetaOne','_BetaHalf']
+			for c in ctypes:
+				tcard = newcard
+				if 'BetaHalf' in c:
+					tcard = newcard_BetaHalf
+				if 'BetaOne' in c:
+					tcard = newcard_BetaOne
+				ftmp = open(tcard,'w')
+				fnorm = open('TMPComboCards/combocard_COMBO'+c+'_M_'+str(uniquecardmasses[x])+'.cfg','r')
+				
+				betahalfplace = 99
+				betaoneplace = 99
+				for line in fnorm:
 	
-			os.system('rfcp '+newcard+' '+newcastorcard)
+					if ('LQ' in line and 'process' in line):
+						linesplit = line.split()
+						for place in range(len(linesplit)):
+							if 'LQ' in linesplit[place] and 'BetaHalf' in linesplit[place]:
+								betahalfplace = place
+							if 'LQ' in linesplit[place] and 'BetaHalf' not in linesplit[place]:
+								betaoneplace = place
+								
+					if ( 'rate' in line):
+	
+						linesplit = line.split()
+						linesplit2 = []
+						for place in range(len(linesplit)):
+							arg = linesplit[place]
+							if betahalfplace == place:
+								arg = str(float(arg)*beta*(1.0-beta)*4.0)
+							
+							if betaoneplace == place:						
+								arg = str(float(arg)*beta*beta)
+							linesplit2.append(arg)
+						line2 = ''
+						for xpart in linesplit2:
+							line2 += xpart + '    '
+						line2 += '\n'
+						line = line2
+					if  'stat' in line and 'sig' in line and 'gmN' in line:
+						linesplit = line.split()
+						for nsp in range(len(linesplit)):
+							if 'BetaHalf' not in line and nsp == betaoneplace+1:
+								repsold =  str(linesplit[nsp+1])
+								repsnew = str(float(repsold)*beta*beta)
+								line = line.replace(repsold,repsnew)
+							if 'BetaHalf' in line and nsp == betahalfplace+1:
+								repsold =  str(linesplit[nsp+1])
+								repsnew = str(float(repsold)*beta*(1.0-beta)*4.0)
+								line = line.replace(repsold,repsnew)
+					ftmp.write(line)
+				ftmp.close()
+			if (dobatch==True):
+				os.system('rfcp '+newcard+' '+newcastorcard)
+				os.system('rfcp '+newcard_BetaOne+' '+newcastorcard_BetaOne)
+				os.system('rfcp '+newcard_BetaHalf+' '+newcastorcard_BetaHalf)
+
 		
 			thisname ='beta_'+ betaval + '_M_'+str(uniquecardmasses[x])
 			mdir = (os.popen('pwd').readlines())[0]
@@ -468,8 +524,15 @@ if do_combo == 1:
 			fsub.write('eval `scramv1 runtime -csh`'+ cr)
 			fsub.write('cd -'+ cr)
 			fsub.write('cp '+mdir+'/'+newcard+' .'+ cr)
-			fsub.write('SUBCOMMAND'+'\n')
-			fsub.write('mv *root Combo_'+thisname+'_R_RVALUE_ind_`bash -c \'echo $RANDOM\'`.root \n')			
+			fsub.write('cp '+mdir+'/'+newcard_BetaOne+' .'+ cr)
+			fsub.write('cp '+mdir+'/'+newcard_BetaHalf+' .'+ cr)
+
+			fsub.write('SUBCOMMAND0'+'\n')
+			fsub.write('mv higgs*root Combo_'+thisname+'_R_RVALUE0_ind_`bash -c \'echo $RANDOM\'`.root \n')			
+			fsub.write('SUBCOMMAND1'+'\n')
+			fsub.write('mv higgs*root ComboBetaOne_'+thisname+'_R_RVALUE1_ind_`bash -c \'echo $RANDOM\'`.root \n')			
+			fsub.write('SUBCOMMAND2'+'\n')
+			fsub.write('mv higgs*root ComboBetaHalf_'+thisname+'_R_RVALUE2_ind_`bash -c \'echo $RANDOM\'`.root \n')						
 			
 			if '--castor_only' not in sys.argv:
 				fsub.write('cp *root '+mdir+'/CLSLimits/Combo'+cdir+'/Combo_beta_'+betaval+'/ \n' )					
@@ -478,18 +541,18 @@ if do_combo == 1:
 			fsub.close()
 			
 			## Estimate the r values with Asymptotic CLs
-			EstimationInformation = [' r < 0.0000']
+			EstimationInformation0 = [' r < 0.0000']
 			rmax = 1000.0
 			breaker = False 
-			while 'r < 0.0000' in str(EstimationInformation):
-				#print 'combine '+ESTIMATIONMETHOD+' '+newcard +'--rMax '+str(rmax)
-				EstimationInformation = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard +' --rMax '+str(rmax)).readlines()
+			while 'r < 0.0000' in str(EstimationInformation0):
+				print 'combine '+ESTIMATIONMETHOD+' '+newcard +' --rMax '+str(rmax)
+				EstimationInformation0 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard +' --rMax '+str(rmax)).readlines()
 				
 				if breaker ==True:
 					break
-				if 'r < 0.0000' not in str(EstimationInformation):
+				if 'r < 0.0000' not in str(EstimationInformation0):
 					effrmax = -999999
-					for e in EstimationInformation:
+					for e in EstimationInformation0:
 						if 'r <'  in e and 'Expected' in e:
 							thisrval = e.split('<')[-1]
 							thisrval = thisrval.replace('\n','')
@@ -497,22 +560,93 @@ if do_combo == 1:
 							if thisrval>effrmax:
 								effrmax = thisrval
 					rmax = effrmax*15.0
-					EstimationInformation = [' r < 0.0000']
+					EstimationInformation0 = [' r < 0.0000']
 					breaker = True
 				rmax = rmax/5.0
-			## Estimation Complete
+
+
+			EstimationInformation1 = [' r < 0.0000']
+			rmax = 1000.0
+			breaker = False 
+			while 'r < 0.0000' in str(EstimationInformation1):
+				print 'combine '+ESTIMATIONMETHOD+' '+newcard_BetaOne +' --rMax '+str(rmax)
+				EstimationInformation1 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard_BetaOne +' --rMax '+str(rmax)).readlines()
+				
+				if breaker ==True:
+					break
+				if 'r < 0.0000' not in str(EstimationInformation1):
+					effrmax = -999999
+					for e in EstimationInformation1:
+						if 'r <'  in e and 'Expected' in e:
+							thisrval = e.split('<')[-1]
+							thisrval = thisrval.replace('\n','')
+							thisrval = float(thisrval)
+							if thisrval>effrmax:
+								effrmax = thisrval
+					rmax = effrmax*15.0
+					EstimationInformation1 = [' r < 0.0000']
+					breaker = True
+				rmax = rmax/5.0
+				
+				
+			EstimationInformation2 = [' r < 0.0000']
+			rmax = 1000.0
+			breaker = False 
+			while 'r < 0.0000' in str(EstimationInformation2):
+				print 'combine '+ESTIMATIONMETHOD+' '+newcard_BetaHalf +' --rMax '+str(rmax)
+				EstimationInformation2 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard_BetaHalf +' --rMax '+str(rmax)).readlines()
+				
+				if breaker ==True:
+					break
+				if 'r < 0.0000' not in str(EstimationInformation2):
+					effrmax = -999999
+					for e in EstimationInformation2:
+						if 'r <'  in e and 'Expected' in e:
+							thisrval = e.split('<')[-1]
+							thisrval = thisrval.replace('\n','')
+							thisrval = float(thisrval)
+							if thisrval>effrmax:
+								effrmax = thisrval
+					rmax = effrmax*15.0
+					EstimationInformation2 = [' r < 0.0000']
+					breaker = True
+				rmax = rmax/5.0				
+
 			
-			expectedlines = []
-			for line in EstimationInformation:
+			expectedlines0 = []
+			for line in EstimationInformation0:
 				if 'Expected' in line and 'r <' in line:
-					expectedlines.append(line.replace('\n',''))
-			values = []
-			for e in expectedlines:
+					expectedlines0.append(line.replace('\n',''))
+			values0 = []
+			for e in expectedlines0:
 				print e
-				values.append(float(e.split()[-1]))
-	
+				values0.append(float(e.split()[-1]))
+
+
+			expectedlines1 = []
+			for line in EstimationInformation1:
+				if 'Expected' in line and 'r <' in line:
+					expectedlines1.append(line.replace('\n',''))
+			values1 = []
+			for e in expectedlines1:
+				print e
+				values1.append(float(e.split()[-1]))
+				
+				
+			expectedlines2 = []
+			for line in EstimationInformation2:
+				if 'Expected' in line and 'r <' in line:
+					expectedlines2.append(line.replace('\n',''))
+			values2 = []
+			for e in expectedlines2:
+				print e
+				values2.append(float(e.split()[-1]))				
+
+			## Estimation Complete
+
+
 			## Fill the arrays of Asymptotic Values
-			for line in EstimationInformation:
+			for line in EstimationInformation0:
 				if 'Observed' in line and '<' in line:
 					ComboObs[betaind].append((line.split('<')[-1]).replace('\n',''))
 				if 'Expected' in line and '<' in line:
@@ -526,34 +660,120 @@ if do_combo == 1:
 						Combo68up[betaind].append((line.split('<')[-1]).replace('\n',''))
 					if '97.5%' in line:
 						Combo95up[betaind].append((line.split('<')[-1]).replace('\n',''))
+
+			for line in EstimationInformation1:
+				if 'Observed' in line and '<' in line:
+					ComboBetaOneObs[betaind].append((line.split('<')[-1]).replace('\n',''))
+				if 'Expected' in line and '<' in line:
+					if '2.5%' in line:
+						ComboBetaOne95down[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '16.0%' in line:
+						ComboBetaOne68down[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '50.0%' in line:
+						ComboBetaOneExp[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '84.0%' in line:
+						ComboBetaOne68up[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '97.5%' in line:
+						ComboBetaOne95up[betaind].append((line.split('<')[-1]).replace('\n',''))
+
+			for line in EstimationInformation2:
+				if 'Observed' in line and '<' in line:
+					ComboBetaHalfObs[betaind].append((line.split('<')[-1]).replace('\n',''))
+				if 'Expected' in line and '<' in line:
+					if '2.5%' in line:
+						ComboBetaHalf95down[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '16.0%' in line:
+						ComboBetaHalf68down[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '50.0%' in line:
+						ComboBetaHalfExp[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '84.0%' in line:
+						ComboBetaHalf68up[betaind].append((line.split('<')[-1]).replace('\n',''))
+					if '97.5%' in line:
+						ComboBetaHalf95up[betaind].append((line.split('<')[-1]).replace('\n',''))
 			
-			vstart = round((min(values)/2),5)
-			vstop = round((max(values)*2),5)
-			rvalues = []
-			interval = abs(vstop-vstart)/100.0
+			## Asymptotic Information Filled
 			
-			nindex = 0
-			thisr = 0
 			
-			expinc = 0.9999*(2.718281828**((0.0666666666667*(math.log(vstop/vstart)))))
-			while thisr<vstop:
-				thisr = vstart*expinc**(float(nindex))
-				rvalues.append(thisr)
-				nindex += 1
-			strRvalues = []
-			for r in rvalues:
-				strRvalues.append(str(round(r,5)))
-			print strRvalues
+			vstart0 = round((min(values0)/2),5)
+			vstop0 = round((max(values0)*2),5)
+			rvalues0 = []
+
+
+			vstart1 = round((min(values1)/2),5)
+			vstop1 = round((max(values1)*2),5)
+			rvalues1 = []
 			
-			for r in strRvalues:
-				command = 'combine '+METHOD.replace('SINGLEPOINT',r).replace('CONFIGURATION',newcard.split('/')[-1])
-				strR = r.replace('.','_')
-				os.system('cat ShellScriptsForBatch/subcombo_'+cdir+thisname+'.csh | sed  \'s/SUBCOMMAND/'+command+'/g\' | sed  \'s/RVALUE/'+strR+'/g\' > ShellScriptsForBatch/subcombo_R_'+strR+'_'+cdir+thisname+'.csh')
-				os.system('chmod 777 ShellScriptsForBatch/subcombo_R_'+strR+'_'+cdir+thisname+'.csh')
+			vstart2 = round((min(values2)/2),5)
+			vstop2 = round((max(values2)*2),5)
+			rvalues2 = []			
+			
+			nindex0 = 0
+			thisr0 = 0
+
+			nindex1 = 0
+			thisr1= 0
+			
+			nindex2 = 0
+			thisr2 = 0
+			
+			print 'vstop0 '+str(vstop0) + '   vstart0  '+str(vstart0)
+			print 'vstop1 '+str(vstop1) + '   vstart1  '+str(vstart1)
+			print 'vstop2 '+str(vstop2) + '   vstart2  '+str(vstart2)
+
+			expinc0 = 0.9999*(2.718281828**((0.0666666666667*(math.log(vstop0/vstart0)))))
+			expinc1 = 0.9999*(2.718281828**((0.0666666666667*(math.log(vstop1/vstart1)))))
+			expinc2 = 0.9999*(2.718281828**((0.0666666666667*(math.log(vstop2/vstart2)))))
+			
+			
+			while thisr0<vstop0:
+				thisr0 = vstart0*expinc0**(float(nindex0))
+				rvalues0.append(thisr0)
+				nindex0 += 1
+			strRvalues0 = []
+			for r in rvalues0:
+				strRvalues0.append(str(round(r,5)))
+			#print strRvalues0
+
+
+			while thisr1<vstop1:
+				thisr1 = vstart1*expinc1**(float(nindex1))
+				rvalues1.append(thisr1)
+				nindex1 += 1
+			strRvalues1 = []
+			for r in rvalues1:
+				strRvalues1.append(str(round(r,5)))
+			#print strRvalues1
+
+			while thisr2<vstop2:
+				thisr2 = vstart2*expinc2**(float(nindex2))
+				rvalues2.append(thisr2)
+				nindex2 += 1
+			strRvalues2 = []
+			for r in rvalues2:
+				strRvalues2.append(str(round(r,5)))
+			#print strRvalues2
+			
+
+			
+			for rind in range(len(strRvalues0)):
+				r0 = strRvalues0[rind]
+				r1 = strRvalues1[rind]
+				r2 = strRvalues2[rind]
+
+				command0 = 'combine '+METHOD.replace('SINGLEPOINT',r0).replace('CONFIGURATION',newcard.split('/')[-1])
+				command1 = 'combine '+METHOD.replace('SINGLEPOINT',r1).replace('CONFIGURATION',newcard_BetaOne.split('/')[-1])
+				command2 = 'combine '+METHOD.replace('SINGLEPOINT',r2).replace('CONFIGURATION',newcard_BetaHalf.split('/')[-1])
+
+				strR0 = r0.replace('.','_')
+				strR1 = r1.replace('.','_')
+				strR2 = r2.replace('.','_')
+
+				os.system('cat ShellScriptsForBatch/subcombo_'+cdir+thisname+'.csh | sed  \'s/SUBCOMMAND0/'+command0+'/g\' | sed  \'s/RVALUE0/'+strR0+'/g\' | sed  \'s/SUBCOMMAND1/'+command1+'/g\' | sed  \'s/RVALUE1/'+strR1+'/g\' | sed  \'s/SUBCOMMAND2/'+command2+'/g\' | sed  \'s/RVALUE2/'+strR2+'/g\' > ShellScriptsForBatch/subcombo_R_'+str(rind)+'_'+cdir+thisname+'.csh')
+				os.system('chmod 777 ShellScriptsForBatch/subcombo_R_'+str(rind)+'_'+cdir+thisname+'.csh')
 	
 				for nn in range(numdo):
 					if (dobatch):
-						os.system('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobcombo'+str(nn)+'_R_'+strR+'_'+thisname+' < ShellScriptsForBatch/subcombo_R_'+strR+'_'+cdir+thisname+'.csh')
+						os.system('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobcombo'+str(nn)+'_R_'+str(rind)+'_'+thisname+' < ShellScriptsForBatch/subcombo_R_'+str(rind)+'_'+cdir+thisname+'.csh')
 	
 
 
@@ -691,7 +911,7 @@ if do_BetaHalf == 1:
 #### COMBINATION CHANNEL
 if do_combo == 1:
 
-	print "*"*40 + '\n COMBINATIONASYMPTOTIC CLS RESULTS\n\n' +"*"*40
+	print "*"*40 + '\n COMBINATION ASYMPTOTIC CLS RESULTS\n\n' +"*"*40
 
 					
 	mTh = [ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850]
@@ -718,6 +938,20 @@ if do_combo == 1:
 	s_Combo68up = re_eval(Combo68up)
 	s_Combo95up = re_eval(Combo95up)
 	
+	s_ComboBetaOneObs = re_eval(ComboBetaOneObs)
+	s_ComboBetaOne95down = re_eval(ComboBetaOne95down)
+	s_ComboBetaOne68down = re_eval(ComboBetaOne68down)
+	s_ComboBetaOneExp = re_eval(ComboBetaOneExp)
+	s_ComboBetaOne68up = re_eval(ComboBetaOne68up)
+	s_ComboBetaOne95up = re_eval(ComboBetaOne95up)
+	
+	s_ComboBetaHalfObs = re_eval(ComboBetaHalfObs)
+	s_ComboBetaHalf95down = re_eval(ComboBetaHalf95down)
+	s_ComboBetaHalf68down = re_eval(ComboBetaHalf68down)
+	s_ComboBetaHalfExp = re_eval(ComboBetaHalfExp)
+	s_ComboBetaHalf68up = re_eval(ComboBetaHalf68up)
+	s_ComboBetaHalf95up = re_eval(ComboBetaHalf95up)
+
 
 	from ROOT import *
 	from array import array
@@ -822,32 +1056,91 @@ if do_combo == 1:
 	m_ComboExp = fill_mlists(s_ComboExp)
 	m_Combo68up = fill_mlists(s_Combo68up)
 	m_Combo95up = fill_mlists(s_Combo95up)
+
+	m_ComboBetaOneObs = fill_mlists(s_ComboBetaOneObs)
+	m_ComboBetaOne95down = fill_mlists(s_ComboBetaOne95down)
+	m_ComboBetaOne68down = fill_mlists(s_ComboBetaOne68down)
+	m_ComboBetaOneExp = fill_mlists(s_ComboBetaOneExp)
+	m_ComboBetaOne68up = fill_mlists(s_ComboBetaOne68up)
+	m_ComboBetaOne95up = fill_mlists(s_ComboBetaOne95up)
+
+	m_ComboBetaHalfObs = fill_mlists(s_ComboBetaHalfObs)
+	m_ComboBetaHalf95down = fill_mlists(s_ComboBetaHalf95down)
+	m_ComboBetaHalf68down = fill_mlists(s_ComboBetaHalf68down)
+	m_ComboBetaHalfExp = fill_mlists(s_ComboBetaHalfExp)
+	m_ComboBetaHalf68up = fill_mlists(s_ComboBetaHalf68up)
+	m_ComboBetaHalf95up = fill_mlists(s_ComboBetaHalf95up)
+	
 	
 	betav = []
 	for x in betas:
 		betav.append(str(round(x,4)))
-	betastring = 'Double_t beta_vals['+str(len(betas))+'] = {' +str(betav).replace('[','').replace(']','').replace('\'','')+'};'
+	betastring = 'static int numbetas = '+str(len(betas))+';\n'+'Double_t beta_vals['+str(len(betas))+'] = {' +str(betav).replace('[','').replace(']','').replace('\'','')+'};'
 
-	band1sigma = 'Double_t m_1sigma['+str(2*len(betas))+']={'
-	band2sigma = 'Double_t m_2sigma['+str(2*len(betas))+']={'
-	excurve = 'Double_t m_expected['+str(len(betas))+'] = {' 
-	obcurve = 'Double_t m_observed['+str(len(betas))+'] = {'  
+	band1sigma_combo = 'Double_t m_1sigma_combo['+str(2*len(betas))+']={'
+	band2sigma_combo = 'Double_t m_2sigma_combo['+str(2*len(betas))+']={'
+	excurve_combo = 'Double_t m_expected_combo['+str(len(betas))+'] = {' 
+	obcurve_combo = 'Double_t m_observed_combo['+str(len(betas))+'] = {'  
+
+	band1sigma_lljj = 'Double_t m_1sigma_lljj['+str(2*len(betas))+']={'
+	band2sigma_lljj = 'Double_t m_2sigma_lljj['+str(2*len(betas))+']={'
+	excurve_lljj = 'Double_t m_expected_lljj['+str(len(betas))+'] = {' 
+	obcurve_lljj = 'Double_t m_observed_lljj['+str(len(betas))+'] = {'  
 	
-	excurve += str(m_ComboExp).replace('[','').replace(']','')+'};'
-	obcurve += str(m_ComboObs).replace('[','').replace(']','')+'};'
+	band1sigma_lvjj = 'Double_t m_1sigma_lvjj['+str(2*len(betas))+']={'
+	band2sigma_lvjj = 'Double_t m_2sigma_lvjj['+str(2*len(betas))+']={'
+	excurve_lvjj = 'Double_t m_expected_lvjj['+str(len(betas))+'] = {' 
+	obcurve_lvjj = 'Double_t m_observed_lvjj['+str(len(betas))+'] = {'  
+	
+	
+	excurve_combo += str(m_ComboExp).replace('[','').replace(']','')+'};'
+	obcurve_combo += str(m_ComboObs).replace('[','').replace(']','')+'};'
+
+	excurve_lljj += str(m_ComboBetaOneExp).replace('[','').replace(']','')+'};'
+	obcurve_lljj += str(m_ComboBetaOneObs).replace('[','').replace(']','')+'};'
+	
+	excurve_lvjj += str(m_ComboBetaHalfExp).replace('[','').replace(']','')+'};'
+	obcurve_lvjj += str(m_ComboBetaHalfObs).replace('[','').replace(']','')+'};'	
+
 	m_Combo68up.reverse()
 	m_Combo95up.reverse()
-	band1sigma += str(m_Combo68down).replace('[','').replace(']','') + ', '+  str(m_Combo68up).replace('[','').replace(']','')+'};'
-	band2sigma += str(m_Combo95down).replace('[','').replace(']','') + ', '+ str(m_Combo95up).replace('[','').replace(']','')+'};'
+
+	m_ComboBetaOne68up.reverse()
+	m_ComboBetaOne95up.reverse()
+	
+	m_ComboBetaHalf68up.reverse()
+	m_ComboBetaHalf95up.reverse()
+	
+		
+	band1sigma_combo += str(m_Combo68down).replace('[','').replace(']','') + ', '+  str(m_Combo68up).replace('[','').replace(']','')+'};'
+	band2sigma_combo += str(m_Combo95down).replace('[','').replace(']','') + ', '+ str(m_Combo95up).replace('[','').replace(']','')+'};'
+
+	band1sigma_lljj += str(m_ComboBetaOne68down).replace('[','').replace(']','') + ', '+  str(m_ComboBetaOne68up).replace('[','').replace(']','')+'};'
+	band2sigma_lljj += str(m_ComboBetaOne95down).replace('[','').replace(']','') + ', '+ str(m_ComboBetaOne95up).replace('[','').replace(']','')+'};'
+	
+	band1sigma_lvjj += str(m_ComboBetaHalf68down).replace('[','').replace(']','') + ', '+  str(m_ComboBetaHalf68up).replace('[','').replace(']','')+'};'
+	band2sigma_lvjj += str(m_ComboBetaHalf95down).replace('[','').replace(']','') + ', '+ str(m_ComboBetaHalf95up).replace('[','').replace(']','')+'};'
+	
+	
+	
 	print '\n'
 	print betastring
 	print '\n'
-	print excurve
+	print excurve_combo
+	print obcurve_combo
+	print band1sigma_combo
+	print band2sigma_combo
+
 	print '\n'
-	print obcurve
+	print excurve_lljj
+	print obcurve_lljj
+	print band1sigma_lljj
+	print band2sigma_lljj
+	
 	print '\n'
-	print band1sigma
-	print '\n'
-	print band2sigma
+	print excurve_lvjj
+	print obcurve_lvjj
+	print band1sigma_lvjj
+	print band2sigma_lvjj	
 	print '\n'
 	print '\n'
