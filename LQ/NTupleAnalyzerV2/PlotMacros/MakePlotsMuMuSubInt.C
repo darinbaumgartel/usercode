@@ -130,7 +130,7 @@ int nBins, float xLow, float xMax, TString var, TString var_emu, bool Use_integr
 
 	// Rescaling Routine
 	H_zjets->Scale(znorm);
-	H_wjets->Scale(1.21);
+	H_wjets->Scale(1.23);
 	//H_vvjets->Scale(0.9);
 	//H_singtop->Scale(0.9);
 	if (Use_emu) {H_ttbar->Scale(0.55);}
@@ -545,12 +545,11 @@ void MakePlotsMuMuSubInt()
 		Use_emu = true;
 		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 80,0,400, "MET_pf", "MET_pf",        use_integral, "","E_{T}^{miss}(GeV) " +xtag  ,lumi,50,ZNormalization,filetag);
 		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 50,0,250, "MET_pfsig", "MET_pfsig",        use_integral, "","E_{T}^{miss} Significance (GeV)" +xtag  ,lumi,50,ZNormalization,filetag);
-		gROOT->ProcessLine(".q;");
 
 		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,40,340, "M_muon1muon2", "M_muon1HEEPele1", use_integral, "","M_{#mu#mu}(GeV) " +xtag,lumi,50,ZNormalization,filetag);
 		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, false, 60,40,340, "M_muon1muon2", "M_muon1HEEPele1", use_integral, "","M_{#mu#mu}(GeV) " +xtag,lumi,50,ZNormalization,filetag+"nosub");
 		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true, 60,40,340, "M_muon1muon2", "M_muon1HEEPele1", true, "","M_{#mu#mu}(GeV) " +xtag,lumi,50,ZNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,40,.-.5,39.5, "N_Vertices", "N_Vertices", use_integral, "","N_{Vertices} " +xtag,lumi,500,ZNormalization,filetag);
+		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,40,.-.5,39.5, "N_GoodVertices", "N_GoodVertices", use_integral, "","N_{Vertices} " +xtag,lumi,500,ZNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "GlobalMuonCount", "GlobalMuonCount", use_integral, "","N_{Global #mu} " +xtag,lumi,100,ZNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,6,.-.5,5.5, "TrackerMuonCount", "TrackerMuonCount", use_integral, "","N_{Tracker #mu} " +xtag,lumi,100,ZNormalization,filetag);
 		fillHisto(lq_choice, cut_mc, cut_data, cut_data_emu, Use_emu, true,12,.-.5,11.5, "PFJetCount", "PFJetCount", use_integral, "","N_{PFJet} " +xtag,lumi,500,ZNormalization,filetag);
@@ -616,7 +615,7 @@ void MakePlotsMuMuSubInt()
 		TString cut_full_mc = cut_mc +     "*(ST_pf_mumu > 610)*(M_muon1muon2 > 130)*(LowestMass_BestLQCombo > 250)";
 
 		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", use_integral, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
-		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", use_integral, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,2750, "ST_pf_mumu", "ST_pf_emu", use_integral, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
 		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_muon1muon2", "M_muon1HEEPele1", use_integral, "","M_{#mu#mu}(GeV) " +xtag,lumi,500,ZNormalization,filetag);
 
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", true, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
@@ -632,7 +631,7 @@ void MakePlotsMuMuSubInt()
 		TString cut_full_mc = cut_mc + "*(ST_pf_mumu > 770)*(M_muon1muon2 > 130)*(LowestMass_BestLQCombo > 370)";
 
 		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", use_integral, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
-		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", use_integral, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,2750, "ST_pf_mumu", "ST_pf_emu", use_integral, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
 		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_muon1muon2", "M_muon1HEEPele1", use_integral, "","M_{#mu#mu}(GeV) " +xtag,lumi,500,ZNormalization,filetag);
 
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", true, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
@@ -648,7 +647,7 @@ void MakePlotsMuMuSubInt()
 		TString cut_full_mc = cut_mc + "*(ST_pf_mumu > 880)*(M_muon1muon2 > 140)*(LowestMass_BestLQCombo > 470)";
 
 		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", use_integral, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
-		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,1750, "ST_pf_mumu", "ST_pf_emu", use_integral, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu, Use_emu, false, 25,250,2750, "ST_pf_mumu", "ST_pf_emu", use_integral, "","S_{T} (GeV)" +xtag,lumi,500,ZNormalization,filetag);
 		fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_muon1muon2", "M_muon1HEEPele1", use_integral, "","M_{#mu#mu}(GeV) " +xtag,lumi,500,ZNormalization,filetag);
 
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data,cut_full_data_emu,  Use_emu, false, 25,0.0,2000.0, "M_bestmupfjet1_mumu", "M_bestmuORelepfjet1_mumu_emuselection", true, "","M_{#mu j} " +xtag,lumi,500,ZNormalization,filetag);
