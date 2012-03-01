@@ -29,6 +29,8 @@ if 'do_Combo' in str(sys.argv):
 	do_combo = 1
 if 'just_observed' in str(sys.argv):
 	do_observedonly = 1	
+singlebeta = -1
+
 numdo = 1	
 queue = '1nd'
 if 'CLSLimits' not in os.listdir('.'):
@@ -53,12 +55,17 @@ for x in range(len(sys.argv)):
 		numdo = int(sys.argv[x+1])
 	if sys.argv[x] == '-q':
 		queue = str(sys.argv[x+1])
-
+	if sys.argv[x] == '--single_beta':
+		singlebeta = float(sys.argv[x+1])
 	if '--Asymptotic_Only' in sys.argv[x]:
 		dobatch = False 
 from ROOT import *
 from array import array
 
+
+if singlebeta>0:
+	betas = []
+	betas.append(singlebeta)
 beta_combo = []
 m_combo = []
 dif_combo = []
@@ -1144,3 +1151,5 @@ if do_combo == 1:
 	print band2sigma_lvjj	
 	print '\n'
 	print '\n'
+	
+	
