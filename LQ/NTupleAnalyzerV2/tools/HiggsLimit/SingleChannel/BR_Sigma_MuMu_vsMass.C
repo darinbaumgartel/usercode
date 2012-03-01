@@ -179,7 +179,7 @@ void setTDRStyle() {
   tdrStyle->cd();
 }
 
-void makePlots()
+void makePlotsBO()
 {
  // **********************************************
  // *            Input parameters                *
@@ -188,7 +188,7 @@ void makePlots()
  bool systematics = true; // does nothing at the moment
 
  // total integrated luminosity (in pb-1)
- Double_t L_int = 2000;
+ Double_t L_int = 4700;
  // relative uncertainty on the integrated luminosity (0.1 = 10% uncertainty)
  Double_t Sigma_L_int = 0.11;
 
@@ -224,11 +224,14 @@ Double_t mData[10] = {250, 350, 400, 450, 500, 550, 600, 650, 750, 850};
  string title = ";M_{LQ} (GeV);#beta^{2}#times#sigma (pb)";
 
  // integrated luminosity
- string lint = "2.0 fb^{-1}";
+ string lint = "4.7 fb^{-1}";
 
  // region excluded by Tevatron limits
- Double_t x_shaded[5] = {250,316,316,250,250};// CHANGED FOR LQ2
+ Double_t x_shaded[5] = {250,422,422,250,250};// CHANGED FOR LQ2
  Double_t y_shaded[5] = {0.0001,0.0001,50,50,0.0001};// CHANGED FOR LQ2
+
+ Double_t x_shaded2[5] = {250,394,394,250,250};// CHANGED FOR LQ2
+ Double_t y_shaded2[5] = {0.0001,0.0001,50,50,0.0001};// CHANGED FOR LQ2
 
  // PDF uncertainty band
  //Double_t x_pdf[12] = {100	 ,	150	 ,	200 	,	250	, 300	,	350	,	350	, 300	, 250, 200, 150, 100};
@@ -244,16 +247,34 @@ Double_t x_shademasses[20]={250, 350, 400, 450, 500, 550, 600, 650, 750, 850, 85
 
 
 
-Double_t xsUp_expected[10] = {0.1442826 , 0.0327699 , 0.01930895 , 0.013634283 , 0.009994318 , 0.007099588 , 0.0061989212 , 0.00543902164 , 0.003250542 , 0.00303089724 }; 
+//////////// ASYMPTOTIC /////////////////
+Double_t xsUp_expected[10] = {0.069053 , 0.0161226 , 0.008733 , 0.00552318 , 0.0037503 , 0.00305148 , 0.00248496 , 0.002202408 , 0.00159487 , 0.0013957776 }; 
 
 
-Double_t xsUp_observed[10] = {0.1320682 , 0.02664522 , 0.0161704 , 0.013236652 , 0.011248585 , 0.010426008 , 0.0085645436 , 0.0087776572 , 0.0034295295 , 0.00318575184 }; 
+Double_t xsUp_observed[10] = {0.059337 , 0.0101601 , 0.0051455 , 0.00335946 , 0.00249557 , 0.0020414 , 0.00199516 , 0.001934036 , 0.00109994 , 0.0008164728 }; 
 
 
-Double_t y_1sigma[20]={0.1139201 , 0.02367351 , 0.0152438 , 0.01014481 , 0.00788952 , 0.005441216 , 0.00486142 , 0.00427974924 , 0.0027735645 , 0.00257148672 , 0.00424789848 , 0.0045987425 , 0.0075351016 , 0.0087680772 , 0.010122276 , 0.014249751 , 0.018323292 , 0.0275315 , 0.04403664 , 0.1774558 }; 
+Double_t y_1sigma[20]={0.049621 , 0.0116388 , 0.0062935 , 0.0039858 , 0.00270855 , 0.00220188 , 0.00179304 , 0.001589276 , 0.001150895 , 0.0010073052 , 0.0019387752 , 0.00221536 , 0.0030589 , 0.00345092 , 0.00423856 , 0.00521338 , 0.00766792 , 0.012136 , 0.0223713 , 0.095772 }; 
 
 
-Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.005533776 , 0.004693568 , 0.0038878712 , 0.00345898384 , 0.0025823005 , 0.00233103936 , 0.00591927408 , 0.0063552065 , 0.0102769576 , 0.0120242304 , 0.0138898508 , 0.018592228 , 0.025362974 , 0.03592215 , 0.05578515 , 0.218263 }; 
+Double_t y_2sigma[20]={0.037476 , 0.0087291 , 0.0047355 , 0.00299884 , 0.0020372 , 0.00165672 , 0.00134788 , 0.001195168 , 0.000865375 , 0.000757254 , 0.002575908 , 0.00294335 , 0.004064788 , 0.00458552 , 0.00563332 , 0.00692648 , 0.01018277 , 0.016113 , 0.0297648 , 0.127349 }; 
+
+
+
+
+////////////  FULL CLS  /////////////////
+
+//Double_t xsUp_expected[10] = {0.0777627 , 0.01560267 , 0.0089339 , 0.00553267 , 0.003772061 , 0.003216208 , 0.002489672 , 0.00222817712 , 0.00162043135 , 0.00142071684 }; 
+
+
+//Double_t xsUp_observed[10] = {0.0671792 , 0.01005993 , 0.00473755 , 0.003566342 , 0.002552982 , 0.00207326 , 0.002150656 , 0.0019998784 , 0.00115006725 , 0.00092639724 }; 
+
+
+//Double_t y_1sigma[20]={0.0580531 , 0.01222551 , 0.0066666 , 0.004129099 , 0.00268077 , 0.002176864 , 0.001857892 , 0.0016453164 , 0.0011672479 , 0.00101384928 , 0.0019871604 , 0.002292115 , 0.0031024344 , 0.003503248 , 0.004525536 , 0.005307832 , 0.007785596 , 0.0125706 , 0.02195631 , 0.1042388 }; 
+
+
+//Double_t y_2sigma[20]={0.0412583 , 0.00868617 , 0.00389705 , 0.003396471 , 0.002205269 , 0.001624388 , 0.001455636 , 0.0013536224 , 0.0010016721 , 0.00085905324 , 0.00279386832 , 0.0031528245 , 0.00433380896 , 0.005175884 , 0.006064728 , 0.007468653 , 0.010433306 , 0.01684485 , 0.02942136 , 0.1330398 }; 
+
 
 
 
@@ -299,6 +320,15 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  pl->SetLineColor(kGray);   // CHANGED FOR LQ2
  pl->Draw();
 
+ TPolyLine *p2 = new TPolyLine(5,x_shaded2,y_shaded2,"F");
+//  pl->SetFillStyle(3001);
+ p2->SetLineColor(0);
+ p2->SetFillColor(kBlack);
+ p2->SetFillStyle(3344);
+
+ p2->SetLineColor(kBlack);   // CHANGED FOR LQ2
+ p2->Draw();
+
  TGraph *exshade1 = new TGraph(20,x_shademasses,y_1sigma);
  exshade1->SetFillColor(kGreen);
  TGraph *exshade2 = new TGraph(20,x_shademasses,y_2sigma);
@@ -323,7 +353,7 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  gStyle->SetPadLeftMargin(0.14);
  gROOT->ForceStyle();
 
- TGraph *xsTh_vs_m = new TGraph(16, mTh, xsTh);
+ TGraph *xsTh_vs_m = new TGraph(15, mTh, xsTh);
  xsTh_vs_m->SetLineWidth(2);
  xsTh_vs_m->SetLineColor(kBlue);
  xsTh_vs_m->SetFillColor(kCyan-6);
@@ -371,7 +401,8 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  legend->SetTextFont(42);
  legend->SetMargin(0.15);
  legend->SetHeader("LQ#bar{LQ} #rightarrow #mu q #mu q");
- legend->AddEntry(pl,"D#oslash exclusion (1 fb^{-1}, #beta=1)","f");
+ legend->AddEntry(pl,"ATLAS exclusion (35 pb^{-1}, #beta=1)","f");
+ legend->AddEntry(p2,"CMS exclusion (34 pb^{-1}, #beta=1)","f");
  legend->AddEntry(xsTh_vs_m,"#beta^{2}#times #sigma_{theory} with theory unc., (#beta=1)","lf");
  legend->AddEntry(xsData_vs_m_expected, "Expected 95% C.L. upper limit","lp");
  legend->AddEntry(xsData_vs_m_observed, "Observed 95% C.L. upper limit","lp");
@@ -382,8 +413,8 @@ Double_t y_2sigma[20]={0.0926143 , 0.02231406 , 0.0123943 , 0.008008611 , 0.0055
  l1.SetTextSize(0.045);
  l1.SetTextFont(42);
  l1.SetNDC();
- l1.DrawLatex(0.25,0.29,"CMS Preliminary");
- l1.DrawLatex(0.25,0.23,lint.c_str());
+ l1.DrawLatex(0.52,0.6,"CMS Preliminary");
+ l1.DrawLatex(0.52,0.54,lint.c_str());
 //  TLatex l2;
 //  l2.SetTextAlign(12);
 //  l2.SetTextSize(0.037);
