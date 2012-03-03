@@ -47,7 +47,12 @@ for x in allsigs:
 
 jetzpos = []
 muzpos = []
+jetzpos_smear = []
+muzpos_smear = []
+
 unscaled = 0.0
+unsmeard = 0.0
+
 
 mumuprejetscalez = 1.0
 mumupremuscalez = 1.0
@@ -56,6 +61,14 @@ munuprejetscalew = 1.0
 munuprejetscalett = 1.0
 munupremuscalew = 1.0
 munupremuscalett = 1.0
+
+mumuprejetsmearz = 1.0
+mumupremusmearz = 1.0
+
+munuprejetsmearw = 1.0
+munuprejetsmeartt = 1.0
+munupremusmearw = 1.0
+munupremusmeartt = 1.0
 
 for i in range(len(sel)):
 	if 'PreSel' not in sel[i]:
@@ -66,21 +79,42 @@ for i in range(len(sel)):
 		jetzpos.append(tot[i])
 	if 'ZJet' in sig[i] and 'MuScale' in typ[i]:
 		muzpos.append(tot[i])	
+	if 'ZJet' in sig[i] and 'JetSmear' in typ[i]:
+		jetzpos_smear.append(tot[i])
+	if 'ZJet' in sig[i] and 'MuSmear' in typ[i]:
+		muzpos_smear.append(tot[i])	
 	if 'ZJet' in sig[i] and 'StandardSelection' in typ[i]:
-		unscaled = (tot[i])	
+		unscaled = (tot[i])
+		unsmeard = (tot[i])	
 for x in jetzpos:
 	if abs(x - unscaled) > mumuprejetscalez:
 		mumuprejetscalez = (abs(x - unscaled) + unscaled)/unscaled
 for x in muzpos:
 	if abs(x - unscaled) > mumupremuscalez:
 		mumupremuscalez = (abs(x - unscaled) + unscaled)/unscaled
+for x in jetzpos_smear:
+	if abs(x - unsmeard) > mumuprejetsmearz:
+		mumuprejetsmearz = (abs(x - unsmeard) + unsmeard)/unsmeard
+for x in muzpos_smear:
+	if abs(x - unsmeard) > mumupremusmearz:
+		mumupremusmearz = (abs(x - unsmeard) + unsmeard)/unsmeard
+
 
 jetwpos = []
 muwpos = []
 jetttpos = []
 muttpos = []
+jetwpos_smear = []
+muwpos_smear = []
+jetttpos_smear = []
+muttpos_smear = []
+
 unscaledw = 0.0
 unscaledtt = 0.0
+
+unsmeardw = 0.0
+unsmeardtt = 0.0
+
 
 for i in range(len(sel)):
 	if 'PreSel' not in sel[i]:
@@ -95,10 +129,24 @@ for i in range(len(sel)):
 		jetttpos.append(tot[i])
 	if 'TTBar' in sig[i] and 'MuScale' in typ[i]:
 		muttpos.append(tot[i])			
+		
+	if 'WJet' in sig[i] and 'JetSmear' in typ[i]:
+		jetwpos_smear.append(tot[i])
+	if 'WJet' in sig[i] and 'MuSmear' in typ[i]:
+		muwpos_smear.append(tot[i])	
+	if 'TTBar' in sig[i] and 'JetSmear' in typ[i]:
+		jetttpos_smear.append(tot[i])
+	if 'TTBar' in sig[i] and 'MuSmear' in typ[i]:
+		muttpos_smear.append(tot[i])					
+		
 	if 'WJet' in sig[i] and 'StandardSelection' in typ[i]:
 		unscaledw = (tot[i])	
+		unsmeardw = (tot[i])	
+
 	if 'TTBar' in sig[i] and 'StandardSelection' in typ[i]:
 		unscaledtt = (tot[i])	
+		unsmeardtt = (tot[i])	
+
 for x in jetwpos:
 	if abs(x - unscaledw) > munuprejetscalew:
 		munuprejetscalew = (abs(x - unscaledw) + unscaledw)/unscaledw
@@ -111,6 +159,19 @@ for x in jetttpos:
 for x in muttpos:
 	if abs(x - unscaledtt) > munupremuscalett:
 		munupremuscalett = (abs(x - unscaledtt) + unscaledtt)/unscaledtt
+
+for x in jetwpos_smear:
+	if abs(x - unsmeardw) > munuprejetsmearw:
+		munuprejetsmearw = (abs(x - unsmeardw) + unsmeardw)/unsmeardw
+for x in muwpos_smear:
+	if abs(x - unsmeardw) > munupremusmearw:
+		munupremusmearw = (abs(x - unsmeardw) + unsmeardw)/unsmeardw
+for x in jetttpos_smear:
+	if abs(x - unsmeardtt) > munuprejetsmeartt:
+		munuprejetsmeartt = (abs(x - unsmeardtt) + unsmeardtt)/unsmeardtt
+for x in muttpos_smear:
+	if abs(x - unsmeardtt) > munupremusmeartt:
+		munupremusmeartt = (abs(x - unsmeardtt) + unsmeardtt)/unsmeardtt
 		
 from math import sqrt
 for B in Backgrounds:
@@ -154,47 +215,59 @@ for B in Backgrounds:
 			jres = 1.0+abs(i_JetSmear - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
 			mres = 1.0+abs(i_MuSmear - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012
 			if 'BetaHalf' not in S and 'ZJet' in B:
-				if jes> mumuprejetscalez:
-					j = 1.0 - jes
-					J = 1.0 - mumuprejetscalez
-					jes = 1+ sqrt( j*j - J*J )
-				else:
-					jes = 1.0		
+				j = jes
+				J = mumuprejetscalez
+				jes = 1.0+ abs(1.0/j-1.0/J)/(1.0/j)
 					
-				if mes> mumupremuscalez:
-					m = 1.0 - mes
-					M = 1.0 - mumupremuscalez
-					mes = 1 + sqrt(m*m-M*M)
-				else:
-					mes = 1.0
+				m = mes
+				M = mumupremuscalez
+				mes = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
+
+				j = jres
+				J = mumuprejetsmearz
+				jres = 1.0+ abs(1.0/j-1.0/J)/(1.0/j)
+					
+				m = mres
+				M = mumupremusmearz
+				mres = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
+				
+					
 			if 'BetaHalf' in S and 'WJet' in B:
-				if jes> munuprejetscalew:
-					j = 1.0 - jes
-					J = 1.0 - munuprejetscalew
-					jes = 1+ sqrt( j*j - J*J )
-				else:
-					jes = 1.0		
-					
-				if mes> munupremuscalew:
-					m = 1.0 - mes
-					M = 1.0 - munupremuscalew
-					mes = 1 + sqrt(m*m-M*M)
-				else:
-					mes = 1.0	
+				j = jes
+				J = munuprejetscalew
+				jes = 1.0+ abs(1.0/j-1.0/J)/(1.0/j)
+				#print '@@ '+str(j) + '  '+str(J) + '  '+str(res)
+
+				m =  mes
+				M =  munupremuscalew
+				mes = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
+
+				j = jres
+				J = munuprejetsmearw
+				jres = 1.0+ abs(1.0/j-1.0/J)/(1.0/j)
+				#print '@@ '+str(j) + '  '+str(J) + '  '+str(jres)
+				m =  mres
+				M =  munupremusmearw
+				mres = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
+				#print ' @@ -------------------------'
+				
 			if 'BetaHalf' in S and 'TTBar' in B:
-				if jes> munuprejetscalett:
-					j = 1.0 - jes
-					J = 1.0 - munuprejetscalett
-					jes = 1+ sqrt( j*j - J*J )
-				else:
-					jes = 1.0		
+				j = jes
+				J = munuprejetscalett
+				jes = 1.0+ abs(1.0/j-1.0/J)/(1.0/j)
+				
+				m = mes
+				M = munupremuscalett
+				mes = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
+
+				j = jres
+				J = munuprejetsmeartt
+				jres = 1.0+ abs(1.0/j-1.0/J)/(1.0/j)
+				
+				m = mres
+				M = munupremusmeartt
+				mres = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
 					
-				if mes> munupremuscalett:
-					m = 1.0 - mes
-					M = 1.0 - munupremuscalett
-					mes = 1 + sqrt(m*m-M*M)
-				else:
-					mes = 1.0									
 		if 'BetaHalf' not in S and 'DiBoson' in B:
 			continue
 		print S+','+str(int(N))+';'+str(w)+',R_'+str(rateerr)+'_'+str(rate)+','+str(jes)+','+str(mes)+','+str(jres)+','+str(mres)+','+str(mod)+','+str(mrii)+','+str(lum)

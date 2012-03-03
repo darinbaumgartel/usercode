@@ -2,36 +2,39 @@ import os
 import sys
 from ROOT import *
 
-#castors = [
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_PostLP_2fb_2011_08_24_05_33_55/SummaryFiles',
-##'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_ForLP_2011_08_09_22_42_53/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleUp_0p04_ForLP_2011_08_10_03_58_37/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetScaleDown_0p04_ForLP_2011_08_10_04_20_57/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleUp_0p01_ForLP_2011_08_10_04_05_41/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuScaleDown_0p01_ForLP_2011_08_10_04_24_33/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_JetSmear_0p10_ForLP_2011_08_10_03_58_26/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_MuSmear_0p04_ForLP_2011_08_10_04_28_17/SummaryFiles'
-#]
+
+#castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan10_2012_01_10_23_03_00/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan10_JetScaleUp_2012_01_11_00_38_03/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan10_JetScaleDown_2012_01_11_01_29_06/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan10_MuScaleUp_2012_01_11_02_10_50/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan10_MuScaleDown_2012_01_11_04_20_45/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan10_JetSmear_2012_01_11_05_08_45/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan10_MuSmear_2012_01_11_05_46_18/SummaryFiles']
+
+#castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_2012_01_16_22_03_27/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan16_JetScaleUp_2012_01_16_22_59_44/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan16_JetScaleDown_2012_01_16_23_42_35/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan16_MuScaleUp_2012_01_17_00_22_34/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan16_MuScaleDown_2012_01_17_00_59_38/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan16_JetSmear_2012_01_17_01_35_20/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan16_MuSmear_2012_01_17_02_09_25/SummaryFiles']
+
+#castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_2012_01_20_17_30_11/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_JetScaleDown_2012_01_20_20_12_27/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_JetScaleUp_2012_01_20_19_19_40/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_JetSmear_2012_01_21_02_37_45/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_MuScaleDown_2012_01_20_22_07_44/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_MuScaleUp_2012_01_20_20_54_33/SummaryFiles',
+#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan20_MuSmear_2012_01_21_07_37_21/SummaryFiles']
 
 
-#castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_2011_10_04_15_37_02/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetScaleUp_2011_10_03_20_50_18/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetScaleDown_2011_10_08_00_36_55/SummaryFiles',
-##'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetScaleDown_2011_10_03_20_54_43/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_MuScaleUp_2011_10_03_21_50_50/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_MuScaleDown_2011_10_03_21_53_21/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JetSmear_2011_10_05_20_00_46/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_MuSmear_2011_10_03_23_45_46/SummaryFiles']
-
-castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_2011_11_02_01_10_04/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_JetScaleUp_2011_11_02_01_41_37/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_JetScaleDown_2011_11_02_02_14_47/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuScaleUp_2011_11_02_02_43_41/SummaryFiles',
-#'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuScaleDown_2011_11_02_03_31_43/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuScaleDown_2011_11_08_16_31_17/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_JetSmear_2011_11_02_12_48_04/SummaryFiles',
-'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_05_Default_StandardSelections_2fb_JETRESFIX_MuSmear_2011_11_02_13_21_25/SummaryFiles']
-
+castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb03_2012_02_07_21_01_29/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_JetScaleUp_2012_02_13_04_00_59/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_JetScaleDown_2012_02_13_05_28_31/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_MuScaleUp_2012_02_13_08_01_25/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_MuScaleDown_2012_02_13_10_27_44/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_JetSmear_2012_02_13_12_17_12/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_MuSmear_2012_02_13_15_06_37/SummaryFiles']
 
 KeepFiles = ['LQToCMu_BetaHalf_M_250.root',
 'LQToCMu_BetaHalf_M_350.root',
@@ -59,13 +62,14 @@ KeepFiles = ['LQToCMu_BetaHalf_M_250.root',
 'WJets_Sherpa.root',
 'ZJets_Sherpa.root'] 
 
-TTScale = 0.97;
-TTDDScale = 0.47;
-WScale = 1.26;
-ZScale = 8.723;
+TTScale = 0.93
+TTDDScale = 0.55
+WScale = 1.23
+ZScale = 1.34
+OtherScale = 0.9
 
 
-normtag = 'StandardSelections_2fb_JETRESFIX_2011'
+normtag = 'StandardSelections_4p7fb_Feb03_2012'
 scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown','JetSmear','MuSmear']
 #scaletags = ['JetScaleUp']
 tags = []
@@ -98,71 +102,13 @@ for c in castors:
 			os.system('stager_get -M '+x)
 		
 		
-lumi = 2000.0
+lumi = 4700.0
 
 cut_mc = ''
-#cut_mc += "*(";
-#cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.137148419144))+";
-#cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.570685400523))+";
-#cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(1.14449974737))+";
-#cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.8163157224))+";
-#cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(2.270776812))+";
-#cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(2.29783559215))+";
-#cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.05828090818))+";
-#cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.70525206573))+";
-#cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.28872517493))+";
-#cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(0.914713614527))+";
-#cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.625159994865))+";
-#cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.400496981648))+";
-#cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.245671305417))+";
-#cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.149501993628))+";
-#cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.0943735268094))+";
-#cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.055714218504))+";
-#cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.032273131211))+";
-#cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.0193368300632))+";
-#cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0109074260718))+";
-#cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.00646596430331))+";
-#cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.00324352812525))+";
-#cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.00178440502281))+";
-#cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.00111645018356))+";
-#cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.000602006464283))+";
-#cut_mc += "((N_PileUpInteractions > 23.5)*(0.000602006464283))";
-#cut_mc += ")";
 
-
-#cut_mc += "*(";
-#cut_mc += "((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)*(0.0752233034121))+";
-#cut_mc += "((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)*(0.361994702942))+";
-#cut_mc += "((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)*(0.787119271271))+";
-#cut_mc += "((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)*(1.31779962348))+";
-#cut_mc += "((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)*(1.76293927848))+";
-#cut_mc += "((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)*(1.99059826007))+";
-#cut_mc += "((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)*(2.00731349758))+";
-#cut_mc += "((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)*(1.82730847106))+";
-#cut_mc += "((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)*(1.56802352509))+";
-#cut_mc += "((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)*(1.26852456276))+";
-#cut_mc += "((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)*(0.993808726427))+";
-#cut_mc += "((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)*(0.760786688881))+";
-#cut_mc += "((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)*(0.566015549542))+";
-#cut_mc += "((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)*(0.41722578577))+";
-#cut_mc += "((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)*(0.303388545407))+";
-#cut_mc += "((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)*(0.220634364549))+";
-#cut_mc += "((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)*(0.155308189438))+";
-#cut_mc += "((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)*(0.110585960196))+";
-#cut_mc += "((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)*(0.0776646451932))+";
-#cut_mc += "((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)*(0.0543492223545))+";
-#cut_mc += "((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)*(0.037244740125))+";
-#cut_mc += "((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)*(0.0259826507587))+";
-#cut_mc += "((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)*(0.0175412449088))+";
-#cut_mc += "((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)*(0.0118325534711))+";
-#cut_mc += "((N_PileUpInteractions > 23.5)*(0.00))";
-#cut_mc += ")";
-
-
-
-preselectionmumu = str(lumi)+'*weight_pileup2fb*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)||(abs(Eta_muon2)<2.1)))' + cut_mc
-preselectionmunu = str(lumi)+'*weight_pileup2fb*(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))' +cut_mc
-preselectionemu = '0.47*(LowestUnprescaledTriggerPass>0.5)*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(M_muon1HEEPele1>50)*(deltaR_muon1HEEPele1>0.3)*((abs(Eta_muon1)<2.1)||(abs(Eta_HEEPele1)<2.1))';
+preselectionmumu = str(lumi)+'*weight_pileup4p7fb_higgs*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)&&(abs(Eta_muon2)<2.1)))' + cut_mc
+preselectionmunu = str(lumi)+'*weight_pileup4p7fb_higgs*(pass_HBHENoiseFilter>0.5)*(pass_passBeamHaloFilterTight>0.5)*(pass_EcalMaskedCellDRFilter>0.5)*(pass_isTrackingFailure>0.5)*(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>55)*(Pt_pfjet1>40)*(Pt_pfjet2>40)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0)*(deltaR_muon1pfjet1>0.7)*(deltaR_muon1pfjet2>0.7))' +cut_mc
+preselectionemu = '0.55*(LowestUnprescaledTriggerPass>0.5)*(pass_isBPTX0>0.5)*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(M_muon1HEEPele1>50)*(deltaR_muon1HEEPele1>0.3)*((abs(Eta_muon1)<2.1)&&(abs(Eta_HEEPele1)<2.1))';
 
 
 
@@ -302,6 +248,8 @@ for s in range(len(selections)):
 				scalefactor = '*'+(str(ZScale))
 			if 'LQToCMu' in x and use not in  x: 
 				continue;
+			if 'LQToCMu' in x and 'BetaHalf' in x:
+				scalefactor = '*(0.9)'
 			marker = 'mumu'
 			if "_BetaHalf_" in use or "MuNu" in use:
 				marker = 'munu'
@@ -311,8 +259,8 @@ for s in range(len(selections)):
 			if 'TTBar' in x and ('BetaHalf' not in use and 'MuNu' not in use):
 				isTT = 1
 				scalefactor = '*'+(str(TTDDScale))				
-			
-			
+			if ('DiBoson' in x or 'SingleTo' in x) and ('BetaHalf' in use or 'MuNu' in use): 
+				scalefactor = '*'+str(OtherScale)
 			thistag = ''
 			for t in tags:
 				if t in x:
@@ -343,7 +291,8 @@ for s in range(len(selections)):
 				n = TTDDScale*h.GetEntries()
 			
 			if 'BetaHalf' in use or 'MuNu' in use:
-				t.Project('hw','1.0',preselectionmunu+scalefactor)	
+				t.Project('hw','1.0',preselectionmunu+scalefactor)
+
 			else:
 				t.Project('hw','1.0',preselectionmumu+scalefactor)
 			
@@ -369,8 +318,8 @@ for s in range(len(selections)):
 			else:
 				issignal_n.append('bg')
 			#print rootfile +(25-len(rootfile))*' '+ str(n) 
-			print use + '   ' + rootfile + (35 - len(rootfile))*' ' +tag+(40 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)
-			flogV.write(use + '   ' + rootfile + (35 - len(rootfile))*' ' +tag+(40 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)+'\n')
+			print use + '   ' + rootfile + (50 - len(rootfile))*' ' +tag+(50 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)
+			flogV.write(use + '   ' + rootfile + (50 - len(rootfile))*' ' +tag+(50 - len(tag))*' '+str(MCint)+'   '+str(thisweight)+'  '+str(n)+'  '+str(nerr)+'\n')
 			f.Close()
 			del t
 flogV.close()			
@@ -464,144 +413,3 @@ for o in range(len(opts)):
 
 fout.close()
 
-#summary_opts = []
-
-#for t in tags:
-	#for s in samples:
-		#exec ('summary_int_'+t+'_'+s+'=[]')
-		#exec ('summary_int_'+t+'_'+s+'_var=[]')
-		
-#for t in tags:
-	#for s in samples:		
-		#for o in opts:
-			#exec('summary_int_'+t+'_'+s+'.append(0.0)')
-			#exec('summary_int_'+t+'_'+s+'_var.append(0.0)')	
-				
-#for o in range(len(opts)):
-	#if 'BetaHalf' in opts[o]:
-		#ignores = ['TTBar','WJets']
-		#ignores = []
-
-	#else:
-		#ignores = ['TTBar','ZJetsMG','DiBoson']
-		#ignores = []
-
-	#summary_opts.append(opts[o])
-	#for i in R:		
-		#if opt_n[i] != opts[o]:
-			#continue
-		#exec('summary_int_'+tag_n[i]+'_'+samples[i]+'['+str(o)+']='+str(total_n[i]))
-		#if sample_n[i] not in ignores:
-			#exec('summary_int_'+tag_n[i]+'_'+samples[i]+'_var['+str(o)+']='+str(total_n[i]))
-
-#fout = open('SystematicsLog_FullSel.txt','w')
-
-#hline = '\n\nLeptoquarks\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
-#for t in tags:
-	#if 'Standard' not in t:
-		#hline += t + '\t'
-		
-#fout.write(hline+'\n')		
-#print hline
-#for o in range(len(opts)):
-	#line = opts[o] + '\t'
-	#for t in tags:
-		#for s in samples:
-			#if 'Standard' in t:
-				#exec('line += str(float(summary_int_StandardSelections_'+s+'_var['+str(o)+']) )+"\t"')
-			#if 'Standard' not in t:
-				#exec('line += str(float(summary_int_'+t+'_'+s+'_var['+str(o)+']) - float(summary_int_StandardSelections_'+s+'_var['+str(o)+']) )+"\t"')
-	#print line
-	#fout.write(line+'\n')
-
-
-##hline = '\n\nBackgrounds\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
-##for t in tags:
-	##if 'Standard' not in t:
-		##hline += t + '\t'
-		
-##fout.write(hline+'\n')		
-##print hline
-##for o in range(len(opts)):
-	##line = opts[o] + '\t'
-	##for t in tags:
-		##for s in samples:
-		
-		##if 'Standard'  in t:
-			##exec('line += str(float(summary_int_StandardSelections_'+s+'_var['+str(o)+']) )+"\t"')
-		##if 'Standard' not in t:
-			##exec('line += str(float(summary_int_'+t+'_'+s+'_var['+str(o)+']) - float(summary_int_StandardSelections_bg_var['+str(o)+']) )+"\t"')
-	##print line
-	##fout.write(line+'\n')
-
-#fout.close()
-
-
-#summary_opts = []
-
-#for t in tags:
-	#exec('summary_int_'+t+'_sig=[]')
-	#exec('summary_int_'+t+'_bg=[]')
-	#exec('summary_int_'+t+'_sig_var=[]')
-	#exec('summary_int_'+t+'_bg_var=[]')	
-#for t in tags:		
-	#for o in opts:
-		#exec('summary_int_'+t+'_sig.append(0.0)')
-		#exec('summary_int_'+t+'_bg.append(0.0)')
-		#exec('summary_int_'+t+'_sig_var.append(0.0)')
-		#exec('summary_int_'+t+'_bg_var.append(0.0)')
-#for o in range(len(opts)):
-	#if 'BetaHalf' in opts[o]:
-		#ignores = ['TTBar','WJets']
-		#ignores = []
-
-	#else:
-		#ignores = ['TTBar','ZJetsMG','DiBoson']
-		#ignores = ['TTBar']
-
-	#summary_opts.append(opts[o])
-	#for i in R:		
-		#if opt_n[i] != opts[o]:
-			#continue
-		#exec('summary_int_'+tag_n[i]+'_'+issignal_n[i]+'['+str(o)+']+='+str(total_n[i]))
-		#if sample_n[i] not in ignores:
-			#exec('summary_int_'+tag_n[i]+'_'+issignal_n[i]+'_var['+str(o)+']+='+str(total_n[i]))
-
-#fout = open('SystematicsLog_FullSel.txt','w')
-
-#hline = '\n\nLeptoquarks\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
-#for t in tags:
-	#if 'Standard' not in t:
-		#hline += t + '\t'
-		
-#fout.write(hline+'\n')		
-#print hline
-#for o in range(len(opts)):
-	#line = opts[o] + '\t'
-	#for t in tags:
-		#if 'Standard' in t:
-			#exec('line += str(float(summary_int_StandardSelections_sig_var['+str(o)+']) )+"\t"')
-		#if 'Standard' not in t:
-			#exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) - float(summary_int_StandardSelections_sig_var['+str(o)+']) )+"\t"')
-	#print line
-	#fout.write(line+'\n')
-
-
-#hline = '\n\nBackgrounds\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
-#for t in tags:
-	#if 'Standard' not in t:
-		#hline += t + '\t'
-		
-#fout.write(hline+'\n')		
-#print hline
-#for o in range(len(opts)):
-	#line = opts[o] + '\t'
-	#for t in tags:
-		#if 'Standard'  in t:
-			#exec('line += str(float(summary_int_StandardSelections_bg_var['+str(o)+']) )+"\t"')
-		#if 'Standard' not in t:
-			#exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) - float(summary_int_StandardSelections_bg_var['+str(o)+']) )+"\t"')
-	#print line
-	#fout.write(line+'\n')
-
-#fout.close()
