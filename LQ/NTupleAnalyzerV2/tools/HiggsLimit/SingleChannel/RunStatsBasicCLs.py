@@ -505,6 +505,7 @@ if do_combo == 1:
 						line = line2
 					if  'stat' in line and 'sig' in line and 'gmN' in line:
 						linesplit = line.split()
+						print linesplit
 						for nsp in range(len(linesplit)):
 							if 'BetaHalf' not in line and nsp == betaoneplace+1:
 								repsold =  str(linesplit[nsp+1])
