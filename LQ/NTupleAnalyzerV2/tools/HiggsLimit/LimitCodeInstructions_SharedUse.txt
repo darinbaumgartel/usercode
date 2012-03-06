@@ -186,6 +186,7 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
 
 ##################################################################
 
+0) Follow steps (1) and (2) of the normal method above to set up the working area and make your FinalCards.txt
 
 1) Put your normal "FinalCards.txt" in the SingleChanel directory and run the individual channel limits with:
 
