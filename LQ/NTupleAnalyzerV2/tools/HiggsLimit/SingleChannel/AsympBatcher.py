@@ -41,6 +41,8 @@ for b in betas:
 	
 	f.close()
 	bsubs .append('bsub -o /dev/null -e /dev/null -q 1nd -J job_'+bs+' < ' +'BatcherResults/batch_R_'+bs+'.csh')
+	#bsubs .append('bsub -q 1nd -J job_'+bs+' < ' +'BatcherResults/batch_R_'+bs+'.csh')
+
 	
 os.system('chmod 777 BatcherResults/*.csh')
 
