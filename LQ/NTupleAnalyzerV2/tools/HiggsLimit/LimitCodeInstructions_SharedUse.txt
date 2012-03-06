@@ -83,11 +83,13 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
 
 	  cd NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/
 
-      python RunStatsBasicCLs.py --do_BetaOne --do_BetaHalf -q 8nh -n 3 -c MyFirstRun
+      python RunStatsBasicCLs.py --do_BetaOne --do_BetaHalf -q 8nh -n 2 -c MyFirstRun
 
       About the options:
       
-      --do_BetaOne --do_BetaHalf :  Specifies to do both channels.
+      --do_BetaOne               :  Specifies to do beta=1 channel
+      --do_BetaHalf              :  Specifies to do beta=1/2 channel
+      --do_Combo                 :  Specifies to do combination of beta=1 and beta=1/2 channels
       -q 8nh                     :  Specifies batch queue '8nh'
       -c MyFirstRun              :  Specifies the output log files and castor directories of root files will be
                                     labeled "StandardExample". Choose whatever name you want. 
@@ -96,6 +98,12 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
                                     * Use this if you don't have at least 200MB
                                       free space in your working area for root
                                       files *   
+      --Asymptotic_Only          : Specifies not to run the full batch calcualtion of CLs, but just to use
+                                   the fast Asymptotic CLs method. Results will print to screen. Roughly 10 mins
+                                   for single channels and upwards of an hour for combination. Asymptotic results
+                                   also print to screen by default when using batch mode, this just turns of batch.                     
+                     
+                                      
     b) What does the script do? 
     
        - It Looks at FinalCards.txt and splits up all the cards for each channel/mass. 
@@ -148,11 +156,52 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
     Of course, edit the legends/labels as needed, but the theory curve etc should be good for our 2011 mass points.
     
     
-6) Channel combinations - Coming soon ...
+    
+6) Channel combination jobs
 
+   a) Use the batch mode launching with:
+
+	  cd NTupleAnalyzerV2/tools/HiggsLimit/SingleChannel/
+
+      python RunStatsBasicCLs.py --do_Combo -q 8nh -n 1 -c MyFirstComboRun
        
        
+   b) Or just use Asymptotic CLS with multiple jobs:
+   
+      python AsympBatcher.py --do_Combo -q 8nh -n 1 -c JunkTest --castor_only --Asymptotic_Only
+      
+      ... Wait for jobs to complete.
+      
+      python AsympmBatcherParser.py 
+      
+7) Gather Combination Results
+
+   ... working
+   
+   
+   
+##################################################################
+
+    NEW: QUICK RESULTS WITH ASYMPTOTIC CLS
+
+##################################################################
+
+
+1) Put your normal "FinalCards.txt" in the SingleChanel directory and run the individual channel limits with:
+
+    python RunStatsBasicCLs.py --do_BetaOne --do_BetaHalf -q 8nh -n 2 -c DummyTag  --castor_only --Asymptotic_Only
        
-       
-       
+	Results will print to screen.
+	
+2) You can also run the Combination asymptotically. Every beta value takes about as long as step (1), and 
+   it's good to use many beta values. So a quick fix is to batch this. 
+   
+   A) First run the script that submits the jobs to batch. This will fill text files of results into a newly created 
+      "BatcherResults" directory.   
+   
+       python AsympBatcher.py --do_Combo -q 8nh -n 1 -c DummyTag --castor_only --Asymptotic_Only
+
+   B) Then run the additional script to scan the contents of the "BatcherResults" directory. Results output to screen.
+  
+       python AsympBatcherParser.py 
        
