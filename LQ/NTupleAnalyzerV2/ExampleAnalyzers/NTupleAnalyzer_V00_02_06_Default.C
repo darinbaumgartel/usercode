@@ -40,6 +40,16 @@ Double_t SmearObject(Double_t PT, Double_t fraction)
 	return (rr->Gaus(PT,fraction*PT));
 }
 
+Double_t JERFactor(Double_t J_ETA)
+{
+if ((abs(J_ETA)<0.5))                     return rr->Gaus(1.052,0.063);
+if ((abs(J_ETA)>0.5)&&(abs(J_ETA)<1.1))   return rr->Gaus(1.057,0.057);
+if ((abs(J_ETA)>1.1)&&(abs(J_ETA)<1.7))   return rr->Gaus(1.096,0.065);
+if ((abs(J_ETA)>1.7)&&(abs(J_ETA)<2.3))   return rr->Gaus(1.134,0.094);
+if ((abs(J_ETA)>2.3)&&(abs(J_ETA)<5.0))   return rr->Gaus(1.288,0.200);
+return 1.0;
+}
+
 Double_t GetRecoGenJetScaleFactor(Double_t RecoPT,Double_t GenPT, Double_t SmearFactor)
 {
 	Double_t deltaPT = ((RecoPT-GenPT)*SmearFactor);
@@ -58,7 +68,6 @@ TLorentzVector PropagatePTChangeToMET(Double_t MET, Double_t METPhi, Double_t PT
 	vmetcorr.SetPtEtaPhiM( metCorr,0,metPhiCorr,0 );
 	return vmetcorr;
 }
-
 
 // Recoil Correction Function for U1
 Double_t F_U1Prime(Double_t P)
@@ -81,8 +90,8 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 {
 	int isgood = 1;
 
-	if (e_pt_real<35.0) isgood = 0; // OK
-	if (e_pt<35.0) isgood = 0; // OK
+	if (e_pt_real<40.0) isgood = 0; // OK
+	if (e_pt<40.0) isgood = 0; // OK
 	//if (fabs(e_eta) > 1.442 && fabs(e_eta) < 1.560) isgood = 0;
 	if (fabs(e_eta) > 2.50) isgood = 0; //OK
 	if (!e_ecaldriven) isgood = 0; //OK
@@ -231,6 +240,8 @@ void placeholder::Loop()
 	BRANCH(deltaR_muon2pfjet1); BRANCH(deltaR_muon2pfjet2);
 	BRANCH(deltaR_muon1closestPFJet);
 	BRANCH(deltaR_muon1HEEPele1);
+	BRANCH(deltaR_HEEPele1pfjet1);
+	BRANCH(deltaR_HEEPele1pfjet2);
 
 
 	// Mass Combinations
@@ -771,15 +782,17 @@ void placeholder::Loop()
 			}
 		}
 
-		
 		if (!isData)
 		{
+			int filterjetcount = 0;
 			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 			{
-				if (PFJetPt->at(ijet) < 25.0) continue;
+				if (filterjetcount >=5) continue;
+				if (PFJetPt->at(ijet) < 20.0) continue;
 				if (PFJetPassLooseID->at(ijet) != 1) continue;		
-				if ( fabs(PFJetEta->at(ijet)) > 3.0 ) continue;
-	
+				if ( fabs(PFJetEta->at(ijet)) > 2.4 ) continue;
+				filterjetcount += 1;
+				
 				bool consider = true;
 				TLorentzVector ThisPFJet;
 				Double_t JetLepDR;
@@ -790,23 +803,30 @@ void placeholder::Loop()
 					TLorentzVector ThisLepton;	
 					ThisLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
 					JetLepDR = ThisLepton.DeltaR(ThisPFJet);
-					if (JetLepDR < .2) consider = false;
+					if (JetLepDR < .3) consider = false;
 				}
 				for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
 				{
 					TLorentzVector ThisLepton;	
 					ThisLepton.SetPtEtaPhiM(ElectronPt->at(iele),ElectronEta->at(iele),ElectronPhi->at(iele),0.0);
 					JetLepDR = ThisLepton.DeltaR(ThisPFJet);
-					if (JetLepDR < .2) consider = false;
+					if (JetLepDR < .3) consider = false;
 				}
 				
 				if (!consider) continue;
-				double NewJetRescalingFactor = 1.0+NewJesUncertainty((JetRescaleFactor - 1.0), (*PFJetPtRaw)[ijet], (*PFJetEta)[ijet]);
-				if (JetRescaleFactor < 1.0) NewJetRescalingFactor = 2.0 - NewJetRescalingFactor;
 				
+				
+				double NewJetRescalingFactor = JetRescaleFactor;
+				
+				if (false)
+					{
+					NewJetRescalingFactor = 1.0+NewJesUncertainty((JetRescaleFactor - 1.0), (*PFJetPtRaw)[ijet], (*PFJetEta)[ijet]);
+					if (JetRescaleFactor < 1.0) NewJetRescalingFactor = 2.0 - NewJetRescalingFactor;
+					}
 				
 				double NewJetPT = (*PFJetPt)[ijet];
 				double NewJetETA = (*PFJetEta)[ijet];
+
 
 				if (JetRescaleFactor != 1.00) NewJetPT = NewJetPT + ((ScaleObject((*PFJetPtRaw)[ijet],NewJetRescalingFactor)) - ((*PFJetPtRaw)[ijet])) ; 
 				
@@ -828,7 +848,10 @@ void placeholder::Loop()
 				}
 			
 				Double_t Standard_rescale = 0.0;
-				if (SmallestDeltaR<0.5) Standard_rescale = 0.1;
+				if (false)
+				{
+					if (SmallestDeltaR<0.5) Standard_rescale = 0.1;
+				}
 				//if ((SmallestDeltaR<0.5)&&(ijet==0)) std::cout<<ClosestGenJetPT<<std::endl;
 				//if ((SmallestDeltaR<0.5)&&(ijet==0)) difreg += ((ClosestGenJetPT - (PFJetPt->at(ijet)))*(ClosestGenJetPT - (PFJetPt->at(ijet))));
 				//if ((SmallestDeltaR<0.5)&&(ijet==0)) difraw += ((ClosestGenJetPT - (PFJetPtRaw->at(ijet)))*(ClosestGenJetPT - (PFJetPtRaw->at(ijet))));
@@ -844,17 +867,12 @@ void placeholder::Loop()
 				if (JetSmearFactor > 0.0){
 
 					Double_t JetEta = fabs(PFJetEta->at(ijet));
-					Double_t Systematic_rescale = 0.2;
-					
-					if ((JetEta >1.5) && (JetEta<2.0)) Systematic_rescale = 0.25;
-					if (JetEta >2.0) Systematic_rescale = 0.3;
-					
+					Double_t Systematic_rescale = 	JERFactor(JetEta);				
 					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Systematic_rescale);
 					NewJetPT *=JetAdjustmentFactorSys;
 				
 				}
-				
-				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+				std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
 				
 				//std::cout<<SmallestDeltaR<<"   "<<ClosestGenJetPT<<"   "<<(*PFJetPt)[ijet]<<"   "<<NewJetPT<<"        "<<(*PFMET)[0]<<"   "<<JetAdjustedMET.Pt()<<std::endl;
 
@@ -868,7 +886,7 @@ void placeholder::Loop()
 
 		(*PFMET)[0] = JetAdjustedMET.Pt();
 		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
-		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
+		std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
 
 		//std::cout<<" ------------------------------------------------ " <<std::endl;
 		//========================     Muon Rescaling / Smearing Sequence   ================================//
@@ -880,6 +898,30 @@ void placeholder::Loop()
 		{
 			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 			{
+				Double_t muonPt = MuonPt->at(imuon);
+				Double_t muonEta = MuonEta->at(imuon);
+				
+				if  (muonPt < 20.0)  continue;
+				if  ( fabs(muonEta) > 2.1 )      continue;
+	
+				bool PassGlobalTightPrompt =
+					MuonIsGlobal ->at(imuon) == 1 &&
+					MuonIsTracker ->at(imuon) == 1 &&
+					//fabs(MuonRelIso->at(imuon)) < 0.1 &&
+					(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
+					//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
+					MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
+	
+				bool PassPOGTight =
+					MuonStationMatches->at(imuon) > 1 && 
+					fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
+					MuonGlobalChi2 ->at(imuon) < 10.0 &&                         /// Disable for EWK
+					MuonPixelHitCount ->at(imuon) >=1 &&
+					MuonGlobalTrkValidHits->at(imuon)>=1 ;
+	
+				if ( ! (PassGlobalTightPrompt && PassPOGTight) ) continue;
+			
+							
 				double NewMuonPT =  ScaleObject((*MuonPt)[imuon],MuonRescaleFactor); 
 				NewMuonPT =  SmearObject(NewMuonPT,MuonSmearFactor); 
 				MuAdjustedMET = PropagatePTChangeToMET(MuAdjustedMET.Pt(),  MuAdjustedMET.Phi(), NewMuonPT, (*MuonPt)[imuon], MuonPhi->at(imuon));
@@ -935,6 +977,8 @@ void placeholder::Loop()
 
 		for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
 		{
+			if (fabs(ElectronEta->at(iele))>2.1) continue;
+			
 			double e_pt_real = ElectronPt->at(iele);			
 			double e_pt = ElectronPtHeep->at(iele);
 			double e_eta = ElectronSCEta->at(iele);
@@ -980,8 +1024,8 @@ void placeholder::Loop()
 			Double_t muonPt = MuonPt->at(imuon);
 			Double_t muonEta = MuonEta->at(imuon);
 
-			if (checkPT && (muonPt < 20.0) ) continue;
-			if  ( fabs(muonEta) > 2.4 )      continue;
+			if (checkPT && (muonPt < 40.0) ) continue;
+			if  ( fabs(muonEta) > 2.1 )      continue;
 
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
@@ -1004,7 +1048,7 @@ void placeholder::Loop()
 			muon.SetPtEtaPhiM( MuonPt -> at(imuon), MuonEta-> at(imuon),    MuonPhi-> at(imuon),    0);
 
 			muons.push_back(muon);
-			checkPT=false;
+			//checkPT=false;
 
 			v_idx_muon_final.push_back(imuon);
 		}						 // loop over muons
@@ -1062,19 +1106,19 @@ void placeholder::Loop()
 			CurrentPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
 
 			bool IsLepton = false;
-			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
-			{
-				CurrentLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
-				if (CurrentLepton.DeltaR(CurrentPFJet) < .5) IsLepton = true;
-			}
+			//for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
+			//{
+				//CurrentLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
+				//if (CurrentLepton.DeltaR(CurrentPFJet) < .5) IsLepton = true;
+			//}
 
-			if (PFJetMuonEnergyFraction->at(ijet) > .8) IsLepton = true;
+			//if (PFJetMuonEnergyFraction->at(ijet) > .8) IsLepton = true;
 
 			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)&&(!IsLepton)) FailIDPFThreshold = PFJetPt->at(ijet);
 
-			if ( jetPt < 25.0 ) continue;			
+			if ( jetPt < 20.0 ) continue;			
 
-			if ( fabs(jetEta) > 3.0 ) continue;
+			if ( fabs(jetEta) > 2.4 ) continue;
 
 			if (PFJetPassLooseID->at(ijet) != 1) continue;        // Disable for EWK
 			//if (PFJetPassTightID->at(ijet) != 1) continue;
@@ -1083,13 +1127,14 @@ void placeholder::Loop()
 		}
 		
 		/// Filter out jets that are actually muons
-		TLorentzVector thisjet, thismu;
+		TLorentzVector thisjet, thismu, thise;
 		vector<int> jetstoremove;
 
 		Double_t thisdeltar = 0.0;
 		Double_t mindeltar = 99999;
 		int minjet = 0;
 		int muindex = 99;
+		int eindex = 99;
 		int jetindex = 99;
 		// Get list of jets to throw out
 		//		for(unsigned int imu=0; imu<v_idx_muon_final.size(); imu++)
@@ -1123,12 +1168,24 @@ void placeholder::Loop()
 
 			for(unsigned int imu=0; imu<v_idx_muon_final.size(); imu++)
 			{
+				if (imu>1) continue;
 				muindex = v_idx_muon_final[imu];
 				thismu.SetPtEtaPhiM(MuonPt->at(muindex),MuonEta->at(muindex),MuonPhi->at(muindex),0);
 
 				thisdeltar = thismu.DeltaR(thisjet);
 
-				if (thisdeltar < 0.5)		jetstoremove.push_back(jetindex);
+				if (thisdeltar < 0.3)		jetstoremove.push_back(jetindex);
+			}
+
+			for(unsigned int ie=0; ie<v_idx_ele_good_final.size(); ie++)
+			{
+				if (ie>0) continue;
+				eindex = v_idx_ele_good_final[ie];
+				thise.SetPtEtaPhiM(ElectronPt->at(eindex),ElectronEta->at(eindex),ElectronPhi->at(eindex),0);
+
+				thisdeltar = thise.DeltaR(thisjet);
+
+				if (thisdeltar < 0.3)		jetstoremove.push_back(jetindex);
 			}
 		}
 
@@ -1158,6 +1215,8 @@ void placeholder::Loop()
 			jetindex = v_idx_pfjet_final_unseparated[ijet];
 			double jetPt = PFJetPt -> at(jetindex);
 			double jetEta = PFJetEta -> at(jetindex);
+
+			if (jetPt < 30.0) continue;
 
 			TLorentzVector newjet;
 			newjet.SetPtEtaPhiM(jetPt,  jetEta, PFJetPhi->at(jetindex),     0);
@@ -1588,7 +1647,10 @@ void placeholder::Loop()
 		VRESET(deltaR_muon2pfjet1); VRESET(deltaR_muon2pfjet2);
 		VRESET(deltaR_muon1closestPFJet);
 		VRESET(deltaR_muon1HEEPele1);
-
+		VRESET(deltaR_HEEPele1pfjet1);
+		VRESET(deltaR_HEEPele1pfjet2);
+		VRESET(deltaR_HEEPele1pfjet1);
+		VRESET(deltaR_HEEPele1pfjet2);
 
 		// Mass Combinations
 		VRESET(M_muon1muon2);  VRESET(M_pfjet1pfjet2);
@@ -1668,6 +1730,8 @@ void placeholder::Loop()
 		MET_pf = PFMET->at(0);
 		MET_pfsig = PFMETSig->at(0);
 		pfMET.SetPtEtaPhiM(MET_pf,0.0,PFMETPhi->at(0),0.0);
+		MET_pf_charged = PFMETCharged->at(0);
+	
 		caloMET.SetPtEtaPhiM(CaloMET->at(0),0.0,CaloMETPhi->at(0),0.0);
 		double MET_calo = CaloMET->at(0);
 		
@@ -2057,6 +2121,9 @@ void placeholder::Loop()
    		        ST_pf_emu = Pt_muon1 + Pt_pfjet1 + Pt_pfjet2 + Pt_HEEPele1;
 				M_muon1HEEPele1 = (muon1 + heepele1).M();
 				deltaR_muon1HEEPele1 = (heepele1).DeltaR(muon1);
+				deltaR_HEEPele1pfjet1 = (heepele1).DeltaR(pfjet1);
+				deltaR_HEEPele1pfjet2 = (heepele1).DeltaR(pfjet2);
+
 				M_HEEPele1pfjet1_emuselection = (heepele1 + pfjet1).M();
 				M_HEEPele1pfjet2_emuselection = (heepele1 + pfjet2).M();
 		}
