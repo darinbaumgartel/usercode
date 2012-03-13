@@ -204,6 +204,7 @@ void placeholder::Loop()
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
 	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb); BRANCH(weight_pileup2011B); BRANCH(weight_pileup2011A); BRANCH(weight_pileup4p7fb_higgs);
+	BRANCH(weight_pu_central); BRANCH(weight_pu_sysplus8); BRANCH(weight_pu_sysminus8);
 	BRANCH(weight_pileup4p7fb_Fall11); BRANCH(weight_pileup4p7fb_Fall11Poisson);
 	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_EcalMaskedCellDRFilter); BRANCH(pass_passBeamHaloFilterLoose); 
 	BRANCH(pass_passBeamHaloFilterTight); BRANCH(pass_CaloBoundaryDRFilter);
@@ -697,6 +698,134 @@ void placeholder::Loop()
 
 
 
+
+
+		weight_pu_central = weight;
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_central  *=(0.0136759963465);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_central  *=(0.145092627325);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_central  *=(0.337346053675);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pu_central  *=(0.603889700177);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pu_central  *=(0.875723164145);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pu_central  *=(1.09904167986);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pu_central  *=(1.25430629491);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pu_central  *=(1.34642557836);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pu_central  *=(1.39979322363);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pu_central  *=(1.43532953354);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pu_central  *=(1.47049703593);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pu_central  *=(1.51604545424);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pu_central  *=(1.57633567564);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pu_central  *=(1.64932013381);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pu_central  *=(1.74029438919);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pu_central  *=(1.83791180719);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pu_central  *=(1.94039579764);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pu_central  *=(2.04245281118);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pu_central  *=(2.13680461818);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pu_central  *=(2.22395017393);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pu_central  *=(2.29776136337);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pu_central  *=(2.34107958833);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pu_central  *=(2.37047306281);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pu_central  *=(2.38365361416);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pu_central  *=(2.37251953266);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pu_central  *=(2.33390734715);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pu_central  *=(2.28287109918);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pu_central  *=(2.18527775378);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pu_central  *=(2.09984989719);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pu_central  *=(2.02417217124);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pu_central  *=(1.89559469244);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pu_central  *=(1.73994553659);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pu_central  *=(1.60146781888);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pu_central  *=(1.5415176127);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_central  *=(1.38880554853);
+		if (N_PileUpInteractions > 34.5) weight_pu_central *= 0.0;
+		
+		
+		weight_sysplus8 = weight;
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysplus8 *=(0.00924647898767);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysplus8 *=(0.103765308587);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysplus8 *=(0.254901026276);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pu_sysplus8 *=(0.480371942144);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pu_sysplus8 *=(0.729944556297);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pu_sysplus8 *=(0.954968986548);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pu_sysplus8 *=(1.13004026908);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pu_sysplus8 *=(1.25116215302);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pu_sysplus8 *=(1.33545960398);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pu_sysplus8 *=(1.40112202125);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pu_sysplus8 *=(1.46629994308);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pu_sysplus8 *=(1.54467848996);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pu_sysplus8 *=(1.64461047702);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pu_sysplus8 *=(1.7680582782);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pu_sysplus8 *=(1.9248181748);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pu_sysplus8 *=(2.10637260323);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pu_sysplus8 *=(2.31374222506);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pu_sysplus8 *=(2.54319600245);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pu_sysplus8 *=(2.78724430301);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pu_sysplus8 *=(3.04707340275);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pu_sysplus8 *=(3.31429303739);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pu_sysplus8 *=(3.56161966349);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pu_sysplus8 *=(3.80974218256);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pu_sysplus8 *=(4.05230970884);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pu_sysplus8 *=(4.27119855299);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pu_sysplus8 *=(4.45358283315);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pu_sysplus8 *=(4.6210083076);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pu_sysplus8 *=(4.69553893978);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pu_sysplus8 *=(4.79226541944);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pu_sysplus8 *=(4.90898557824);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pu_sysplus8 *=(4.88722270965);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pu_sysplus8 *=(4.77074865948);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pu_sysplus8 *=(4.67125617297);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pu_sysplus8 *=(4.78457737387);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_sysplus8 *=(4.58784771674);
+		if (N_PileUpInteractions > 34.5) weight_pu_sysplus8 *= 0.0;
+		
+		
+		weight_sysminus8 = weight;
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysminus8 *=(0.0201084522235);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysminus8 *=(0.201872953791);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysminus8 *=(0.444291440305);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pu_sysminus8 *=(0.754784951423);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pu_sysminus8 *=(1.04300038865);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pu_sysminus8 *=(1.25373948702);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pu_sysminus8 *=(1.37815071794);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pu_sysminus8 *=(1.43249643277);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pu_sysminus8 *=(1.44824842983);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pu_sysminus8 *=(1.44760397441);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pu_sysminus8 *=(1.44595859288);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pu_sysminus8 *=(1.45056585209);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pu_sysminus8 *=(1.46233900245);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pu_sysminus8 *=(1.47682664198);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pu_sysminus8 *=(1.49703207679);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pu_sysminus8 *=(1.51206676472);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pu_sysminus8 *=(1.52066555932);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pu_sysminus8 *=(1.51950731213);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pu_sysminus8 *=(1.50475499659);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pu_sysminus8 *=(1.47887521537);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pu_sysminus8 *=(1.43996103898);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pu_sysminus8 *=(1.38034035275);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pu_sysminus8 *=(1.31320230704);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pu_sysminus8 *=(1.2392809902);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pu_sysminus8 *=(1.15650697488);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pu_sysminus8 *=(1.06581520421);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pu_sysminus8 *=(0.975973223375);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pu_sysminus8 *=(0.874112959041);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pu_sysminus8 *=(0.785480306938);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pu_sysminus8 *=(0.707777917329);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pu_sysminus8 *=(0.619354107892);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pu_sysminus8 *=(0.531056657066);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pu_sysminus8 *=(0.456479768112);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pu_sysminus8 *=(0.410264344317);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_sysminus8 *=(0.345060491391);
+		if (N_PileUpInteractions > 34.5) weight_pu_sysminus8 *= 0.0;
+		
+		
+		
+		
+		
+		
+
+
+
+
+
 		//========================     Trigger Scanning  ================================//
 
 		string hltmu ("HLT_Mu");
@@ -959,7 +1088,7 @@ void placeholder::Loop()
 			//std::cout<<CustomHeepID(e_pt, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso )<<std::endl;
 
 			//			if ( ElectronPt->at(iele) < 15.0 ) continue;
-			if  (CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso, e_missinghits ) && ElectronOverlaps->at(iele) == 0 )
+			if  (CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso, e_missinghits ) )
 			{
 				v_idx_ele_final.push_back(iele);
 			}
@@ -996,7 +1125,7 @@ void placeholder::Loop()
 			int e_missinghits = ElectronMissingHits->at(iele);
 
 		  
-		  if ( CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso, e_missinghits )  && ElectronOverlaps->at(iele) == 0 )  
+		  if ( CustomHeepID(e_pt,e_pt_real, e_eta, e_ecaldriven , e_dphi_sc, e_deta_sc, e_hoe, e_sigmann, e_e1x5_over_5x5, e_e2x5_over_5x5, e_em_had1iso , e_had2iso, e_trkiso, e_missinghits ) )  
 		    {		      
 		      v_idx_ele_good_final.push_back(iele);  
 		    }
