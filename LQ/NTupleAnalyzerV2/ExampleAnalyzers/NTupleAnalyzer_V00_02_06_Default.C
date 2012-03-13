@@ -739,7 +739,7 @@ void placeholder::Loop()
 		if (N_PileUpInteractions > 34.5) weight_pu_central *= 0.0;
 		
 		
-		weight_sysplus8 = weight;
+		weight_pu_sysplus8 = weight;
 		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysplus8 *=(0.00924647898767);
 		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysplus8 *=(0.103765308587);
 		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysplus8 *=(0.254901026276);
@@ -778,7 +778,7 @@ void placeholder::Loop()
 		if (N_PileUpInteractions > 34.5) weight_pu_sysplus8 *= 0.0;
 		
 		
-		weight_sysminus8 = weight;
+		weight_pu_sysminus8 = weight;
 		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysminus8 *=(0.0201084522235);
 		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysminus8 *=(0.201872953791);
 		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysminus8 *=(0.444291440305);
