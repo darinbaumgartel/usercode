@@ -36,6 +36,17 @@ castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02
 '/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_JetSmear_2012_02_13_12_17_12/SummaryFiles',
 '/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Feb12_MuSmear_2012_02_13_15_06_37/SummaryFiles']
 
+castors = ['/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Mar03fix_2012_03_03_17_18_27/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Mar03fix_JetScaleUp_2012_03_03_20_46_44/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Mar03fix_JetScaleDown_2012_03_03_21_52_24/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Mar03fix_MuScaleUp_2012_03_04_01_08_22/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Mar03fix_MuScaleDown_2012_03_04_02_14_49/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Mar03fix_JetSmear_2012_03_04_03_20_11/SummaryFiles',
+'/castor/cern.ch/user/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Mar03fix_MuSmear_2012_03_04_04_25_25/SummaryFiles']
+
+castors.append(castors[0].replace('2012','PUScaleUp_2012'))
+castors.append(castors[0].replace('2012','PUScaleDown_2012'))
+
 KeepFiles = ['LQToCMu_BetaHalf_M_250.root',
 'LQToCMu_BetaHalf_M_350.root',
 'LQToCMu_BetaHalf_M_400.root',
@@ -63,14 +74,14 @@ KeepFiles = ['LQToCMu_BetaHalf_M_250.root',
 'ZJets_Sherpa.root'] 
 
 TTScale = 0.93
-TTDDScale = 0.55
+TTDDScale = 0.72
 WScale = 1.23
 ZScale = 1.34
 OtherScale = 0.9
 
 
-normtag = 'StandardSelections_4p7fb_Feb03_2012'
-scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown','JetSmear','MuSmear']
+normtag = 'StandardSelections_4p7fb_Mar03fix_2012'
+scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown','JetSmear','MuSmear','PUScaleUp','PUScaleDown']
 #scaletags = ['JetScaleUp']
 tags = []
 tags.append(normtag)
@@ -106,11 +117,13 @@ lumi = 4700.0
 
 cut_mc = ''
 
+standardweight = 'weight_pileup4p7fb_higgs'
 preselectionmumu = str(lumi)+'*weight_pileup4p7fb_higgs*((Pt_muon1>40)*(Pt_muon2>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_mumu>250)*(deltaR_muon1muon2>0.3)*(M_muon1muon2>50)*((abs(Eta_muon1)<2.1)&&(abs(Eta_muon2)<2.1)))' + cut_mc
 preselectionmunu = str(lumi)+'*weight_pileup4p7fb_higgs*(pass_HBHENoiseFilter>0.5)*(pass_passBeamHaloFilterTight>0.5)*(pass_EcalMaskedCellDRFilter>0.5)*(pass_isTrackingFailure>0.5)*(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>55)*(Pt_pfjet1>40)*(Pt_pfjet2>40)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0)*(deltaR_muon1pfjet1>0.7)*(deltaR_muon1pfjet2>0.7))' +cut_mc
-preselectionemu = '0.55*(LowestUnprescaledTriggerPass>0.5)*(pass_isBPTX0>0.5)*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(M_muon1HEEPele1>50)*(deltaR_muon1HEEPele1>0.3)*((abs(Eta_muon1)<2.1)&&(abs(Eta_HEEPele1)<2.1))';
+preselectionemu = '0.72*(LowestUnprescaledTriggerPass>0.5)*(pass_isBPTX0>0.5)*(Pt_muon1>40)*(Pt_HEEPele1>40)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(ST_pf_emu>250)*(M_muon1HEEPele1>50)*(deltaR_muon1HEEPele1>0.3)*((abs(Eta_muon1)<2.1)&&(abs(Eta_HEEPele1)<2.1))';
 
 
+puweights = ['weight_pileup2011A','weight_pileup2011B']
 
 selections = []
 selections.append(preselectionmumu)
@@ -149,7 +162,7 @@ weight_n = []
 
 pfiles = []
 for c in castors:
-	files = os.popen(lsqry+' '+c).readlines()
+	files = os.popen(lsqry+' '+c.replace('_PUScaleUp','').replace('_PUScaleDown','')).readlines()
 	for x in files:
 		#if 'SingleMuData' in x or 'HighHT' in x:
 			#continue
@@ -185,6 +198,8 @@ if skip == 0:
 		for t in tags:
 			if t in x:
 				thistag = t
+		if 'PUScale' in thistag:
+			continue
 		os.system('mkdir '+tmp+thistag)
 		fout1 = 'file://'+tmp+thistag+'/mumu_'+fname
 		fout2 = 'file://'+tmp+thistag+'/munu_'+fname
@@ -218,13 +233,14 @@ for s in range(len(selections)):
 
 	sel = selections[s]
 	use = signaluse[s]
-	
 	for c in castors:
 		tag = ''
 		for t in tags:
 			if t in c:
 				tag = t
-		files = os.popen(lsqry+' '+c).readlines()
+		#c = c.replace('_PUScaleUp','')
+		#c = c.replace('_PUScaleDown','')
+		files = os.popen(lsqry+' '+c.replace('_PUScaleUp','').replace('_PUScaleDown','')).readlines()
 		cfiles = []
 		for x in files:
 			#if 'SingleMuData' in x  or 'HighHT' in x:				
@@ -238,8 +254,10 @@ for s in range(len(selections)):
 			cfiles.append(prefix+'://'+c+'/'+x.replace('\n',''))
 		for x in cfiles:
 			sel = selections[s]
+			#print sel
 
 			scalefactor = '*1.0'
+
 			if 'TTBar' in x:
 				scalefactor = '*'+(str(TTScale))
 			if 'WJets' in x:
@@ -265,17 +283,20 @@ for s in range(len(selections)):
 			for t in tags:
 				if t in x:
 					thistag = t
-			fout = 'file://'+tmp+thistag+'/'+marker+'_'+fname
-			
+			fout = 'file://'+tmp+thistag.replace('PUScaleUp',normtag).replace('PUScaleDown',normtag)+'/'+marker+'_'+fname
 			if isTT == 1:
-				fout = x.replace('TTBar.root','SingleMuData.root')
+				fout = x.replace('TTBar.root','SingleMuData.root').replace('_PUScaleUp','').replace('_PUScaleDown','')
 				sel = sel.replace(preselectionmumu.replace(cut_mc,''),preselectionemu)
 				sel = sel.replace(cut_mc,'')
 				sel = sel.replace('ST_pf_mumu','ST_pf_emu')
 
 				sel = sel.replace('muon1muon2','muon1HEEPele1')
 				sel = sel.replace('LowestMass_BestLQCombo','LowestMass_BestLQCombo_emuselection')		
-						
+
+			if tag == 'PUScaleUp':
+				scalefactor += '*('+puweights[0]+'/'+standardweight+')'
+			if tag == 'PUScaleDown':
+				scalefactor += '*('+puweights[1]+'/'+standardweight+')'						
 			
 						
 			f = TFile.Open(fout)
@@ -323,93 +344,93 @@ for s in range(len(selections)):
 			f.Close()
 			del t
 flogV.close()			
-opts = []
-samples = []
-tags = []
-for x in opt_n:
-	if x not in opts:
-		opts.append(x)
-		print x
-for x in sample_n:
-	if x not in samples:
-		samples.append(x)
-for x in tag_n:
-	if x not in tags:
-		tags.append(x)
+#opts = []
+#samples = []
+#tags = []
+#for x in opt_n:
+	#if x not in opts:
+		#opts.append(x)
+		#print x
+#for x in sample_n:
+	#if x not in samples:
+		#samples.append(x)
+#for x in tag_n:
+	#if x not in tags:
+		#tags.append(x)
 
-print 'samples'
-for x in samples:
-	print x
-print 'samples'
+#print 'samples'
+#for x in samples:
+	#print x
+#print 'samples'
 
-R = range(len(opt_n))
+#R = range(len(opt_n))
 
-summary_opts = []
+#summary_opts = []
 
-for t in tags:
-	exec('summary_int_'+t+'_sig=[]')
-	exec('summary_int_'+t+'_bg=[]')
-	exec('summary_int_'+t+'_sig_var=[]')
-	exec('summary_int_'+t+'_bg_var=[]')	
-for t in tags:		
-	for o in opts:
-		exec('summary_int_'+t+'_sig.append(0.0)')
-		exec('summary_int_'+t+'_bg.append(0.0)')
-		exec('summary_int_'+t+'_sig_var.append(0.0)')
-		exec('summary_int_'+t+'_bg_var.append(0.0)')
-for o in range(len(opts)):
-	if 'BetaHalf' in opts[o]:
-		ignores = ['TTBar','WJets']
-		ignores = []
+#for t in tags:
+	#exec('summary_int_'+t+'_sig=[]')
+	#exec('summary_int_'+t+'_bg=[]')
+	#exec('summary_int_'+t+'_sig_var=[]')
+	#exec('summary_int_'+t+'_bg_var=[]')	
+#for t in tags:		
+	#for o in opts:
+		#exec('summary_int_'+t+'_sig.append(0.0)')
+		#exec('summary_int_'+t+'_bg.append(0.0)')
+		#exec('summary_int_'+t+'_sig_var.append(0.0)')
+		#exec('summary_int_'+t+'_bg_var.append(0.0)')
+#for o in range(len(opts)):
+	#if 'BetaHalf' in opts[o]:
+		#ignores = ['TTBar','WJets']
+		#ignores = []
 
-	else:
-		ignores = ['TTBar','ZJetsMG','DiBoson']
-		ignores = ['TTBar']
+	#else:
+		#ignores = ['TTBar','ZJetsMG','DiBoson']
+		#ignores = ['TTBar']
 
-	summary_opts.append(opts[o])
-	for i in R:		
-		if opt_n[i] != opts[o]:
-			continue
-		exec('summary_int_'+tag_n[i]+'_'+issignal_n[i]+'['+str(o)+']+='+str(total_n[i]))
-		if sample_n[i] not in ignores:
-			exec('summary_int_'+tag_n[i]+'_'+issignal_n[i]+'_var['+str(o)+']+='+str(total_n[i]))
+	#summary_opts.append(opts[o])
+	#for i in R:		
+		#if opt_n[i] != opts[o]:
+			#continue
+		#exec('summary_int_'+tag_n[i]+'_'+issignal_n[i]+'['+str(o)+']+='+str(total_n[i]))
+		#if sample_n[i] not in ignores:
+			#exec('summary_int_'+tag_n[i]+'_'+issignal_n[i]+'_var['+str(o)+']+='+str(total_n[i]))
 
-fout = open('SystematicsLog_FullSel.txt','w')
+#fout = open('SystematicsLog_FullSel.txt','w')
 
-hline = '\n\nLeptoquarks\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
-for t in tags:
-	if 'Standard' not in t:
-		hline += t + '\t'
+#hline = '\n\nLeptoquarks\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
+#for t in tags:
+	#if 'Standard' not in t:
+		#hline += t + '\t'
 		
-fout.write(hline+'\n')		
-print hline
-for o in range(len(opts)):
-	line = opts[o] + '\t'
-	for t in tags:
-		if t==normtag:
-			exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) )+"\t"')
-		if t!=normtag:
-			exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) - float(summary_int_'+normtag+'_sig_var['+str(o)+']) )+"\t"')
-	print line
-	fout.write(line+'\n')
+#fout.write(hline+'\n')		
+#print hline
+#for o in range(len(opts)):
+	#line = opts[o] + '\t'
+	#for t in tags:
+		#if t==normtag:
+			#exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) )+"\t"')
+		#if t!=normtag:
+			#exec('line += str(float(summary_int_'+t+'_sig_var['+str(o)+']) - float(summary_int_'+normtag+'_sig_var['+str(o)+']) )+"\t"')
+	#print line
+	#fout.write(line+'\n')
 
 
-hline = '\n\nBackgrounds\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
-for t in tags:
-	if 'Standard' not in t:
-		hline += t + '\t'
+#hline = '\n\nBackgrounds\n\n\nOptimized\tMagnitude\tVariations\nSelection\t'
+#for t in tags:
+	#if 'Standard' not in t:
+		#hline += t + '\t'
 		
-fout.write(hline+'\n')		
-print hline
-for o in range(len(opts)):
-	line = opts[o] + '\t'
-	for t in tags:
-		if t==normtag:
-			exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) )+"\t"')
-		if t!=normtag:
-			exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) - float(summary_int_'+normtag+'_bg_var['+str(o)+']) )+"\t"')
-	print line
-	fout.write(line+'\n')
+#fout.write(hline+'\n')		
+#print hline
+#for o in range(len(opts)):
+	#line = opts[o] + '\t'
+	#for t in tags:
+		#if t==normtag:
+			#exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) )+"\t"')
+		#if t!=normtag:
+			#exec('line += str(float(summary_int_'+t+'_bg_var['+str(o)+']) - float(summary_int_'+normtag+'_bg_var['+str(o)+']) )+"\t"')
+	#print line
+	#fout.write(line+'\n')
 
-fout.close()
+#fout.close()
 

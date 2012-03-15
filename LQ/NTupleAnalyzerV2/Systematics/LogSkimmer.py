@@ -1,7 +1,10 @@
 
 flogV = open('SysVerboseLog.txt','r')
-normtag = 'StandardSelections_4p7fb_Feb03_2012'
+normtag = 'StandardSelections_4p7fb_Mar03fix_2012'
 scaletags = ['JetScaleUp','JetScaleDown','MuScaleUp','MuScaleDown','JetSmear','MuSmear']
+scaletags.append('PUScaleUp')
+scaletags.append('PUScaleDown')
+
 #scaletags = ['JetScaleUp']
 scaletags.append(normtag)
 info = []
@@ -49,6 +52,7 @@ jetzpos = []
 muzpos = []
 jetzpos_smear = []
 muzpos_smear = []
+pilezpos = []
 
 unscaled = 0.0
 unsmeard = 0.0
@@ -56,6 +60,8 @@ unsmeard = 0.0
 
 mumuprejetscalez = 1.0
 mumupremuscalez = 1.0
+
+mumuprepuscalez = 1.0
 
 munuprejetscalew = 1.0
 munuprejetscalett = 1.0
@@ -70,6 +76,10 @@ munuprejetsmeartt = 1.0
 munupremusmearw = 1.0
 munupremusmeartt = 1.0
 
+munuprepuscalew = 1.0
+munuprepuscalett = 1.0
+
+
 for i in range(len(sel)):
 	if 'PreSel' not in sel[i]:
 		continue
@@ -77,6 +87,8 @@ for i in range(len(sel)):
 		continue
 	if 'ZJet' in sig[i] and 'JetScale' in typ[i]:
 		jetzpos.append(tot[i])
+	if 'ZJet' in sig[i] and 'PUScale' in typ[i]:
+		pilezpos.append(tot[i])
 	if 'ZJet' in sig[i] and 'MuScale' in typ[i]:
 		muzpos.append(tot[i])	
 	if 'ZJet' in sig[i] and 'JetSmear' in typ[i]:
@@ -98,7 +110,9 @@ for x in jetzpos_smear:
 for x in muzpos_smear:
 	if abs(x - unsmeard) > mumupremusmearz:
 		mumupremusmearz = (abs(x - unsmeard) + unsmeard)/unsmeard
-
+for x in pilezpos:
+	if abs(x - unscaled) > mumuprepuscalez:
+		mumuprepuscalez = (abs(x - unscaled) + unscaled)/unscaled
 
 jetwpos = []
 muwpos = []
@@ -108,6 +122,9 @@ jetwpos_smear = []
 muwpos_smear = []
 jetttpos_smear = []
 muttpos_smear = []
+
+pilewpos = []
+pilettpos=[]
 
 unscaledw = 0.0
 unscaledtt = 0.0
@@ -123,6 +140,7 @@ for i in range(len(sel)):
 		continue
 	if 'WJet' in sig[i] and 'JetScale' in typ[i]:
 		jetwpos.append(tot[i])
+
 	if 'WJet' in sig[i] and 'MuScale' in typ[i]:
 		muwpos.append(tot[i])	
 	if 'TTBar' in sig[i] and 'JetScale' in typ[i]:
@@ -146,6 +164,11 @@ for i in range(len(sel)):
 	if 'TTBar' in sig[i] and 'StandardSelection' in typ[i]:
 		unscaledtt = (tot[i])	
 		unsmeardtt = (tot[i])	
+
+	if 'WJet' in sig[i] and 'PUScale' in typ[i]:
+		pilewpos.append(tot[i])
+	if 'TTBar' in sig[i] and 'PUScale' in typ[i]:
+		pilettpos.append(tot[i])
 
 for x in jetwpos:
 	if abs(x - unscaledw) > munuprejetscalew:
@@ -172,10 +195,18 @@ for x in jetttpos_smear:
 for x in muttpos_smear:
 	if abs(x - unsmeardtt) > munupremusmeartt:
 		munupremusmeartt = (abs(x - unsmeardtt) + unsmeardtt)/unsmeardtt
-		
+
+for x in pilewpos:
+	if abs(x - unscaledw) > munuprepuscalew:
+		munuprepuscalew = (abs(x - unscaledw) + unscaledw)/unscaledw
+
+for x in pilettpos:
+	if abs(x - unscaledtt) > munuprepuscalett:
+		munuprepuscalett = (abs(x - unscaledtt) + unscaledtt)/unscaledtt
+
 from math import sqrt
 for B in Backgrounds:
-	print 'B:'+B+',R:Rate,E:Stat,E:Jes,E:Mes,E:Jres,E:Mres,E:Mod,E:Mrii,E:Lum'
+	print 'B:'+B+',R:Rate,E:Stat,E:Jes,E:Mes,E:Jres,E:Mres,E:Mod,E:Mrii,E:Lum,E:Pileup'
 	N = 0 
 	w = 0
 	for S in Lqsignals:
@@ -190,7 +221,7 @@ for B in Backgrounds:
 					exec ('i_'+t+'= '+str(tot[i]))		
 					exec ('ie_'+t+'= '+str(rate_err[i]))	
 			#print sel[i]+'  '+sig[i]+'  '+typ[i] + '  '+str(tot[i] )
-			if typ[i] == 'StandardSelections_4p7fb_Feb03_2012':
+			if typ[i] == 'StandardSelections_4p7fb_Mar03fix_2012':
 				N = mc[i]
 				w = weight[i]
 		jes = 1.0
@@ -200,20 +231,27 @@ for B in Backgrounds:
 		mod = 1.0
 		mrii = 1.0
 		lum = 1.0
+		pu = 1.0
 		rate = -1.0
 		rateerr = -1.0
 		
-		if i_StandardSelections_4p7fb_Feb03_2012 != 0:
-			rate = i_StandardSelections_4p7fb_Feb03_2012
-			rateerr = 1.0+(ie_StandardSelections_4p7fb_Feb03_2012/i_StandardSelections_4p7fb_Feb03_2012)			
-			jes = 1.0+abs(i_JetScaleDown - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
-			if (abs(i_JetScaleUp - i_StandardSelections_4p7fb_Feb03_2012)>abs(i_JetScaleDown-i_StandardSelections_4p7fb_Feb03_2012)):
-				jes = 1.0+ abs(i_JetScaleUp - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012	
-			mes = 1.0+abs(i_MuScaleDown - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
-			if (abs(i_MuScaleUp-i_StandardSelections_4p7fb_Feb03_2012)> abs(i_MuScaleDown-i_StandardSelections_4p7fb_Feb03_2012)):
-				mes = 1.0+abs(i_MuScaleUp - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
-			jres = 1.0+abs(i_JetSmear - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
-			mres = 1.0+abs(i_MuSmear - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012
+		if i_StandardSelections_4p7fb_Mar03fix_2012 != 0:
+			rate = i_StandardSelections_4p7fb_Mar03fix_2012
+			rateerr = 1.0+(ie_StandardSelections_4p7fb_Mar03fix_2012/i_StandardSelections_4p7fb_Mar03fix_2012)			
+			jes = 1.0+abs(i_JetScaleDown - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+			if (abs(i_JetScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)>abs(i_JetScaleDown-i_StandardSelections_4p7fb_Mar03fix_2012)):
+				jes = 1.0+ abs(i_JetScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012	
+
+			mes = 1.0+abs(i_MuScaleDown - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+			if (abs(i_MuScaleUp-i_StandardSelections_4p7fb_Mar03fix_2012)> abs(i_MuScaleDown-i_StandardSelections_4p7fb_Mar03fix_2012)):
+				mes = 1.0+abs(i_MuScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+
+			pu = 1.0+abs(i_PUScaleDown - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+			if (abs(i_PUScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)>abs(i_PUScaleDown-i_StandardSelections_4p7fb_Mar03fix_2012)):
+				pu = 1.0+ abs(i_PUScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012	
+
+			jres = 1.0+abs(i_JetSmear - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+			mres = 1.0+abs(i_MuSmear - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012
 			if 'BetaHalf' not in S and 'ZJet' in B:
 				j = jes
 				J = mumuprejetscalez
@@ -231,7 +269,10 @@ for B in Backgrounds:
 				M = mumupremusmearz
 				mres = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
 				
-					
+				p = pu
+				P = mumuprepuscalez
+				pu = 1.0+abs(1.0/p - 1.0/P)/(1.0/p)
+				
 			if 'BetaHalf' in S and 'WJet' in B:
 				j = jes
 				J = munuprejetscalew
@@ -251,6 +292,10 @@ for B in Backgrounds:
 				mres = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
 				#print ' @@ -------------------------'
 				
+				p = pu
+				P = munuprepuscalew
+				pu = 1.0+abs(1.0/p - 1.0/P)/(1.0/p)		
+				
 			if 'BetaHalf' in S and 'TTBar' in B:
 				j = jes
 				J = munuprejetscalett
@@ -267,15 +312,21 @@ for B in Backgrounds:
 				m = mres
 				M = munupremusmeartt
 				mres = 1.0+abs(1.0/m - 1.0/M)/(1.0/m)
+
+				p = pu
+				P = munuprepuscalett
+				pu = 1.0+abs(1.0/p - 1.0/P)/(1.0/p)
 					
-		if 'BetaHalf' not in S and 'DiBoson' in B:
-			continue
-		print S+','+str(int(N))+';'+str(w)+',R_'+str(rateerr)+'_'+str(rate)+','+str(jes)+','+str(mes)+','+str(jres)+','+str(mres)+','+str(mod)+','+str(mrii)+','+str(lum)
+		#if 'BetaHalf' not in S and 'DiBoson' in B:
+		#if 'BetaHalf' not in S :
+
+			#continue
+		print S+','+str(int(N))+';'+str(w)+',R_'+str(rateerr)+'_'+str(rate)+','+str(jes)+','+str(mes)+','+str(jres)+','+str(mres)+','+str(mod)+','+str(mrii)+','+str(lum)+','+str(pu)
 	print '\n'
 
 print '\n\n'
 for S in Lqsignals:
-	print 'S:'+S+',R:Rate,E:Stat,E:Jes,E:Mes,E:Jres,E:Mres,E:Mod,E:Mrii,E:Lum'
+	print 'S:'+S+',R:Rate,E:Stat,E:Jes,E:Mes,E:Jres,E:Mres,E:Mod,E:Mrii,E:Lum,E:Pileup'
 	N = 0 
 	w = 0
 	for t in scaletags:
@@ -290,7 +341,7 @@ for S in Lqsignals:
 				exec ('ie_'+t+'= '+str(rate_err[i]))	
 	
 		#print sel[i]+'  '+sig[i]+'  '+typ[i] + '  '+str(tot[i] )
-		if typ[i] == 'StandardSelections_4p7fb_Feb03_2012':
+		if typ[i] == normtag:
 			N = mc[i]
 			w = weight[i]
 	jes = 1.0
@@ -303,18 +354,22 @@ for S in Lqsignals:
 	rate = -1.0
 	rateerr = -1.0
 	
-	if i_StandardSelections_4p7fb_Feb03_2012 != 0:
-		rate = i_StandardSelections_4p7fb_Feb03_2012
-		rateerr = 1.0+(ie_StandardSelections_4p7fb_Feb03_2012/i_StandardSelections_4p7fb_Feb03_2012)			
-
-		jes = 1.0+abs(i_JetScaleDown - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
+	if i_StandardSelections_4p7fb_Mar03fix_2012 != 0:
+		rate = i_StandardSelections_4p7fb_Mar03fix_2012
+		rateerr = 1.0+(ie_StandardSelections_4p7fb_Mar03fix_2012/i_StandardSelections_4p7fb_Mar03fix_2012)			
+		jes = 1.0+abs(i_JetScaleDown - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
 		if (i_JetScaleUp>i_JetScaleDown):
-			jes = 1.0+ abs(i_JetScaleUp - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012
-		mes = abs(i_MuScaleDown - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
+			jes = 1.0+ abs(i_JetScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012
+		mes = 1.0+abs(i_MuScaleDown - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
 		if (i_MuScaleUp>i_MuScaleDown):
-			mes = 1.0+abs(i_MuScaleUp - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
-		jres = 1.0+abs(i_JetSmear - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
-		mres = 1.0+abs(i_MuSmear - i_StandardSelections_4p7fb_Feb03_2012)/i_StandardSelections_4p7fb_Feb03_2012		
-	print S+','+str(int(N))+';'+str(w)+',R_'+str(rateerr)+'_'+str(rate)+','+str(jes)+','+str(mes)+','+str(jres)+','+str(mres)+','+str(mod)+','+str(mrii)+','+str(lum)
+			mes = 1.0+abs(i_MuScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012
+			
+		pu = 1.0+abs(i_PUScaleDown - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+		if (abs(i_PUScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)>abs(i_PUScaleDown-i_StandardSelections_4p7fb_Mar03fix_2012)):
+			pu = 1.0+ abs(i_PUScaleUp - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012	
+
+		jres = 1.0+abs(i_JetSmear - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+		mres = 1.0+abs(i_MuSmear - i_StandardSelections_4p7fb_Mar03fix_2012)/i_StandardSelections_4p7fb_Mar03fix_2012		
+	print S+','+str(int(N))+';'+str(w)+',R_'+str(rateerr)+'_'+str(rate)+','+str(jes)+','+str(mes)+','+str(jres)+','+str(mres)+','+str(mod)+','+str(mrii)+','+str(lum)+','+str(pu)
 	print '\n'
 print '\n'
