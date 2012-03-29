@@ -782,7 +782,6 @@ if do_combo == 1:
 				for nn in range(numdo):
 					if (dobatch):
 						os.system('bsub -o /dev/null -e /dev/null -q '+queue+' -J jobcombo'+str(nn)+'_R_'+str(rind)+'_'+thisname+' < ShellScriptsForBatch/subcombo_R_'+str(rind)+'_'+cdir+thisname+'.csh')
-	
 
 
 ################################################################################################################
@@ -967,6 +966,7 @@ if do_combo == 1:
 	mTh = array("d",[ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850])
 	xsTh = array("d",[  53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732])
 	
+	
 	g = TGraph(len(mTh),mTh,xsTh);
 	spline = TSpline3("xsection",g) 
 	#xx = (spline.Eval(310));
@@ -1000,16 +1000,27 @@ if do_combo == 1:
 	import math
 	inputarrayX = []
 	inputarrayY = []
+
+	def loggraph(inputarrayX,inputarrayY):
+		logarray = []
+		for j in inputarrayY:
+			logarray.append(math.log(j))
+		x = array("d",inputarrayX)
+		y = array("d",logarray)
+		g = TGraph(len(x),x,y)
+		return g
+		
+	logtheory = loggraph(M_th,X_th)
+
 	def logspline(inputarrayX,inputarrayY):
 		logarray = []
-		for x in inputarrayY:
-			logarray.append(math.log(x))
+		for j in inputarrayY:
+			logarray.append(math.log(j))
 		x = array("d",inputarrayX)
 		y = array("d",logarray)
 		g = TGraph(len(x),x,y)
 		outspline = TSpline3("",g)
 		return outspline
-	logtheory = logspline(M_th,X_th)
 	
 	from math import exp
 	def get_intersection(spline1, spline2, xmin,xmax):
@@ -1047,15 +1058,51 @@ if do_combo == 1:
 						
 		return [bestmass,mindif]
 		
+	def get_simple_intersection(graph1, graph2, xmin,xmax):
+		num = (xmax-xmin)*10
+		inc = (xmax - xmin)/(1.0*num)
+
+		dif = []
+		sdif = []
+		x = xmin +0.1
+		xvals = []
+		xx = []
+		yy = []
+		xvals = []
+		while x<(xmax-.1):
+			thisdif = (exp(graph1.Eval(x)) - exp(graph2.Eval(x)))
+			#print (str(x)) + '   '+ str(xmax-.1) +'   '+ str(thisdif)
+			xx.append(exp(graph1.Eval(x)))
+			yy.append(exp(graph2.Eval(x)))
+			sdif.append(thisdif)
+			dif.append(abs(thisdif))
+			xvals.append(x)
+			#print  str(x) + '   ' +str(exp(graph1.Eval(x))) + '    '+str(exp(graph2.Eval(x))) + '    ' + str(thisdif)
+			x = x+inc
+		#print 'Done Looping for Difs'
+		mindif = min(dif)
+		bestmass = 0	
+		
 	
+		for x in range(len(dif)-2):
+			a = sdif[x]
+			b = sdif[x+1]	
+			#print str(xvals[x+1]) +'    '+str(a)  + '     ' +str(b) 
+			if ((a/abs(a))*(b/abs(b))) < 0.0 and a >0.0 :
+				print 'Limit found at: '+ (str(xvals[x]))
+				bestmass = xvals[x]
+				break;
+						
+		return [bestmass,mindif]
+		
 
 
 	def fill_mlists(clist):
 		mlist = []
 		for limit_set in clist:
-			fitted_limits = logspline(masses,limit_set)
-			goodm = get_intersection(logtheory,fitted_limits,250,850)
-			mlist.append(goodm[0])
+			fitted_limits = loggraph(masses,limit_set)
+			goodm = get_simple_intersection(logtheory,fitted_limits,250,850)
+			mlist.append(str(round(goodm[0],2)))
 		return mlist
 		
 	m_ComboObs = fill_mlists(s_ComboObs)
@@ -1101,14 +1148,14 @@ if do_combo == 1:
 	obcurve_lvjj = 'Double_t m_observed_lvjj['+str(len(betas))+'] = {'  
 	
 	
-	excurve_combo += str(m_ComboExp).replace('[','').replace(']','')+'};'
-	obcurve_combo += str(m_ComboObs).replace('[','').replace(']','')+'};'
+	excurve_combo += str(m_ComboExp).replace('[','').replace(']','').replace('\'','')+'};'
+	obcurve_combo += str(m_ComboObs).replace('[','').replace(']','').replace('\'','')+'};'
 
-	excurve_lljj += str(m_ComboBetaOneExp).replace('[','').replace(']','')+'};'
-	obcurve_lljj += str(m_ComboBetaOneObs).replace('[','').replace(']','')+'};'
+	excurve_lljj += str(m_ComboBetaOneExp).replace('[','').replace(']','').replace('\'','')+'};'
+	obcurve_lljj += str(m_ComboBetaOneObs).replace('[','').replace(']','').replace('\'','')+'};'
 	
-	excurve_lvjj += str(m_ComboBetaHalfExp).replace('[','').replace(']','')+'};'
-	obcurve_lvjj += str(m_ComboBetaHalfObs).replace('[','').replace(']','')+'};'	
+	excurve_lvjj += str(m_ComboBetaHalfExp).replace('[','').replace(']','').replace('\'','')+'};'
+	obcurve_lvjj += str(m_ComboBetaHalfObs).replace('[','').replace(']','').replace('\'','')+'};'	
 
 	m_Combo68up.reverse()
 	m_Combo95up.reverse()
@@ -1120,14 +1167,14 @@ if do_combo == 1:
 	m_ComboBetaHalf95up.reverse()
 	
 		
-	band1sigma_combo += str(m_Combo68down).replace('[','').replace(']','') + ', '+  str(m_Combo68up).replace('[','').replace(']','')+'};'
-	band2sigma_combo += str(m_Combo95down).replace('[','').replace(']','') + ', '+ str(m_Combo95up).replace('[','').replace(']','')+'};'
+	band1sigma_combo += str(m_Combo68down).replace('[','').replace(']','').replace('\'','')+ ', '+  str(m_Combo68up).replace('[','').replace(']','').replace('\'','')+'};'
+	band2sigma_combo += str(m_Combo95down).replace('[','').replace(']','').replace('\'','') + ', '+ str(m_Combo95up).replace('[','').replace(']','').replace('\'','')+'};'
 
-	band1sigma_lljj += str(m_ComboBetaOne68down).replace('[','').replace(']','') + ', '+  str(m_ComboBetaOne68up).replace('[','').replace(']','')+'};'
-	band2sigma_lljj += str(m_ComboBetaOne95down).replace('[','').replace(']','') + ', '+ str(m_ComboBetaOne95up).replace('[','').replace(']','')+'};'
+	band1sigma_lljj += str(m_ComboBetaOne68down).replace('[','').replace(']','').replace('\'','') + ', '+  str(m_ComboBetaOne68up).replace('[','').replace(']','').replace('\'','')+'};'
+	band2sigma_lljj += str(m_ComboBetaOne95down).replace('[','').replace(']','').replace('\'','') + ', '+ str(m_ComboBetaOne95up).replace('[','').replace(']','').replace('\'','')+'};'
 	
-	band1sigma_lvjj += str(m_ComboBetaHalf68down).replace('[','').replace(']','') + ', '+  str(m_ComboBetaHalf68up).replace('[','').replace(']','')+'};'
-	band2sigma_lvjj += str(m_ComboBetaHalf95down).replace('[','').replace(']','') + ', '+ str(m_ComboBetaHalf95up).replace('[','').replace(']','')+'};'
+	band1sigma_lvjj += str(m_ComboBetaHalf68down).replace('[','').replace(']','').replace('\'','') + ', '+  str(m_ComboBetaHalf68up).replace('[','').replace(']','').replace('\'','')+'};'
+	band2sigma_lvjj += str(m_ComboBetaHalf95down).replace('[','').replace(']','').replace('\'','') + ', '+ str(m_ComboBetaHalf95up).replace('[','').replace(']','').replace('\'','')+'};'
 	
 	
 	
