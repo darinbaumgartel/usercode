@@ -32,8 +32,8 @@ def parselist(L):
 				lastlistx='250'
 			lastlist.append(lastlistx)
 			x = x.split(',')[0]
-		if x == '0':
-			x = '250'
+		if x == '0.0':
+			x = '250.0'
 		header += x+','
 	if doublemarker == True:
 		lastlist.reverse()

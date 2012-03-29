@@ -1004,7 +1004,7 @@ if do_combo == 1:
 	def loggraph(inputarrayX,inputarrayY):
 		logarray = []
 		for j in inputarrayY:
-			logarray.append(math.log(j))
+			logarray.append(math.log10(j))
 		x = array("d",inputarrayX)
 		y = array("d",logarray)
 		g = TGraph(len(x),x,y)
