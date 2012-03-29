@@ -188,7 +188,7 @@ void makePlotsBH()
  bool systematics = true; // does nothing at the moment
 
  // total integrated luminosity (in pb-1)
- Double_t L_int = 4700;
+ Double_t L_int = 4980;
  // relative uncertainty on the integrated luminosity (0.1 = 10% uncertainty)
  Double_t Sigma_L_int = 0.11;
 
@@ -223,10 +223,10 @@ Double_t mData[10] = {250, 350, 400, 450, 500, 550, 600, 650, 750, 850};
  string title = ";M_{LQ} (GeV);2#beta(1-#beta)#times#sigma (pb)";
 
  // integrated luminosity
- string lint = "4.7 fb^{-1}";
+ string lint = "4.98 fb^{-1}";
 
  // region excluded by Tevatron limits
- Double_t x_shaded[5] = {250,362,362,250,250};// CHANGED FOR LQ2
+ Double_t x_shaded[5] = {250,552,552,250,250};// CHANGED FOR LQ2
  Double_t y_shaded[5] = {0.0001,0.0001,50,50,0.0001};// CHANGED FOR LQ2
 
 
@@ -239,17 +239,16 @@ Double_t x_shademasses[20]={250, 350, 400, 450, 500, 550, 600, 650, 750, 850, 85
 
 //////////// ASYMPTOTIC /////////////////
 
-Double_t xsUp_expected[10] = {0.1434845 , 0.03823155 , 0.0215455 , 0.01336192 , 0.009586415 , 0.0063543 , 0.00493272 , 0.00401882 , 0.003217045 , 0.0028029378 }; 
+Double_t xsUp_expected[10] = {0.141923 , 0.03384315 , 0.02200675 , 0.014068925 , 0.01037583 , 0.00729122 , 0.00574554 , 0.005273814 , 0.00359996 , 0.003205611 }; 
 
 
-Double_t xsUp_observed[10] = {0.1368915 , 0.0289539 , 0.014268 , 0.009466275 , 0.006984355 , 0.00752368 , 0.00459048 , 0.003951558 , 0.0038120575 , 0.0035486994 }; 
+Double_t xsUp_observed[10] = {0.18391 , 0.0349641 , 0.02171975 , 0.01339988 , 0.00853772 , 0.00717794 , 0.00455576 , 0.006753916 , 0.0045080125 , 0.004213758 }; 
 
 
-Double_t y_1sigma[20]={0.1035795 , 0.02759445 , 0.01554925 , 0.00964184 , 0.00691722 , 0.00458548 , 0.00356004 , 0.00290004 , 0.0023216775 , 0.0020228088 , 0.0038932884 , 0.0044684525 , 0.00558207 , 0.00685162 , 0.0088264 , 0.01331588 , 0.018557695 , 0.02993 , 0.05311395 , 0.199178 }; 
+Double_t y_1sigma[20]={0.102365 , 0.0244224 , 0.01587725 , 0.0101543 , 0.007489025 , 0.00526162 , 0.00414594 , 0.00380588 , 0.0025979525 , 0.0023134128 , 0.0044526096 , 0.0050003625 , 0.007325136 , 0.00798002 , 0.01012794 , 0.01441319 , 0.019544655 , 0.0305655 , 0.0470322 , 0.197096 }; 
 
 
-Double_t y_2sigma[20]={0.0779015 , 0.0207495 , 0.01169525 , 0.00725036 , 0.005201805 , 0.00344796 , 0.00267654 , 0.002180438 , 0.00174537 , 0.00152073 , 0.0051727512 , 0.0059369025 , 0.007416396 , 0.00910346 , 0.01172684 , 0.01769123 , 0.02465502 , 0.03975975 , 0.07057215 , 0.264761 }; 
-
+Double_t y_2sigma[20]={0.077034 , 0.0183645 , 0.01194125 , 0.007634705 , 0.00563008 , 0.00395536 , 0.00311736 , 0.00286117 , 0.0019531675 , 0.0017391954 , 0.0059158776 , 0.0066436075 , 0.009732372 , 0.01060262 , 0.01345554 , 0.01914968 , 0.02596464 , 0.0406105 , 0.062487 , 0.2618115 }; 
 
 
 
@@ -344,7 +343,7 @@ Double_t y_2sigma[20]={0.0779015 , 0.0207495 , 0.01169525 , 0.00725036 , 0.00520
  xsTh_vs_m->SetMarkerStyle(22);
  grshade->SetFillStyle(1001); 
  xsTh_vs_m->SetMarkerColor(kBlue);
- xsTh_vs_m->Draw("C");
+ xsTh_vs_m->Draw("L");
 
  TGraph *xsData_vs_m_expected = new TGraph(10, mData, xsUp_expected);
  xsData_vs_m_expected->SetMarkerStyle(0);
@@ -353,7 +352,7 @@ Double_t y_2sigma[20]={0.0779015 , 0.0207495 , 0.01169525 , 0.00725036 , 0.00520
  xsData_vs_m_expected->SetLineWidth(2);
  xsData_vs_m_expected->SetLineStyle(7);
  xsData_vs_m_expected->SetMarkerSize(0.001);
- xsData_vs_m_expected->Draw("CP");
+ xsData_vs_m_expected->Draw("LP");
 
  TGraph *xsData_vs_m_observed = new TGraph(10, mData, xsUp_observed);
  xsData_vs_m_observed->SetMarkerStyle(21);
@@ -362,19 +361,21 @@ Double_t y_2sigma[20]={0.0779015 , 0.0207495 , 0.01169525 , 0.00725036 , 0.00520
  xsData_vs_m_observed->SetLineWidth(2);
  xsData_vs_m_observed->SetLineStyle(1);
  xsData_vs_m_observed->SetMarkerSize(1);
- xsData_vs_m_observed->Draw("CP");
+ xsData_vs_m_observed->Draw("LP");
  
- float mtest = 250.0;
- float xrat = 0.0;
- float orat = 0.0;
- while (mtest<850){
-	 xrat = xsData_vs_m_expected->Eval(mtest)/xsTh_vs_m->Eval(mtest);
-	 orat = xsData_vs_m_observed->Eval(mtest)/xsTh_vs_m->Eval(mtest);
-	 std::cout<<mtest<<"   "<<xrat<<"    "<<orat<<"   "<<"   "<<xsData_vs_m_observed->Eval(mtest)<<"   "<<xsTh_vs_m->Eval(mtest)<<std::endl;
-	 mtest = mtest + 1.0;
-
+ Double_t xsUp_observed_logY[10], xsUp_expected_logY[10], xsTh_logY[15];
+ for (int ii = 0; ii<10; ++ii) xsUp_observed_logY[ii] = log10(xsUp_observed[ii]);
+ for (int ii = 0; ii<10; ++ii) xsUp_expected_logY[ii] = log10(xsUp_expected[ii]);
+ for (int ii = 0; ii<15; ++ii) xsTh_logY[ii] = log10(xsTh[ii]);
+ TGraph *xsTh_vs_m_log = new TGraph(15, mTh, xsTh_logY);
+ TGraph *xsData_vs_m_expected_log = new TGraph(10, mData, xsUp_expected_logY);
+ TGraph *xsData_vs_m_observed_log = new TGraph(10, mData, xsUp_observed_logY);
+ 
+ for (Double_t mtest=250.10; mtest<849.90; mtest = mtest+0.10){
+	 if(( pow(10.0,xsData_vs_m_expected_log->Eval(mtest))/pow(10.0,xsTh_vs_m_log->Eval(mtest)) ) < 1.0 && ( pow(10.0,xsData_vs_m_expected_log->Eval(mtest+0.1))/pow(10.0,xsTh_vs_m_log->Eval(mtest+0.10)) ) > 1.0) std::cout<<"## LVJJ expected limit: "<<mtest<<" GeV"<<std::endl;
+	 if(( pow(10.0,xsData_vs_m_observed_log->Eval(mtest))/pow(10.0,xsTh_vs_m_log->Eval(mtest)) ) < 1.0 && ( pow(10.0,xsData_vs_m_observed_log->Eval(mtest+0.1))/pow(10.0,xsTh_vs_m_log->Eval(mtest+0.10)) ) > 1.0) std::cout<<"## LVJJ observed limit: "<<mtest<<" GeV"<<std::endl;
 	}
- 
+	
  TLegend *legend = new TLegend(.37,.65,.94,.92);
  legend->SetBorderSize(1);
  legend->SetFillColor(0);
@@ -382,7 +383,7 @@ Double_t y_2sigma[20]={0.0779015 , 0.0207495 , 0.01169525 , 0.00725036 , 0.00520
  legend->SetTextFont(42);
  legend->SetMargin(0.15);
  legend->SetHeader("LQ #bar{LQ} #rightarrow #mu q #nu q");
- legend->AddEntry(pl,"ATLAS exclusion (35 pb^{-1}, #beta=1/2)","f");
+ legend->AddEntry(pl,"ATLAS exclusion (1.03 fb^{-1}, #mu #nu j j)","f");
  legend->AddEntry(xsTh_vs_m,"2#beta(1-#beta)#times #sigma_{theory} with theory unc., (#beta=1/2)","lf");
  legend->AddEntry(xsData_vs_m_expected, "Expected 95% C.L. upper limit","lp");
  legend->AddEntry(xsData_vs_m_observed, "Observed 95% C.L. upper limit","lp");
