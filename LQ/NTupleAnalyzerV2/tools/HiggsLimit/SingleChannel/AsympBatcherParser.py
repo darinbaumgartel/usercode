@@ -1,8 +1,26 @@
 import os
 import sys
 
-files = []
+files = os.listdir('BatcherResults')
+for x in files:
+	if ".txt" not in file:
+		continue
+	fin = 'BatcherResults/'+x
+	fbak = 'BatcherResults/'+x+'bak'
 
+	fsplit = x.split('_')
+	num1 = fsplit[-2]
+	num2 = (fsplit[-1]).split('.')[0]
+	num2new = num2+'0'*(4-len(num2))
+	bval = num1+'_'+num2
+	bvalnew = num1+'_'+num2new
+	
+	fout = fin.replace(bval,bvalnew)
+	os.system('cp '+fin+' '+fbak)
+	os.system('mv '+fin+' '+fout)
+
+	
+	
 blist = os.popen('cat BatcherResults/*txt | grep Double_t | grep beta_vals').readlines()
 
 excom = os.popen('cat BatcherResults/*txt | grep Double_t | grep expected | grep combo').readlines()

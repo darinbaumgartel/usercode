@@ -1,590 +1,625 @@
-
-
-LQToCMu_BetaHalf_M_250.txt
-
-imax 1
-jmax 5
-kmax 13
-
-bin 1 
-observation 431
-
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_250 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 902.808459825 8.86431816851 12.9623485968 157.365535711 253.919123629 5.60248227643
-Jes  lnN  1.06984831957 1.1751431763   1.28329447081    1.3234280434     1.27045195335      1.20041558892 
-Mes  lnN  1.01796542692 1.02838750345   1.03624249509    1.04035304448     1.04618557508      1.05696776341 
-Jres  lnN  1.0025186774 1.10260385439   1.22490747956    1.16586300954     1.27326683403      1.70591818242 
-Mres  lnN  1.00148389347 1.01425155866   1.01325656506    1.01952305981     1.03297802624      1.02091219872 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.055789904 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.04211505639 -  -  - 
-stat_TTBar  lnN   -  -  - 1.0286608115 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.05331479097 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.10290927885
-stat_sig  lnN  1.00925408391 -  -  -  -  - 
-
-
-
-
-LQToCMu_BetaHalf_M_350.txt
+                                                                     
+                                                                     
+                                                                     
+                                             
+LQ_BetaHalf_M_250.txt
 
 imax 1
-jmax 5
-kmax 13
+jmax 7
+kmax 17
 
-bin 1 
-observation 64
+bin 1
+observation 430
 
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_350 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 132.639084709 2.118349575 1.91451515448 21.9108975817 43.0323600726 1.05177619841
-Jes  lnN  1.06405138827 1.12769361684   1.4821203726    1.40774481852     1.31712830203      1.23348507632 
-Mes  lnN  1.01135881194 1.03807622406   1.04105340837    1.03273725206     1.04675562558      1.05474726882 
-Jres  lnN  1.00363839285 1.05362691371   1.23884574019    1.20318428292     1.30390416077      1.59254562906 
-Mres  lnN  1.00168511278 1.02144607955   1.0012516931    1.03644368728     1.03033581003      1.02131193479 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.11666152555 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.10174904625 -  -  - 
-stat_TTBar  lnN   -  -  - 1.07630855986 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.08456344237 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.23560673029
-stat_sig  lnN  1.01000095055 -  -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_250 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 1703.5 5.9 33.21 171.12 197.03 7.1 15.31 14.99 
+jes lnN 1.078249 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.018505 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.002671 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.002774 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.005549 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet lnN - 1.28813559322 - - - - - -
+stat_qcd lnN - - 1.03763926528 - - - - -
+stat_ttbar lnN - - - 1.03179055633 - - - -
+stat_wjet lnN - - - - 1.04857128356 - - -
+stat_zjet lnN - - - - - 1.10281690141 - -
+stat_vv lnN - - - - - - 1.05878510777 -
+stat_stop lnN - - - - - - - 1.05003335557
+stat_sig lnN 1.00810096859 - - - - - - -
 
-
-
-
-LQToCMu_BetaHalf_M_400.txt
-
-imax 1
-jmax 5
-kmax 13
-
-bin 1 
-observation 42
-
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_400 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 63.7750610495 1.53291123728 1.25085862052 12.0144777344 24.0491216545 0.717508501119
-Jes  lnN  1.0556851878 1.11658514313   1.26988062315    1.41376353775     1.3163197574      1.22805008392 
-Mes  lnN  1.00940621615 1.01727248219   1.05111985921    1.11504379984     1.05694952318      1.02391096096 
-Jres  lnN  1.00644745229 1.01787008241   1.2259841886    1.1897325495     1.34879426834      1.64930644656 
-Mres  lnN  1.00192776698 1.05553989998   1.01966999233    1.09343879441     1.09256267645      1.03124058561 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.14011029103 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.1269006979 -  -  - 
-stat_TTBar  lnN   -  -  - 1.10333781243 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.11576600731 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.29084140966
-stat_sig  lnN  1.00933844623 -  -  -  -  - 
-
-
-
-
-LQToCMu_BetaHalf_M_450.txt
+LQ_BetaHalf_M_350.txt
 
 imax 1
-jmax 5
-kmax 13
+jmax 7
+kmax 17
 
-bin 1 
-observation 24
+bin 1
+observation 92
 
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_450 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 30.6545921586 0.948850491737 0.632906624054 5.8262721697 13.6260163277 0.601385269145
-Jes  lnN  1.06087062624 1.07498990511   1.1542942017    1.40848109308     1.21316407537      1.17722546648 
-Mes  lnN  1.00930707431 1.02186139641   1.05627363781    1.06099710962     1.03585464212      1.02852799801 
-Jres  lnN  1.00604572634 1.00547052286   1.10135637834    1.31427955686     1.22138526345      1.61506566635 
-Mres  lnN  1.0033234856 1.0699065249   1.06308400675    1.04823635614     1.11623061825      1.03727292121 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.18523999174 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.17562513832 -  -  - 
-stat_TTBar  lnN   -  -  - 1.14823649954 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.16120319624 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.32456643051
-stat_sig  lnN  1.00928827067 -  -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_350 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 285.5 0.56 16.13 29.94 53.98 2.29 4.1 3.96 
+jes lnN 1.082702 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.022042 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.009918 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.00744 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.01375 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 1 - 0.56 - - - - - -
+stat_qcd lnN - - 1.06385616863 - - - - -
+stat_ttbar lnN - - - 1.07481629927 - - - -
+stat_wjet lnN - - - - 1.09133012227 - - -
+stat_zjet lnN - - - - - 1.17467248908 - -
+stat_vv lnN - - - - - - 1.11463414634 -
+stat_stop lnN - - - - - - - 1.09848484848
+stat_sig lnN 1.00735551664 - - - - - - -
 
-
-
-
-LQToCMu_BetaHalf_M_500.txt
-
-imax 1
-jmax 5
-kmax 13
-
-bin 1 
-observation 12
-
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_500 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 13.1266916382 0.664173611952 0.246500160058 2.34421583841 8.13157734414 0.385874315733
-Jes  lnN  1.06603615797 1.14122670838   1.37302252523    1.53354205728     1.16690285296      1.1144133821 
-Mes  lnN  1.0115906891 1.10449552406   1.12479504052    1.12250270596     1.03585464212      1.04446089585 
-Jres  lnN  1.00617053221 1.03077698886   1.14310237619    1.15196610916     1.1057553426      1.24187928332 
-Mres  lnN  1.00116266038 1.0726449649   1.01512070145    1.0047421622     1.04476200057      1.03472591975 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.22676573984 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.27052691271 -  -  - 
-stat_TTBar  lnN   -  -  - 1.23715110691 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.18194110595 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.39749624618
-stat_sig  lnN  1.0089629809 -  -  -  -  - 
-
-
-
-
-LQToCMu_BetaHalf_M_550.txt
+LQ_BetaHalf_M_400.txt
 
 imax 1
-jmax 5
-kmax 13
+jmax 7
+kmax 17
 
-bin 1 
-observation 8
+bin 1
+observation 43
 
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_550 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 7.28115263512 0.424171010879 0.138901248879 0.969854638325 4.6839181935 0.298163808469
-Jes  lnN  1.06794996999 1.08674995343   1.53552992291    1.63558201086     1.22431966633      1.15863993807 
-Mes  lnN  1.00824617165 1.10449552406   1.1875456065    1.11057838598     1.03585464212      1.05753990684 
-Jres  lnN  1.00379122536 1.04694229489   1.27292394218    1.51882013855     1.29186269109      1.21823406394 
-Mres  lnN  1.0012409889 1.0726449649   1.08084499464    1.02299105812     1      1.05753990684 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.2882581339 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.35474405586 -  -  - 
-stat_TTBar  lnN   -  -  - 1.36637511573 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.22399769078 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.42201906561
-stat_sig  lnN  1.00904526464 -  -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_400 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 126.0 0.56 6.33 15.29 29.77 1.56 1.6 2.29 
+jes lnN 1.108505 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.029901 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.019156 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.012984 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.009941 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 1 - 0.56 - - - - - -
+stat_qcd lnN - - 1.07582938389 - - - - -
+stat_ttbar lnN - - - 1.10529758012 - - - -
+stat_wjet lnN - - - - 1.12395028552 - - -
+stat_zjet lnN - - - - - 1.21153846154 - -
+stat_vv lnN - - - - - - 1.175 -
+stat_stop lnN - - - - - - - 1.13100436681
+stat_sig lnN 1.00634920635 - - - - - - -
 
-
-
-
-LQToCMu_BetaHalf_M_600.txt
-
-imax 1
-jmax 5
-kmax 13
-
-bin 1 
-observation 7
-
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_600 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 4.48831173331 0.301562538766 0.131594309729 0.304824143269 3.66829981064 0.243638006274
-Jes  lnN  1.05370898688 1.07953526043   1.440509323    3.50856927158     1.11477750269      1.2757362276 
-Mes  lnN  1.0069074347 1.10449552406   1.1875456065    1.86832336146     1.03585464212      1.01079279065 
-Jres  lnN  1.00963553415 1.04694229489   1.21508148485    2.41598096682     1.38171201641      1.73930576543 
-Mres  lnN  1.00040098088 1.0726449649   1.00748074268    1.92506490953     1.01812461152      1.01079279065 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.3424649637 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.34614384788 -  -  - 
-stat_TTBar  lnN   -  -  - 1.60888473858 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.25866420607 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.48970489837
-stat_sig  lnN  1.00807145859 -  -  -  -  - 
-
-
-
-
-LQToCMu_BetaHalf_M_650.txt
+LQ_BetaHalf_M_450.txt
 
 imax 1
-jmax 5
-kmax 13
+jmax 7
+kmax 17
 
-bin 1 
-observation 6
+bin 1
+observation 29
 
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_650 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 2.50725623347 0.253682809008 0.0735925030909 0.0644937150692 2.55323999306 0.221131347631
-Jes  lnN  1.02829317279 1.35411962368   1.440509323    3.50856927158     1.11477750269      1.26554136665 
-Mes  lnN  1.00785826586 1.10449552406   1.1875456065    1.86832336146     1.03585464212      1.08947556269 
-Jres  lnN  1.00982393367 1.04694229489   1.21508148485    2.41598096682     1.32348404814      1.56797546737 
-Mres  lnN  1.00256844157 1.0726449649   1.00748074268    1.92506490953     1.03111194783      1.08947556269 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.3616127089 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.45448443081 -  -  - 
-stat_TTBar  lnN   -  -  - 1.79249193032 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.30963144677 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.44993934773
-stat_sig  lnN  1.00811061943 -  -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_450 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 68.4 0.0 3.09 10.72 20.42 1.25 1.29 1.59 
+jes lnN 1.066274 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.016456 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.008185 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.00576 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.009562 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 0 - 0.265 - - - - - -
+stat_qcd lnN - - 1.1067961165 - - - - -
+stat_ttbar lnN - - - 1.12313432836 - - - -
+stat_wjet lnN - - - - 1.14740450539 - - -
+stat_zjet lnN - - - - - 1.232 - -
+stat_vv lnN - - - - - - 1.18604651163 -
+stat_stop lnN - - - - - - - 1.15094339623
+stat_sig lnN 1.00584795322 - - - - - - -
 
-
-
-
-LQToCMu_BetaHalf_M_750.txt
-
-imax 1
-jmax 5
-kmax 13
-
-bin 1 
-observation 5
-
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_750 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 0.936268677119 0.221405017004 0.0735925030909 0.00479537553882 2.55323999306 0.201345495873
-Jes  lnN  1.01377017902 1.32972628693   1.440509323    3.50856927158     1.11477750269      1.17253899963 
-Mes  lnN  1.00458577563 1.10449552406   1.1875456065    1.86832336146     1.03585464212      1.08947556269 
-Jres  lnN  1.00942030003 1.04694229489   1.21508148485    2.41598096682     1.24431240993      1.72205753423 
-Mres  lnN  1.00108991057 1.0726449649   1.00748074268    1.92506490953     1.03111194783      1.17253899963 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.40022282636 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.45448443081 -  -  - 
-stat_TTBar  lnN   -  -  - 2.0 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.30963144677 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.48428463091
-stat_sig  lnN  1.00750437907 -  -  -  -  - 
-
-
-
-
-LQToCMu_BetaHalf_M_850.txt
+LQ_BetaHalf_M_500.txt
 
 imax 1
-jmax 5
-kmax 13
+jmax 7
+kmax 17
 
-bin 1 
-observation 5
-
-bin  1 1 1 1 1 1
-process LQToCMu_BetaHalf_M_850 DiBoson SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1 1
-rate 0.359629662669 0.221405017004 0.0735925030909 0.00479537553882 2.42780955635 0.166605545436
-Jes  lnN  1.00583355573 1.25800495799   1.440509323    3.50856927158     1.10471914976      1.40322682281 
-Mes  lnN  1.00597387833 1.10449552406   1.1875456065    1.86832336146     1.03585464212      1.08947556269 
-Jres  lnN  1.00705082927 1.04694229489   1.21508148485    2.41598096682     1.25693457471      2.08113437788 
-Mres  lnN  1.00067163692 1.0726449649   1.00748074268    1.92506490953     1.06241956056      1.17253899963 
-Mod  lnN  1 1   1    1.08     1.2      1 
-Mrii  lnN  1.01 1.01   1.01    1     1      1.01 
-Lum  lnN  1.045 1.045   1.045    1     1      1.045 
-stat_DiBoson  lnN   - 1.40022282636 -  -  -  - 
-stat_SingleTop  lnN   -  - 1.45448443081 -  -  - 
-stat_TTBar  lnN   -  -  - 2.0 -  - 
-stat_WJets_Sherpa  lnN   -  -  -  - 1.32150363759 - 
-stat_ZJets_Sherpa  lnN   -  -  -  -  - 1.54686110875
-stat_sig  lnN  1.00740692871 -  -  -  -  - 
-
-
-
-
-LQToCMu_M_250.txt
-
-imax 1
-jmax 4
-kmax 12
-
-bin 1 
-observation 489
-
-bin  1 1 1 1 1
-process LQToCMu_M_250 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 3668.07956213 8.56512417465 263.2 0.811981827862 286.761722772
-Jes  lnN  1.01083411166 1.06964708599   1    1.25862199537     1.01729818151 
-Mes  lnN  1.00644027452 1.03370831505   1    1     1.0897806234 
-Jres  lnN  1.00014980815 1.01184851146   1    1     1.01302991037 
-Mres  lnN  1.00184444741 1.00875386975   1    1     1.10826741191 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  675 - 0.0126890728513 -  -  - 
-stat_TTBar  gmN  560 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  3 -  -  - 0.270660609287 - 
-stat_ZJets_Sherpa  gmN  6748 -  -  -  - 0.0424958095394
-stat_sig  gmN  26358  0.139163804618 -  -  -  - 
-
-
-
-
-LQToCMu_M_350.txt
-
-imax 1
-jmax 4
-kmax 12
-
-bin 1 
-observation 101
-
-bin  1 1 1 1 1
-process LQToCMu_M_350 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 556.35906742 1.9733398637 57.81 0.202144192993 62.7794841035
-Jes  lnN  1.00958733024 1.10117727201   1    1     1.04861328298 
-Mes  lnN  1.00515325897 1.06213404206   1    1     1.0517009106 
-Jres  lnN  1.00002689076 1.05237119071   1    1     1.01327937616 
-Mres  lnN  1.00087302893 1.00333718911   1    1     1.01582054926 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  176 - 0.0112121583165 -  -  - 
-stat_TTBar  gmN  123 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  1 -  -  - 0.202144192993 - 
-stat_ZJets_Sherpa  gmN  1547 -  -  -  - 0.0405814376881
-stat_sig  gmN  32531  0.0171024274514 -  -  -  - 
-
-
-
-
-LQToCMu_M_400.txt
-
-imax 1
-jmax 4
-kmax 12
-
-bin 1 
-observation 50
-
-bin  1 1 1 1 1
-process LQToCMu_M_400 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 234.845658503 0.970253444318 30.08 0.0 27.6179512373
-Jes  lnN  1.0100292724 1.12206196646   1    1     1 
-Mes  lnN  1.00540905081 1.05072413485   1    1     1.01716720565 
-Jres  lnN  1.00076234627 1.02527173616   1    1     1.00738700718 
-Mres  lnN  1.00192405149 1.06916768554   1    1     1.01761975804 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  85 - 0.0114147464037 -  -  - 
-stat_TTBar  gmN  64 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  654 -  -  -  - 0.0422292832374
-stat_sig  gmN  33379  0.00703573080389 -  -  -  - 
-
-
-
-
-LQToCMu_M_450.txt
-
-imax 1
-jmax 4
-kmax 12
-
-bin 1 
-observation 27
-
-bin  1 1 1 1 1
-process LQToCMu_M_450 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 110.014751207 0.511431439001 13.63 0.0 14.9520278993
-Jes  lnN  1.01288455843 1.10321206446   1    1     1.03718642399 
-Mes  lnN  1.00567991012 1.06500769169   1    1     1.01860509239 
-Jres  lnN  1.00142211533 1.01240719158   1    1     1.00620527779 
-Mres  lnN  1.00048342903 1.01910977885   1    1     1.01260412484 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  41 - 0.0124739375366 -  -  - 
-stat_TTBar  gmN  29 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  354 -  -  -  - 0.0422373669471
-stat_sig  gmN  39359  0.00279516123904 -  -  -  - 
-
-
-
-
-LQToCMu_M_500.txt
-
-imax 1
-jmax 4
-kmax 12
-
-bin 1 
+bin 1
 observation 18
 
-bin  1 1 1 1 1
-process LQToCMu_M_500 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 54.7137318697 0.371714418113 8.46 0.0 7.7986837726
-Jes  lnN  1.0107690898 1.17115989767   1    1     1.07917344401 
-Mes  lnN  1.00460752435 1.06500769169   1    1     1.01860509239 
-Jres  lnN  1.00205238212 1.01240719158   1    1     1.023141391 
-Mres  lnN  1.00104538183 1.04180342896   1    1     1.03388146518 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  27 - 0.0137672006708 -  -  - 
-stat_TTBar  gmN  18 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  185 -  -  -  - 0.0421550474195
-stat_sig  gmN  34507  0.00158558355898 -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_500 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 34.7 0.0 1.8 5.55 13.82 0.86 0.81 1.14 
+jes lnN 1.065484 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.013196 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.004584 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.003315 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.008335 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 0 - 0.265 - - - - - -
+stat_qcd lnN - - 1.13888888889 - - - - -
+stat_ttbar lnN - - - 1.16756756757 - - - -
+stat_wjet lnN - - - - 1.17655571635 - - -
+stat_zjet lnN - - - - - 1.26744186047 - -
+stat_vv lnN - - - - - - 1.23456790123 -
+stat_stop lnN - - - - - - - 1.19298245614
+stat_sig lnN 1.00576368876 - - - - - - -
 
-
-
-
-LQToCMu_M_550.txt
-
-imax 1
-jmax 4
-kmax 12
-
-bin 1 
-observation 9
-
-bin  1 1 1 1 1
-process LQToCMu_M_550 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 24.6730980767 0.0705078369127 2.35 0.0 3.04130356444
-Jes  lnN  1.01789133445 1.1453036712   1    1     1.04432647742 
-Mes  lnN  1.00620898216 1.06500769169   1    1     1.01138493766 
-Jres  lnN  1.00377649114 1.01240719158   1    1     1.02036131964 
-Mres  lnN  1.00151765693 1.10505588753   1    1     1.05001284175 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  10 - 0.00705078369127 -  -  - 
-stat_TTBar  gmN  5 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  74 -  -  -  - 0.0410986968168
-stat_sig  gmN  38904  0.000634204659591 -  -  -  - 
-
-
-
-
-LQToCMu_M_600.txt
+LQ_BetaHalf_M_550.txt
 
 imax 1
-jmax 4
-kmax 12
+jmax 7
+kmax 17
 
-bin 1 
+bin 1
+observation 10
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_550 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 16.3 0.0 0.67 2.96 3.1 0.38 0.45 0.63 
+jes lnN 1.086618 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.018761 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.009981 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.007708 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.012851 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 0 - 0.265 - - - - - -
+stat_qcd lnN - - 1.16417910448 - - - - -
+stat_ttbar lnN - - - 1.24324324324 - - - -
+stat_wjet gmN 10 - - - - 0.31 - - -
+stat_zjet gmN 8 - - - - - 0.0475 - -
+stat_vv lnN - - - - - - 1.31111111111 -
+stat_stop lnN - - - - - - - 1.26984126984
+stat_sig lnN 1.00613496933 - - - - - - -
+
+LQ_BetaHalf_M_600.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 6
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_600 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 9.4 0.0 0.58 2.04 2.54 0.28 0.42 0.59 
+jes lnN 1.058113 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.013374 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.004161 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.003731 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.00742 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 0 - 0.265 - - - - - -
+stat_qcd lnN - - 1.18965517241 - - - - -
+stat_ttbar lnN - - - 1.28921568627 - - - -
+stat_wjet gmN 8 - - - - 0.3175 - - -
+stat_zjet gmN 5 - - - - - 0.056 - -
+stat_vv lnN - - - - - - 1.33333333333 -
+stat_stop lnN - - - - - - - 1.28813559322
+stat_sig lnN 1.01063829787 - - - - - - -
+
+LQ_BetaHalf_M_650.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 4
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_650 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 5.2 0.0 0.34 0.89 2.1 0.18 0.34 0.24 
+jes lnN 1.067789 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.01681 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.006211 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.0052 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.006669 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 0 - 0.265 - - - - - -
+stat_qcd lnN - - 1.23529411765 - - - - -
+stat_ttbar gmN 6 - - - 0.148333333333 - - - -
+stat_wjet gmN 6 - - - - 0.35 - - -
+stat_zjet gmN 4 - - - - - 0.045 - -
+stat_vv gmN 10 - - - - - - 0.034 -
+stat_stop gmN 5 - - - - - - - 0.048
+stat_sig lnN 1.00961538462 - - - - - - -
+
+LQ_BetaHalf_M_750.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 4
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_750 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 1.9 0.0 0.29 0.54 1.51 0.18 0.31 0.17 
+jes lnN 1.044426 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.0111 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.004432 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.002829 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.006643 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 0 - 0.265 - - - - - -
+stat_qcd lnN - - 1.27586206897 - - - - -
+stat_ttbar gmN 4 - - - 0.135 - - - -
+stat_wjet gmN 5 - - - - 0.302 - - -
+stat_zjet gmN 4 - - - - - 0.045 - -
+stat_vv gmN 8 - - - - - - 0.03875 -
+stat_stop gmN 4 - - - - - - - 0.0425
+stat_sig lnN 1.02631578947 - - - - - - -
+
+LQ_BetaHalf_M_850.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 4
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_BetaHalf_M_850 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 0.697 0.0 0.25 0.54 1.27 0.18 0.31 0.12 
+jes lnN 1.029868 1.0 1.0 1.129198 1.141935 1.0 1.138273 1.169671 
+ees lnN 1.008534 1.0 1.0 1.079642 1.032754 1.0 1.025258 1.049968 
+jer lnN 1.005049 1.0 1.0 1.075109 1.1363 1.0 1.012214 1.120143 
+eer lnN 1.002847 1.0 1.0 1.02298 1.013904 1.0 1.000473 1.011209 
+pu lnN 1.004581 1.0 1.0 1.029249 1.012551 1.0 1.031582 1.017481 
+shape lnN 1.0 1.0 1.0 1.1 1.2 1.0 1.0 1.0 
+ereco lnN 1.04 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.25 1.1 1.046 1.0 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.0 1.022 1.022 1.022 
+stat_gjet gmN 0 - 0.265 - - - - - -
+stat_qcd lnN - - 1.32 - - - - -
+stat_ttbar gmN 4 - - - 0.135 - - - -
+stat_wjet gmN 4 - - - - 0.3175 - - -
+stat_zjet gmN 4 - - - - - 0.045 - -
+stat_vv gmN 7 - - - - - - 0.0442857142857 -
+stat_stop gmN 3 - - - - - - - 0.04
+stat_sig lnN 1.00573888092 - - - - - - -
+
+LQ_M_250.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 770
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_250 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 6846.2 0.4 21.19 333.69 2.69 384.93 10.59 14.59 
+jes lnN 1.011703 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.009769 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.002253 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.000793 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.00302 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.01038225578 - - - - -
+stat_ttbar lnN - - - 1.03832898798 - - - -
+stat_wjet gmN 10 - - - - 0.269 - - -
+stat_zjet lnN - - - - - 1.01548333463 - -
+stat_vv lnN - - - - - - 1.05382436261 -
+stat_stop lnN - - - - - - - 1.04729266621
+stat_sig lnN 1.00467412579 - - - - - - -
+
+LQ_M_350.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 139
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_350 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 1119.6 0.4 2.17 41.16 0.43 88.46 2.16 3.12 
+jes lnN 1.015251 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.009256 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.0042 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.002691 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.008147 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.01843317972 - - - - -
+stat_ttbar lnN - - - 1.10908649174 - - - -
+stat_wjet gmN 2 - - - - 0.215 - - -
+stat_zjet lnN - - - - - 1.03187881528 - -
+stat_vv lnN - - - - - - 1.11574074074 -
+stat_stop lnN - - - - - - - 1.10256410256
+stat_sig lnN 1.0040192926 - - - - - - -
+
+LQ_M_400.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 55
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_400 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 487.4 0.4 1.01 19.11 0.43 35.7 0.97 1.32 
+jes lnN 1.015937 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.007236 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.003183 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.001251 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.00579 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.0297029703 - - - - -
+stat_ttbar lnN - - - 1.1601255887 - - - -
+stat_wjet gmN 2 - - - - 0.215 - - -
+stat_zjet lnN - - - - - 1.04901960784 - -
+stat_vv lnN - - - - - - 1.17525773196 -
+stat_stop lnN - - - - - - - 1.15151515152
+stat_sig lnN 1.00451374641 - - - - - - -
+
+LQ_M_450.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 26
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_450 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 225.6 0.4 0.37 7.84 0.42 15.15 0.35 0.76 
+jes lnN 1.020313 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.008987 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.004082 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.002089 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.00801 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.05405405405 - - - - -
+stat_ttbar lnN - - - 1.25 - - - -
+stat_wjet gmN 1 - - - - 0.42 - - -
+stat_zjet lnN - - - - - 1.07458745875 - -
+stat_vv lnN - - - - - - 1.22857142857 -
+stat_stop lnN - - - - - - - 1.21052631579
+stat_sig lnN 1.00443262411 - - - - - - -
+
+LQ_M_500.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 14
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_500 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 109.3 0.4 0.23 2.45 0.0 6.55 0.2 0.44 
+jes lnN 1.021488 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.008994 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.004105 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.00219 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.003062 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.04347826087 - - - - -
+stat_ttbar gmN 5 - - - 0.49 - - - -
+stat_wjet gmN 0 - - - - 0.2 - - -
+stat_zjet lnN - - - - - 1.10534351145 - -
+stat_vv lnN - - - - - - 1.4 -
+stat_stop lnN - - - - - - - 1.29545454545
+stat_sig lnN 1.00457456542 - - - - - - -
+
+LQ_M_550.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 11
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_550 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 57.4 0.4 0.17 0.98 0.0 4.65 0.16 0.28 
+jes lnN 1.020745 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.008946 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.004413 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.002313 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.00077 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.05882352941 - - - - -
+stat_ttbar gmN 2 - - - 0.49 - - - -
+stat_wjet gmN 0 - - - - 0.2 - - -
+stat_zjet lnN - - - - - 1.1247311828 - -
+stat_vv lnN - - - - - - 1.5 -
+stat_stop gmN 10 - - - - - - - 0.028
+stat_sig lnN 1.00348432056 - - - - - - -
+
+LQ_M_600.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
 observation 8
 
-bin  1 1 1 1 1
-process LQToCMu_M_600 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 14.1379866261 0.0705078369127 2.35 0.0 2.69717409513
-Jes  lnN  1.01346905014 1.1453036712   1    1     1.04432647742 
-Mes  lnN  1.00434330284 1.06500769169   1    1     1.01888506902 
-Jres  lnN  1.00270487197 1.01240719158   1    1     1.02651961692 
-Mres  lnN  1.00144129556 1.10505588753   1    1     1.03024896945 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  10 - 0.00705078369127 -  -  - 
-stat_TTBar  gmN  5 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  67 -  -  -  - 0.040256329778
-stat_sig  gmN  33774  0.000418605632324 -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_600 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 31.0 0.4 0.11 0.49 0.0 3.04 0.14 0.19 
+jes lnN 1.019637 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.008457 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.006232 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.003158 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.008913 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.09090909091 - - - - -
+stat_ttbar gmN 1 - - - 0.49 - - - -
+stat_wjet gmN 0 - - - - 0.2 - - -
+stat_zjet lnN - - - - - 1.15131578947 - -
+stat_vv gmN 8 - - - - - - 0.0175 -
+stat_stop gmN 6 - - - - - - - 0.0316666666667
+stat_sig lnN 1.00322580645 - - - - - - -
 
-
-
-
-LQToCMu_M_650.txt
-
-imax 1
-jmax 4
-kmax 12
-
-bin 1 
-observation 7
-
-bin  1 1 1 1 1
-process LQToCMu_M_650 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 7.86132814545 0.0160647408799 0.94 0.0 2.02477431319
-Jes  lnN  1.01193962115 1.1453036712   1    1     1.12893516522 
-Mes  lnN  1.00474141085 1.06500769169   1    1     1.11251625098 
-Jres  lnN  1.0026624559 1.01240719158   1    1     1.03607478358 
-Mres  lnN  1.00091358407 1.10505588753   1    1     1.04711387142 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  5 - 0.00321294817598 -  -  - 
-stat_TTBar  gmN  2 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  49 -  -  -  - 0.041321924759
-stat_sig  gmN  33586  0.000234065626911 -  -  -  - 
-
-
-
-
-LQToCMu_M_750.txt
+LQ_M_650.txt
 
 imax 1
-jmax 4
-kmax 12
+jmax 7
+kmax 17
 
-bin 1 
-observation 1
+bin 1
+observation 6
 
-bin  1 1 1 1 1
-process LQToCMu_M_750 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 2.35229976943 0.0 0.0 0.0 0.984559348031
-Jes  lnN  1.01300177201 1   1    1     1.12893516522 
-Mes  lnN  1.00496641459 1   1    1     1.07134807048 
-Jres  lnN  1.00491966746 1   1    1     1.0185167882 
-Mres  lnN  1.00173717165 1   1    1     1.07315118774 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  0 - 0.012554537305 -  -  - 
-stat_TTBar  gmN  0 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  25 -  -  -  - 0.0393823739212
-stat_sig  gmN  38276  6.14562589986e-05 -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_650 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 17.0 0.4 0.09 0.49 0.0 2.14 0.01 0.08 
+jes lnN 1.019205 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.007836 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.004508 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.002624 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.010012 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.11111111111 - - - - -
+stat_ttbar gmN 1 - - - 0.49 - - - -
+stat_wjet gmN 0 - - - - 0.2 - - -
+stat_zjet lnN - - - - - 1.17757009346 - -
+stat_vv gmN 2 - - - - - - 0.005 -
+stat_stop gmN 4 - - - - - - - 0.02
+stat_sig lnN 1.00352941176 - - - - - - -
 
-
-
-
-LQToCMu_M_850.txt
+LQ_M_750.txt
 
 imax 1
-jmax 4
-kmax 12
+jmax 7
+kmax 17
 
-bin 1 
-observation 1
+bin 1
+observation 0
 
-bin  1 1 1 1 1
-process LQToCMu_M_850 SingleTop TTBar WJets_Sherpa ZJets_Sherpa
-process 0 1 1 1 1
-rate 0.85587371219 0.0 0.0 0.0 0.984559348031
-Jes  lnN  1.00792611639 1   1    1     1.12893516522 
-Mes  lnN  1.00319600733 1   1    1     1.07134807048 
-Jres  lnN  1.00295270771 1   1    1     1.0185167882 
-Mres  lnN  1.00295816131 1   1    1     1.07315118774 
-Mod  lnN  1 1   1    1     1.6 
-Mrii  lnN  1.02 1.02   1    1.02     1 
-Lum  lnN  1.045 1.045   1    1.045     1 
-stat_SingleTop  gmN  0 - 0.012554537305 -  -  - 
-stat_TTBar  gmN  0 -  - 0.47 -  - 
-stat_WJets_Sherpa  gmN  0 -  -  - 0.17347982133 - 
-stat_ZJets_Sherpa  gmN  25 -  -  -  - 0.0393823739212
-stat_sig  gmN  36658  2.33475288393e-05 -  -  -  - 
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_750 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 5.53 0.4 0.012 0.0 0.0 1.04 0.01 0.0005 
+jes lnN 1.017394 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.007908 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.004593 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.002132 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.001591 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.21666666667 - - - - -
+stat_ttbar gmN 0 - - - 0.49 - - - -
+stat_wjet gmN 0 - - - - 0.2 - - -
+stat_zjet lnN - - - - - 1.25 - -
+stat_vv gmN 2 - - - - - - 0.005 -
+stat_stop gmN 1 - - - - - - - 0.0005
+stat_sig lnN 1.00361663653 - - - - - - -
+
+LQ_M_850.txt
+
+imax 1
+jmax 7
+kmax 17
+
+bin 1
+observation 0
+
+bin 1 1 1 1 1 1 1 1 
+process LQ_M_850 gjet qcd ttbar wjet zjet vv stop 
+process 0 1 1 1 1 1 1 1 
+rate 1.97 0.4 0.001 0.0 0.0 0.81 0.0001 0.0005 
+jes lnN 1.011322 1.0 1.0 1.0 1.0 1.004724 1.089498 1.085456 
+ees lnN 1.004179 1.0 1.0 1.0 1.0 1.078396 1.097066 1.037991 
+jer lnN 1.004142 1.0 1.0 1.0 1.0 1.011093 1.009615 1.018063 
+eer lnN 1.001288 1.0 1.0 1.0 1.0 1.005113 1.00153 1.011591 
+pu lnN 1.008159 1.0 1.0 1.0 1.0 1.007414 1.014663 1.005561 
+shape lnN 1.0 1.0 1.0 1.0 1.0 1.15 1.0 1.0 
+ereco lnN 1.03 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+norm lnN 1.0 1.0 1.5 1.02 1.0 1.015 1.0 1.0 
+lumi lnN 1.022 1.022 1.0 1.0 1.022 1.0 1.022 1.022 
+stat_gjet gmN 1 - 0.4 - - - - - -
+stat_qcd lnN - - 1.3 - - - - -
+stat_ttbar gmN 0 - - - 0.49 - - - -
+stat_wjet gmN 0 - - - - 0.2 - - -
+stat_zjet lnN - - - - - 1.28395061728 - -
+stat_vv gmN 1 - - - - - - 0.0001 -
+stat_stop gmN 1 - - - - - - - 0.0005
+stat_sig lnN 1.00507614213 - - - - - - -
 
 
