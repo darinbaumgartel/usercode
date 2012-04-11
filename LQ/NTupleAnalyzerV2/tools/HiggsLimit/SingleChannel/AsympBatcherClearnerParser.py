@@ -3,7 +3,7 @@ import sys
 
 files = os.listdir('BatcherResults')
 for x in files:
-	if ".txt" not in file:
+	if ".txt" not in x:
 		continue
 	fin = 'BatcherResults/'+x
 	fbak = 'BatcherResults/'+x+'bak'
