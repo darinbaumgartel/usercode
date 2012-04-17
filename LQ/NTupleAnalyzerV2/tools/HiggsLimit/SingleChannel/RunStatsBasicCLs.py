@@ -167,10 +167,13 @@ if do_BetaOne == 1:
 		EstimationInformation = [' r < 0.0000']
 		rmax = 1000.0
 		breaker = False 
+		ExtraCheck=True
 		while 'r < 0.0000' in str(EstimationInformation):
 			EstimationInformation = os.popen('combine '+ESTIMATIONMETHOD+' CLSLimits/BetaOne'+cdir+'/confbetaone_'+cdir+'_'+name[x]+'.cfg --rMax '+str(rmax)).readlines()
-			if breaker ==True:
+			if breaker==True and ExtraCheck==False:
 				break
+			if breaker ==True and ExtraCheck==True:
+				ExtraCheck=False
 			if 'r < 0.0000' not in str(EstimationInformation):
 				effrmax = -999999
 				for e in EstimationInformation:
@@ -284,10 +287,13 @@ if do_BetaHalf == 1:
 		EstimationInformation = [' r < 0.0000']
 		rmax = 1000.0
 		breaker = False 
+		ExtraCheck=True
 		while 'r < 0.0000' in str(EstimationInformation):
 			EstimationInformation = os.popen('combine '+ESTIMATIONMETHOD+' CLSLimits/BetaHalf'+cdir+'/confbetahalf_'+cdir+'_'+name[x]+'.cfg --rMax '+str(rmax)).readlines()
-			if breaker ==True:
+			if breaker==True and ExtraCheck==False:
 				break
+			if breaker ==True and ExtraCheck==True:
+				ExtraCheck=False
 			if 'r < 0.0000' not in str(EstimationInformation):
 				effrmax = -999999
 				for e in EstimationInformation:
@@ -552,12 +558,15 @@ if do_combo == 1:
 			EstimationInformation0 = [' r < 0.0000']
 			rmax = 1000.0
 			breaker = False 
+			ExtraCheck = True
 			while 'r < 0.0000' in str(EstimationInformation0):
 				print 'combine '+ESTIMATIONMETHOD+' '+newcard +' --rMax '+str(rmax)
 				EstimationInformation0 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard +' --rMax '+str(rmax)).readlines()
 				
-				if breaker ==True:
+				if breaker==True and ExtraCheck==False:
 					break
+				if breaker ==True and ExtraCheck==True:
+					ExtraCheck=False
 				if 'r < 0.0000' not in str(EstimationInformation0):
 					effrmax = -999999
 					for e in EstimationInformation0:
@@ -572,16 +581,22 @@ if do_combo == 1:
 					breaker = True
 				rmax = rmax/5.0
 
+				
+
 
 			EstimationInformation1 = [' r < 0.0000']
 			rmax = 1000.0
 			breaker = False 
+			ExtraCheck = True
+			
 			while 'r < 0.0000' in str(EstimationInformation1):
 				print 'combine '+ESTIMATIONMETHOD+' '+newcard_BetaOne +' --rMax '+str(rmax)
 				EstimationInformation1 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard_BetaOne +' --rMax '+str(rmax)).readlines()
 				
-				if breaker ==True:
+				if breaker==True and ExtraCheck==False:
 					break
+				if breaker ==True and ExtraCheck==True:
+					ExtraCheck=False
 				if 'r < 0.0000' not in str(EstimationInformation1):
 					effrmax = -999999
 					for e in EstimationInformation1:
@@ -600,12 +615,16 @@ if do_combo == 1:
 			EstimationInformation2 = [' r < 0.0000']
 			rmax = 1000.0
 			breaker = False 
+			ExtraCheck = True
+
 			while 'r < 0.0000' in str(EstimationInformation2):
 				print 'combine '+ESTIMATIONMETHOD+' '+newcard_BetaHalf +' --rMax '+str(rmax)
 				EstimationInformation2 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard_BetaHalf +' --rMax '+str(rmax)).readlines()
 				
-				if breaker ==True:
+				if breaker==True and ExtraCheck==False:
 					break
+				if breaker ==True and ExtraCheck==True:
+					ExtraCheck=False
 				if 'r < 0.0000' not in str(EstimationInformation2):
 					effrmax = -999999
 					for e in EstimationInformation2:
@@ -724,9 +743,9 @@ if do_combo == 1:
 			nindex2 = 0
 			thisr2 = 0
 			
-			print 'vstop0 '+str(vstop0) + '   vstart0  '+str(vstart0)
-			print 'vstop1 '+str(vstop1) + '   vstart1  '+str(vstart1)
-			print 'vstop2 '+str(vstop2) + '   vstart2  '+str(vstart2)
+			#print 'vstop0 '+str(vstop0) + '   vstart0  '+str(vstart0)
+			#print 'vstop1 '+str(vstop1) + '   vstart1  '+str(vstart1)
+			#print 'vstop2 '+str(vstop2) + '   vstart2  '+str(vstart2)
 
 			expinc0 = 0.9999*(2.718281828**((0.0666666666667*(math.log(vstop0/vstart0)))))
 			expinc1 = 0.9999*(2.718281828**((0.0666666666667*(math.log(vstop1/vstart1)))))
@@ -973,7 +992,30 @@ if do_combo == 1:
 	M_th=[ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850]
 	X_th=[  53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732]
 		
-		
+
+
+	def PrintPlot(Mtheory,Stheory,MLim,SLim,MExp,SExp,MOneLim,SOneLim,MOneExp,SOneExp,MHalfLim,SHalfLim,MHalfExp,SHalfExp,beta,name):
+		import matplotlib.pyplot
+		matplotlib.pyplot.figure
+		matplotlib.pyplot.plot(Mtheory, Stheory, "b-", lw=1)
+		matplotlib.pyplot.plot(MLim, SLim, "k-o", lw=1)
+		matplotlib.pyplot.plot(MExp, SExp, "k--", lw=1)
+		matplotlib.pyplot.plot(MOneLim, SOneLim, "r-o", lw=1)
+		matplotlib.pyplot.plot(MOneExp, SOneExp, "r--", lw=1)
+		matplotlib.pyplot.plot(MHalfLim, SHalfLim, "g-o", lw=1)
+		matplotlib.pyplot.plot(MHalfExp, SHalfExp, "g--", lw=1)
+		strbeta = str(beta).replace('.','_')
+		strbeta = strbeta + '0'*(6-len(strbeta))
+	
+		matplotlib.pyplot.ylabel("$Sigma$")
+		matplotlib.pyplot.xlabel("$Mass (GeV)$")
+		matplotlib.pyplot.yscale('log')
+		matplotlib.pyplot.title(name + " Limit Vs Mass for Beta "+strbeta)
+		matplotlib.pyplot.grid(True)
+		matplotlib.pyplot.legend(("Theory", "Combo Observed","Combo Expected", "lljj Observed","lljj Expected", "lvjj Observed","lvjj Expected"))
+
+		matplotlib.pyplot.savefig(name+"_"+strbeta+".png", format="png", transparent=False)
+
 	def sigmaval(mval):
 		return spline.Eval(mval)
 		
@@ -1105,6 +1147,11 @@ if do_combo == 1:
 			mlist.append(str(round(goodm[0],2)))
 		return mlist
 		
+
+	if '--single_beta' in sys.argv and (False):
+		PrintPlot(M_th,X_th,masses,s_ComboObs[0],masses,s_ComboExp[0],masses,s_ComboBetaOneObs[0],masses,s_ComboBetaOneExp[0],masses,s_ComboBetaHalfObs[0],masses,s_ComboBetaHalfExp[0],singlebeta,"Combo")		
+
+	
 	m_ComboObs = fill_mlists(s_ComboObs)
 	m_Combo95down = fill_mlists(s_Combo95down)
 	m_Combo68down = fill_mlists(s_Combo68down)

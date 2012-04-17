@@ -5,11 +5,12 @@ betas = [0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.18,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0
 
 betas = []
 b = 0.00
+
 while b<0.9999:
 	if b < 0.1 or b > 0.9:
 		b = b + 0.002
 	else: 
-		b = b + 0.01
+		b = b + 0.005
 	if b < 1.0:
 		betas.append( b )
 betas.append(0.9995)
@@ -39,6 +40,7 @@ for b in betas:
 
 	f.write('python RunStatsBasicCLs.py '+sysargs+' '+str(b)+' > Result_'+bs+'.txt\n')
 	f.write('cp Result* '+mdir+'/BatcherResults/\n\n')
+	f.write('cp *png '+mdir+'/BatcherResults/\n\n')
 	
 	f.close()
 	bsubs .append('bsub -o /dev/null -e /dev/null -q 1nd -J job_'+bs+' < ' +'BatcherResults/batch_R_'+bs+'.csh')
