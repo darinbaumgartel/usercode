@@ -129,6 +129,13 @@ void placeholder::Loop()
 	//         MUON AND CALOJET/CALOMET VARIABLES BELOW
 	//*****************************************************************
 
+	Double_t weight=0.0;
+	Double_t xsection=0.0;
+	//Double_t Events_AfterLJ=0.0;
+	Double_t Events_Orig=0.0;
+	Double_t N_PileUpInteractions=0.0;
+	Double_t Pt_HEEPele1=0.0;
+
 	// Particle Counts
 	BRANCH(MuonCount); BRANCH(EleCount); BRANCH(HEEPEleCount); BRANCH(PFJetCount); BRANCH(BpfJetCount);
 	BRANCH(GlobalMuonCount); BRANCH(TrackerMuonCount);
@@ -141,17 +148,13 @@ void placeholder::Loop()
 	tree->Branch("event_number",&event_number,"event_number/i");
 	tree->Branch("run_number",&run_number,"run_number/i");
 	tree->Branch("ls_number",&ls_number,"ls_number/i");
-	BRANCH(bx);	BRANCH(xsection);   BRANCH(weight);
-	BRANCH(Events_AfterLJ); BRANCH(Events_Orig);
+	BRANCH(bx);	
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
-	BRANCH(weight_964pileup_gen); BRANCH(weight_pileup2fb); BRANCH(weight_pileup4p7fb); BRANCH(weight_pileup2011B); BRANCH(weight_pileup2011A); BRANCH(weight_pileup4p7fb_higgs);
 	BRANCH(weight_pu_central); BRANCH(weight_pu_sysplus8); BRANCH(weight_pu_sysminus8);
-	BRANCH(weight_pileup4p7fb_Fall11); BRANCH(weight_pileup4p7fb_Fall11Poisson);
-	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_EcalMaskedCellDRFilter); BRANCH(pass_passBeamHaloFilterLoose); 
-	BRANCH(pass_passBeamHaloFilterTight); BRANCH(pass_CaloBoundaryDRFilter);
+	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_passBeamHaloFilterLoose); 
+	BRANCH(pass_passBeamHaloFilterTight);
 	BRANCH(pass_isTrackingFailure);
-	BRANCH(N_PileUpInteractions);
 
 	// PFMET
 	BRANCH(MET_pfsig);	BRANCH(MET_pf_charged);
@@ -166,7 +169,7 @@ void placeholder::Loop()
 	BRANCH(Pt_genjet3);  BRANCH(Phi_genjet3);  BRANCH(Eta_genjet3);  
 	BRANCH(Pt_genjet4);  BRANCH(Phi_genjet4);  BRANCH(Eta_genjet4);  
 	BRANCH(Pt_genjet5);  BRANCH(Phi_genjet5);  BRANCH(Eta_genjet5);  
-	BRANCH(Pt_genjet6);  BRANCH(Phi_genjet6);  BRANCH(Eta_genjet6);  
+	//BRANCH(Pt_genjet6);  BRANCH(Phi_genjet6);  BRANCH(Eta_genjet6);  
 	
 	BRANCH(Pt_genmuon1);  BRANCH(Phi_genmuon1);  BRANCH(Eta_genmuon1);  
 	BRANCH(Pt_genmuon2);  BRANCH(Phi_genmuon2);  BRANCH(Eta_genmuon2);  
@@ -183,7 +186,7 @@ void placeholder::Loop()
 	BRANCH(Pt_pfjet3);  BRANCH(Phi_pfjet3);  BRANCH(Eta_pfjet3);  
 	BRANCH(Pt_pfjet4);  BRANCH(Phi_pfjet4);  BRANCH(Eta_pfjet4);  
 	BRANCH(Pt_pfjet5);  BRANCH(Phi_pfjet5);  BRANCH(Eta_pfjet5);  
-	BRANCH(Pt_pfjet6);  BRANCH(Phi_pfjet6);  BRANCH(Eta_pfjet6);  
+	//BRANCH(Pt_pfjet6);  BRANCH(Phi_pfjet6);  BRANCH(Eta_pfjet6);  
 	
 	BRANCH(Pt_muon1);  BRANCH(Phi_muon1);  BRANCH(Eta_muon1);  
 	BRANCH(Pt_muon2);  BRANCH(Phi_muon2);  BRANCH(Eta_muon2);  
@@ -195,12 +198,15 @@ void placeholder::Loop()
 	
 
 	// Trigger and other
-	BRANCH(LowestUnprescaledTrigger); BRANCH(Closest40UnprescaledTrigger);
-	BRANCH(LowestUnprescaledTriggerPass); BRANCH(Closest40UnprescaledTriggerPass);
-	BRANCH(HLTIsoMu24Pass);
-	BRANCH(HLTMu40TriggerPass);
-	BRANCH(HT_genMG);
+	BRANCH(LowestUnprescaledTriggerPass); 
 
+	Double_t LowestUnprescaledTrigger=0.0;//BRANCH(LowestUnprescaledTrigger); 
+	Double_t Closest40UnprescaledTrigger=0.0;//BRANCH(Closest40UnprescaledTrigger);
+	Double_t Closest40UnprescaledTriggerPass=0.0;//BRANCH(Closest40UnprescaledTriggerPass);
+	Double_t HLTIsoMu24Pass=0.0;//RANCH(HLTIsoMu24Pass);
+	Double_t HLTMu40TriggerPass=0.0;//BRANCH(HLTMu40TriggerPass);
+	Double_t HT_genMG=0.0;//BRANCH(HT_genMG);
+	
 	//===================================================================================================
 	//===================================================================================================
 
@@ -275,8 +281,8 @@ void placeholder::Loop()
 		
 		pass_HBHENoiseFilter =1.0*passHBHENoiseFilter;
 		pass_isBPTX0 = 1.0*isBPTX0 ; 
-		pass_EcalMaskedCellDRFilter = 1.0*passEcalMaskedCellDRFilter ; 
-		pass_CaloBoundaryDRFilter = 1.0*passCaloBoundaryDRFilter ; 
+		//pass_EcalMaskedCellDRFilter = 1.0*passEcalMaskedCellDRFilter ; 
+		//pass_CaloBoundaryDRFilter = 1.0*passCaloBoundaryDRFilter ; 
 		pass_passBeamHaloFilterLoose = 1.0*passBeamHaloFilterLoose ; 
 		pass_passBeamHaloFilterTight = 1.0*passBeamHaloFilterTight ;
 		pass_isTrackingFailure = 1.00*(1.0-1.0*isTrackingFailure);		
@@ -541,7 +547,7 @@ void placeholder::Loop()
 					}
 				
 				double NewJetPT = (*PFJetPt)[ijet];
-				double NewJetETA = (*PFJetEta)[ijet];
+				//double NewJetETA = (*PFJetEta)[ijet];
 
 
 				if (JetRescaleFactor != 1.00) NewJetPT = NewJetPT + ((ScaleObject((*PFJetPtRaw)[ijet],NewJetRescalingFactor)) - ((*PFJetPtRaw)[ijet])) ; 
@@ -842,7 +848,7 @@ void placeholder::Loop()
 			Pt_genjet3 = 0;       Phi_genjet3 = 0;       Eta_genjet3 = 0;
 			Pt_genjet4 = 0;       Phi_genjet4 = 0;       Eta_genjet4 = 0;
 			Pt_genjet5 = 0;       Phi_genjet5 = 0;       Eta_genjet5 = 0;
-			Pt_genjet6 = 0;       Phi_genjet6 = 0;       Eta_genjet6 = 0;
+			//Pt_genjet6 = 0;       Phi_genjet6 = 0;       Eta_genjet6 = 0;
 			
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
 			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
@@ -944,9 +950,9 @@ void placeholder::Loop()
 			if (PFJetCount>=5)	Pt_genjet5  =	SortedGenJets[4].Pt();
 			if (PFJetCount>=5)	Eta_genjet5 =	SortedGenJets[4].Eta();
 			if (PFJetCount>=5)	Phi_genjet5 =	SortedGenJets[4].Phi();
-			if (PFJetCount>=6)	Pt_genjet6  =	SortedGenJets[5].Pt();
-			if (PFJetCount>=6)	Eta_genjet6 =	SortedGenJets[5].Eta();
-			if (PFJetCount>=6)	Phi_genjet6 =	SortedGenJets[5].Phi();
+			//if (PFJetCount>=6)	Pt_genjet6  =	SortedGenJets[5].Pt();
+			//if (PFJetCount>=6)	Eta_genjet6 =	SortedGenJets[5].Eta();
+			//if (PFJetCount>=6)	Phi_genjet6 =	SortedGenJets[5].Phi();
 
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
@@ -969,7 +975,7 @@ void placeholder::Loop()
 			Pt_pfjet3 = 0;       Phi_pfjet3 = 0;       Eta_pfjet3 = 0;
 			Pt_pfjet4 = 0;       Phi_pfjet4 = 0;       Eta_pfjet4 = 0;
 			Pt_pfjet5 = 0;       Phi_pfjet5 = 0;       Eta_pfjet5 = 0;
-			Pt_pfjet6 = 0;       Phi_pfjet6 = 0;       Eta_pfjet6 = 0;
+			//Pt_pfjet6 = 0;       Phi_pfjet6 = 0;       Eta_pfjet6 = 0;
 			
 			Pt_muon1 = 0;      Phi_muon1 = 0;      Eta_muon1 = 0;
 			Pt_muon2 = 0;      Phi_muon2 = 0;      Eta_muon2 = 0;
@@ -1000,9 +1006,9 @@ void placeholder::Loop()
 			if (PFJetCount>=5)	Pt_pfjet5  =	RecoJets[4].Pt();
 			if (PFJetCount>=5)	Eta_pfjet5 =	RecoJets[4].Eta();
 			if (PFJetCount>=5)	Phi_pfjet5 =	RecoJets[4].Phi();
-			if (PFJetCount>=6)	Pt_pfjet6  =	RecoJets[5].Pt();
-			if (PFJetCount>=6)	Eta_pfjet6 =	RecoJets[5].Eta();
-			if (PFJetCount>=6)	Phi_pfjet6 =	RecoJets[5].Phi();
+			//if (PFJetCount>=6)	Pt_pfjet6  =	RecoJets[5].Pt();
+			//if (PFJetCount>=6)	Eta_pfjet6 =	RecoJets[5].Eta();
+			//if (PFJetCount>=6)	Phi_pfjet6 =	RecoJets[5].Phi();
 	
 			Pt_MET = PFMET->at(0);
 			Phi_MET = PFMETPhi->at(0);
@@ -1016,10 +1022,17 @@ void placeholder::Loop()
 	
 			MET_pfsig = PFMETSig->at(0);
 			MET_pf_charged = PFMETCharged->at(0);
+			
+			Pt_HEEPele1=0.0;
+			if (HEEPEleCount>=1) Pt_HEEPele1 = ElectronPt->at(v_idx_ele_good_final[0]);
 	
 		if (Pt_muon1<45) continue;
-		if (Pt_MET<20) continue;
-		tree->Write();
+		if (Pt_MET<30) continue;
+		if (Pt_muon2>20) continue;
+		if (MT_muon1MET<50) continue;
+		if (Pt_HEEPele1>20.0) continue;
+		//if (MT_muon1MET>110) continue;
+		tree->Fill();
 	}
 
 	tree->Write();
