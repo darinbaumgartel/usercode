@@ -774,6 +774,9 @@ void placeholder::Loop()
 
 		if ( MuonCount < 1 ) continue;
 
+		int LeadMuonVertex=MuonVtxIndex->at(v_idx_muon_final[0]);
+		
+
 		//========================     PFJet Conditions   ================================//
 		// Get Good Jets in general
 
@@ -792,15 +795,16 @@ void placeholder::Loop()
 			double jetEta = PFJetEta -> at(ijet);
 			CurrentPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
 
+			if (PFJetBestVertexTrackAssociationIndex->at(ijet) != LeadMuonVertex) continue;
+
 			bool IsLepton = false;
 
 			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)&&(!IsLepton)) FailIDPFThreshold = PFJetPt->at(ijet);
-			if ( jetPt < 30.0 ) continue;			
+			//if ( jetPt < 30.0 ) continue;			
 			if ( fabs(jetEta) > 2.4 ) continue;
 			if (PFJetPassLooseID->at(ijet) != 1) continue;   
 			v_idx_pfjet_prefinal.push_back(ijet);
 		}
-		
 		// Filter out jets that are actually muons or electrons
 		TLorentzVector thisjet, thismu, thise;
 
@@ -819,6 +823,7 @@ void placeholder::Loop()
 			{
 				muindex = v_idx_muon_final[imu];
 				thismu.SetPtEtaPhiM(MuonPt->at(muindex),MuonEta->at(muindex),MuonPhi->at(muindex),0);
+				if (thismu.Pt()<20.0) continue;
 				if (thismu.DeltaR(thisjet) < 0.3)		KeepJet=false;
 			}
 
@@ -848,7 +853,7 @@ void placeholder::Loop()
 			Pt_genjet3 = 0;       Phi_genjet3 = 0;       Eta_genjet3 = 0;
 			Pt_genjet4 = 0;       Phi_genjet4 = 0;       Eta_genjet4 = 0;
 			Pt_genjet5 = 0;       Phi_genjet5 = 0;       Eta_genjet5 = 0;
-			//Pt_genjet6 = 0;       Phi_genjet6 = 0;       Eta_genjet6 = 0;
+			Pt_genjet6 = 0;       Phi_genjet6 = 0;       Eta_genjet6 = 0;
 			
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
 			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
@@ -950,9 +955,9 @@ void placeholder::Loop()
 			if (PFJetCount>=5)	Pt_genjet5  =	SortedGenJets[4].Pt();
 			if (PFJetCount>=5)	Eta_genjet5 =	SortedGenJets[4].Eta();
 			if (PFJetCount>=5)	Phi_genjet5 =	SortedGenJets[4].Phi();
-			//if (PFJetCount>=6)	Pt_genjet6  =	SortedGenJets[5].Pt();
-			//if (PFJetCount>=6)	Eta_genjet6 =	SortedGenJets[5].Eta();
-			//if (PFJetCount>=6)	Phi_genjet6 =	SortedGenJets[5].Phi();
+			if (PFJetCount>=6)	Pt_genjet6  =	SortedGenJets[5].Pt();
+			if (PFJetCount>=6)	Eta_genjet6 =	SortedGenJets[5].Eta();
+			if (PFJetCount>=6)	Phi_genjet6 =	SortedGenJets[5].Phi();
 
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
@@ -975,7 +980,7 @@ void placeholder::Loop()
 			Pt_pfjet3 = 0;       Phi_pfjet3 = 0;       Eta_pfjet3 = 0;
 			Pt_pfjet4 = 0;       Phi_pfjet4 = 0;       Eta_pfjet4 = 0;
 			Pt_pfjet5 = 0;       Phi_pfjet5 = 0;       Eta_pfjet5 = 0;
-			//Pt_pfjet6 = 0;       Phi_pfjet6 = 0;       Eta_pfjet6 = 0;
+			Pt_pfjet6 = 0;       Phi_pfjet6 = 0;       Eta_pfjet6 = 0;
 			
 			Pt_muon1 = 0;      Phi_muon1 = 0;      Eta_muon1 = 0;
 			Pt_muon2 = 0;      Phi_muon2 = 0;      Eta_muon2 = 0;
@@ -1006,9 +1011,9 @@ void placeholder::Loop()
 			if (PFJetCount>=5)	Pt_pfjet5  =	RecoJets[4].Pt();
 			if (PFJetCount>=5)	Eta_pfjet5 =	RecoJets[4].Eta();
 			if (PFJetCount>=5)	Phi_pfjet5 =	RecoJets[4].Phi();
-			//if (PFJetCount>=6)	Pt_pfjet6  =	RecoJets[5].Pt();
-			//if (PFJetCount>=6)	Eta_pfjet6 =	RecoJets[5].Eta();
-			//if (PFJetCount>=6)	Phi_pfjet6 =	RecoJets[5].Phi();
+			if (PFJetCount>=6)	Pt_pfjet6  =	RecoJets[5].Pt();
+			if (PFJetCount>=6)	Eta_pfjet6 =	RecoJets[5].Eta();
+			if (PFJetCount>=6)	Phi_pfjet6 =	RecoJets[5].Phi();
 	
 			Pt_MET = PFMET->at(0);
 			Phi_MET = PFMETPhi->at(0);
@@ -1027,9 +1032,9 @@ void placeholder::Loop()
 			if (HEEPEleCount>=1) Pt_HEEPele1 = ElectronPt->at(v_idx_ele_good_final[0]);
 	
 		if (Pt_muon1<45) continue;
-		if (Pt_MET<30) continue;
+		//if (Pt_MET<30) continue;
 		if (Pt_muon2>20) continue;
-		if (MT_muon1MET<50) continue;
+		//if (MT_muon1MET<50) continue;
 		if (Pt_HEEPele1>20.0) continue;
 		//if (MT_muon1MET>110) continue;
 		tree->Fill();
