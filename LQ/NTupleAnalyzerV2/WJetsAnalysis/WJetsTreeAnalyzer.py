@@ -4,6 +4,7 @@ import math
 sys.argv.append( '-b' )
 from ROOT import *
 gROOT.ProcessLine("gErrorIgnoreLevel = 2001;")
+TFormula.SetMaxima(100000,1000,1000000)
 import numpy
 import math
 rnd= TRandom3()
@@ -25,14 +26,10 @@ gStyle.SetNumberContours(NCont)
 ##########################################################################
 
 # Directory where root files are kept and the tree you want to get root files from
-#FileDirectory = 
-'/afs/cern.ch/user/d/darinb/neuhome/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_QCD_QCDSelections_4p7fb_Jan20_2012_01_25_21_20_57/SummaryFiles/'
-FileDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsV2_2012_04_27_19_09_02/SummaryFiles/'
+#FileDirectory = '/afs/cern.ch/user/d/darinb/neuhome/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_QCD_QCDSelections_4p7fb_Jan20_2012_01_25_21_20_57/SummaryFiles/'
+FileDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsStandard_May3_2012_05_03_22_50_28/SummaryFiles/'
 TreeName = "PhysicalVariables"
 
-selection = '(Pt_muon1>45)*(Pt_MET>30)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50)'
-#selectiondata='((Pt_muon1>45)*(Pt_MET>30)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50))'
-weight = '*weight_pu_central*4980*0.92'
 
 # Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
 for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
@@ -59,6 +56,7 @@ def CreateHisto(name,legendname,tree,variable,binning,selection,style,label):
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
 	hout= TH1D(name,legendname,n,array('d',binset))
+	hout.Sumw2()
 	tree.Project(name,variable,selection)
 	hout.SetFillStyle(style[0])
 	hout.SetMarkerStyle(style[1])
@@ -127,6 +125,7 @@ def Create2DHisto(name,legendname,tree,variable1,variable2,binning,selection,lab
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
 	hout= TH2D(name,legendname,n,array('d',binset),n,array('d',binset))
+	hout.Sumw2()
 	tree.Project(name,variable1+":"+variable2,selection)
 	hout.GetXaxis().SetTitle(label[0])
 	hout.GetYaxis().SetTitle(label[1])
@@ -317,8 +316,8 @@ def FindOptimalTauWithPseudoExp(Params,binning):
 	bestdif = -9999999999
 	bsettau=9999999999
 	n = int(round(n-1))
-	histoset=GetNSmearedHistos(Params[1],binning,10)
-	for t in range(int(round(n/4))):
+	histoset=GetNSmearedHistos(Params[1],binning,8)
+	for t in range(int(round(n/2))):
 		if t<1: 
 			continue
 		if t>n-1:
@@ -394,8 +393,50 @@ def GetConstBinStructure(binning):
 	for x in range(binning[0]+1):
 		outputbins.append(binning[1]+Width*x)
 	return outputbins
-		
-def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar):
+
+def GetRescaling(histo1, histo2,binning,variable):
+	bincontent1=[]
+	bincontent2=[]
+	scalefactors=[]
+	errors = []
+	bindown=[]
+	binup=[]
+
+	binset=ConvertBinning(binning)
+	n = len(binset)-1
+	
+	hdiv= histo1.Clone()
+	hdiv.Sumw2()
+	hdiv.Divide(histo2)
+	scalefactors2=[]
+	
+	
+	for x in range(histo1.GetNbinsX()+1):
+		if x==0:
+			continue
+		bincontent1.append(histo1.GetBinContent(x))
+		bincontent2.append(histo2.GetBinContent(x))
+		scalefactors.append(1.0)
+		errors.append(hdiv.GetBinError(x))
+		scalefactors2.append(hdiv.GetBinContent(x))
+
+		if (bincontent2[x-1]>0.0):
+			scalefactors[x-1]=(1.0*bincontent1[x-1])/(1.0*bincontent2[x-1])
+		bindown.append(histo1.GetBinLowEdge(x))
+		binup.append(histo1.GetBinLowEdge(x)+histo1.GetBinWidth(x))
+	
+	scalestring='(0.0'	
+	errorstring='(0.0'
+	for x in range(len(bincontent1)):
+		#print str(bindown[x]) + '  ' + str(binup[x])+'  '+str(scalefactors[x])+'  '+str(scalefactors2[x])+'  '+str(errors[x])
+		scalestring+=' + '+str(scalefactors[x])+"*("+variable+">"+str(bindown[x])+')*('+variable+'<'+str(binup[x])+')'
+		errorstring+=' + '+str(errors[x])+"*("+variable+">"+str(bindown[x])+')*('+variable+'<'+str(binup[x])+')'
+	scalestring+=')'
+	errorstring+=')'
+			
+	return [scalestring,errorstring]
+			
+def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,optvar):
 	print "\n     Performing unfolding analysis for "+recovariable+" in "+str(binning[0]) +" bins from "+str(binning[1])+" to "+str(binning[2])+"  ... \n"
 	# Create Canvas
 	c1 = TCanvas("c1","",1000,700)
@@ -407,10 +448,10 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar)
 	MCGenSmearStyle=[0,20,.00001,1,9]
 
 	MCRecoStyle=[0,20,.00001,1,4]
-	DataRecoStyle=[0,20,.7,1,1]
-	DataCompStyle=[0,20,0.7,1,4]
+	DataRecoStyle=[0,20,.3,1,1]
+	DataCompStyle=[0,20,0.3,1,6]
 	BlankRecoStyle=[0,20,.00001,1,0]
-	DataUnfoldedStyle=[0,21,0.9,1,2]
+	DataUnfoldedStyle=[0,21,0.4,1,1]
 	# X and Y axis labels for plot
 	Label=[xlabel,"Events/Bin"]
 
@@ -420,11 +461,6 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar)
 	DiBosonStackStyle=[3006,20,.00001,2,3]
 	StopStackStyle=[3008,20,.00001,2,9]
 
-	# Get optimal variable binning binning
-	#varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[10000*binning[0],binning[1],binning[2]],selection+weight,MCGenStyle,Label),binning[0])
-	varbinning=GetConstBinStructure(binning)
-	if (optvar=="v" or optvar=="V"):
-		varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[10000*binning[0],binning[1],binning[2]],selection+weight,MCGenStyle,Label),binning[0])
 
 	##############################################################################
 	#######     To Right - Background Subtracted Distributions          #######
@@ -434,9 +470,14 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar)
 		c1.cd(2).SetLogx()
 
 	selection+='*('+recovariable+'<'+str(binning[2])+')*('+recovariable+'>'+str(binning[1])+')'
-	selection_response=str(selection)
-	#selection_response+='*('+genvariable+'<'+str(binning[2])+')*('+genvariable+'>'+str(binning[1])+')'
-	#selection_response +='*'+ selection_response.replace('muon','genmuon').replace('pfjet','genjet').replace('MET','genMET')
+	selection_response=str(selection)#+'*('+genvariable+'<'+str(binning[2])+')*('+genvariable+'>'+str(binning[1])+')'
+
+	# Get optimal variable binning binning
+	#varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[10000*binning[0],binning[1],binning[2]],selection+weight,MCGenStyle,Label),binning[0])
+	varbinning=GetConstBinStructure(binning)
+	if (optvar=="v" or optvar=="V"):
+		varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[100000*binning[0],binning[1],binning[2]],selection_response+weight,MCGenStyle,Label),binning[0])
+
 	print selection
 	print selection_response
 	# WJets Gen + Reco
@@ -453,22 +494,27 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar)
 	## Rescaling Factor Calculation
 	SM = [h_rec_WJets,h_rec_DiBoson,h_rec_ZJets,h_rec_TTBar,h_rec_SingleTop]
 	SMInt = sum(k.Integral() for k in SM)
+	print SMInt
+	print h_rec_Data.GetEntries()
+	print h_rec_Data.Integral()
 	mcdatascale = (1.0*(h_rec_Data.GetEntries()))/SMInt
 	genmcscale = (h_rec_WJets.Integral()/h_gen_WJets.Integral())
 	
 	for x in SM:
 		x.Scale(mcdatascale)
 
-	#h_gen_WJets.Scale(genmcscale*mcdatascale)
+	h_gen_WJets.Scale(genmcscale*mcdatascale)
 
 	print "MC Global Scale Factor: "+str(mcdatascale)
 	print "Gen-Reco Scale Factor: "+str(genmcscale)
 
-	h_rec_WJets.SetMaximum(2.0*h_rec_WJets.GetMaximum())
-	h_gen_WJets.SetMaximum(2.0*h_gen_WJets.GetMaximum())
+	#h_rec_WJets.SetMaximum(2.0*h_rec_WJets.GetMaximum())
+	h_gen_WJets.SetMaximum(2.0*h_rec_WJets.GetMaximum())
 
 	## Do the Drawing
 	h_gen_WJets.Draw("")
+	h_gen_WJets.SetMaximum(1.0*h_gen_WJets.GetMaximum())
+	h_gen_WJets.SetMinimum(0.6*h_gen_WJets.GetMinimum())
 	h_rec_WJets.Draw("SAME")
 
 	# Create Legend
@@ -484,22 +530,22 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar)
 	MCStack.SetMinimum(1.0)
 	MCStack.SetMaximum(SMInt*100)
 	
-	## Make the plots without variable bins!
-	hs_rec_WJets=CreateHisto('hs_rec_WJets','W+Jets [Reco]',t_WJets_MG,recovariable,binning,selection+weight,WStackStyle,Label)
-	hs_rec_Data=CreateHisto('hs_rec_Data','Data, 5/fb [Reco]',t_SingleMuData,recovariable,binning,selection,DataRecoStyle,Label)
-	hs_rec_DiBoson=CreateHisto('hs_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recovariable,binning,selection+weight,DiBosonStackStyle,Label)
-	hs_rec_ZJets=CreateHisto('hs_rec_ZJets','Z+Jets [Alpgen]',t_ZJets_MG,recovariable,binning,selection+weight,ZStackStyle,Label)
-	hs_rec_TTBar=CreateHisto('hs_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recovariable,binning,selection+weight,TTStackStyle,Label)
-	hs_rec_SingleTop=CreateHisto('hs_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recovariable,binning,selection+weight,StopStackStyle,Label)
+	### Make the plots without variable bins!
+	hs_rec_WJets=CreateHisto('hs_rec_WJets','W+Jets [Reco]',t_WJets_MG,recovariable,presentationbinning,selection+weight,WStackStyle,Label)
+	hs_rec_Data=CreateHisto('hs_rec_Data','Data, 5/fb [Reco]',t_SingleMuData,recovariable,presentationbinning,selection,DataRecoStyle,Label)
+	hs_rec_DiBoson=CreateHisto('hs_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recovariable,presentationbinning,selection+weight,DiBosonStackStyle,Label)
+	hs_rec_ZJets=CreateHisto('hs_rec_ZJets','Z+Jets [Alpgen]',t_ZJets_MG,recovariable,presentationbinning,selection+weight,ZStackStyle,Label)
+	hs_rec_TTBar=CreateHisto('hs_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recovariable,presentationbinning,selection+weight,TTStackStyle,Label)
+	hs_rec_SingleTop=CreateHisto('hs_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recovariable,presentationbinning,selection+weight,StopStackStyle,Label)
 	
 	SM=[hs_rec_SingleTop,hs_rec_DiBoson,hs_rec_ZJets,hs_rec_TTBar,hs_rec_WJets]
-	mcdatascale = (1.0*(hs_rec_Data.GetEntries()))/(sum(k.Integral() for k in SM))
+	mcdatascalepres = (1.0*(hs_rec_Data.GetEntries()))/(sum(k.Integral() for k in SM))
 	
 	for x in SM:
-		#x.Scale(mcdatascale)
+		#x.Scale(mcdatascalepres)
 		MCStack.Add(x)
 	
-	MCStack.Draw("")
+	MCStack.Draw("HIST")
 	MCStack=BeautifyStack(MCStack,Label)
 	hs_rec_Data.Draw("EPSAME")
 
@@ -512,8 +558,10 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar)
 	#######      Bottom Left - Gen Versus Reco Response Matrix             #######
 	##############################################################################	
 	c1.cd(3)
+	if (optvar=="v" or optvar=="V"):
+		c1.cd(3).SetLogx()	
+		c1.cd(3).SetLogy()
 	h_response_WJets=Create2DHisto('h_response_WJets','ResponseMatrix',t_WJets_MG,genvariable,recovariable,varbinning,selection_response+weight+"*"+str(mcdatascale),[xlabel+" Reco",xlabel+" Truth"])
-	
 	h_response_WJets.Draw("COL")
 
 	
@@ -529,56 +577,76 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,selection,optvar)
 	Params = [ h_rec_WJets, h_gen_WJets, h_response_WJets]
 
 	tau = FindOptimalTauWithPseudoExp(Params,varbinning)
-	#tau = FindOptimalTauFromWithDVals(h_rec_Data2,Params)
-	#tau=3
+	#tau=2
 
-
-	[h_unf_Data,h_dd,h_sv,optimal_tau,optimal_i] = GetSmartSVD(h_rec_Data2,Params,  binning,tau)
+	[h_unf_Data,h_dd,h_sv,optimal_tau,optimal_i] = GetSmartSVD(h_rec_Data2,Params, varbinning,tau)
 
 	UnfScale=(h_rec_Data2.Integral()/h_unf_Data.Integral())
 	h_unf_Data = BeautifyHisto(h_unf_Data,DataUnfoldedStyle,Label,"Data, 5/fb [Unfolded, #tau = "+str(optimal_tau)+",R="+str(round(UnfScale,2))+"]")
 
+	[DataRescalingString,DataErrorString] = GetRescaling(h_unf_Data,h_rec_Data2,varbinning,recovariable)
 
 	print "Scaling of Unfolded Dist: "+str(UnfScale)
 
 	h_unf_Data.Draw("EPSAME")
-	
 	h_rec_Data2.Draw("EPSAME")
 	FixDrawLegend(c1.cd(2).BuildLegend())
 
+	CompMax = 1.15*(max([h_rec_WJets.GetMaximum(),h_gen_WJets.GetMaximum(),h_unf_Data.GetMaximum(),h_rec_Data2.GetMaximum() ]))
+	CompMin = 0.85*(min([h_rec_WJets.GetMinimum(),h_gen_WJets.GetMinimum(),h_unf_Data.GetMinimum(),h_rec_Data2.GetMinimum() ]))
+	h_gen_WJets.SetMaximum(CompMax)
+	h_gen_WJets.SetMinimum(CompMin)
+	c1.cd(3).Update()
 
-
+	##############################################################################
+	#######      Bottom Right - D Value And SV Value Dists                 #######
+	##############################################################################	
 	c1.cd(4)
-	c1.cd(4).SetLogy()
+	#c1.cd(4).SetLogy()
 
-	h_dd.SetMaximum(10*(h_dd.GetMaximum()+h_sv.GetMaximum()))
-	h_dd.SetMinimum(0.01)
-	h_dd=BeautifyHisto(h_dd,[0,20,.00001,1,1],["Index i","Values"],"Diagonal Values")
-	h_sv=BeautifyHisto(h_sv,[0,20,.00001,1,2],["Index i","Values"],"Singular Values")
-	h_dd.Draw("")
-	h_sv.Draw("SAME")
-	legend=FixDrawLegend(c1.cd(4).BuildLegend())
-	#line =  TLine( 0,1.,binning[0],1. )
-	#line.SetLineStyle(2)
-	#line.Draw("SAME")
+	# WJets Gen + Reco
+	h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets MadGraph [Truth/Reco]',t_WJets_MG,genvariable,presentationbinning,selection_response+weight,MCRecoStyle,Label)
+	h_pres_rec_WJets=CreateHisto('h_pres_rec_WJets','W+Jets  MadGraph [Truth/Reco]',t_WJets_MG,recovariable,presentationbinning,selection_response+weight,MCRecoStyle,Label)
+	# Data
+	h_pres_rec_Data=CreateHisto('h_pres_rec_Data','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection,DataCompStyle,Label)
+	h_pres_rec_Data_err=CreateHisto('h_pres_rec_Data_err','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection,DataCompStyle,Label)
 
-	#line2 =  TLine( optimal_i,h_dd.GetMinimum(),optimal_i,h_dd.GetMaximum() )
-	#line2.SetLineStyle(2)	
-	#line2.SetLineColor(4)	
-	#line2.Draw("SAME")	
+	h_pres_unf_Data=CreateHisto('h_pres_unf_Data','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection+"*"+DataRescalingString,DataUnfoldedStyle,Label)
+	h_pres_unf_Data_err=CreateHisto('h_pres_unf_Data_err','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection+"*"+DataErrorString,DataUnfoldedStyle,Label)
 
-	#line3 =  TLine( 0,optimal_tau,binning[0],optimal_tau )
-	#line3.SetLineStyle(2)	
-	#line3.SetLineColor(2)	
-	#line3.Draw("SAME")	
+	#for x in range(h_pres_rec_Data.GetNbinsX()+1):
+		#if x==0:
+			#continue
+		#h_pres_unf_Data.SetBinError(x,h_pres_rec_Data_err.GetBinContent(x))
 	
-	#legend.AddEntry(line,"d[i] Threshold","l")
-	#legend.AddEntry(line2,"Max Significant i","l")
-	#legend.AddEntry(line3,"#tau from SV[i]","l")
+	# Other Backgrounds
+	h_pres_rec_DiBoson=CreateHisto('h_pres_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recovariable,presentationbinning,selection_response+weight,DiBosonStackStyle,Label)
+	h_pres_rec_ZJets=CreateHisto('h_pres_rec_ZJets','Z+Jets [Alpgen]',t_ZJets_MG,recovariable,presentationbinning,selection_response+weight,ZStackStyle,Label)
+	h_pres_rec_TTBar=CreateHisto('h_pres_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recovariable,presentationbinning,selection_response+weight,TTStackStyle,Label)
+	h_pres_rec_SingleTop=CreateHisto('h_pres_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recovariable,presentationbinning,selection_response+weight,StopStackStyle,Label)	
+
+	h_pres_rec_Data = BackgroundSubtractedHistogram(h_pres_rec_Data,[ h_pres_rec_DiBoson, h_pres_rec_ZJets,h_pres_rec_TTBar,h_pres_rec_SingleTop])
 
 
-	#line.SetTitle("d_{i} Significace Thresold")
-	#line2.SetTitle("Chosen #tau")
+
+	## Do the Drawing
+	#h_pres_gen_WJets.Draw("")
+	h_pres_gen_WJets.Divide(h_pres_rec_WJets)
+	h_pres_unf_Data.Divide(h_pres_rec_Data)
+	h_pres_gen_WJets.Draw("EP")
+	h_pres_gen_WJets.SetMaximum(0.0)
+	h_pres_gen_WJets.SetMaximum(3.0)
+	h_pres_unf_Data.Draw("EPSAME")
+	# Create Legend
+	FixDrawLegend(c1.cd(4).BuildLegend())
+
+	#h_dd.SetMaximum(10*(h_dd.GetMaximum()+h_sv.GetMaximum()))
+	#h_dd.SetMinimum(0.01)
+	#h_dd=BeautifyHisto(h_dd,[0,20,.00001,1,1],["Index i","Values"],"Diagonal Values")
+	#h_sv=BeautifyHisto(h_sv,[0,20,.00001,1,2],["Index i","Values"],"Singular Values")
+	#h_dd.Draw("")
+	#h_sv.Draw("SAME")
+	#legend=FixDrawLegend(c1.cd(4).BuildLegend())
 
 	c1.Print('pyplots/'+recovariable+'.pdf')
 	c1.Print('pyplots/'+recovariable+'.png')
@@ -591,14 +659,19 @@ j4=j3+"*(Pt_pfjet4>30)"
 
 
 #MakeUnfoldedPlots('Pt_genmuon1','Pt_muon1',"p_{T}(#mu) [GeV]",[25,45,145],selection,'')
-#MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[25,50,150],selection,'')
+
+selection = '(Pt_muon1>45)*(Pt_MET>30)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50)'
+weight = '*weight_pu_central*4980*0.92'
+
+
+#MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[75,50,200],[20,60,110],selection,'v')
 #MakeUnfoldedPlots('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[25,30,530],selection,'')
 
 
-#MakeUnfoldedPlots('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[25,30,530],selection+j1,'')
-MakeUnfoldedPlots('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[25,10,510],selection+j2,'v')
-MakeUnfoldedPlots('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[25,30,530],selection+j3,'v')
-#MakeUnfoldedPlots('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[50,30,230],selection+j4,'')
+MakeUnfoldedPlots('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,5.0,750],[25,40,490],selection,'v')
+#MakeUnfoldedPlots('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,1.0,750],[25,30,530],selection+j1,'v')
+#MakeUnfoldedPlots('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[50,1.0,750],[25,30,530],selection+j2,'v')
+#MakeUnfoldedPlots('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[50,1.0,750],[25,30,530],selection+j3,'v')
 
 
 
