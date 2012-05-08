@@ -165,7 +165,7 @@ for (unsigned int ii = 0; ii < numbetas; ++ii){
 
 
  // axes labels for the final plot
- string title = ";M_{LQ} [GeV];#beta";
+ string title = ";M_{LQ} (GeV);#beta";
 
  // integrated luminosity
  string sqrts = "#sqrt{s} = 7 TeV";
@@ -213,11 +213,11 @@ Double_t AtlasComboBeta[34] ={0.04541595925297,0.04626485568761,0.04668930390492
  gr_excl_D0->SetLineStyle(6);
  //gr_excl_D0->Draw("C");
 
- TPolyLine*gr_excl_ATLAS = new TPolyLine(34,AtlasComboMass,AtlasComboBeta,"F");
+ TPolyLine*gr_excl_ATLAS = new TPolyLine(34,AtlasComboMass,AtlasComboBeta,"");
  //gr_excl_ATLAS->SetLineWidth(3);
- gr_excl_ATLAS->SetLineColor(16);
- gr_excl_ATLAS->SetFillColor(16);
- gr_excl_ATLAS->SetFillStyle(3244);
+ gr_excl_ATLAS->SetLineColor(15);
+ gr_excl_ATLAS->SetFillColor(15);
+ gr_excl_ATLAS->SetFillStyle(3344);
 
  TGraph *gr_excl_D0_new = new TGraph(11,x_excl_D0_new,y_excl_D0_new);
  gr_excl_D0_new->SetLineWidth(3);
@@ -299,7 +299,10 @@ Double_t AtlasComboBeta[34] ={0.04541595925297,0.04626485568761,0.04668930390492
  beta_vs_m_comb_expected_shade2->Draw("f");
 
  beta_vs_m_comb_expected_shade1->Draw("f");
- gr_excl_ATLAS->Draw();
+
+ gr_excl_ATLAS->Draw("L");
+ gr_excl_ATLAS->Draw("F");
+
 
  beta_vs_m_lljj_expected->Draw("C");
  beta_vs_m_lvjj_expected->Draw("C");
@@ -335,7 +338,7 @@ Double_t AtlasComboBeta[34] ={0.04541595925297,0.04626485568761,0.04668930390492
  l1.SetTextFont(132);
  l1.SetNDC();
  l1.SetTextSize(0.04);
- l1.DrawLatex(0.68,0.41,"CMS Preliminary");
+ l1.DrawLatex(0.68,0.41,"CMS 4.98 fb^{-1}");
  l1.SetTextSize(0.04);
  l1.DrawLatex(0.68,0.36,sqrts.c_str());
 
