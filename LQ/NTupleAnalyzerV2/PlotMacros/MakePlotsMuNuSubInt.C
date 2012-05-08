@@ -84,11 +84,11 @@ int nBins, float xLow, float xMax, TString var, bool Use_integral, TString fileN
 	// Rescaling Routine
 	//H_wjets->Scale(6.13);;
 	H_wjets->Scale(wnorm);
-	H_zjets->Scale(1.34);
-	H_ttbar->Scale(0.93);
-	H_vvjets->Scale(0.9);
-	H_singtop->Scale(0.9);
-	H_lq->Scale(0.9);
+	H_zjets->Scale(1.27);
+	H_ttbar->Scale(0.88);
+	H_vvjets->Scale(0.92);
+	H_singtop->Scale(0.92);
+	H_lq->Scale(0.92);
 	// ***************************************         SCREEN READOUT       *************************************************** //
 
 	Double_t Nd = H_data->Integral();
@@ -186,6 +186,10 @@ int nBins, float xLow, float xMax, TString var, bool Use_integral, TString fileN
 	TH1F* H_bkg = new TH1F("H_bkg","",nBins,xLow,xMax);
 	H_bkg->Add(H_vvjets);
 	H_bkg->Add(H_qcd);
+	H_bkg->Add(H_zjets);
+	H_bkg->Add(H_singtop);
+	
+
 
 	float num_lq = 0.0;
 	float num_zjets = 0.0;
@@ -274,8 +278,8 @@ int nBins, float xLow, float xMax, TString var, bool Use_integral, TString fileN
 
 	THStack* H_stack = new THStack("H_stack","");
 	H_stack->Add(H_bkg);
-	H_stack->Add(H_zjets);
-	H_stack->Add(H_singtop);
+	//H_stack->Add(H_zjets);
+	//H_stack->Add(H_singtop);
 	H_stack->Add(H_ttbar);
 	H_stack->Add(H_wjets);
 	//    H_stack->Add(H_lq);
@@ -291,7 +295,7 @@ int nBins, float xLow, float xMax, TString var, bool Use_integral, TString fileN
 	H_data->GetYaxis()->SetTitleFont(132);
 
 	H_data->SetMarkerStyle(21);
-	H_data->SetMarkerSize(0.0);
+	H_data->SetMarkerSize(0.7);
 	gStyle->SetOptStat(0);
 	H_data->Draw("E");
 
@@ -302,11 +306,11 @@ int nBins, float xLow, float xMax, TString var, bool Use_integral, TString fileN
 	leg->SetTextFont(132);
 	leg->SetFillColor(0);
 	leg->SetBorderSize(0);
-	leg->AddEntry(H_data,"Data 2011, 4.7 fb^{-1}");
-	leg->AddEntry(H_zjets,"Z/#gamma* + jets");
+	leg->AddEntry(H_data,"Data 2011, 4.98 fb^{-1}");
+	//leg->AddEntry(H_zjets,"Z/#gamma* + jets");
 	leg->AddEntry(H_wjets,"W + jets");
 	leg->AddEntry(H_ttbar,"t#bar{t}");
-	leg->AddEntry(H_singtop,"Single Top");
+	//leg->AddEntry(H_singtop,"Single Top");
 	leg->AddEntry(H_bkg,"Other backgrounds");
 
 	if (lq_choice == "lqmunu250")  leg->AddEntry(H_lq,"LQ M = 250");
@@ -327,7 +331,7 @@ int nBins, float xLow, float xMax, TString var, bool Use_integral, TString fileN
 	H_data->SetMinimum(0.010);
 	H_data->SetMaximum(1.2*extrascalefactor*(H_data->GetMaximum()));
 
-	TLatex* txt =new TLatex((xMax-xLow)*.02+xLow,.3*H_data->GetMaximum(),"CMS 2011 Preliminary");
+	TLatex* txt =new TLatex((xMax-xLow)*.05+xLow,.1*H_data->GetMaximum(),"CMS 2011");
 	txt->SetTextFont(132);
 	txt->SetTextSize(0.06);
 	txt->Draw();
@@ -449,8 +453,8 @@ int nBins, float xLow, float xMax, TString var, bool Use_integral, TString fileN
 		H_compr->SetLineColor(kRed);
 		H_compr->SetLineWidth(2);
 		H_compr->SetMarkerColor(kRed);
-		H_compr->SetMarkerStyle(1);
-		H_compr->SetMarkerSize(0.0);
+		H_compr->SetMarkerStyle(21);
+		H_compr->SetMarkerSize(0.7);
 
 		H_compr->Draw("ep");
 		line0->Draw("SAME");
@@ -489,12 +493,12 @@ void MakePlotsMuNuSubInt()
 	//------Choose which lq mass you want here----
 	TString lq_choice = "lqmunu400";
 
-	TString lumi ="4700"  ;
+	TString lumi ="4980"  ;
 	TString cut_data ="(Pt_muon1>40)*(MET_pf>55.0)";
-	cut_data +="*(Pt_muon2<15)";
+	cut_data +="*(Pt_muon2<40)";
 	////  TString cut_data ="(Pt_muon1>30)*(Pt_muon2>30)";
 	////  cut_data +="*(Pt_W<40)*(Pt_W>0)";
-	cut_data +="*(Pt_ele1<30.0)";
+	cut_data +="*(Pt_HEEPele1<40.0)";
 	cut_data +="*(Pt_pfjet1>40)*(Pt_pfjet2>40)";
 	cut_data += "*(deltaR_muon1pfjet1>0.7)*(deltaR_muon1pfjet2>0.7)";
 	cut_data +="*(abs(Eta_muon1)<2.1)";
@@ -506,7 +510,7 @@ void MakePlotsMuNuSubInt()
 	cut_data +="*(abs(deltaPhi_muon1pfMET)>.8)";
 	cut_data +="*(FailIDPFThreshold<25.0)";
 	cut_data +="*(MT_muon1pfMET>50.0)";
-	cut_data += "*(pass_HBHENoiseFilter>0.5)*(pass_passBeamHaloFilterTight>0.5)*(pass_EcalMaskedCellDRFilter>0.5)*(pass_isTrackingFailure>0.5)";
+	cut_data += "*(pass_HBHENoiseFilter>0.5)*(pass_passBeamHaloFilterTight>0.5)*(pass_isTrackingFailure>0.5)";
 
 	//cut_data +="*(abs(deltaPhi_pfjet1pfMET)>0.7)";
 	//cut_data +="*(abs(deltaPhi_pfjet2pfMET)>.5)";
@@ -548,7 +552,7 @@ void MakePlotsMuNuSubInt()
 	TString cut_mc = lumi+"*weight_pileup4p7fb_higgs*("+cut_data+")";
 	cut_data += "*(LowestUnprescaledTriggerPass>0.5)*(pass_isBPTX0>0.5)";
 
-	float WNormalization = 1.23;
+	float WNormalization = 1.21;
 	bool do_tt_est = false;
 	bool use_integral = false;
 	TString filetag ="";
@@ -605,7 +609,7 @@ void MakePlotsMuNuSubInt()
 	cut_data +="*(ST_pf_munu>250.0)";
 	cut_mc +="*(ST_pf_munu>250.0)";
 	TString filetag ="2011Data_PreSelection";
-	TString xtag =" [Presel]";
+	TString xtag =" [Preselelection]";
 
 	if (false)
 	{
@@ -660,6 +664,14 @@ void MakePlotsMuNuSubInt()
 	if (true)
 	{
 
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 20,200,2200,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 20,200,2200,"ST_pf_munu", true,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 10,1200,82200,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag+"highST");
+
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 10,1200,2200,"ST_pf_munu", true,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag+"highST");
+
+		//gROOT->ProcessLine(".q;");
+
 		//TString LQpredict = " (run_number<2)*(1.0*( abs(MT_muon1pfjet1-MT_pfjet2pfMET) < abs(MT_muon1pfjet2-MT_pfjet1pfMET) ) + 2.0*( abs(MT_muon1pfjet1-MT_pfjet2pfMET) > abs(MT_muon1pfjet2-MT_pfjet1pfMET) )  -JetMatchMuon1)";
 		//TString LQpredict = " (run_number<2)*(1.0*( abs(MT_muon1pfjet1-MT_pfjet2pfMET)/(MT_muon1pfjet1+MT_pfjet2pfMET) < abs(MT_muon1pfjet2-MT_pfjet1pfMET)/(MT_muon1pfjet2+MT_pfjet1pfMET) ) + 2.0*( abs(MT_muon1pfjet1-MT_pfjet2pfMET)/(MT_muon1pfjet1+MT_pfjet2pfMET) > abs(MT_muon1pfjet2-MT_pfjet1pfMET)/(MT_muon1pfjet2+MT_pfjet1pfMET) )  -JetMatchMuon1)";
 
@@ -676,17 +688,17 @@ void MakePlotsMuNuSubInt()
 
 		fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,500,"MET_pf",        use_integral,"","E_{T}^{miss}(GeV)" +xtag  ,lumi,100,WNormalization,filetag);
 
-		fillHisto(lq_choice, cut_mc, cut_data, false, 50,0,500,"MET_pf",        use_integral,"","E_{T}^{miss}(GeV)" +xtag  ,lumi,100,WNormalization,filetag+"nosub");
+		//fillHisto(lq_choice, cut_mc, cut_data, false, 50,0,500,"MET_pf",        use_integral,"","E_{T}^{miss}(GeV)" +xtag  ,lumi,100,WNormalization,filetag+"nosub");
 
-		fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,500,"MET_pfsig",        use_integral,"","E_{T}^{miss} Significance (GeV)" +xtag  ,lumi,100,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,500,"MET_pfsig",        use_integral,"","E_{T}^{miss} Significance (GeV)" +xtag  ,lumi,100,WNormalization,filetag);
 
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_muon1pfMET", use_integral,"","#Delta #phi (#mu,E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_pfjet1pfMET", use_integral,"","#Delta #phi (j_{1},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_pfjet2pfMET", use_integral,"","#Delta #phi (j_{2},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data ,true,40,.-.5,39.5,"N_GoodVertices", use_integral,"","N_{Vertices}" +xtag,lumi,1000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_muon1pfMET", use_integral,"","#Delta #phi (#mu,E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_pfjet1pfMET", use_integral,"","#Delta #phi (j_{1},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_pfjet2pfMET", use_integral,"","#Delta #phi (j_{2},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data ,true,40,.-.5,39.5,"N_GoodVertices", use_integral,"","N_{Vertices}" +xtag,lumi,1000,WNormalization,filetag);
 
-		fillHisto(lq_choice, cut_mc, cut_data, true, 50,-3.15,3.15,"deltaPhi_pfjet2pfMET", use_integral,"","#Delta #phi (j_{2},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 50,-3.15,3.15,"deltaPhi_pfjet2pfMET", use_integral,"","#Delta #phi (j_{2},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 50,-3.15,3.15,"deltaPhi_pfjet2pfMET", use_integral,"","#Delta #phi (j_{2},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 50,-3.15,3.15,"deltaPhi_pfjet2pfMET", use_integral,"","#Delta #phi (j_{2},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
 
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 50,-.5,49.5,"PFJetNeutralMultiplicity_pfjet1", use_integral,"","Neutral Mult. (Jet 1) " +xtag,lumi,100,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,1,"PFJetNeutralHadronEnergyFraction_pfjet1", use_integral,"","Neutral Had Fraction (Jet 1) " +xtag,lumi,1000,WNormalization,filetag);
@@ -723,19 +735,19 @@ void MakePlotsMuNuSubInt()
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 42,-2,40,"FailIDCaloThreshold", use_integral,"","CaloJetID Failure p_{T} (GeV)" +xtag,lumi,10,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 42,-2,40,"FailIDPFThreshold", use_integral,"","PFJetID Failure p_{T} (GeV)" +xtag,lumi,20,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data ,true,50,.-.5,49.5,"N_PileUpInteractions", use_integral,"","N_{PU}" +xtag,lumi,1000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data ,true,40,.-.5,39.5,"N_GoodVertices", use_integral,"","N_{Vertices}" +xtag,lumi,1000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data ,true,40,.-.5,39.5,"N_GoodVertices", use_integral,"","N_{Vertices}" +xtag,lumi,1000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data ,true,6,.-.5,5.5,"GlobalMuonCount", use_integral,"","N_{Global #mu}" +xtag,lumi,100,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data ,true,6,.-.5,5.5,"TrackerMuonCount", use_integral,"","N_{Tracker #mu}" +xtag,lumi,100,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data ,true,12,.-.5,11.5,"PFJetCount", use_integral,"","N_{PFJet}" +xtag,lumi,100,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data ,true,8,.-.5,7.5,"BpfJetCount", use_integral,"","N_{BPFJet}" +xtag,lumi,100,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data ,true,12,.-.5,11.5,"PFJetCount", use_integral,"","N_{PFJet}" +xtag,lumi,100,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data ,true,8,.-.5,7.5,"BpfJetCount", use_integral,"","N_{BPFJet}" +xtag,lumi,100,WNormalization,filetag);
 		fillHisto(lq_choice, cut_mc, cut_data, true, 80,0,800,"MT_muon1pfMET", use_integral,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,100,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, false, 50,0,500,"MT_muon1pfMET", use_integral,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,100,WNormalization,filetag+"nosub");
+		//fillHisto(lq_choice, cut_mc, cut_data, false, 50,0,500,"MT_muon1pfMET", use_integral,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,100,WNormalization,filetag+"nosub");
 
-		fillHisto(lq_choice, cut_mc, cut_data, true, 80,0,800,"MT_muon1pfMET", true,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,100,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 80,0,800,"MT_muon1pfMET", true,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,100,WNormalization,filetag);
 
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 25,70,170,"MT_muon1pfMET", use_integral,"","M^{T}_{#mu#nu}(GeV)" +xtag,lumi,100,WNormalization,filetag+"ZOOMRegion");
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,400,"Pt_W",        use_integral,"","p_{T}(W)(GeV)" +xtag  ,lumi,5000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_muon1pfMET", use_integral,"","#Delta #phi (#mu,E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,400,"Pt_W",        use_integral,"","p_{T}(W)(GeV)" +xtag  ,lumi,5000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_muon1pfMET", use_integral,"","#Delta #phi (#mu,E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_pfjet1pfMET", use_integral,"","#Delta #phi (j_{1},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_pfjet2pfMET", use_integral,"","#Delta #phi (j_{2},E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METClosestPFJet", use_integral,"","#Delta #phi (E_{T}^{miss},Closest PFJet)" +xtag,lumi,100,WNormalization,filetag);
@@ -743,37 +755,37 @@ void MakePlotsMuNuSubInt()
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METClosestCaloJet", use_integral,"","#Delta #phi (E_{T}^{miss},Closest CaloJet)" +xtag,lumi,100,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METFurthestCaloJet", use_integral,"","#Delta #phi (E_{T}^{miss},Furthest CaloJet)" +xtag,lumi,1000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METClosestPT10PFJet", use_integral,"","#Delta #phi (E_{T}^{miss},Closest 10GeV PFJet)" +xtag,lumi,100,WNormalization,filetag);
-		////fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METFurthestPT10PFJet", use_integral,"","#Delta #phi (E_{T}^{miss},Furthest 10GeV PFJet)" +xtag,lumi,1000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METClosestPT10CaloJet", use_integral,"","#Delta #phi (E_{T}^{miss},Closest 10GeV CaloJet)" +xtag,lumi,100,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METFurthestPT10CaloJet", use_integral,"","#Delta #phi (E_{T}^{miss},Furthest 10GeV CaloJet)" +xtag,lumi,1000,WNormalization,filetag);
+		//////fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METFurthestPT10PFJet", use_integral,"","#Delta #phi (E_{T}^{miss},Furthest 10GeV PFJet)" +xtag,lumi,1000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METClosestPT10CaloJet", use_integral,"","#Delta #phi (E_{T}^{miss},Closest 10GeV CaloJet)" +xtag,lumi,100,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,3.15,"deltaPhi_METFurthestPT10CaloJet", use_integral,"","#Delta #phi (E_{T}^{miss},Furthest 10GeV CaloJet)" +xtag,lumi,1000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 60,0,30,"EcalIso_muon1", use_integral,"","ECAL Iso_{#mu} (GeV)" +xtag,lumi,10,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,3,"HcalIso_muon1", use_integral,"","HCAL Iso (#mu)" +xtag,lumi,10,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 35,0,3.5,"TrkIso_muon1", use_integral,"","Track Iso (#mu)" +xtag,lumi,10,WNormalization,filetag);
 		fillHisto(lq_choice, cut_mc, cut_data, true, 70,0,700,"Pt_muon1", use_integral,"","p_{T} (#mu) (GeV)" +xtag,lumi,100,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,50,"PtError_muon1", use_integral,"","#sigma(p_{T}) (#mu) (GeV)" +xtag,lumi,10,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 42,-2.1,2.1,"Eta_muon1", use_integral,"","#eta (#mu)" +xtag,lumi,10000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,.001,"EtaError_muon1", use_integral,"","#sigma(#eta) (#mu)" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,50,"PtError_muon1", use_integral,"","#sigma(p_{T}) (#mu) (GeV)" +xtag,lumi,10,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 42,-2.1,2.1,"Eta_muon1", use_integral,"","#eta (#mu)" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,.001,"EtaError_muon1", use_integral,"","#sigma(#eta) (#mu)" +xtag,lumi,10000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true,30,-3.141593,3.141593,"Phi_muon1", use_integral,"","#phi (#mu)" +xtag,lumi,2000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 50,0,.0005,"PhiError_muon1", use_integral,"","#sigma(#phi) (#mu)" +xtag,lumi,1000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,.0008,"QOverPError_muon1", use_integral,"","#sigma(Q/p)_{#mu}(GeV)" +xtag,lumi,100,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,.0008,"QOverPError_muon1", use_integral,"","#sigma(Q/p)_{#mu}(GeV)" +xtag,lumi,100,WNormalization,filetag);
 		fillHisto(lq_choice, cut_mc, cut_data, true, 90,0,900,"Pt_pfjet1", use_integral,"","p_{T} (jet_{1}) (GeV)" +xtag,lumi,100,WNormalization,filetag);
 		fillHisto(lq_choice, cut_mc, cut_data, true, 90,0,900,"Pt_pfjet2", use_integral,"","p_{T} (jet_{2}) (GeV)" +xtag,lumi,100,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.0,3.0,"Eta_pfjet1", use_integral,"","#eta (jet_{1})" +xtag,lumi,10000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.0,3.0,"Eta_pfjet2", use_integral,"","#eta (jet_{2})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.0,3.0,"Eta_pfjet1", use_integral,"","#eta (jet_{1})" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.0,3.0,"Eta_pfjet2", use_integral,"","#eta (jet_{2})" +xtag,lumi,10000,WNormalization,filetag);
 
 		fillHisto(lq_choice, cut_mc, cut_data, true, 90,200,2000,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, false, 90,200,2000,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag+"nosub");
+		//fillHisto(lq_choice, cut_mc, cut_data, false, 90,200,2000,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag+"nosub");
 
-		fillHisto(lq_choice, cut_mc, cut_data, true, 90,200,2000,"ST_pf_munu", true,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 90,200,2000,"ST_pf_munu", true,"","S_{T} (GeV)" +xtag,lumi,500,WNormalization,filetag);
 
-		fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,2000,"M_bestmupfjet_munu", use_integral,"","M_{#mu jet}" +xtag,lumi,1000,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,2000,"M_bestmupfjet_munu", true,"","M_{#mu jet}" +xtag,lumi,1000,WNormalization,filetag);
+		fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,2000,"M_bestmupfjet_munu", use_integral,"","M_{#mu j} (GeV)" +xtag,lumi,1000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 100,0,2000,"M_bestmupfjet_munu", true,"","M_{#mu jet}" +xtag,lumi,1000,WNormalization,filetag);
 
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,800,"M_pfjet1pfjet2", use_integral,"","M_{jj}(GeV)" +xtag,lumi,10,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,800,"M_pfjet1pfjet2", use_integral,"","M_{jj}(GeV)" +xtag,lumi,10,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 60,0,600,"MT_pfjet1pfMET", use_integral,"","M_{T}(j_{1},E_{T}^{miss})(GeV)" +xtag,lumi,10,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,400,"MT_pfjet2pfMET", use_integral,"","M_{T}(j_{2},E_{T}^{miss})(GeV)" +xtag,lumi,10,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,400,"MT_pfjet1pfjet2", use_integral,"","M^{T}_{jj}(GeV)" +xtag,lumi,10,WNormalization,filetag);
-		fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,8,"deltaR_pfjet1pfjet2", use_integral,"","#Delta R (j_{1}j_{2})(GeV)" +xtag,lumi,10000,WNormalization,filetag);
+		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,0,8,"deltaR_pfjet1pfjet2", use_integral,"","#Delta R (j_{1}j_{2})(GeV)" +xtag,lumi,10000,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_mc, cut_data, true, 40,-3.15,3.15,"deltaPhi_pfjet1pfjet2", use_integral,"","#Delta#phi (j_{1}j_{2})(GeV)" +xtag,lumi,1000,WNormalization,filetag);
 
 	}
@@ -791,7 +803,7 @@ void MakePlotsMuNuSubInt()
 		TString cut_full_data = cut_data +"*(ST_pf_munu > 700)*(MET_pf  > 140)*(M_bestmupfjet_munu > 360)*(MT_muon1pfMET>120.0)";
 		TString cut_full_mc = cut_mc +"*(ST_pf_munu > 700)*(MET_pf  > 140)*(M_bestmupfjet_munu > 360)*(MT_muon1pfMET>120.0)";
 
-		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2500.0,"M_bestmupfjet_munu", use_integral,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2500.0,"M_bestmupfjet_munu", use_integral,"","M_{#mu j} (GeV)" +xtag,lumi,40,WNormalization,filetag);
 		fillHisto(lq_choice,  cut_full_mc, cut_full_data, use_integral, 25,250,2750,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
 
 		////fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2500.0,"M_bestmupfjet_munu", true,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
@@ -816,7 +828,7 @@ void MakePlotsMuNuSubInt()
 		////fillHisto(lq_choice, cut_full_mc, cut_full_data, use_integral,  50,0,1,"PFJetNeutralHadronEnergyFraction_pfjet2", use_integral,"","Neutral Had Fraction (Jet 2) " +xtag,lumi,1000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_full_mc, cut_full_data, use_integral,  50,0,1,"PFJetNeutralEmEnergyFraction_pfjet2", use_integral,"","NeutralEM Fraction (Jet 2) " +xtag,lumi,1000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 55,0.0,1.0,"DeltaPtOverPt_muon1", use_integral,"","#Delta(p_{T})/p_{T}" +xtag,lumi,40,WNormalization,filetag);
-		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", use_integral,"","M^{T}_{#nu j}" +xtag,lumi,40,WNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", use_integral,"","M^{T}_{#nu j} (GeV)" +xtag,lumi,40,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", true,"","M^{T}_{#nu j}" +xtag,lumi,40,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 40,-3.15,3.15,"deltaPhi_muon1pfMET", use_integral,"","#Delta #phi (#mu,E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
 		////fillHisto(lq_choice, cut_full_mc, cut_full_data, use_integral, 30,0,600,"MET_pfsig",        use_integral,"","E_{T}^{miss} [Sig] (GeV)" +xtag  ,lumi,100,WNormalization,filetag);
@@ -831,7 +843,7 @@ void MakePlotsMuNuSubInt()
 		TString cut_full_data = cut_data +"*(ST_pf_munu > 890)*(MET_pf  > 180)*(M_bestmupfjet_munu > 480)*(MT_muon1pfMET>120.0)";
 		TString cut_full_mc = cut_mc+"*(ST_pf_munu > 890)*(MET_pf  > 180)*(M_bestmupfjet_munu > 480)*(MT_muon1pfMET>120.0)";
 
-		fillHisto(lq_choice, cut_full_mc, cut_full_data, false , 25,0.0,2500.0,"M_bestmupfjet_munu", use_integral,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data, false , 25,0.0,2500.0,"M_bestmupfjet_munu", use_integral,"","M_{#mu j} (GeV)" +xtag,lumi,40,WNormalization,filetag);
 		fillHisto(lq_choice,  cut_full_mc, cut_full_data, false , 25,250,2750,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
 
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, false , 25,0.0,2500.0,"M_bestmupfjet_munu", true,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
@@ -857,7 +869,7 @@ void MakePlotsMuNuSubInt()
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, use_integral,  50,0,1,"PFJetNeutralEmEnergyFraction_pfjet2", use_integral,"","NeutralEM Fraction (Jet 2) " +xtag,lumi,1000,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 55,0.0,1.0,"DeltaPtOverPt_muon1", use_integral,"","#Delta(p_{T})/p_{T}" +xtag,lumi,40,WNormalization,filetag);
 
-		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", use_integral,"","M^{T}_{#nu j}" +xtag,lumi,40,WNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", use_integral,"","M^{T}_{#nu j} (GeV)" +xtag,lumi,40,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", true,"","M^{T}_{#nu j}" +xtag,lumi,40,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 40,-3.15,3.15,"deltaPhi_muon1pfMET", use_integral,"","#Delta #phi (#mu,E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, use_integral, 30,0,600,"MET_pfsig",        use_integral,"","E_{T}^{miss} [Sig] (GeV)" +xtag  ,lumi,100,WNormalization,filetag);
@@ -870,7 +882,7 @@ void MakePlotsMuNuSubInt()
 		TString cut_full_data = cut_data +"*(ST_pf_munu > 1000)*(MET_pf  > 220)*(M_bestmupfjet_munu > 540)*(MT_muon1pfMET>120.0)";
 		TString cut_full_mc = cut_mc+"*(ST_pf_munu > 1000)*(MET_pf  > 220)*(M_bestmupfjet_munu > 540)*(MT_muon1pfMET>120.0)";
 
-		fillHisto(lq_choice, cut_full_mc, cut_full_data, false , 25,0.0,2500.0,"M_bestmupfjet_munu", use_integral,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data, false , 25,0.0,2500.0,"M_bestmupfjet_munu", use_integral,"","M_{#mu j} (GeV)" +xtag,lumi,40,WNormalization,filetag);
 		fillHisto(lq_choice,  cut_full_mc, cut_full_data, false , 25,250,2750,"ST_pf_munu", use_integral,"","S_{T} (GeV)" +xtag,lumi,50,WNormalization,filetag);
 
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, false , 25,0.0,2500.0,"M_bestmupfjet_munu", true,"","M_{#mu j}" +xtag,lumi,40,WNormalization,filetag);
@@ -898,7 +910,7 @@ void MakePlotsMuNuSubInt()
 
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, use_integral, 30,0,600,"MET_pfsig",        use_integral,"","E_{T}^{miss} [Sig] (GeV)" +xtag  ,lumi,100,WNormalization,filetag);
 
-		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", use_integral,"","M^{T}_{#nu j}" +xtag,lumi,40,WNormalization,filetag);
+		fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", use_integral,"","M^{T}_{#nu j} (GeV)" +xtag,lumi,40,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 25,0.0,2000.0,"MT_bestMETpfjet_munu", true,"","M^{T}_{#nu j}" +xtag,lumi,40,WNormalization,filetag);
 		//fillHisto(lq_choice, cut_full_mc, cut_full_data, false, 40,-3.15,3.15,"deltaPhi_muon1pfMET", use_integral,"","#Delta #phi (#mu,E_{T}^{miss})" +xtag,lumi,10000,WNormalization,filetag);
 
