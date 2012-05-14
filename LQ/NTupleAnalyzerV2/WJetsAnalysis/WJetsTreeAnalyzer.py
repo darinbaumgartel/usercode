@@ -421,7 +421,7 @@ def GetRescaling(histo1, histo2,binning,variable):
 		bincontent1.append(histo1.GetBinContent(x))
 		bincontent2.append(histo2.GetBinContent(x))
 		scalefactors.append(1.0)
-		errors.append(hdiv.GetBinError(x))
+		errors.append(hdiv.GetBinError(x)/hdiv.GetBinContent(x))
 		scalefactors2.append(hdiv.GetBinContent(x))
 
 		if (bincontent2[x-1]>0.0):
@@ -432,7 +432,7 @@ def GetRescaling(histo1, histo2,binning,variable):
 	scalestring='(0.0'	
 	errorstring='(0.0'
 	for x in range(len(bincontent1)):
-		print str(bindown[x]) + '<' +variable+'<'+ str(binup[x])+' : weight = '+str(round(scalefactors[x],4))+' +- '+str(round(errors[x],4))
+		#print str(bindown[x]) + '<' +variable+'<'+ str(binup[x])+' : weight = '+str(round(scalefactors[x],4))+' +- '+str(round(errors[x],4))
 		scalestring+=' + '+str(scalefactors[x])+"*("+variable+">"+str(bindown[x])+')*('+variable+'<'+str(binup[x])+')'
 		errorstring+=' + '+str(errors[x])+"*("+variable+">"+str(bindown[x])+')*('+variable+'<'+str(binup[x])+')'
 	scalestring+=')'
@@ -575,8 +575,9 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	l_bottom=TLine(binning[1], presentationbinning[1] ,binning[2],presentationbinning[1])
 	l_top=TLine(binning[1], presentationbinning[2] ,binning[2],presentationbinning[2])
 	l_left=TLine(presentationbinning[1], binning[1] ,presentationbinning[1],binning[2])
-	l_right=TLine(presentationbinning[2], binning[2] ,presentationbinning[2],binning[2])
+	l_right=TLine(presentationbinning[2], binning[1] ,presentationbinning[2],binning[2])
 	bounds = [l_bottom,l_top,l_right,l_left]
+	#bounds = [l_bottom,l_top,l_left]
 	
 	for x in bounds:
 		x.SetLineStyle(2)
@@ -594,7 +595,7 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	Params = [ h_rec_WJets, h_gen_WJets, h_response_WJets]
 
 	tau = FindOptimalTauWithPseudoExp(Params,varbinning)
-	#tau=2
+	#tau=6
 
 	[h_unf_Data,h_dd,h_sv,optimal_tau,optimal_i] = GetSmartSVD(h_rec_Data2,Params, varbinning,tau)
 
@@ -639,25 +640,31 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	h_pres_unf_Data=CreateHisto('h_pres_unf_Data','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection+"*"+DataRescalingString,DataUnfoldedStyle,Label)
 	h_pres_unf_Data_err=CreateHisto('h_pres_unf_Data_err','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection+"*"+DataErrorString,DataUnfoldedStyle,Label)
 
-	#for x in range(h_pres_rec_Data.GetNbinsX()+1):
-		#if x==0:
-			#continue
-		#h_pres_unf_Data.SetBinError(x,h_pres_rec_Data_err.GetBinContent(x))
-	
 	# Other Backgrounds
 	h_pres_rec_DiBoson=CreateHisto('h_pres_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recovariable,presentationbinning,selection_response+weight,DiBosonStackStyle,Label)
 	h_pres_rec_ZJets=CreateHisto('h_pres_rec_ZJets','Z+Jets [Alpgen]',t_ZJets_MG,recovariable,presentationbinning,selection_response+weight,ZStackStyle,Label)
 	h_pres_rec_TTBar=CreateHisto('h_pres_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recovariable,presentationbinning,selection_response+weight,TTStackStyle,Label)
 	h_pres_rec_SingleTop=CreateHisto('h_pres_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recovariable,presentationbinning,selection_response+weight,StopStackStyle,Label)	
 
+
 	h_pres_rec_Data = BackgroundSubtractedHistogram(h_pres_rec_Data,[ h_pres_rec_DiBoson, h_pres_rec_ZJets,h_pres_rec_TTBar,h_pres_rec_SingleTop])
+	h_pres_unf_Data = BackgroundSubtractedHistogram(h_pres_unf_Data,[ h_pres_rec_DiBoson, h_pres_rec_ZJets,h_pres_rec_TTBar,h_pres_rec_SingleTop])
+
+	for x in range(h_pres_rec_Data.GetNbinsX()+1):
+		if x==0:
+			continue
+		h_pres_unf_Data.SetBinError(x,h_pres_unf_Data_err.GetBinContent(x)/h_pres_unf_Data.GetBinContent(x))
+		#print h_pres_unf_Data.GetBinCenter(x),h_pres_unf_Data_err.GetBinContent(x)
 
 
 
 	## Do the Drawing
-	#h_pres_gen_WJets.Draw("")
 	h_pres_gen_WJets.Divide(h_pres_rec_WJets)
 	h_pres_unf_Data.Divide(h_pres_rec_Data)
+
+
+	
+	
 	RelMax=0.0
 	RelMin=990.0
 	for x in range(binning[0]):
@@ -701,13 +708,13 @@ selection = '(Pt_muon1>45)*(Pt_muon2<15)*(Pt_MET>30)*(abs(Eta_muon1)<2.1)*(MT_mu
 weight = '*weight_pu_central*4980*0.92'
 
 
-#MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[150,50,200],[20,60,100],selection,'v','standard')
+MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[75,50,150],[20,60,100],selection,'v','standard')
 #MakeUnfoldedPlots('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[25,30,530],[25,30,530],selection,'v','standard')
-MakeUnfoldedPlots('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,30,530],[30,50,350],selection+j1,'v','standard')
-MakeUnfoldedPlots('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,30,530],[30,50,350],selection+j2,'v','standard')
-MakeUnfoldedPlots('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[50,30,530],[10,50,350],selection+j3,'v','standard')
-MakeUnfoldedPlots('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[50,30,530],[10,50,350],selection+j4,'v','standard')
-MakeUnfoldedPlots('Pt_genjet5','Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[50,30,530],[10,50,350],selection+j5,'v','standard')
+MakeUnfoldedPlots('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,30,530],[25,50,300],selection+j1,'v','standard')
+#MakeUnfoldedPlots('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,30,530],[30,50,350],selection+j2,'v','standard')
+#MakeUnfoldedPlots('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[50,30,530],[10,50,350],selection+j3,'v','standard')
+#MakeUnfoldedPlots('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[50,30,530],[10,50,350],selection+j4,'v','standard')
+#MakeUnfoldedPlots('Pt_genjet5','Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[50,30,530],[10,50,350],selection+j5,'v','standard')
 
 
 
