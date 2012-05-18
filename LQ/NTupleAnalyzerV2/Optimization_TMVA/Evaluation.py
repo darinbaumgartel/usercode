@@ -7,37 +7,56 @@ print 'ROOT loaded.'
 
 # FILL OUT INFORMATION BELOW ------------------------------------------------------------------------------------------------------------------
 #discriminatingvariables = ['MET_pf','Pt_muon1','ST_pf_munu','M_bestmupfjet_munu']
-discriminatingvariables = ['ST_pf_munu','M_bestmupfjet_munu','MT_muon1pfMET','MET_pf','Pt_muon1','Pt_pfjet2']# Discriminating variables, in order, used for the TMVA
-methods = ['Likelihood']  # METHOD Used
+discriminatingvariables = ['Z_Pz','Z_rapidity_z','THRUST_2D','L1_L2_cosangle','redMETd0_muon_DYZZ','TransMass_ZH150_uncl','TransMass_ZH150']# Discriminating variables, in order, used for the TMVA
+methods = ['BDT','Likelihood']  # METHOD Used
 
-fdir = '~/neuhome/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_Default_StandardSelections_4p7fb_Jan17_TEST_2012_01_17_18_23_52/SummaryFiles/' # Where your root files are kept
-tag = 'MVABetaHalfV3'  # Tag to name your new directory of root files. DO NOT LEAVE BLANK
+fdir = '/tmp/chasco/ORIGINAL/' # Where your root files are kept
+tag = 'OUTPUT_TMVA_ALL'  # Tag to name your new directory of root files. DO NOT LEAVE BLANK
 
 # Your preselection. Filter some events. It's fun.
-preselection = '(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))'
+#preselection = '(((Pt_muon1>40)*(Pt_muon2<15.0)*(MET_pf>45)*(Pt_pfjet1>30)*(Pt_pfjet2>30)*(Pt_ele1<15.0)*(ST_pf_munu>250)*(abs(Eta_muon1)<2.1))*(abs(deltaPhi_muon1pfMET)>.8)*(abs(deltaPhi_pfjet1pfMET)>.5)*(FailIDPFThreshold<25.0)*(MT_muon1pfMET>50.0))'
+
+preselection_basic = '((cat == 1) + (cat == 2))*(ln==0)*(Cosmic==0)*(fabs(Mass_Z - 91.18)<10)*(Pt_Z>30)*(DeltaPhi_metjet>0.5)*(Pt_J1 < 30)*(pfMEToverPt_Z > 0.4)*(pfMEToverPt_Z < 1.8)'
+
+preselection_lepton = '' #both, #'*(cat == 1)' #muon pair
+
+preselection_btag = '*((Pt_Jet_btag_CSV_max > 20)*(btag_CSV_max < 0.244) + (1-(Pt_Jet_btag_CSV_max > 20)))'
+
+preselection_MET = '*(sqrt(pow(dilepPROJLong + 1.25*recoilPROJLong + 0.0*uncertPROJLong,2)*(dilepPROJLong + 1.25*recoilPROJLong + 0.0*uncertPROJLong > 0) + 1.0*pow(dilepPROJPerp + 1.25*recoilPROJPerp + 0.0*uncertPROJPerp,2)*(dilepPROJPerp + 1.25*recoilPROJPerp + 0.0*uncertPROJPerp > 0)) > 45.0)' #both
+
+preselection = preselection_basic + preselection_lepton + preselection_btag + preselection_MET
 
 
-TreeName = 'PhysicalVariables' # The name of the tree in which the discriminating variables are stored.
+TreeName = 'data' # The name of the tree in which the discriminating variables are stored.
 # These are the files you are using. 
-OrigKeepFiles = ['LQToCMu_BetaHalf_M_250.root',
-'LQToCMu_BetaHalf_M_350.root',
-'LQToCMu_BetaHalf_M_400.root',
-'LQToCMu_BetaHalf_M_450.root',
-'LQToCMu_BetaHalf_M_500.root',
-'LQToCMu_BetaHalf_M_550.root',
-'LQToCMu_BetaHalf_M_600.root',
-'LQToCMu_BetaHalf_M_650.root',
-'LQToCMu_BetaHalf_M_750.root',
-'LQToCMu_BetaHalf_M_850.root',
-'DiBoson.root',
-'SingleTop.root',
-'TTBar.root',
-'WJets_Sherpa.root',
-'ZJets_Sherpa.root',
-'SingleMuData.root']	
+OrigKeepFiles = ['MC_DYJetsToLL.root',
+'MC_SingleT_s.root',
+'MC_SingleT_t.root',
+'MC_SingleT_tW.root',
+'MC_SingleTbar_s.root',
+'MC_SingleTbar_t.root',
+'MC_SingleTbar_tW.root',
+'MC_TTJets.root',
+'MC_WJetsToLNu.root',
+'MC_WW.root',
+'MC_WZ.root',
+'MC_ZH150.root',
+'MC_ZZ.root',
+'Data_DoubleElectron2011A_0.root',
+'Data_DoubleElectron2011A_1.root',
+'Data_DoubleElectron2011B_0.root',
+'Data_DoubleElectron2011B_1.root',
+'Data_DoubleMu2011A_0.root',
+'Data_DoubleMu2011A_1.root',
+'Data_DoubleMu2011B_0.root',
+'Data_DoubleMu2011B_1.root',
+'Data_MuEG2011A_0.root',
+'Data_MuEG2011A_1.root',
+'Data_MuEG2011B_0.root',
+'Data_MuEG2011B_1.root']
 
-signal_tag = 'LQ' # This identifies which files are signal. Should be in each signal file name above. 
-data_tag = 'Data' # This identifies which files are real data. 
+signal_tag = 'MC_ZH150' # This identifies which files are signal. Should be in each signal file name above. 
+data_tag = 'Data_' # This identifies which files are real data. 
 # All files not meeting above tags are background!
 
 

@@ -132,8 +132,8 @@ for stype in signaltags:
 				line = line.replace('Steps=30','Steps=50')
 
 			if '"!H:!V:NTrees=400' in line:
-				line = line.replace('NTrees=400','NTrees=2000')
-				line = line.replace('MaxDepth=3','MaxDepth=4')
+				line = line.replace('NTrees=400','NTrees=5000') #NTrees = 2000
+				line = line.replace('MaxDepth=3','MaxDepth=5') #MaxDepth=4
 
 			if ":NSmoothSig[0]=20:NSmoothBkg[0]" in line:
 				line = line.replace(':NSmoothSig[0]=20:NSmoothBkg[0]=20','')
