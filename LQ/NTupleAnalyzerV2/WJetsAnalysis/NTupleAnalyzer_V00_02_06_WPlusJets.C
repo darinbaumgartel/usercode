@@ -139,9 +139,9 @@ void placeholder::Loop()
 	// Particle Counts
 	BRANCH(MuonCount); BRANCH(EleCount); BRANCH(HEEPEleCount); BRANCH(PFJetCount); BRANCH(BpfJetCount);
 	BRANCH(GlobalMuonCount); BRANCH(TrackerMuonCount);
-	BRANCH(PFJetRawCount);  
 	BRANCH(GlobalMuonCount10GeV);
-
+	BRANCH(GenJetCount); BRANCH(GenJet30Count); BRANCH(GenJet40Count); 
+	BRANCH(PFJet30Count); BRANCH(PFJet40Count);
 
 	// Event Information
 	UInt_t run_number,event_number,ls_number;
@@ -169,8 +169,16 @@ void placeholder::Loop()
 	BRANCH(Pt_genjet3);  BRANCH(Phi_genjet3);  BRANCH(Eta_genjet3);  
 	BRANCH(Pt_genjet4);  BRANCH(Phi_genjet4);  BRANCH(Eta_genjet4);  
 	BRANCH(Pt_genjet5);  BRANCH(Phi_genjet5);  BRANCH(Eta_genjet5);  
-	//BRANCH(Pt_genjet6);  BRANCH(Phi_genjet6);  BRANCH(Eta_genjet6);  
+	BRANCH(Pt_genjet6);  BRANCH(Phi_genjet6);  BRANCH(Eta_genjet6);  
 	
+	BRANCH(ST_muonMET);
+	BRANCH(ST_muonMETpfjet1);
+	BRANCH(ST_muonMETpfjet12);
+	BRANCH(ST_muonMETpfjet123);
+	BRANCH(ST_muonMETpfjet1234);
+	BRANCH(ST_muonMETpfjet12345);
+	BRANCH(ST_muonMETpfjet123456);
+
 	BRANCH(Pt_genmuon1);  BRANCH(Phi_genmuon1);  BRANCH(Eta_genmuon1);  
 	BRANCH(Pt_genmuon2);  BRANCH(Phi_genmuon2);  BRANCH(Eta_genmuon2);  
 	
@@ -186,7 +194,15 @@ void placeholder::Loop()
 	BRANCH(Pt_pfjet3);  BRANCH(Phi_pfjet3);  BRANCH(Eta_pfjet3);  
 	BRANCH(Pt_pfjet4);  BRANCH(Phi_pfjet4);  BRANCH(Eta_pfjet4);  
 	BRANCH(Pt_pfjet5);  BRANCH(Phi_pfjet5);  BRANCH(Eta_pfjet5);  
-	//BRANCH(Pt_pfjet6);  BRANCH(Phi_pfjet6);  BRANCH(Eta_pfjet6);  
+	BRANCH(Pt_pfjet6);  BRANCH(Phi_pfjet6);  BRANCH(Eta_pfjet6);  
+
+	BRANCH(ST_genmuongenMET);
+	BRANCH(ST_genmuongenMETgenjet1);
+	BRANCH(ST_genmuongenMETgenjet12);
+	BRANCH(ST_genmuongenMETgenjet123);
+	BRANCH(ST_genmuongenMETgenjet1234);
+	BRANCH(ST_genmuongenMETgenjet12345);
+	BRANCH(ST_genmuongenMETgenjet123456);
 	
 	BRANCH(Pt_muon1);  BRANCH(Phi_muon1);  BRANCH(Eta_muon1);  
 	BRANCH(Pt_muon2);  BRANCH(Phi_muon2);  BRANCH(Eta_muon2);  
@@ -612,13 +628,13 @@ void placeholder::Loop()
 					MuonIsGlobal ->at(imuon) == 1 &&
 					MuonIsTracker ->at(imuon) == 1 &&
 					//fabs(MuonRelIso->at(imuon)) < 0.1 &&
-					(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.05) &&                             // Disable for EWK
+					(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
 					//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
 					MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 	
 				bool PassPOGTight =
 					MuonStationMatches->at(imuon) > 1 && 
-					fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.1  &&
+					fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
 					MuonGlobalChi2 ->at(imuon) < 10.0 &&                         /// Disable for EWK
 					MuonPixelHitCount ->at(imuon) >=1 &&
 					MuonGlobalTrkValidHits->at(imuon)>=1 ;
@@ -751,13 +767,13 @@ void placeholder::Loop()
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
 				//fabs(MuonRelIso->at(imuon)) < 0.1 &&
-				(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.05) &&                             // Disable for EWK
+				(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
 				//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 
 			bool PassPOGTight =
 				MuonStationMatches->at(imuon) > 1 && 
-				fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.1  &&
+				fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
 				MuonGlobalChi2 ->at(imuon) < 10.0 &&                         // Disable for EWK
 				MuonPixelHitCount ->at(imuon) >=1 &&
 				MuonGlobalTrkValidHits->at(imuon)>=1 ;
@@ -812,6 +828,9 @@ void placeholder::Loop()
 		int eindex = 99;
 		int jetindex = 99;
 
+		PFJet30Count = 0.0;
+		PFJet40Count = 0.0;
+
 		for(unsigned int ijet=0; ijet<v_idx_pfjet_prefinal.size(); ijet++)
 		{
 			jetindex = v_idx_pfjet_prefinal[ijet];
@@ -838,6 +857,9 @@ void placeholder::Loop()
 			if ( PFJetTrackCountingHighEffBTag->at(jetindex) > 2.0 ) BpfJetCount = BpfJetCount + 1.0;
 			RecoJets.push_back(thisjet);
 			v_idx_pfjet_final.push_back(jetindex);
+			if (thisjet.Pt() > 30.0) PFJet30Count += 1.0;
+			if (thisjet.Pt() > 40.0) PFJet40Count += 1.0;
+
 		}
 		PFJetCount = 1.0*v_idx_pfjet_final.size();
 
@@ -857,8 +879,17 @@ void placeholder::Loop()
 			
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
 			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
+			GenJetCount=0;        GenJet30Count = 0.0;   GenJet40Count = 0.0;
 
 			HT_genMG = 0.0;
+
+			ST_genmuongenMET = 0 ;
+			ST_genmuongenMETgenjet1 = 0 ;
+			ST_genmuongenMETgenjet12 = 0 ;
+			ST_genmuongenMETgenjet123 = 0 ;
+			ST_genmuongenMETgenjet1234 = 0 ;
+			ST_genmuongenMETgenjet12345 = 0 ;
+			ST_genmuongenMETgenjet123456 = 0 ;
 
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
@@ -879,14 +910,18 @@ void placeholder::Loop()
 					GenMuNeutrinos.push_back(thisgenneutrino);
 				}
 			}
-
+			
 			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
 			{
 				if (fabs(GenJetEta->at(ijet))>2.4) continue;
 				TLorentzVector(thisgenjet);
 				thisgenjet.SetPtEtaPhiM(GenJetPt->at(ijet),GenJetEta->at(ijet),GenJetPhi->at(ijet),0.0);
 				GenJets.push_back(thisgenjet);
+				if (thisgenjet.Pt()>30.0) GenJet30Count+= 1.0;				
+				if (thisgenjet.Pt()>40.0) GenJet40Count+= 1.0;
 			}
+			
+			GenJetCount = 1.0*(GenJets.size());
 
 
 			for(unsigned int irecjet = 0; irecjet != RecoJets.size(); ++irecjet)
@@ -969,6 +1004,13 @@ void placeholder::Loop()
 			Pt_W_gen = (SortedGenMuons[0]+v_GenMet).Pt();
 			Phi_W_gen = (SortedGenMuons[0]+v_GenMet).Phi();
 
+			ST_genmuongenMET = Pt_genMET+Pt_genmuon1 ;
+			ST_genmuongenMETgenjet1 = ST_genmuongenMET + Pt_genjet1 ;
+			ST_genmuongenMETgenjet12 = ST_genmuongenMETgenjet1 + Pt_genjet2 ;
+			ST_genmuongenMETgenjet123 = ST_genmuongenMETgenjet12 + Pt_genjet3 ;
+			ST_genmuongenMETgenjet1234 = ST_genmuongenMETgenjet123 + Pt_genjet4 ;
+			ST_genmuongenMETgenjet12345 = ST_genmuongenMETgenjet1234 + Pt_genjet5 ;
+			ST_genmuongenMETgenjet123456 = ST_genmuongenMETgenjet12345 + Pt_genjet6 ;
 		}
 
 
@@ -986,6 +1028,15 @@ void placeholder::Loop()
 			Pt_muon2 = 0;      Phi_muon2 = 0;      Eta_muon2 = 0;
 	
 			Pt_MET = 0;        Phi_MET = 0;        
+
+	
+			ST_muonMET = 0 ;
+			ST_muonMETpfjet1 = 0 ;
+			ST_muonMETpfjet12 = 0 ;
+			ST_muonMETpfjet123 = 0 ;
+			ST_muonMETpfjet1234 = 0 ;
+			ST_muonMETpfjet12345 = 0 ;
+			ST_muonMETpfjet123456 = 0 ;
 	
 			// Assign Muon Variables	
 			if (MuonCount>=1)	Pt_muon1  =	RecoMuons[0].Pt();
@@ -1014,7 +1065,7 @@ void placeholder::Loop()
 			if (PFJetCount>=6)	Pt_pfjet6  =	RecoJets[5].Pt();
 			if (PFJetCount>=6)	Eta_pfjet6 =	RecoJets[5].Eta();
 			if (PFJetCount>=6)	Phi_pfjet6 =	RecoJets[5].Phi();
-	
+
 			Pt_MET = PFMET->at(0);
 			Phi_MET = PFMETPhi->at(0);
 			
@@ -1027,6 +1078,15 @@ void placeholder::Loop()
 	
 			MET_pfsig = PFMETSig->at(0);
 			MET_pf_charged = PFMETCharged->at(0);
+
+			ST_muonMET = Pt_MET+Pt_muon1 ;
+			ST_muonMETpfjet1 = ST_muonMET + Pt_pfjet1 ;
+			ST_muonMETpfjet12 = ST_muonMETpfjet1 + Pt_pfjet2 ;
+			ST_muonMETpfjet123 = ST_muonMETpfjet12 + Pt_pfjet3 ;
+			ST_muonMETpfjet1234 = ST_muonMETpfjet123 + Pt_pfjet4 ;
+			ST_muonMETpfjet12345 = ST_muonMETpfjet1234 + Pt_pfjet5 ;
+			ST_muonMETpfjet123456 = ST_muonMETpfjet12345 + Pt_pfjet6 ;
+	
 			
 			Pt_HEEPele1=0.0;
 			if (HEEPEleCount>=1) Pt_HEEPele1 = ElectronPt->at(v_idx_ele_good_final[0]);
