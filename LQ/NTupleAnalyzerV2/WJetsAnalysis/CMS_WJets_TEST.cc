@@ -363,14 +363,14 @@ namespace Rivet
 
 				//if((isWmn)&&(finaljet_list.size()>=1)) std::cout<<finaljet_list[0].pT()<<std::endl;
 				if((isWmn)&&(finaljet_list.size()>=1)) FillWithValue(_histJetPT1Wmu,weight,finaljet_list[0].pT());
-				if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetPT1Wmu,weight,finaljet_list[1].pT());
-				if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetPT1Wmu,weight,finaljet_list[2].pT());
-				if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetPT1Wmu,weight,finaljet_list[3].pT());
+				if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetPT2Wmu,weight,finaljet_list[1].pT());
+				if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetPT3Wmu,weight,finaljet_list[2].pT());
+				if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetPT4Wmu,weight,finaljet_list[3].pT());
 
 				if((isWmn)&&(finaljet_list.size()>=1)) FillWithValue(_histJetETA1Wmu,weight,finaljet_list[0].eta());
-				if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetETA1Wmu,weight,finaljet_list[1].eta());
-				if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetETA1Wmu,weight,finaljet_list[2].eta());
-				if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetETA1Wmu,weight,finaljet_list[3].eta());
+				if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetETA2Wmu,weight,finaljet_list[1].eta());
+				if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetETA3Wmu,weight,finaljet_list[2].eta());
+				if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetETA4Wmu,weight,finaljet_list[3].eta());
 
 			}
 
