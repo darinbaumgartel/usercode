@@ -1,5 +1,6 @@
 // -*- C++ -*-
 // AUTHOR:  Anil Singh (anil@cern.ch), Lovedeep Saini (lovedeep@cern.ch)
+// Modified for 2011 analysis for wjets with jet pt/eta, D Baumgartel (darinb@cern.ch)
 
 #include "Rivet/Analysis.hh"
 #include "Rivet/RivetAIDA.hh"
