@@ -133,15 +133,14 @@ if do_BetaOne == 1:
 		count = 0
 		print name[x]
 		for l in mycards:
-			if count ==1:
+
+			if '.txt' in l and name[x] in l:
+				count = 1
+			if '.txt' in l and name[x] not in l:
+				count = 0
+
+			if count ==1 and '.txt' not in l:
 				f.write(l+'\n')
-			if 'BetaHalf' not in l and '.txt' in l:
-				newname = l
-				if name[x] in newname:
-					print newname
-					count = 1
-				else:
-					count = 0
 	
 		f.close()
 
@@ -248,17 +247,13 @@ if do_BetaHalf == 1:
 		count = 0
 		print name[x]
 		for l in mycards:
-			if '.txt' in l and 'BetaHalf' not in l:
-				break			
-			if count ==1:
+			if '.txt' in l and name[x] in l:
+				count = 1
+			if '.txt' in l and name[x] not in l:
+				count = 0
+			if count ==1 and '.txt' not in l:
 				f.write(l+'\n')
-			if 'BetaHalf' in l and '.txt' in l:
-				newname = l
-				if name[x].replace('LQ','') in newname:
-					print newname
-					count = 1
-				else:
-					count = 0
+					
 		f.close()
 
 		os.system('rfmkdir /castor/cern.ch/user/'+person[0]+'/'+person+'/CLSLimits/BetaHalf'+cdir+'/'+name[x])
@@ -401,26 +396,30 @@ if do_combo == 1:
 		if x not in uniquecardmasses:
 			uniquecardmasses.append(x)
 	for m in uniquecardmasses:
-		print 'Printing cards for mass' +str(m)
-		pair = []
+		print 'Printing cards for mass ' +str(m)
+		pair = ['','']
+		nn = 0
 		for x in combocards:
 			if m in x:
-				pair.append(x)
+				pair[nn] = x
+				nn += 1
 		if 'BetaHalf' in pair[0]:
 			bcard = pair[0]
 			ocard = pair[1]
 		if 'BetaHalf' not in pair[0]:
 			bcard = pair[1]
-			ocard = pair[0]			
+			ocard = pair[0]
+		if '850' in bcard:
+			card850 = bcard			
 
-		if '900' not in m:
-			os.system('combineCards.py '+pair[0]+ ' '+pair[1]+ '  > TMPComboCards/combocard_COMBO_M_'+m+'.cfg ' )
+		if '900' not in str(m):
+			os.system('combineCards.py '+bcard+ ' '+ocard+ '  > TMPComboCards/combocard_COMBO_M_'+m+'.cfg ' )
 			os.system('combineCards.py '+bcard+' > TMPComboCards/combocard_COMBO_BetaHalf_M_'+m+'.cfg ' )
 			os.system('combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' )
-
-		if '900' not in m:
+			print 'combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' 
+		if '900' in str(m):
 			os.system('combineCards.py '+ocard+ '  > TMPComboCards/combocard_COMBO_M_'+m+'.cfg ' )
-			os.system('combineCards.py '+bcard+' > TMPComboCards/combocard_COMBO_BetaHalf_M_'+m+'.cfg ' )
+			os.system('combineCards.py '+card850+' > TMPComboCards/combocard_COMBO_BetaHalf_M_'+m+'.cfg ' )
 			os.system('combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' )
 
 		print pair
@@ -867,6 +866,10 @@ if do_BetaOne == 1:
 	print '\n'
 	print '\n'
 
+masses_old = []
+for x in masses:
+	if '900' not in str(x):
+		masses_old.append(x)
 
 #### BETA HALF CHANNEL
 if do_BetaHalf == 1:
@@ -888,16 +891,16 @@ if do_BetaHalf == 1:
 	fac = 0.5
 	sigma = []
 	for x in range(len(mThold)):
-		if (mTh[x]) in masses: 
+		if (mThold[x]) in masses: 
 			sigma.append(xsTh[x]*fac)
 	
-	for x in range(len(masses)):
+	for x in range(len(masses_old)):
 		excurve += str(float(med[x])*float(sigma[x])) + ' , ' 
 		obcurve += str(float(ob[x])*float(sigma[x])) + ' , ' 
 		band1sigma += str(float(down1[x])*float(sigma[x])) + ' , ' 
 		band2sigma += str(float(down2[x])*float(sigma[x])) + ' , ' 
 	
-	for x in range(len(masses)):
+	for x in range(len(masses_old)):
 		band1sigma += str(float(up1[-(x+1)])*float(sigma[-(x+1)])) + ' , ' 
 		band2sigma += str(float(up2[-(x+1)])*float(sigma[-(x+1)])) + ' , ' 
 	excurve += '}'
@@ -1110,7 +1113,7 @@ if do_combo == 1:
 		mlist = []
 		for limit_set in clist:
 			fitted_limits = loggraph(masses,limit_set)
-			goodm = get_simple_intersection(logtheory,fitted_limits,250,850)
+			goodm = get_simple_intersection(logtheory,fitted_limits,250,900)
 			mlist.append(str(round(goodm[0],2)))
 		return mlist
 		
