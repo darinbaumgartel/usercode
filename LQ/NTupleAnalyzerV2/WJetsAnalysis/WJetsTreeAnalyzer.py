@@ -67,8 +67,6 @@ def main():
 
 
 
-
-
 ####################################################################################################################################################
 ####################################################################################################################################################
 ####################################################################################################################################################
@@ -233,6 +231,27 @@ def BackgroundSubtractedHistogram(data,backgrounds):
 		data.Add(b)
 		b.Scale(-1)
 	return data
+
+def PseudoDataHisto(histo,newname,binning):
+	binset=ConvertBinning(binning)
+	n = len(binset)-1
+	
+	hout= TH1D(newname,"",n,array('d',binset))
+	bincontent=[]
+	binx=[]
+	for x in range(n):
+		bincontent.append(int(round(histo.GetBinContent(x))))
+		binx.append(histo.GetBinCenter(x))
+	
+	offset = 0.0
+	resolution = 0.0
+	maxbin=max(binset)
+	minbin=min(binset)
+	
+	for a in range(len(binx)):
+		for y in range(bincontent[a]):
+			hout.Fill(binx[a])
+	return hout
 
 def SmearOffsetHisto(histo,newname,binning,should_offset):
 	binset=ConvertBinning(binning)
@@ -613,7 +632,7 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,tagna
 def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,tagname):
 	print "\n     Performing unfolding analysis for "+recovariable+" in "+str(binning[0]) +" bins from "+str(binning[1])+" to "+str(binning[2])+"  ... \n"
 	# Create Canvas
-	c1 = TCanvas("c1","",1000,700)
+	c1 = TCanvas("c1","",1200,900)
 	c1.Divide(2,2)
 	gStyle.SetOptStat(0)
 
@@ -626,6 +645,9 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	DataCompStyle=[0,20,0.3,1,6]
 	BlankRecoStyle=[0,20,.00001,1,0]
 	DataUnfoldedStyle=[0,21,0.4,1,1]
+	DataUnfoldedStyle_pseudo=[0,21,0.4,1,9]
+	DataUnfoldedStyle_pseudo2=[0,20,0.4,1,2]
+
 	# X and Y axis labels for plot
 	Label=[xlabel,"Events/Bin"]
 
@@ -666,6 +688,12 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	h_rec_TTBar=CreateHisto('h_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recovariable,varbinning,selection_response+weight,TTStackStyle,Label)
 	h_rec_SingleTop=CreateHisto('h_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recovariable,varbinning,selection_response+weight,StopStackStyle,Label)
 	h_rec_QCDMu=CreateHisto('h_rec_QCDMu','QCD #mu-enriched [Pythia]',t_QCDMu,recovariable,varbinning,selection_response+weight,QCDStackStyle,Label)
+
+	h_rec_Data_pseudo=PseudoDataHisto(h_rec_WJets,'h_rec_PseudoData',varbinning)
+
+	#print '********************',h_rec_WJets.Integral(),h_rec_PseudoData.Integral()
+	#sys.exit()
+	
 
 	## Rescaling Factor Calculation
 	SM = [h_rec_WJets,h_rec_DiBoson,h_rec_ZJets,h_rec_TTBar,h_rec_SingleTop,h_rec_QCDMu]
@@ -778,15 +806,22 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 
 	[h_unf_Data,h_dd,h_sv,optimal_tau,optimal_i] = GetSmartSVD(h_rec_Data2,Params, varbinning,tau)
 
+	[h_unf_Data_pseudo,h_dd,h_sv_pseudo,optimal_tau_pseudo,optimal_i_pseudo] = GetSmartSVD(h_rec_Data_pseudo,Params, varbinning,tau)
+
 	UnfScale=(h_rec_Data2.Integral()/h_unf_Data.Integral())
 	h_unf_Data = BeautifyHisto(h_unf_Data,DataUnfoldedStyle,Label,"Data, 5/fb [Unfolded, #tau = "+str(optimal_tau)+",R="+str(round(UnfScale,2))+"]")
+	h_unf_Data_pseudo = BeautifyHisto(h_unf_Data_pseudo,DataUnfoldedStyle_pseudo,Label,"WJets Closure [Unfolded, #tau = "+str(optimal_tau)+",R="+str(round(UnfScale,2))+"]")
+
 
 	[DataRescalingString,DataErrorString] = GetRescaling(h_unf_Data,h_rec_Data2,varbinning,recovariable)
+	[DataRescalingString_pseudo,DataErrorString_pseudo] = GetRescaling(h_unf_Data_pseudo,h_rec_Data_pseudo,varbinning,recovariable)
+
 
 	print "Scaling of Unfolded Dist: "+str(UnfScale)
 
 	h_unf_Data.Draw("EPSAME")
 	h_rec_Data2.Draw("EPSAME")
+	h_unf_Data_pseudo.Draw("EPSAME")
 
 	
 	FixDrawLegend(c1.cd(2).BuildLegend())
@@ -839,6 +874,10 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	h_pres_unf_Data=CreateHisto('h_pres_unf_Data','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection+"*"+DataRescalingString,DataUnfoldedStyle,Label)
 	h_pres_unf_Data_err=CreateHisto('h_pres_unf_Data_err','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recovariable,presentationbinning,selection+"*"+DataErrorString,DataUnfoldedStyle,Label)
 
+
+	h_pres_unf_Data_pseudo=CreateHisto('h_pres_unf_Data_pseudo','MC Closure [Unf. Reco/ Gen]',t_WJets_MG,recovariable,presentationbinning,selection_response+weight+"*"+DataRescalingString_pseudo,DataUnfoldedStyle_pseudo,Label)
+	h_pres_unf_Data_err_pseudo=CreateHisto('h_pres_unf_Data_err_pseudo','MC Closure [Unf. Reco/ Gen]',t_WJets_MG,recovariable,presentationbinning,selection_response+weight+"*"+DataErrorString_pseudo,DataUnfoldedStyle_pseudo,Label)
+
 	# Other Backgrounds
 	h_pres_rec_DiBoson=CreateHisto('h_pres_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recovariable,presentationbinning,selection_response+weight,DiBosonStackStyle,Label)
 	h_pres_rec_ZJets=CreateHisto('h_pres_rec_ZJets','Z+Jets [Alpgen]',t_ZJets_MG,recovariable,presentationbinning,selection_response+weight,ZStackStyle,Label)
@@ -858,14 +897,25 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 			h_pres_unf_Data.SetBinError(x,0)
 		#print h_pres_unf_Data.GetBinCenter(x),h_pres_unf_Data_err.GetBinContent(x)
 
-
+	for x in range(h_pres_rec_Data.GetNbinsX()+1):
+		if x==0:
+			continue
+		if h_pres_unf_Data_pseudo.GetBinContent(x) != 0:
+			h_pres_unf_Data_pseudo.SetBinError(x,h_pres_unf_Data_err_pseudo.GetBinContent(x)/h_pres_unf_Data_pseudo.GetBinContent(x))
+		else: 
+			h_pres_unf_Data_pseudo.SetBinError(x,0)
+	
+	h_pres_unf_Data_pseudo.Divide(h_pres_gen_WJets)
 
 	## Do the Drawing
 	h_pres_gen_WJets.Divide(h_pres_rec_WJets)
 	h_pres_unf_Data.Divide(h_pres_rec_Data)
 
+	h_pres_unf_Data_pseudo = BeautifyHisto(h_pres_unf_Data_pseudo,DataUnfoldedStyle_pseudo2,Label,"MC Closure [Unf. Reco/ Gen]")
 
-	
+
+	l_one=TLine(presentationbinning[1], 1 ,presentationbinning[2],1)
+	l_one.SetLineStyle(2)
 	
 	RelMax=0.0
 	RelMin=990.0
@@ -879,9 +929,11 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	RelMax*=1.5
 	RelMin*=0.85
 	h_pres_gen_WJets.Draw("EP")
+	l_one.Draw("SAME")
 	h_pres_gen_WJets.SetMaximum(RelMax)
 	h_pres_gen_WJets.SetMinimum(RelMin)
 	h_pres_unf_Data.Draw("EPSAME")
+	h_pres_unf_Data_pseudo.Draw("EPSAME")
 	# Create Legend
 	FixDrawLegend(c1.cd(4).BuildLegend())
 
