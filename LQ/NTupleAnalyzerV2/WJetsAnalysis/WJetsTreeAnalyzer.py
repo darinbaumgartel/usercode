@@ -1,7 +1,7 @@
 import os
 
 # Directory where root files are kept and the tree you want to get root files from
-FileDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_StandardMuonDefs_2012_05_25_03_46_08/SummaryFiles/'
+NormalDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_StandardMuonDefs_2012_05_25_03_46_08/SummaryFiles/'
 TreeName = "PhysicalVariables"
 
 
@@ -24,42 +24,51 @@ def main():
 	selection = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50)*(MT_muon1MET<110)'
 	weight = '*weight_pu_central*4980*0.92'
 	
-	MakeUnfoldedPlots('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c','standard')	
-	MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,50,150],[20,60,100],selection,weight,'v','standard')
-	MakeUnfoldedPlots('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[15,30,330],selection,weight,'v','standard')
-	MakeUnfoldedPlots('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,500],[26,40,300],selection,weight,'v','standard')
-	MakeUnfoldedPlots('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,500],[26,40,300],selection+j1,weight,'v','standard')
-	MakeUnfoldedPlots('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[25,0,500],[13,40,300],selection+j2,weight,'v','standard')
-	MakeUnfoldedPlots('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[25,0,500],[13,40,300],selection+j3,weight,'v','standard')
-	MakeUnfoldedPlots('Pt_genjet5','Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[10,0,500],[5,40,300],selection+j4,weight,'v','standard')
+	FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v')
+		
+	#MakeUnfoldedPlots('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c',NormalDirectory,-1,'standard')	
+	#MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,50,150],[20,60,100],selection,weight,'v',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[15,30,330],selection,weight,'v',NormalDirectory,-1,'standard')
+	#[tau,data,mc]=MakeUnfoldedPlots('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v',NormalDirectory,2,'standard')
+	#print tau
+	#print ' '
+	#for x in data:
+		#print x
+	#print ' '
+	#for x in mc:
+		#print x
+	#MakeUnfoldedPlots('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,500],[26,40,300],selection+j1,weight,'v',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[25,0,500],[13,40,300],selection+j2,weight,'v',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[25,0,500],[13,40,300],selection+j3,weight,'v',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Pt_genjet5','Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[10,0,500],[5,40,300],selection+j4,weight,'v',NormalDirectory,-1,'standard')
 
-	MakeUnfoldedPlots('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j1,weight,'c','standard')
-	MakeUnfoldedPlots('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j2,weight,'c','standard')
-	MakeUnfoldedPlots('Eta_genjet3','Eta_pfjet3',"#eta(jet_{3}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j3,weight,'c','standard')
-	MakeUnfoldedPlots('Eta_genjet4','Eta_pfjet4',"#eta(jet_{4}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j4,weight,'c','standard')
-	MakeUnfoldedPlots('Eta_genjet5','Eta_pfjet5',"#eta(jet_{5}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j5,weight,'c','standard')
+	#MakeUnfoldedPlots('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j1,weight,'c',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j2,weight,'c',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Eta_genjet3','Eta_pfjet3',"#eta(jet_{3}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j3,weight,'c',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Eta_genjet4','Eta_pfjet4',"#eta(jet_{4}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j4,weight,'c',NormalDirectory,-1,'standard')
+	#MakeUnfoldedPlots('Eta_genjet5','Eta_pfjet5',"#eta(jet_{5}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j5,weight,'c',NormalDirectory,-1,'standard')
 
-	#MakeBasicPlot('PFJetCount',"N_{Jet} (Inclusive) [GeV]",[10,-0.5,9.5],selection,weight,'standard')
+	#MakeBasicPlot('PFJetCount',"N_{Jet} (Inclusive) [GeV]",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
 
 	
-	#MakeBasicPlot('PFJetCount',"N_{Jet} (Inclusive) [GeV]",[10,-0.5,9.5],selection,weight,'standard')
-	#MakeBasicPlot('PFJet30Count',"N_{Jet} (Inclusive) [GeV] - 30 GeV Threshold",[10,-0.5,9.5],selection,weight,'standard')
-	#MakeBasicPlot('PFJet40Count',"N_{Jet} (Inclusive) [GeV] - 40 GeV Threshold",[10,-0.5,9.5],selection,weight,'standard')
-	#MakeBasicPlot('MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[40,60,160],selection,weight,'standard')
-	#MakeBasicPlot('Pt_MET',"E_{T}^{miss} [GeV]",[80,0,400],selection,weight,'standard')
+	#MakeBasicPlot('PFJetCount',"N_{Jet} (Inclusive) [GeV]",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('PFJet30Count',"N_{Jet} (Inclusive) [GeV] - 30 GeV Threshold",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('PFJet40Count',"N_{Jet} (Inclusive) [GeV] - 40 GeV Threshold",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[40,60,160],selection,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Pt_MET',"E_{T}^{miss} [GeV]",[80,0,400],selection,weight,NormalDirectory,-1,'standard')
 	
-	#MakeBasicPlot('MET_pfsig',"E_{T}^{miss} Signif [GeV]",[50,0,250],selection,weight,'standard')
-	#MakeBasicPlot('Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[40,40,440],selection+j1,weight,'standard')
-	#MakeBasicPlot('Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[40,40,440],selection+j2,weight,'standard')
-	#MakeBasicPlot('Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[40,40,440],selection+j3,weight,'standard')
-	#MakeBasicPlot('Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[40,40,440],selection+j4,weight,'standard')
-	#MakeBasicPlot('Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[40,40,440],selection+j5,weight,'standard')
+	#MakeBasicPlot('MET_pfsig',"E_{T}^{miss} Signif [GeV]",[50,0,250],selection,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[40,40,440],selection+j1,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[40,40,440],selection+j2,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[40,40,440],selection+j3,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[40,40,440],selection+j4,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[40,40,440],selection+j5,weight,NormalDirectory,-1,'standard')
 	
-	#MakeBasicPlot('Eta_pfjet1',"#eta(jet_{1})",[24,-2.4,2.4],selection+j1,weight,'standard')
-	#MakeBasicPlot('Eta_pfjet2',"#eta(jet_{2})",[24,-2.4,2.4],selection+j2,weight,'standard')
-	#MakeBasicPlot('Eta_pfjet3',"#eta(jet_{3})",[24,-2.4,2.4],selection+j3,weight,'standard')
-	#MakeBasicPlot('Eta_pfjet4',"#eta(jet_{4})",[24,-2.4,2.4],selection+j4,weight,'standard')
-	#MakeBasicPlot('Eta_pfjet5',"#eta(jet_{5})",[24,-2.4,2.4],selection+j5,weight,'standard')	
+	#MakeBasicPlot('Eta_pfjet1',"#eta(jet_{1})",[24,-2.4,2.4],selection+j1,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Eta_pfjet2',"#eta(jet_{2})",[24,-2.4,2.4],selection+j2,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Eta_pfjet3',"#eta(jet_{3})",[24,-2.4,2.4],selection+j3,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Eta_pfjet4',"#eta(jet_{4})",[24,-2.4,2.4],selection+j4,weight,NormalDirectory,-1,'standard')
+	#MakeBasicPlot('Eta_pfjet5',"#eta(jet_{5})",[24,-2.4,2.4],selection+j5,weight,NormalDirectory,-1,'standard')	
 	
 	
 
@@ -103,12 +112,6 @@ gStyle.SetNumberContours(NCont)
 ##########################################################################
 ##########################################################################
 
-
-
-# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
-for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
-	exec('t_'+f.replace(".root\n","")+" = TFile.Open(\""+FileDirectory+"/"+f.replace("\n","")+"\")"+".Get(\""+TreeName+"\")")
-tmpfile = TFile("tmp.root","RECREATE")
 
 def FixDrawLegend(legend):
 	legend.SetTextFont(132)
@@ -565,7 +568,13 @@ def GetRescaling(histo1, histo2,binning,variable):
 	return [scalestring,errorstring]
 
 
-def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,tagname):
+def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileDirectory,tagname):
+
+	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
+	for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
+		exec('t_'+f.replace(".root\n","")+" = TFile.Open(\""+FileDirectory+"/"+f.replace("\n","")+"\")"+".Get(\""+TreeName+"\")")
+	tmpfile = TFile("tmp.root","RECREATE")
+	
 	print "\n     Making basic histogram for "+recovariable+". \n"
 	# Create Canvas
 	c1 = TCanvas("c1","",700,500)
@@ -629,7 +638,13 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,tagna
 	c1.Print('pyplots/Basic_'+recovariable+'_'+tagname+'.png')
 
 			
-def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,tagname):
+def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,FileDirectory,tau_override,tagname):
+	
+	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
+	for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
+		exec('t_'+f.replace(".root\n","")+" = TFile.Open(\""+FileDirectory+"/"+f.replace("\n","")+"\")"+".Get(\""+TreeName+"\")")
+	tmpfile = TFile("tmp.root","RECREATE")
+		
 	print "\n     Performing unfolding analysis for "+recovariable+" in "+str(binning[0]) +" bins from "+str(binning[1])+" to "+str(binning[2])+"  ... \n"
 	# Create Canvas
 	c1 = TCanvas("c1","",1200,900)
@@ -658,21 +673,22 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	StopStackStyle=[3008,20,.00001,2,9]
 	QCDStackStyle=[3013,20,.00001,2,15]
 
+	presentationbinning=ConvertBinning(presentationbinning)
+
 
 	##############################################################################
 	#######     To Right - Background Subtracted Distributions          #######
 	##############################################################################
 	c1.cd(2)
-
-	selection+='*('+recovariable+'<'+str(presentationbinning[2])+')*('+recovariable+'>'+str(presentationbinning[1])+')'
-	selection_response=str(selection)+'*('+genvariable+'<'+str(binning[2])+')*('+genvariable+'>'+str(binning[1])+')'
+	selection+='*('+recovariable+'<'+str(presentationbinning[-1])+')*('+recovariable+'>'+str(presentationbinning[0])+')'
+	selection_response=str(selection)+'*('+genvariable+'<'+str(binning[-1])+')*('+genvariable+'>'+str(binning[1])+')'
 
 
 	# Get optimal variable binning binning
 	#varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[10000*binning[0],binning[1],binning[2]],selection+weight,MCGenStyle,Label),binning[0])
 	varbinning=GetConstBinStructure(binning)
 	if (optvar=="v" or optvar=="V"):
-		varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[100000*presentationbinning[0],presentationbinning[1],presentationbinning[2]],selection_response+weight,MCGenStyle,Label),binning)
+		varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[100000*len(presentationbinning),presentationbinning[0],presentationbinning[-1]],selection_response+weight,MCGenStyle,Label),binning)
 	#print varbinning
 
 	print selection
@@ -776,10 +792,10 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	if (optvar=="v" or optvar=="V"):
 		c1.cd(3).SetLogx()	
 		c1.cd(3).SetLogy()
-	l_bottom=TLine(binning[1], presentationbinning[1] ,binning[2],presentationbinning[1])
-	l_top=TLine(binning[1], presentationbinning[2] ,binning[2],presentationbinning[2])
-	l_left=TLine(presentationbinning[1], binning[1] ,presentationbinning[1],binning[2])
-	l_right=TLine(presentationbinning[2], binning[1] ,presentationbinning[2],binning[2])
+	l_bottom=TLine(binning[1], presentationbinning[0] ,binning[2],presentationbinning[0])
+	l_top=TLine(binning[1], presentationbinning[0] ,binning[2],presentationbinning[0])
+	l_left=TLine(presentationbinning[0], binning[1] ,presentationbinning[0],binning[2])
+	l_right=TLine(presentationbinning[-1], binning[1] ,presentationbinning[-1],binning[2])
 	bounds = [l_bottom,l_top,l_right,l_left]
 	#bounds = [l_bottom,l_top,l_left]
 	
@@ -801,8 +817,11 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	should_offset=True
 	if "Eta" in recovariable:
 		should_offset=False
-	tau = FindOptimalTauWithPseudoExp(Params,varbinning,should_offset)
-	#tau=2
+	
+	if tau_override>0:
+		tau=tau_override
+	else:
+		tau = FindOptimalTauWithPseudoExp(Params,varbinning,should_offset)
 
 	[h_unf_Data,h_dd,h_sv,optimal_tau,optimal_i] = GetSmartSVD(h_rec_Data2,Params, varbinning,tau)
 
@@ -844,8 +863,8 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	if "Eta" in recovariable:
 		CompMax = 5*CompMax
 
-	leftborder =  TLine( presentationbinning[1],CompMin,presentationbinning[1],CompMax )
-	rightborder =  TLine( presentationbinning[2],CompMin,presentationbinning[2],CompMax )
+	leftborder =  TLine( presentationbinning[0],CompMin,presentationbinning[0],CompMax )
+	rightborder =  TLine( presentationbinning[-1],CompMin,presentationbinning[-1],CompMax )
 	leftborder.SetLineStyle(2)
 	rightborder.SetLineStyle(2)
 	h_gen_WJets.SetMaximum(CompMax)
@@ -888,6 +907,9 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	h_pres_rec_Data = BackgroundSubtractedHistogram(h_pres_rec_Data,[ h_pres_rec_DiBoson, h_pres_rec_ZJets,h_pres_rec_TTBar,h_pres_rec_SingleTop])
 	h_pres_unf_Data = BackgroundSubtractedHistogram(h_pres_unf_Data,[ h_pres_rec_DiBoson, h_pres_rec_ZJets,h_pres_rec_TTBar,h_pres_rec_SingleTop])
 
+	DataBinInfo=[]
+	MCBinInfo=[]
+
 	for x in range(h_pres_rec_Data.GetNbinsX()+1):
 		if x==0:
 			continue
@@ -895,6 +917,27 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 			h_pres_unf_Data.SetBinError(x,h_pres_unf_Data_err.GetBinContent(x)/h_pres_unf_Data.GetBinContent(x))
 		else: 
 			h_pres_unf_Data.SetBinError(x,0)
+
+		lhs=h_pres_unf_Data.GetBinCenter(x)-0.5*(h_pres_unf_Data.GetBinWidth(x))
+		rhs=h_pres_unf_Data.GetBinCenter(x)+0.5*(h_pres_unf_Data.GetBinWidth(x))
+		content=h_pres_unf_Data.GetBinContent(x)
+		error=h_pres_unf_Data_err.GetBinContent(x)
+		lhs=str(lhs)
+		rhs=str(rhs)
+		content=str(round(content,2))
+		error=str(round(error,2))
+		DataBinInfo.append([lhs+' - '+str(rhs),content+' +- '+error])
+
+		lhs=h_pres_gen_WJets.GetBinCenter(x)-0.5*(h_pres_gen_WJets.GetBinWidth(x))
+		rhs=h_pres_gen_WJets.GetBinCenter(x)+0.5*(h_pres_gen_WJets.GetBinWidth(x))
+		content=h_pres_gen_WJets.GetBinContent(x)
+		error=h_pres_gen_WJets.GetBinError(x)
+		lhs=str(lhs)
+		rhs=str(rhs)
+		content=str(round(content,2))
+		error=str(round(error,2))
+		MCBinInfo.append([lhs+' - '+rhs,content+' +- '+error])
+		
 		#print h_pres_unf_Data.GetBinCenter(x),h_pres_unf_Data_err.GetBinContent(x)
 
 	for x in range(h_pres_rec_Data.GetNbinsX()+1):
@@ -914,7 +957,7 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	h_pres_unf_Data_pseudo = BeautifyHisto(h_pres_unf_Data_pseudo,DataUnfoldedStyle_pseudo2,Label,"MC Closure [Unf. Reco/ Gen]")
 
 
-	l_one=TLine(presentationbinning[1], 1 ,presentationbinning[2],1)
+	l_one=TLine(presentationbinning[0], 1 ,presentationbinning[-1],1)
 	l_one.SetLineStyle(2)
 	
 	RelMax=0.0
@@ -947,6 +990,42 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 
 	c1.Print('pyplots/'+recovariable+'_'+tagname+'.pdf')
 	c1.Print('pyplots/'+recovariable+'_'+tagname+'.png')
+
+	return [tau,DataBinInfo,MCBinInfo]
+
+
+def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar):
+
+	[tau,data_standard,mc_standard]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,-1,'standard')
+	[null,data_pileup_plus,_pileup_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysplus8'),optvar,NormalDirectory,tau,'pileup_plus')
+	[null,data_pileup_minus,mc_pileup_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysminus8'),optvar,NormalDirectory,tau,'pileup_minus')
+
+	
+	data_table=[['|','Bin','|','Prediction','|','DataMean','|','PU_plus','PU_minus','|']]
+	for x in range(len(data_standard)):
+		thisbin=(data_standard[x])[0]
+		center = (data_standard[x])[1]
+		prediction = (mc_standard[x])[1]
+		pu_up = (data_pileup_plus[x])[1]
+		pu_down = (data_pileup_minus[x])[1]
+		data_table.append(['|',thisbin,'|',prediction,'|',center,'|',pu_up,pu_down,'|'])
+	
+	f = open('table_tmp.txt','w')
+	for line in data_table:
+		line=str(line)
+		line=line.replace('[','')
+		line=line.replace(']','')
+		line=line.replace('\'','')
+		line=line.replace('\t',' ')
+		for x in range(5):
+			line=line.replace('  ','')
+
+		f.write(line+'\n')
+	f.close()
+	
+	os.system('cat table_tmp.txt | column -t -s"," > pyplots/'+recovariable+'.txt')
+	os.system('rm table_tmp.txt')
+	
 
 
 main()
