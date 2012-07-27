@@ -1021,7 +1021,7 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,present
 	[null,data_musmear,mc_musmear]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuSmearDirectory,tau,'musmear')	
 	
 	
-	data_table=[['|','Bin','|','Prediction','|','DataMean','|','PU_plus','PU_minus','|','JetScale_plus','JetScale_minus','JetSmear','|','MuScale_plus','MuScale_minus','MuSmear','|']]
+	data_table=[['|','Bin','|','Prediction','|','DataMean','|','PU(+)','PU(-)','|','JScale(+)','JScale(-)','JetSmear','|','MuScale(+)','MuScale(-)','MuSmear','|']]
 	for x in range(len(data_standard)):
 		thisbin=(data_standard[x])[0]
 		center = (data_standard[x])[1]
@@ -1037,6 +1037,8 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,present
 		mu_down = (data_muscale_minus[x])[1]
 		mu_smear = (data_musmear[x])[1]
 		
+		for v in ['pu_up','pu_down','jet_up','jet_down','jet_smear','mu_up','mu_down','mu_smear']:
+			exec(v+'='+v+'.split("+-")[0]')
 		
 		data_table.append(['|',thisbin,'|',prediction,'|',center,'|',pu_up,pu_down,'|',jet_up,jet_down,jet_smear,'|',mu_up,mu_down,mu_smear,'|'])
 	
