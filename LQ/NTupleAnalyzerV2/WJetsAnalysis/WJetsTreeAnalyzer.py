@@ -1,7 +1,17 @@
 import os
 
 # Directory where root files are kept and the tree you want to get root files from
-NormalDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_StandardMuonDefs_2012_05_25_03_46_08/SummaryFiles/'
+#NormalDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_StandardMuonDefs_2012_05_25_03_46_08/SummaryFiles/'
+
+NormalDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_2012_07_19_17_35_41/SummaryFiles/'
+JetScaleDownDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_JetScaleDown_2012_07_20_07_48_49/SummaryFiles/'
+JetScaleUpDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_JetScaleUp_2012_07_20_05_31_46/SummaryFiles/'
+JetSmearDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_JetSmear_2012_07_21_00_26_52/SummaryFiles/'
+MuScaleDownDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuScaleDown_2012_07_20_21_31_13/SummaryFiles/'
+MuScaleUpDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuScaleUp_2012_07_20_10_05_48/SummaryFiles/'
+MuSmearDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuSmear_2012_07_21_03_12_15/SummaryFiles/'
+
+
 TreeName = "PhysicalVariables"
 
 
@@ -997,18 +1007,38 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar):
 
 	[tau,data_standard,mc_standard]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,-1,'standard')
-	[null,data_pileup_plus,_pileup_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysplus8'),optvar,NormalDirectory,tau,'pileup_plus')
+	
+	[null,data_pileup_plus,mc_pileup_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysplus8'),optvar,NormalDirectory,tau,'pileup_plus')
 	[null,data_pileup_minus,mc_pileup_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysminus8'),optvar,NormalDirectory,tau,'pileup_minus')
 
+
+	[null,data_jetscale_plus,mc_jetscale_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetScaleUpDirectory,tau,'jetscale_plus')
+	[null,data_jetscale_minus,mc_jetscale_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetScaleDownDirectory,tau,'jetscale_minus')
+	[null,data_jetsmear,mc_jetsmear]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetSmearDirectory,tau,'jetsmear')
+
+	[null,data_muscale_plus,mc_muscale_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuScaleUpDirectory,tau,'muscale_plus')
+	[null,data_muscale_minus,mc_muscale_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuScaleDownDirectory,tau,'muscale_minus')
+	[null,data_musmear,mc_musmear]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuSmearDirectory,tau,'musmear')	
 	
-	data_table=[['|','Bin','|','Prediction','|','DataMean','|','PU_plus','PU_minus','|']]
+	
+	data_table=[['|','Bin','|','Prediction','|','DataMean','|','PU_plus','PU_minus','|','JetScale_plus','JetScale_minus','JetSmear','|','MuScale_plus','MuScale_minus','MuSmear','|']]
 	for x in range(len(data_standard)):
 		thisbin=(data_standard[x])[0]
 		center = (data_standard[x])[1]
 		prediction = (mc_standard[x])[1]
 		pu_up = (data_pileup_plus[x])[1]
 		pu_down = (data_pileup_minus[x])[1]
-		data_table.append(['|',thisbin,'|',prediction,'|',center,'|',pu_up,pu_down,'|'])
+		
+		jet_up = (data_jetscale_plus[x])[1]
+		jet_down = (data_jetscale_minus[x])[1]
+		jet_smear = (data_jetsmear[x])[1]
+		
+		mu_up = (data_muscale_plus[x])[1]
+		mu_down = (data_muscale_minus[x])[1]
+		mu_smear = (data_musmear[x])[1]
+		
+		
+		data_table.append(['|',thisbin,'|',prediction,'|',center,'|',pu_up,pu_down,'|',jet_up,jet_down,jet_smear,'|',mu_up,mu_down,mu_smear,'|'])
 	
 	f = open('table_tmp.txt','w')
 	for line in data_table:
