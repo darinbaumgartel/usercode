@@ -20,7 +20,7 @@ TreeName = "PhysicalVariables"
 ##########################################################################
 
 def main():
-	os.system("rm pyplots/*.*")
+	#os.system("rm pyplots/*.*")
 
 	j1="*(Pt_pfjet1>40.0)"
 	j2="*(Pt_pfjet2>40.0)"
@@ -34,7 +34,10 @@ def main():
 	selection = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50)*(MT_muon1MET<110)'
 	weight = '*weight_pu_central*4980*0.92'
 	
-	FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v')
+	#FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v')
+		
+		
+	ParseTablesToFinalResults()	
 		
 	#MakeUnfoldedPlots('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c',NormalDirectory,-1,'standard')	
 	#MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,50,150],[20,60,100],selection,weight,'v',NormalDirectory,-1,'standard')
@@ -255,7 +258,7 @@ def PseudoDataHisto(histo,newname,binning):
 	for x in range(n):
 		bincontent.append(int(round(histo.GetBinContent(x))))
 		binx.append(histo.GetBinCenter(x))
-	
+		#print x, bincontent[x]
 	offset = 0.0
 	resolution = 0.0
 	maxbin=max(binset)
@@ -648,11 +651,21 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileD
 	c1.Print('pyplots/Basic_'+recovariable+'_'+tagname+'.png')
 
 			
-def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,FileDirectory,tau_override,tagname):
+def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,FileDirectory,file_override,tau_override,tagname):
 	
 	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
 	for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
-		exec('t_'+f.replace(".root\n","")+" = TFile.Open(\""+FileDirectory+"/"+f.replace("\n","")+"\")"+".Get(\""+TreeName+"\")")
+		if 'Scale' in f or 'Match' in f:
+			continue
+		fin=f.replace("\n","")
+		if file_override != '':
+			if fin=='ZJets_MG.root':
+				fin=fin.replace('_MG.root','_'+file_override+'.root')
+			if fin=='WJets_MG.root':
+				fin=fin.replace('_MG.root','_'+file_override+'.root')
+			if fin=='TTBar.root':
+				fin=fin.replace('Bar.root','Jets_'+file_override+'.root')				
+		exec('t_'+f.replace(".root\n","")+" = TFile.Open(\""+FileDirectory+"/"+fin.replace("\n","")+"\")"+".Get(\""+TreeName+"\")")
 	tmpfile = TFile("tmp.root","RECREATE")
 		
 	print "\n     Performing unfolding analysis for "+recovariable+" in "+str(binning[0]) +" bins from "+str(binning[1])+" to "+str(binning[2])+"  ... \n"
@@ -701,8 +714,8 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 		varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recovariable,[100000*len(presentationbinning),presentationbinning[0],presentationbinning[-1]],selection_response+weight,MCGenStyle,Label),binning)
 	#print varbinning
 
-	print selection
-	print selection_response
+	#print selection
+	#print selection_response
 	# WJets Gen + Reco
 	h_gen_WJets=CreateHisto('h_gen_WJets','W+Jets [Truth]',t_WJets_MG,genvariable,varbinning,selection_response+weight,MCGenStyle,Label)
 	h_rec_WJets=CreateHisto('h_rec_WJets','W+Jets [Reco]',t_WJets_MG,recovariable,varbinning,selection_response+weight,MCRecoStyle,Label)
@@ -720,13 +733,12 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	#print '********************',h_rec_WJets.Integral(),h_rec_PseudoData.Integral()
 	#sys.exit()
 	
-
 	## Rescaling Factor Calculation
 	SM = [h_rec_WJets,h_rec_DiBoson,h_rec_ZJets,h_rec_TTBar,h_rec_SingleTop,h_rec_QCDMu]
 	SMInt = sum(k.Integral() for k in SM)
-	print SMInt
-	print h_rec_Data.GetEntries()
-	print h_rec_Data.Integral()
+	#print SMInt
+	#print h_rec_Data.GetEntries()
+	#print h_rec_Data.Integral()
 	#sys.exit()
 	mcdatascale = (1.0*(h_rec_Data.GetEntries()))/SMInt
 	genmcscale = (h_rec_WJets.Integral()/h_gen_WJets.Integral())
@@ -752,8 +764,6 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	#h_gen_WJets.SetMaximum(2.0*h_gen_WJets.GetMaximum())
 	#h_gen_WJets.SetMinimum(0.6*h_gen_WJets.GetMinimum())
 	h_rec_WJets.Draw("SAME")
-
-
 
 	# Create Legend
 	FixDrawLegend(c1.cd(2).BuildLegend())
@@ -812,7 +822,6 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	for x in bounds:
 		x.SetLineStyle(2)
 		x.Draw("SAME")
-	
 	##############################################################################
 	#######      Top Right Addition  - UnFolded Distribution               #######
 	##############################################################################	
@@ -831,6 +840,7 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	if tau_override>0:
 		tau=tau_override
 	else:
+		#tau=2
 		tau = FindOptimalTauWithPseudoExp(Params,varbinning,should_offset)
 
 	[h_unf_Data,h_dd,h_sv,optimal_tau,optimal_i] = GetSmartSVD(h_rec_Data2,Params, varbinning,tau)
@@ -852,7 +862,6 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	h_rec_Data2.Draw("EPSAME")
 	h_unf_Data_pseudo.Draw("EPSAME")
 
-	
 	FixDrawLegend(c1.cd(2).BuildLegend())
 
 	CompMin = 99999999999999
@@ -1004,30 +1013,58 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	return [tau,DataBinInfo,MCBinInfo]
 
 
+
+import csv
+from itertools import izip
+
 def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar):
 
-	[tau,data_standard,mc_standard]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,-1,'standard')
-	
-	[null,data_pileup_plus,mc_pileup_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysplus8'),optvar,NormalDirectory,tau,'pileup_plus')
-	[null,data_pileup_minus,mc_pileup_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysminus8'),optvar,NormalDirectory,tau,'pileup_minus')
+	[tau,data_standard,mc_standard]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,'',-1,'standard')
 
-
-	[null,data_jetscale_plus,mc_jetscale_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetScaleUpDirectory,tau,'jetscale_plus')
-	[null,data_jetscale_minus,mc_jetscale_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetScaleDownDirectory,tau,'jetscale_minus')
-	[null,data_jetsmear,mc_jetsmear]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetSmearDirectory,tau,'jetsmear')
-
-	[null,data_muscale_plus,mc_muscale_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuScaleUpDirectory,tau,'muscale_plus')
-	[null,data_muscale_minus,mc_muscale_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuScaleDownDirectory,tau,'muscale_minus')
-	[null,data_musmear,mc_musmear]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuSmearDirectory,tau,'musmear')	
+	[null,data_scale_plus,mc_scale_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,'ScaleUp',tau,'scaleup')
+	[null,data_scale_minus,mc_scale_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,'ScaleDown',tau,'scaledown')
+	[null,data_match_plus,mc_match_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,'MatchUp',tau,'matchup')
+	[null,data_match_minus,mc_match_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,'MatchDown',tau,'matchdown')
 	
 	
-	data_table=[['|','Bin','|','Prediction','|','DataMean','|','PU(+)','PU(-)','|','JScale(+)','JScale(-)','JetSmear','|','MuScale(+)','MuScale(-)','MuSmear','|']]
+	[null,data_pileup_plus,mc_pileup_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysplus8'),optvar,NormalDirectory,'',tau,'pileup_plus')
+	[null,data_pileup_minus,mc_pileup_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('central','sysminus8'),optvar,NormalDirectory,'',tau,'pileup_minus')
+
+	[null,data_lumi_plus,mc_lumi_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('4980','5090'),optvar,NormalDirectory,'',tau,'lumi_plus')
+	[null,data_lumi_minus,mc_lumi_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight.replace('4980','4870'),optvar,NormalDirectory,'',tau,'lumi_minus')
+
+
+	[null,data_jetscale_plus,mc_jetscale_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetScaleUpDirectory,'',tau,'jetscale_plus')
+	[null,data_jetscale_minus,mc_jetscale_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetScaleDownDirectory,'',tau,'jetscale_minus')
+	[null,data_jetsmear,mc_jetsmear]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,JetSmearDirectory,'',tau,'jetsmear')
+
+	[null,data_muscale_plus,mc_muscale_plus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuScaleUpDirectory,'',tau,'muscale_plus')
+	[null,data_muscale_minus,mc_muscale_minus]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuScaleDownDirectory,'',tau,'muscale_minus')
+	[null,data_musmear,mc_musmear]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,MuSmearDirectory,'',tau,'musmear')	
+
+
+	
+	data_table=[['|','Bin','|','Prediction','|','DataMean','|','PU(+)','PU(-)','|','Lumi(+)','Lumi(-)','|','JScale(+)','JScale(-)','JetSmear','|','MuScale(+)','MuScale(-)','MuSmear','|','Scale(+)','Scale(-)','Match(+)','Match(-)','|']]
 	for x in range(len(data_standard)):
 		thisbin=(data_standard[x])[0]
 		center = (data_standard[x])[1]
 		prediction = (mc_standard[x])[1]
+
+		scale_up = (data_scale_plus[x])[1]
+		scale_down = (data_scale_minus[x])[1]
+		match_up = (data_match_plus[x])[1]
+		match_down = (data_match_minus[x])[1]		
+
+		#scale_up = '--'
+		#scale_down = '--'
+		#match_up = '--'
+		#match_down = '--'			
+
 		pu_up = (data_pileup_plus[x])[1]
 		pu_down = (data_pileup_minus[x])[1]
+
+		lumi_up = (data_lumi_plus[x])[1]
+		lumi_down = (data_lumi_minus[x])[1]
 		
 		jet_up = (data_jetscale_plus[x])[1]
 		jet_down = (data_jetscale_minus[x])[1]
@@ -1036,29 +1073,393 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,present
 		mu_up = (data_muscale_plus[x])[1]
 		mu_down = (data_muscale_minus[x])[1]
 		mu_smear = (data_musmear[x])[1]
-		
-		for v in ['pu_up','pu_down','jet_up','jet_down','jet_smear','mu_up','mu_down','mu_smear']:
+
+
+		for v in ['pu_up','pu_down','jet_up','jet_down','jet_smear','mu_up','mu_down','mu_smear','lumi_up','lumi_down']:
 			exec(v+'='+v+'.split("+-")[0]')
 		
-		data_table.append(['|',thisbin,'|',prediction,'|',center,'|',pu_up,pu_down,'|',jet_up,jet_down,jet_smear,'|',mu_up,mu_down,mu_smear,'|'])
+		data_table.append(['|',thisbin,'|',prediction,'|',center,'|',pu_up,pu_down,'|',lumi_up,lumi_down,'|',jet_up,jet_down,jet_smear,'|',mu_up,mu_down,mu_smear,'|',scale_up,scale_down,match_up,match_down,'|'])
 	
 	f = open('table_tmp.txt','w')
+	
 	for line in data_table:
 		line=str(line)
 		line=line.replace('[','')
 		line=line.replace(']','')
 		line=line.replace('\'','')
 		line=line.replace('\t',' ')
-		for x in range(5):
-			line=line.replace('  ','')
+		#line=line.replace('|','-')
+
+		for x in range(10):
+			line=line.replace('  ',' ')
 
 		f.write(line+'\n')
 	f.close()
 	
+
+	#a = izip(*csv.reader(open("table_tmp.csv", "rb")))
+	#csv.writer(open("table_tmp_out.csv", "wb")).writerows(a)
+	##os.system('mv table_tmp_out.csv table_tmp.txt')
+	
+	#f_fin=open('table_tmp.txt','w')
+	#L=0
+	#C=0
+	#for line in open('table_tmp_out.csv','r'):
+		#if len(line)>L:
+			#L=len(line)
+	
+	#for line in open('table_tmp_out.csv','r'):
+		#if '|' in line:
+			#line=L*'-'
+		#f_fin.write(line)
+	#f_fin.close()
+	#os.system('rm table_tmp_out.csv')
+	
+	
 	os.system('cat table_tmp.txt | column -t -s"," > pyplots/'+recovariable+'.txt')
 	os.system('rm table_tmp.txt')
+
+
+from glob import *
+
+def tabletolist(table):
+	output=[]
+	Nvertical=0
+	Nhorizontal=0
+	
+	for line in open(table,'r'):
+		line=line.replace('|','')
+		line=line.replace('\t',' ')
+		line=line.replace(' +- ','+-')
+		line=line.replace(' - ','-')
+		line=line.replace('\n','')
+		
+		for x in range(20):
+			line=line.replace('  ',' ')
+			if line[0]==' ':
+				line=line[1:]
+			if line[-1]==' ':
+				line=line[:-2]
+		line=line.split(' ')
+		output.append(line)
+		Nvertical += 1
+	Nhorizontal = len(output[0])
+	#print output
+	return [Nvertical,Nhorizontal,output]
+
+def getcell(listedtable,V,H):
+	Nvertical = listedtable[0]
+	Nhorizontal=listedtable[1]
+	table=listedtable[2]
+	if V>=Nvertical or H>=Nhorizontal:
+		return 'NA'
+	content = table[V][H]
+	
+	return content
+	
+def getbinning(listedtable):
+	element = ''
+	contents=[]
+	n=0
+	while True:
+		n+= 1
+		element =getcell(listedtable,n,0) 
+		if element=='NA':
+			break
+		contents.append(element)
+	binning = []
+	for c in contents:
+		edges=c.split('-')
+		for e in edges:
+			if float(e) not in binning:
+				binning.append(float(e))
+	texcontents = ['$ '+ c+ ' $' for c in contents]
+	return [texcontents,binning]
+
+def getcolumn(listedtable,column):
+	element = ''
+	contents=[]
+	n=0
+	while True:
+		n+= 1
+		element =getcell(listedtable,n,column) 
+		if element=='NA':
+			break
+		contents.append(element)	
+	mean = []
+	error=[]
+	for c in contents:
+		if '+-' in c:
+			m,e = float(c.split('+-')[0]), float(c.split('+-')[1])
+		else:
+			m,e = float(c),0.0
+		mean.append(m)
+		error.append(e)
+	texcontents=[ '$ ' +c.replace('+-', '\pm')+' $' for c in contents]
+	return [texcontents,mean,error]
+import math
+def getmeasurement(listedtable):
+	[meas_tex, meas_mean, meas_staterr] = getcolumn(listedtable,2)
+	m=3
+	variations=[]
+	while True:
+		[null, variation, variation_staterr] = getcolumn(listedtable,m)
+		#print variation
+		if 'NA' in str(variation) or len(str(variation)) < 5:
+			break
+		variations.append(variation)
+		m+=1
+
+	num = len(variations[0])
+	
+	tex = []
+	means=[]
+	err_plus=[]
+	err_minus=[]
+	
+	for n in range(num):
+		plus_err = []
+		minus_err = []
+		mean = meas_mean[n]
+		errors=[]
+		for v in range(len(variations)):
+			if mean>0:
+				errors.append((variations[v][n] - mean)/mean)
+			else: 
+				errors.append(0)
+		#print mean,errors
+		
+		filtered_errors=[]
+		def filter_pair(values):
+			output = []
+			if values[0] * values[1] < 0:
+				return values
+			else:
+				if abs(values[0]) > abs(values[1]):
+					return [values[0]]
+				else:
+					return [values[1]]
+			
+		PUerrors = filter_pair([errors[0],errors[1]])
+		LUMIerrors=filter_pair([errors[2],errors[3]])
+		JESerrors=filter_pair([errors[4],errors[5]])
+		JERerrors=[errors[6]]
+		MESerrors=filter_pair([errors[7],errors[8]])
+		MERerrors=[errors[9]]
+		SCALEerrors=filter_pair([errors[10],errors[11]])
+		MATCHerrors=filter_pair([errors[12],errors[13]])
+		
+		allerrors=PUerrors+LUMIerrors+JESerrors+JERerrors+MESerrors+MERerrors+SCALEerrors+MATCHerrors
+		
+		pos_error = 0
+		neg_error = 0
+		for x in allerrors:
+			if x>0:
+				pos_error += x*x
+			if x<0:
+				neg_error += x*x
+		pos_error = float(str(round(mean*math.sqrt(pos_error),2)))
+		neg_error = float(str(round(-mean*math.sqrt(neg_error),2)))
+		
+		#print  mean, pos_error,neg_error
+		
+		tex.append('$ ' + str(mean) +'_{'+ str(neg_error) +'}'+'^{+'+str(pos_error)  +'}'  ' $')
+		means.append(mean)
+		err_plus.append(pos_error)
+		err_minus.append(neg_error) 
+		
+	return [tex,means,err_plus, err_minus]
+
+def TexTableFromColumns(columns):
+	global_length = len(columns[0])
+	for c in columns:
+		if len(c) != global_length:
+			return 'ERROR: Columns not of equal length!!!'
+	table = '\n'
+	for x in range(global_length):
+		line=''
+		for c in columns:
+			line+=c[x] + ' ,& '
+			
+		line+='\n'
+		line=line.replace('& \n',' \\\\\n')
+		table+= line
+	table+='\n'
+	return table	
+
+def StringToFile(string,file, spacer):
+	f = open(file,'w')
+	for line in string:
+		f.write(line)
+	f.close()
+	
+	if spacer != '':
+		os.system('cat '+file+' | column -t -s"'+spacer+'" > '+file+'edit')
+		os.system('mv '+file+'edit '+file)
+		
+	print 'File ', file, ' has been written.'
+
+def NormalizeTexTable(file,norm):
+	nums='.0123456789'
+	
+	def IsNumber(Character):
+		if Character in nums:
+			return True
+		else:
+			return False
+	newtable=''
+	for line in open(file):
+		line=line.split('&')
+		#print line
+		newline = ''
+		for element in range(len(line)):
+			if element==0:
+				newline += line[element]
+				continue
+			element = line[element]
+			isnumber=False
+			runningnumber=''
+			
+			for x in element:
+				isnumber = IsNumber(x)
+				if (isnumber):
+					runningnumber+=x
+				else: 
+					if runningnumber!='':
+						runningnumber = str(round(float(runningnumber)/norm,2))
+						newline+=runningnumber
+						runningnumber=''
+						newline += x
+					else:
+						newline+=x
+						#print newline
+				#print newline
+			newline += ' ,& '
+		newline = newline.replace('\n ,& ','\n')
+		newtable += newline
+	return newtable
+
+from array import array
+
+def CreateHistoFromLists(binning, name, label, mean, up, down, style):
+	binset=ConvertBinning(binning)
+	n = len(binset)-1
+	htest= TH1D('htest','htest',n,array('d',binset))
+
+	X = []
+	Y = []
+	Xplus=[]
+	Xminus=[]
+	Yplus=[]
+	Yminus=[]
+	
 	
 
+	for x in range(len(binset)-1):
+		c = htest.GetBinCenter(x+1)
+		d = 0.5*htest.GetBinWidth(x+1)
+		center = mean[x]
+		upper = up[x]
+		lower=down[x]
+		
+		X.append(c)
+		Xplus.append(abs(d))
+		Xminus.append(abs(d))
+		
+		Y.append(center)
+		Yplus.append(abs(upper))
+		Yminus.append(abs(lower))
+		
+		print c-d,' -- ', c+d, '   ', center, upper, lower
+	
+	X = array("d", X)
+	Xplus = array("d", Xplus)
+	Xminus = array("d", Xminus)
+
+
+	Y = array("d", Y)
+	Yplus = array("d", Yplus)
+	Yminus = array("d", Yminus)	
+
+	hout = TGraphAsymmErrors(n,X,Y,Xminus,Xplus,Yminus,Yplus)
+	
+	#hout.SetFillStyle(style[0])
+	#hout.SetMarkerStyle(style[1])
+	#hout.SetMarkerSize(style[2])
+	#hout.SetLineWidth(style[3])
+	#hout.SetMarkerColor(style[4])
+	#hout.SetLineColor(style[4])
+	#hout.SetFillColor(style[4])
+	#hout.SetFillColor(style[4])
+	##hout.SetMaximum(2.0*hout.GetMaximum())
+	#hout.GetXaxis().SetTitle(label[0])
+	#hout.GetYaxis().SetTitle(label[1])
+	#hout.GetXaxis().SetTitleFont(132)
+	#hout.GetYaxis().SetTitleFont(132)
+	#hout.GetXaxis().SetLabelFont(132)
+	#hout.GetYaxis().SetLabelFont(132)
+	return hout
+
+def FinalHisto(binning, label, quantity, filename ,expectation_means, expectation_errors, expectation_names, measurement, measurement_error_up, measurement_error_down, normalization):
+
+	c1 = TCanvas("c1","",700,500)
+	gStyle.SetOptStat(0)
+	MadGraphStyle=[0,20,.00001,1,4]
+	DataRecoStyle=[0,20,.7,1,1]	
+	
+	if normalization==0:
+		label = [label, 'Events/Bin']
+	else:
+		label = [label, 'd#sigma/d'+quantity+' [pb/GeV]']
+	
+	for x in range(len(expectation_names)):
+		name = expectation_names[x]
+		mean_value = expectation_means[x]
+		plus_errors = expectation_errors[x]
+		minus_errors = expectation_errors[x]
+		style=MadGraphStyle
+		Exp = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style)
+		print Exp
+		Exp.Print()
+		Exp.Draw("ALP")
+		#break
+
+	c1.Print('pyplots/draft.pdf')
+	c1.Print('pyplots/draft.png')
+
+		
+		
+def ParseTablesToFinalResults():
+	allfiles = glob('pyplots/*txt')
+	for f in allfiles:
+		if 'FINAL' in f:
+			continue
+		output = f.replace('.txt','FINAL.')
+		table = tabletolist(f)
+
+		[tablebinning,rootbinning] = getbinning(table)
+		[pred_tex, pred_mean, pred_err] = getcolumn(table,1)
+		[meas_tex, meas_mean, meas_err_plus, meas_err_minus] = getmeasurement(table)
+		
+		StringToFile(TexTableFromColumns([tablebinning,pred_tex,meas_tex]), output+'TexCount.txt', ',') 
+		StringToFile(NormalizeTexTable(output+'TexCount.txt',4980.0), output+'TexXSec.txt',',')
+
+		prediction_means = [pred_mean]
+		prediction_errors = [pred_err]
+		prediction_names = ['MADGRAPH']
+		
+		label = f.split('/')[-1]
+		label = f.split('.')[0]
+		
+		quantity = ' BLANK '
+		
+		if label=='Pt_pfjet1':
+			label = '1^{st} jet p_{T} (GeV)'
+			quantity = 'p_T'
+		
+		FinalHisto(rootbinning,label,quantity, output+'Plot.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,0)
+
+		os.system('cat pyplots/Pt_pfjet1FINAL.TexCount.txt')
 
 main()
 
