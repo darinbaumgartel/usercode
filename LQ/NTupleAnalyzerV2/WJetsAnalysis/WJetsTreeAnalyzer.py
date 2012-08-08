@@ -1403,6 +1403,7 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style):
 def FinalHisto(binning, label, quantity, filename ,expectation_means, expectation_errors, expectation_names, measurement, measurement_error_up, measurement_error_down, normalization):
 
 	c1 = TCanvas("c1","",700,500)
+	c1.SetGrid()
 	gStyle.SetOptStat(0)
 	MadGraphStyle=[0,20,.00001,1,4]
 	DataRecoStyle=[0,20,.7,1,1]	
@@ -1421,7 +1422,7 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 		Exp = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style)
 		print Exp
 		Exp.Print()
-		Exp.Draw("ALP")
+		Exp.Draw("AP")
 		#break
 
 	c1.Print('pyplots/draft.pdf')
