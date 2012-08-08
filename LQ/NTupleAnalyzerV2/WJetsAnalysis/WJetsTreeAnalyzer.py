@@ -34,8 +34,18 @@ def main():
 	selection = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50)*(MT_muon1MET<110)'
 	weight = '*weight_pu_central*4980*0.92'
 	
-	#FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection+j1,weight,'v')
+
+	FullAnalysisWithUncertainty('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c')	
+	FullAnalysisWithUncertainty('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,50,150],[60,65,70,75,80,85,90,95,100,110,130],selection,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[30,40,50,60,80,90,100,130,160,190,250,350],selection,weight,'v')
 		
+	FullAnalysisWithUncertainty('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j1,weight,'c')
+	FullAnalysisWithUncertainty('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j2,weight,'c')
+
+	
+	
 		
 	ParseTablesToFinalResults()	
 		
@@ -1341,7 +1351,7 @@ def NormalizeTexTable(file,norm):
 
 from array import array
 
-def CreateHistoFromLists(binning, name, label, mean, up, down, style):
+def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalization):
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
 	htest= TH1D('htest','htest',n,array('d',binset))
@@ -1353,7 +1363,10 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style):
 	Yplus=[]
 	Yminus=[]
 	
-	
+	if normalization==0:
+		N=1.0
+	else:
+		N=normalization
 
 	for x in range(len(binset)-1):
 		c = htest.GetBinCenter(x+1)
@@ -1366,9 +1379,9 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style):
 		Xplus.append(abs(d))
 		Xminus.append(abs(d))
 		
-		Y.append(center)
-		Yplus.append(abs(upper))
-		Yminus.append(abs(lower))
+		Y.append(center/N)
+		Yplus.append(abs(upper)/N)
+		Yminus.append(abs(lower)/N)
 		
 		print c-d,' -- ', c+d, '   ', center, upper, lower
 	
@@ -1383,35 +1396,44 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style):
 
 	hout = TGraphAsymmErrors(n,X,Y,Xminus,Xplus,Yminus,Yplus)
 	
-	#hout.SetFillStyle(style[0])
-	#hout.SetMarkerStyle(style[1])
-	#hout.SetMarkerSize(style[2])
-	#hout.SetLineWidth(style[3])
-	#hout.SetMarkerColor(style[4])
-	#hout.SetLineColor(style[4])
-	#hout.SetFillColor(style[4])
-	#hout.SetFillColor(style[4])
-	##hout.SetMaximum(2.0*hout.GetMaximum())
-	#hout.GetXaxis().SetTitle(label[0])
-	#hout.GetYaxis().SetTitle(label[1])
-	#hout.GetXaxis().SetTitleFont(132)
-	#hout.GetYaxis().SetTitleFont(132)
-	#hout.GetXaxis().SetLabelFont(132)
-	#hout.GetYaxis().SetLabelFont(132)
+	hout.SetTitle(name)
+	hout.SetFillStyle(style[0])
+	hout.SetMarkerStyle(style[1])
+	hout.SetMarkerSize(style[2])
+	hout.SetLineWidth(style[3])
+	hout.SetMarkerColor(style[4])
+	hout.SetLineColor(style[4])
+	hout.SetFillColor(style[4])
+	hout.SetFillColor(style[4])
+	#hout.SetMaximum(2.0*hout.GetMaximum())
+	hout.GetXaxis().SetTitle(label[0])
+	hout.GetYaxis().SetTitle(label[1])
+	hout.GetXaxis().SetTitleFont(132)
+	hout.GetYaxis().SetTitleFont(132)
+	hout.GetXaxis().SetLabelFont(132)
+	hout.GetYaxis().SetLabelFont(132)
 	return hout
 
 def FinalHisto(binning, label, quantity, filename ,expectation_means, expectation_errors, expectation_names, measurement, measurement_error_up, measurement_error_down, normalization):
 
 	c1 = TCanvas("c1","",700,500)
 	c1.SetGrid()
+	c1.cd(1).SetLogy()
 	gStyle.SetOptStat(0)
-	MadGraphStyle=[0,20,.00001,1,4]
+	MadGraphStyle=[1001,20,.00001,1,4]
 	DataRecoStyle=[0,20,.7,1,1]	
+	
+	
+	
+	Max = max(measurement)*2
+	Min = min(measurement)*.5
 	
 	if normalization==0:
 		label = [label, 'Events/Bin']
 	else:
 		label = [label, 'd#sigma/d'+quantity+' [pb/GeV]']
+		Max=Max/normalization
+		Min=Min/normalization
 	
 	for x in range(len(expectation_names)):
 		name = expectation_names[x]
@@ -1419,14 +1441,42 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 		plus_errors = expectation_errors[x]
 		minus_errors = expectation_errors[x]
 		style=MadGraphStyle
-		Exp = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style)
-		print Exp
+		Exp = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
 		Exp.Print()
-		Exp.Draw("AP")
-		#break
 
-	c1.Print('pyplots/draft.pdf')
-	c1.Print('pyplots/draft.png')
+		Exp.SetMaximum(Max)
+		Exp.SetMinimum(Min)
+
+		if x==0:
+			Exp.Draw("A2")
+		else:
+			Exp.Draw("2")
+	
+	name="Measured"
+	mean_value = measurement
+	plus_errors=measurement_error_up
+	minus_errors=measurement_error_down
+	style=DataRecoStyle
+	Meas = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
+	
+	Meas.Draw("P")
+
+	FixDrawLegend(c1.cd(1).BuildLegend())
+	
+	sqrts = "#sqrt{s} = 7 TeV";
+	l1=TLatex()
+	l1.SetTextAlign(12)
+	l1.SetTextFont(132)
+	l1.SetNDC()
+	l1.SetTextSize(0.04)
+ 
+	l1.DrawLatex(0.67,0.63,"CMS 2011")
+	l1.DrawLatex(0.67,0.58,sqrts)
+	l1.DrawLatex(0.67,0.53,"PRELIMINARY")
+
+
+	c1.Print(filename+'pdf')
+	c1.Print(filename+'png')
 
 		
 		
@@ -1450,15 +1500,40 @@ def ParseTablesToFinalResults():
 		prediction_names = ['MADGRAPH']
 		
 		label = f.split('/')[-1]
-		label = f.split('.')[0]
+		label = label.split('.')[0]
 		
 		quantity = ' BLANK '
 		
 		if label=='Pt_pfjet1':
-			label = '1^{st} jet p_{T} (GeV)'
-			quantity = 'p_T'
+			label = 'Leading Jet p_{T} [GeV]'
+			quantity = 'p_{T}'
+
+		if label=='Pt_pfjet2':
+			label = 'Second Leading Jet p_{T} [GeV]'
+			quantity = 'p_{T}'
+			
+		if label=='Eta_pfjet2':
+			label = 'Leading Jet #eta'
+			quantity = '#eta'
+			
+		if label=='Eta_pfjet2':
+			label = 'Second Leading Jet #eta'
+			quantity = '#eta'						
+
+		if label=='PFJet40Count':
+			label = 'Jet Count (Exclusive)'
+			quantity = 'N_{Jet}'
+
+		if label=='MT_muon1MET':
+			label = 'M_{T}(#mu,E_{T}^{miss}) [GeV]'
+			quantity = 'M_{T}'
+
+		if label=='Pt_MET':
+			label = 'E_{T}^{miss} [GeV]'
+			quantity = 'E_{T}^{miss}'
 		
-		FinalHisto(rootbinning,label,quantity, output+'Plot.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,0)
+		FinalHisto(rootbinning,label,quantity, output+'PlotCount.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,0)
+		FinalHisto(rootbinning,label,quantity, output+'PlotXSec.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,4980.0)
 
 		os.system('cat pyplots/Pt_pfjet1FINAL.TexCount.txt')
 
