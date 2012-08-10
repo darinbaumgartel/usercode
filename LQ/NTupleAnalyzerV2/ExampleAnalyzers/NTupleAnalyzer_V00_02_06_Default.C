@@ -87,46 +87,82 @@ Double_t F_U2Prime(Double_t P)
 	return gRandom->Gaus(newU2,newsU2);
 }
 
+//int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso, double e_losthits )
+//{
+	//int isgood = 1;
+
+	//if (e_pt_real<40.0) isgood = 0; // OK
+	//if (e_pt<40.0) isgood = 0; // OK
+	////if (fabs(e_eta) > 1.442 && fabs(e_eta) < 1.560) isgood = 0;
+	//if (fabs(e_eta) > 2.50) isgood = 0; //OK
+	//if (!e_ecaldriven) isgood = 0; //OK
+	//if (fabs(e_dphi_sc) > 0.06) isgood = 0; //OK
+	//if (e_hoe > 0.05) isgood = 0; //OK
+	//if (e_losthits != 0) isgood = 0;
+	////bool barrel = (fabs(e_eta) < 1.442);
+	//bool barrel = (fabs(e_eta) < 1.560); //OK
+	//bool endcap = (fabs(e_eta) > 1.560 && fabs(e_eta) < 2.5); //OK
+	
+	//if (barrel)
+	//{
+		//if (fabs(e_deta_sc) > 0.005) isgood = 0; // OK
+		//if (( e_e1x5_over_5x5 < 0.83)&&( e_e2x5_over_5x5 < 0.94 )) isgood = 0; // OK
+		//if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0; //OK
+		//if (e_trkiso > 5) isgood = 0; //OK
+	//}
+	
+	//if (endcap)
+	//{
+		//if (fabs(e_deta_sc)> 0.007) isgood = 0; //OK
+		//if (fabs(e_sigmann) > 0.03) isgood = 0; //OK
+		//if ((e_pt < 50.0) && ( e_em_had1iso >  2.5 )) isgood = 0; //OK
+		//if ((e_pt >= 50.0) && ( e_em_had1iso > ( 2.5 + 0.03*(e_pt-50.0) ))) isgood = 0; // OK
+		////if ( e_had2iso > 0.5 ) isgood = 0;
+		//if (e_trkiso > 5.0) 	isgood = 0; // OK
+	//}
+	
+	//return isgood;
+//}
+			
+
 int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso, double e_losthits )
 {
 	int isgood = 1;
 
 	if (e_pt_real<40.0) isgood = 0; // OK
-	if (e_pt<40.0) isgood = 0; // OK
-	//if (fabs(e_eta) > 1.442 && fabs(e_eta) < 1.560) isgood = 0;
-	if (fabs(e_eta) > 2.50) isgood = 0; //OK
 	if (!e_ecaldriven) isgood = 0; //OK
-	if (fabs(e_dphi_sc) > 0.06) isgood = 0; //OK
+	if (fabs(e_dphi_sc) > 0.09) isgood = 0; //OK
 	if (e_hoe > 0.05) isgood = 0; //OK
 	if (e_losthits != 0) isgood = 0;
-	//bool barrel = (fabs(e_eta) < 1.442);
-	bool barrel = (fabs(e_eta) < 1.560); //OK
+	bool barrel = (fabs(e_eta) < 1.442); //OK
 	bool endcap = (fabs(e_eta) > 1.560 && fabs(e_eta) < 2.5); //OK
+	
+	if ((!barrel)&&(!endcap)) isgood = 0;
 	
 	if (barrel)
 	{
+		if (e_pt<35.0) isgood = 0; // OK
 		if (fabs(e_deta_sc) > 0.005) isgood = 0; // OK
 		if (( e_e1x5_over_5x5 < 0.83)&&( e_e2x5_over_5x5 < 0.94 )) isgood = 0; // OK
 		if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0; //OK
-		if (e_trkiso > 5) isgood = 0; //OK
+		if (e_trkiso > 7.5) isgood = 0; //OK
 	}
 	
 	if (endcap)
 	{
+		if (e_pt<40.0) isgood = 0; // OK	
 		if (fabs(e_deta_sc)> 0.007) isgood = 0; //OK
 		if (fabs(e_sigmann) > 0.03) isgood = 0; //OK
 		if ((e_pt < 50.0) && ( e_em_had1iso >  2.5 )) isgood = 0; //OK
 		if ((e_pt >= 50.0) && ( e_em_had1iso > ( 2.5 + 0.03*(e_pt-50.0) ))) isgood = 0; // OK
-		//if ( e_had2iso > 0.5 ) isgood = 0;
-		if (e_trkiso > 5.0) 	isgood = 0; // OK
+		if ( e_had2iso > 0.5 ) isgood = 0;
+		if (e_trkiso > 15.0) 	isgood = 0; // OK
 	}
 	
-	
 	return isgood;
-	
-	
 }
-			
+
+
 
 // Boolean switches for Recoil and Smearing corrections, False by default.
 bool DoRecoilCorrections = false;
