@@ -53,7 +53,8 @@ return 1.0;
 Double_t GetRecoGenJetScaleFactor(Double_t RecoPT,Double_t GenPT, Double_t SmearFactor)
 {
 	Double_t deltaPT = ((RecoPT-GenPT)*SmearFactor);
-	return (RecoPT+deltaPT)/RecoPT;
+	if (SmearFactor>0)	return (GenPT+deltaPT)/RecoPT;
+	else return 1.0;
 }
 
 
@@ -105,7 +106,7 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 	if (barrel)
 	{
 		if (fabs(e_deta_sc) > 0.005) isgood = 0; // OK
-		if (( e_e1x5_over_5x5 > 0.83)&&( e_e2x5_over_5x5 > 0.94 )) isgood = 0; // OK
+		if (( e_e1x5_over_5x5 < 0.83)&&( e_e2x5_over_5x5 < 0.94 )) isgood = 0; // OK
 		if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0; //OK
 		if (e_trkiso > 5) isgood = 0; //OK
 	}
@@ -160,6 +161,7 @@ void placeholder::Loop()
 	BRANCH(TrackerIsoSumPT_muon1);
 	BRANCH(DeltaPtOverPt_muon1); 
 	BRANCH(BackToBackCompatibility_muon1); BRANCH(CosmicCompatibility_muon1);
+	BRANCH(PrimaryVertexIP_muon1);
 	
 	// Leading muon 2
 	BRANCH(TrkD0_muon2);     BRANCH(NHits_muon2);   BRANCH(TrkDZ_muon2);   BRANCH(ChiSq_muon2);
@@ -169,7 +171,7 @@ void placeholder::Loop()
 	BRANCH(TrackerIsoSumPT_muon2);
 	BRANCH(DeltaPtOverPt_muon2); 
 	BRANCH(BackToBackCompatibility_muon2); BRANCH(CosmicCompatibility_muon2);
-
+	BRANCH(PrimaryVertexIP_muon2);
 
 	// PFJet 1
 	BRANCH(Phi_pfjet1); BRANCH(Eta_pfjet1); BRANCH(Pt_pfjet1); BRANCH(BDisc_pfjet1);
@@ -177,6 +179,8 @@ void placeholder::Loop()
 	BRANCH(PFJetNeutralEmEnergyFraction_pfjet1);     BRANCH(PFJetChargedMultiplicity_pfjet1);
 	BRANCH(PFJetChargedHadronEnergyFraction_pfjet1); BRANCH(PFJetChargedEmEnergyFraction_pfjet1);
 	BRANCH(PFJetTrackAssociatedVertex_pfjet1);
+	BRANCH(PFJetN90Matched_pfjet1); BRANCH(PFJetN90Matched_pfjet2); 
+	BRANCH(PFJetHighestN90);
 
 	// PFJet 2
 	BRANCH(Phi_pfjet2); BRANCH(Eta_pfjet2); BRANCH(Pt_pfjet2); BRANCH(BDisc_pfjet2);
@@ -329,7 +333,7 @@ void placeholder::Loop()
 	BRANCH(LowestUnprescaledTriggerPass); BRANCH(Closest40UnprescaledTriggerPass);
 	BRANCH(HLTIsoMu24Pass);
 	BRANCH(HLTMu40TriggerPass);
-
+	BRANCH(Rand1); BRANCH(Rand2); BRANCH(Rand3);
 	//===================================================================================================
 	//===================================================================================================
 
@@ -378,6 +382,10 @@ void placeholder::Loop()
 		if (!isData) extraweight = Weight;
 		
 		weight = extraweight*lumi*xsection/Events_Orig;
+
+		Rand1 = rr->Rndm();
+		Rand2 = rr->Rndm();
+		Rand3 = rr->Rndm();
 
 		//========================     JSON   Conditions   ================================//
 
@@ -896,7 +904,7 @@ void placeholder::Loop()
 		}
 		//std::cout<<LowestUnprescaledTriggerPass<<"  "<<LowestUnprescaledTrigger<<"              "<<Closest40UnprescaledTrigger<<"  "<<Closest40UnprescaledTriggerPass<<std::endl;
 		
-		
+
 		//========================     Jet Rescaling / Smearing Sequence   ================================//
 
 		TLorentzVector JetAdjustedMET;
@@ -986,25 +994,25 @@ void placeholder::Loop()
 				//if ((SmallestDeltaR<0.5)&&(ijet==0)) difraw += ((ClosestGenJetPT - (PFJetPtRaw->at(ijet)))*(ClosestGenJetPT - (PFJetPtRaw->at(ijet))));
 
 				//if ((SmallestDeltaR<0.5)&&(ijet==0)) std::cout<<difreg<<"  "<<difraw<<std::endl;
-				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
-				NewJetPT *=JetAdjustmentFactor;
-
-				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+				//Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
+				//NewJetPT *=JetAdjustmentFactor;
 
 				//std::cout<<SmallestDeltaR<<"   "<<ClosestGenJetPT<<"   "<<(*PFJetPt)[ijet]<<"   "<<NewJetPT<<"        "<<(*PFMET)[0]<<"   "<<JetAdjustedMET.Pt()<<std::endl;
 		
-				if (JetSmearFactor > 0.0){
+				if (JetSmearFactor > 0.0 && SmallestDeltaR<0.4){
 
 					Double_t JetEta = fabs(PFJetEta->at(ijet));
 					Double_t Systematic_rescale = 	JERFactor(JetEta);				
 					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Systematic_rescale);
 					NewJetPT *=JetAdjustmentFactorSys;
-				
 				}
-				std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
+
+
+				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+
 				
 				//std::cout<<SmallestDeltaR<<"   "<<ClosestGenJetPT<<"   "<<(*PFJetPt)[ijet]<<"   "<<NewJetPT<<"        "<<(*PFMET)[0]<<"   "<<JetAdjustedMET.Pt()<<std::endl;
-
+				//std::cout<<((*PFJetPt)[ijet] - NewJetPT)/((*PFJetPt)[ijet])<<std::endl;
 				(*PFJetPt)[ijet] = NewJetPT ;	
 				//(*PFJetEta)[ijet] = NewJetETA ;	
 				
@@ -1012,10 +1020,12 @@ void placeholder::Loop()
 			}
 		}
 		//std::cout<<(*PFJetPt)[0]<<"  "<<(*PFJetPtRaw)[0]<<std::endl;
-
+		//std::cout<<(*PFMET)[0]<<std::endl;
 		(*PFMET)[0] = JetAdjustedMET.Pt();
 		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
-		std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
+		//std::cout<<(*PFMET)[0]<<std::endl;
+
+		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
 
 		//std::cout<<" ------------------------------------------------ " <<std::endl;
 		//========================     Muon Rescaling / Smearing Sequence   ================================//
@@ -1063,6 +1073,37 @@ void placeholder::Loop()
 		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
 		//std::cout<<" ---------------------------------------------------"<<std::endl;
 
+
+
+
+
+		//========================    CaloJet Extras Conditions   ================================//
+
+		vector<int> PFJetCaloMatches;
+
+
+		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
+		{
+			TLorentzVector ThisPFJet;
+			ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
+			
+			int closestcalojet = -1;
+			Double_t SmallestDeltaR = 9999.9999;
+			for(unsigned int icalojet = 0; icalojet < CaloJetPt->size(); ++icalojet)
+			{
+				if (CaloJetPassLooseID->at(icalojet)!=1) continue;
+				TLorentzVector thisCaloJet;
+				thisCaloJet.SetPtEtaPhiM(CaloJetPt->at(icalojet),CaloJetEta->at(icalojet),CaloJetPhi->at(icalojet),0);
+				Double_t ThisCaloJetDR = fabs((thisCaloJet).DeltaR(ThisPFJet));
+				if (ThisCaloJetDR<SmallestDeltaR) 
+				{
+					SmallestDeltaR = ThisCaloJetDR;
+					closestcalojet = icalojet;
+				}
+			}
+			PFJetCaloMatches.push_back(closestcalojet);
+		}
+		
 		//========================     Electron Conditions   ================================//
 
 		vector<int> v_idx_ele_final;
@@ -1170,6 +1211,8 @@ void placeholder::Loop()
 				MuonGlobalChi2 ->at(imuon) < 10.0 &&                         /// Disable for EWK
 				MuonPixelHitCount ->at(imuon) >=1 &&
 				MuonGlobalTrkValidHits->at(imuon)>=1 ;
+
+
 
 			if ( ! (PassGlobalTightPrompt && PassPOGTight) ) continue;
 			iMUON = imuon;
@@ -1717,7 +1760,7 @@ void placeholder::Loop()
 		VRESET(TrackerIsoSumPT_muon1);
 		VRESET(DeltaPtOverPt_muon1); 
 		VRESET(BackToBackCompatibility_muon1); VRESET(CosmicCompatibility_muon1);
-
+		VRESET(PrimaryVertexIP_muon1);
 
 		// Leading muon 2
 		VRESET(TrkD0_muon2);     VRESET(NHits_muon2);   VRESET(TrkDZ_muon2);   VRESET(ChiSq_muon2);
@@ -1727,6 +1770,7 @@ void placeholder::Loop()
 		VRESET(TrackerIsoSumPT_muon2);
 		VRESET(DeltaPtOverPt_muon2); 
 		VRESET(BackToBackCompatibility_muon2); VRESET(CosmicCompatibility_muon2);
+		VRESET(PrimaryVertexIP_muon2);
 
 
 		// PFJet 1
@@ -1734,6 +1778,8 @@ void placeholder::Loop()
 		VRESET(PFJetNeutralMultiplicity_pfjet1);         VRESET(PFJetNeutralHadronEnergyFraction_pfjet1);
 		VRESET(PFJetNeutralEmEnergyFraction_pfjet1);     VRESET(PFJetChargedMultiplicity_pfjet1);
 		VRESET(PFJetChargedHadronEnergyFraction_pfjet1); VRESET(PFJetChargedEmEnergyFraction_pfjet1);
+		VRESET(PFJetN90Matched_pfjet1); VRESET(PFJetN90Matched_pfjet2); 
+		VRESET(PFJetHighestN90);
 
 		// PFJet 2
 		VRESET(Phi_pfjet2); VRESET(Eta_pfjet2); VRESET(Pt_pfjet2); VRESET(BDisc_pfjet2);
@@ -2045,7 +2091,7 @@ void placeholder::Loop()
 
 			BackToBackCompatibility_muon1 = MuonBackToBackCompatibility->at(v_idx_muon_final[0]);
 			CosmicCompatibility_muon1 = MuonCosmicCompatibility->at(v_idx_muon_final[0]);
-
+			PrimaryVertexIP_muon1 = MuonPrimaryVertexDXY->at(v_idx_muon_final[0]);
 
 			// muon Pt/Eta/Phi
 			Pt_muon1 = MuonPt->at(v_idx_muon_final[0]);
@@ -2099,7 +2145,7 @@ void placeholder::Loop()
 
 			BackToBackCompatibility_muon2 = MuonBackToBackCompatibility->at(v_idx_muon_final[1]);
 			CosmicCompatibility_muon2 = MuonCosmicCompatibility->at(v_idx_muon_final[1]);
-			
+			PrimaryVertexIP_muon2 = MuonPrimaryVertexDXY->at(v_idx_muon_final[1]);			
 
 			// muon Pt/Eta/Phi
 			Pt_muon2 = MuonPt->at(v_idx_muon_final[1]);
@@ -2155,10 +2201,12 @@ void placeholder::Loop()
 			deltaPhi_pfjet1pfMET = (pfMET.DeltaPhi(pfjet1));
 			MT_pfjet1pfMET = TMass(Pt_pfjet1,MET_pf,deltaPhi_pfjet1pfMET);
 			BDisc_pfjet1 = PFJetTrackCountingHighEffBTag->at(v_idx_pfjet_final[0]);
-
+			
+			PFJetN90Matched_pfjet1 = 0.0;
+			if (PFJetCaloMatches[v_idx_pfjet_final[0]] > -1) PFJetN90Matched_pfjet1=1.0*(CaloJetn90Hits->at(PFJetCaloMatches[v_idx_pfjet_final[0]]));
 		}
 
-		//========================   At least 2 PFJET  ================================//
+		//========================   At least 2 PFJET  ================================//e
 
 		if (PFJetCount>=2)
 		{
@@ -2187,6 +2235,13 @@ void placeholder::Loop()
 			deltaR_pfjet1pfjet2 = pfjet1.DeltaR(pfjet2);
 			deltaPhi_pfjet1pfjet2 = (pfjet1.DeltaPhi(pfjet2));
 			M_pfjet1pfjet2 = (pfjet1 + pfjet2).M();
+		
+			PFJetN90Matched_pfjet2 = 0.0;
+			if (PFJetCaloMatches[v_idx_pfjet_final[1]] > -1) PFJetN90Matched_pfjet2=1.0*(CaloJetn90Hits->at(PFJetCaloMatches[v_idx_pfjet_final[1]]));
+			
+			PFJetHighestN90 = PFJetN90Matched_pfjet1;
+			
+			if (PFJetN90Matched_pfjet2 > PFJetN90Matched_pfjet1) PFJetHighestN90 = PFJetN90Matched_pfjet2;
 		}
 
 		//========================   1 Muon 1 Jet ================================//
