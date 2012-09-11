@@ -1,7 +1,6 @@
 import os
 
-# Directory where root files are kept and the tree you want to get root files from
-#NormalDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_StandardMuonDefs_2012_05_25_03_46_08/SummaryFiles/'
+# Directory where root files are kept and the tree you want to get root files from. Normal is for standard analysis, the jet rescaling, jet smearing, muon PT rescaling ,and muon PT smearing. 
 
 NormalDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_2012_07_19_17_35_41/SummaryFiles/'
 JetScaleDownDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_JetScaleDown_2012_07_20_07_48_49/SummaryFiles/'
@@ -11,7 +10,7 @@ MuScaleDownDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyz
 MuScaleUpDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuScaleUp_2012_07_20_10_05_48/SummaryFiles/'
 MuSmearDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuSmear_2012_07_21_03_12_15/SummaryFiles/'
 
-
+# This is the main (and only) tree in the root files, storing single-valued branches (basically an NTuple, but made as TTree)
 TreeName = "PhysicalVariables"
 
 
@@ -19,9 +18,11 @@ TreeName = "PhysicalVariables"
 ########      Put all uses of the plotting funcs into main()      ########
 ##########################################################################
 
+# The main function, called at the end of the script after all other function definitions. If just running analysis on a variable, modify only here.
 def main():
 	#os.system("rm pyplots/*.*")
 
+	# Requirements on jet pT, to be implemented when looking at higher jet multiplicities, stored as strings for insertion in TCuts/projections.
 	j1="*(Pt_pfjet1>40.0)"
 	j2="*(Pt_pfjet2>40.0)"
 	j3="*(Pt_pfjet3>40.0)"
@@ -31,35 +32,41 @@ def main():
 	
 	#MakeUnfoldedPlots('Pt_genmuon1','Pt_muon1',"p_{T}(#mu) [GeV]",[25,45,145],selection,'')
 	
+	# This is the baseline selection - only one muon, fiducial region, MT in W window.
 	selection = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50)*(MT_muon1MET<110)'
+
+	# This is the baseline weight. Central PU (Not modified for systematics), ILum = 4980/pb, muon HLT eff of 0.92.
 	weight = '*weight_pu_central*4980*0.92'
-	
-	FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v')
-	FullAnalysisWithUncertainty('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection+j1,weight,'v')
+	        
+	# Calling on FullAnalysisWithUncertainty - creates all plots, tables, with unfolding, etc. Examples for Jet PT.  
+	# To detail the arguments:
+	# .........................(Gen Variable, Reco Var , X Label, Unfolding Binning, Presentation Binning, selection, weight, switch: 'v'= use ideal variable bins for unfolding, 'c' = use unmodified binning)                                                                                     
+	FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection+j1,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection+j2,weight,'v')
 
+	# Further examples  - Jet Count, Transverse Mass, MET
 	FullAnalysisWithUncertainty('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c')	
-	FullAnalysisWithUncertainty('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,50,150],[60,65,70,75,80,85,90,95,100,110,130],selection,weight,'v')
-	FullAnalysisWithUncertainty('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[30,40,50,60,80,90,100,130,160,190,250,350],selection,weight,'v')
-		
-	FullAnalysisWithUncertainty('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j1,weight,'c')
-	FullAnalysisWithUncertainty('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j2,weight,'c')
+	FullAnalysisWithUncertainty('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,0,200],[60,65,70,75,80,85,90,95,100,110,150],selection,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[30,40,50,60,70,80,90,100,115,130,150,170,200,240,280,350],selection,weight,'v')
+	
+	# Further examples - Jet Etas	
+	FullAnalysisWithUncertainty('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j1,weight,'c')
+	FullAnalysisWithUncertainty('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j2,weight,'c')
+	FullAnalysisWithUncertainty('Eta_genjet3','Eta_pfjet3',"#eta(jet_{3}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j3,weight,'c')
 
-	
-	
-		
+	# FullAnalysisWithUncertainty will create .txt files in the pyplots directory. This is the final results. 
+	# Calling ParseTablesToFinalResults() will read these tables and produce fancier TeX tables and root plots.		
 	ParseTablesToFinalResults()	
 		
+
+
+	# Below are just some calls of MakeUnfoldedPlots() - this function is called multiple times in FullAnalysisWithUncertainty. 
+
 	#MakeUnfoldedPlots('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c',NormalDirectory,-1,'standard')	
 	#MakeUnfoldedPlots('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,50,150],[20,60,100],selection,weight,'v',NormalDirectory,-1,'standard')
 	#MakeUnfoldedPlots('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[15,30,330],selection,weight,'v',NormalDirectory,-1,'standard')
-	#[tau,data,mc]=MakeUnfoldedPlots('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,60,70,80,90,100,110,125,140,170,200,250,350],selection,weight,'v',NormalDirectory,2,'standard')
-	#print tau
-	#print ' '
-	#for x in data:
-		#print x
-	#print ' '
-	#for x in mc:
-		#print x
+
 	#MakeUnfoldedPlots('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,500],[26,40,300],selection+j1,weight,'v',NormalDirectory,-1,'standard')
 	#MakeUnfoldedPlots('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[25,0,500],[13,40,300],selection+j2,weight,'v',NormalDirectory,-1,'standard')
 	#MakeUnfoldedPlots('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[25,0,500],[13,40,300],selection+j3,weight,'v',NormalDirectory,-1,'standard')
@@ -71,9 +78,10 @@ def main():
 	#MakeUnfoldedPlots('Eta_genjet4','Eta_pfjet4',"#eta(jet_{4}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j4,weight,'c',NormalDirectory,-1,'standard')
 	#MakeUnfoldedPlots('Eta_genjet5','Eta_pfjet5',"#eta(jet_{5}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j5,weight,'c',NormalDirectory,-1,'standard')
 
-	#MakeBasicPlot('PFJetCount',"N_{Jet} (Inclusive) [GeV]",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
 
-	
+	# There is also a basic histogram maker... No unfolding, bells, nor whistles.
+
+	#MakeBasicPlot('PFJetCount',"N_{Jet} (Inclusive) [GeV]",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
 	#MakeBasicPlot('PFJetCount',"N_{Jet} (Inclusive) [GeV]",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
 	#MakeBasicPlot('PFJet30Count',"N_{Jet} (Inclusive) [GeV] - 30 GeV Threshold",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
 	#MakeBasicPlot('PFJet40Count',"N_{Jet} (Inclusive) [GeV] - 40 GeV Threshold",[10,-0.5,9.5],selection,weight,NormalDirectory,-1,'standard')
@@ -94,8 +102,10 @@ def main():
 	#MakeBasicPlot('Eta_pfjet5',"#eta(jet_{5})",[24,-2.4,2.4],selection+j5,weight,NormalDirectory,-1,'standard')	
 	
 	
-
+	# Just saving tons of PNG output into a single PDF for easier viewing.
 	os.system("convert pyplots/*.png pyplots/AllPlots.pdf")
+	os.system("convert pyplots/*FINAL*png pyplots/AllFinalPlots.pdf")
+	
 
 
 
@@ -111,19 +121,19 @@ def main():
 
 import sys
 import math
-sys.argv.append( '-b' )
-from ROOT import *
-gROOT.ProcessLine("gErrorIgnoreLevel = 2001;")
-TFormula.SetMaxima(100000,1000,1000000)
+sys.argv.append( '-b' )  # Batch mode - no XWindows - much faster
+from ROOT import * # Load root
+gROOT.ProcessLine("gErrorIgnoreLevel = 2001;") # Suppress warnings
+TFormula.SetMaxima(100000,1000,1000000) # Allow big strings for tcuts
 import numpy
-import math
-rnd= TRandom3()
+rnd= TRandom3() # Using TRandom3 for random numbers - no profound impact
 ##########################################################################
 ########              Clean up ROOT  Style                        ########
 ##########################################################################
-gROOT.SetStyle('Plain')
-gStyle.SetOptTitle(0)
-from array import array
+gROOT.SetStyle('Plain')  # Plain white default for plots
+gStyle.SetOptTitle(0) # No titles
+# Below is for setting TH2D color plots to red-blue heat spectrum
+from array import array 
 NCont = 50
 NRGBs = 5
 stops = array("d",[ 0.00, 0.34, 0.61, 0.84, 1.00])
@@ -135,7 +145,7 @@ gStyle.SetNumberContours(NCont)
 ##########################################################################
 ##########################################################################
 
-
+# Small function to clean up a TLegend style
 def FixDrawLegend(legend):
 	legend.SetTextFont(132)
 	legend.SetFillColor(0)
@@ -143,6 +153,7 @@ def FixDrawLegend(legend):
 	legend.Draw()
 	return legend
 
+# All binning is passed as variable binning. This converts constant to variable.
 def ConvertBinning(binning):
 	binset=[]
 	if len(binning)==3:
@@ -152,26 +163,16 @@ def ConvertBinning(binning):
 		binset=binning
 	return binset
 
+# Make basic TH1D for a branch. Projects branch to histo for given binning and selection. 
 def CreateHisto(name,legendname,tree,variable,binning,selection,style,label):
-	binset=ConvertBinning(binning)
-	n = len(binset)-1
-	hout= TH1D(name,legendname,n,array('d',binset))
-	hout.Sumw2()
-	tree.Project(name,variable,selection)
-	#if "Count" in variable:
-		#num=0.0
-		#err=0.0
-		#thisbin=hout.GetNbinsX()
-		#for x in range(hout.GetNbinsX()+1):
-			#num+=hout.GetBinContent(thisbin)
-			#if hout.GetBinCenter(thisbin) <0:
-				#continue
-			#err=math.sqrt(hout.GetBinError(thisbin)*hout.GetBinError(thisbin) + err*err)
-			#hout.SetBinContent(thisbin,num)
-			#hout.SetBinError(thisbin,err)
-			#thisbin+=-1
-		
+	binset=ConvertBinning(binning) # Assure variable binning
+	n = len(binset)-1 # carry the 1
+	hout= TH1D(name,legendname,n,array('d',binset)) # Declar empty TH1D
+	hout.Sumw2() # Store sum of squares
+	tree.Project(name,variable,selection) # Project from branch to histo
 	
+	# Below is all style. Style is list of arguments passed:
+	# [FillStyle, MarkerStyle, MarkerSize, Global Color]
 	hout.SetFillStyle(style[0])
 	hout.SetMarkerStyle(style[1])
 	hout.SetMarkerSize(style[2])
@@ -180,17 +181,24 @@ def CreateHisto(name,legendname,tree,variable,binning,selection,style,label):
 	hout.SetLineColor(style[4])
 	hout.SetFillColor(style[4])
 	hout.SetFillColor(style[4])
-	hout.SetMaximum(2.0*hout.GetMaximum())
-	hout.GetXaxis().SetTitle(label[0])
+	hout.SetMaximum(2.0*hout.GetMaximum()) # Better looking maximum
+
+	# label is a list [XLabel, YLabel]
+	hout.GetXaxis().SetTitle(label[0]) 
 	hout.GetYaxis().SetTitle(label[1])
+
+	# Good old-fashioned times new roman.
 	hout.GetXaxis().SetTitleFont(132)
 	hout.GetYaxis().SetTitleFont(132)
 	hout.GetXaxis().SetLabelFont(132)
 	hout.GetYaxis().SetLabelFont(132)
 	return hout
 
+# Converts ugly histo to pretty histo, or can change style of any histo.
 def BeautifyHisto(histo,style,label,newname):
-	histo.SetTitle(newname)	
+	histo.SetTitle(newname)	# New legend name
+
+	# And the same style setup as above.
 	histo.SetFillStyle(style[0])
 	histo.SetMarkerStyle(style[1])
 	histo.SetMarkerSize(style[2])
@@ -207,22 +215,25 @@ def BeautifyHisto(histo,style,label,newname):
 	histo.GetYaxis().SetLabelFont(132)
 	return histo
 
+# Cleans up a stacked histogram
 def BeautifyStack(stack,label):
+	# Fix Font
 	stack.GetHistogram().GetXaxis().SetTitleFont(132)
 	stack.GetHistogram().GetYaxis().SetTitleFont(132)
 	stack.GetHistogram().GetXaxis().SetLabelFont(132)
 	stack.GetHistogram().GetYaxis().SetLabelFont(132)
+	#Fix Label
 	stack.GetHistogram().GetXaxis().SetTitle(label[0])
 	stack.GetHistogram().GetYaxis().SetTitle(label[1])
-
 	return stack
 
 def Create2DHisto(name,legendname,tree,variable1,variable2,binning,selection,label):
-	binset=ConvertBinning(binning)
-	n = len(binset)-1
-	hout= TH2D(name,legendname,n,array('d',binset),n,array('d',binset))
-	hout.Sumw2()
-	tree.Project(name,variable1+":"+variable2,selection)
+	binset=ConvertBinning(binning) # Variable binning
+	n = len(binset)-1 # Carry the 1
+	hout= TH2D(name,legendname,n,array('d',binset),n,array('d',binset)) # Declare empty histo
+	hout.Sumw2() # Store sum of squares
+	tree.Project(name,variable1+":"+variable2,selection) # Project branch1:branch2 with selection 
+	# Clean up font and labels.
 	hout.GetXaxis().SetTitle(label[0])
 	hout.GetYaxis().SetTitle(label[1])
 	hout.GetXaxis().SetTitleFont(132)
@@ -230,6 +241,8 @@ def Create2DHisto(name,legendname,tree,variable1,variable2,binning,selection,lab
 	hout.GetXaxis().SetLabelFont(132)
 	hout.GetYaxis().SetLabelFont(132)
 	
+	#Feeble attempt to convert TH2 to integrated TH2 for inclusive jet count. Not working yet.
+
 	#if "Count" in variable:
 		#num=0.0
 		#err=0.0
@@ -251,6 +264,7 @@ def Create2DHisto(name,legendname,tree,variable1,variable2,binning,selection,lab
 	
 	return hout
 
+# Function to take data histogram and subtract list of background histograms.
 def BackgroundSubtractedHistogram(data,backgrounds):
 	for b in backgrounds:
 		b.Scale(-1)
@@ -258,32 +272,49 @@ def BackgroundSubtractedHistogram(data,backgrounds):
 		b.Scale(-1)
 	return data
 
+# This will take a weight MC histogram and create an unweighted data-like histogram. 
+# Used for closure test on Madgraph MC. 
 def PseudoDataHisto(histo,newname,binning):
+	# Convert to var binning
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
 	
+	# Make new histogram
 	hout= TH1D(newname,"",n,array('d',binset))
+	
+	# Get bin content and round to integer.
 	bincontent=[]
 	binx=[]
 	for x in range(n):
 		bincontent.append(int(round(histo.GetBinContent(x))))
 		binx.append(histo.GetBinCenter(x))
 		#print x, bincontent[x]
+
+	# No offset or resolution needed like in smeared histos in next function. Ignore.
 	offset = 0.0
 	resolution = 0.0
+
+	# Bin ranges. 
 	maxbin=max(binset)
 	minbin=min(binset)
 	
+	# Fill.
 	for a in range(len(binx)):
 		for y in range(bincontent[a]):
 			hout.Fill(binx[a])
 	return hout
 
+# This will take an MC histo and created a smeared data-like histo. For running pseudo-experiments for tau opt.
 def SmearOffsetHisto(histo,newname,binning,should_offset):
+
+	# Make variable binning
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
 	
+	# empty histogram
 	hout= TH1D(newname,"",n,array('d',binset))
+
+	# Get bins of (rounded) integer size
 	bincontent=[]
 	binx=[]
 	for x in range(n):
@@ -291,13 +322,15 @@ def SmearOffsetHisto(histo,newname,binning,should_offset):
 		binx.append(histo.GetBinCenter(x))
 		#print '**',n, bincontent[x], binx[x]
 	
+	# SMearing and offseting histo
 	offset = 0.0
-	if should_offset==True:
+	if should_offset==True: # No offset for Eta histos
 		offset=abs((numpy.random.normal(1.0,0.05))-1.0)
-	resolution = 0.05
+	resolution = 0.05 # Just 5%, arbitrary choice
 	maxbin=max(binset)
 	minbin=min(binset)
 	
+	# Fill output Histogram
 	for a in range(len(binx)):
 		for y in range(bincontent[a]):
 			#print binx[a], resolution
@@ -309,23 +342,28 @@ def SmearOffsetHisto(histo,newname,binning,should_offset):
 	#hout.Scale(histo.Integral()/hout.Integral())
 	return hout
 
-	
+# Basic SVD for a given Tau. 
 def GetBasicSVD(data_histo,Params, tau, binning):
-	data=data_histo.Clone()
-	binset=ConvertBinning(binning)
-	n = len(binset)-1
-	tsvdunf= TSVDUnfold( data_histo, Params[0], Params[1], Params[2] )
-	unfres = tsvdunf.Unfold( tau )	
+	data=data_histo.Clone() # Data histogram, cloned for safe keeping
+	binset=ConvertBinning(binning) # Binning
+	n = len(binset)-1 # Carry the 1
+	tsvdunf= TSVDUnfold( data_histo, Params[0], Params[1], Params[2] ) # Do the unfolding. Params is [ reco 1D, gen 1D, response 2D]
+	unfres = tsvdunf.Unfold( tau )	# Unfold for given tau
 	return unfres
-	
+
+# This is the basic SVD with full uncertainty using covariance matrix	
 def GetSVD(data_histo,Params, tau, binning):
-	data=data_histo.Clone()
-	binset=ConvertBinning(binning)
+	# Clone data histogram and get binning
+	data=data_histo.Clone() 
+	binset=ConvertBinning(binning) 
 	n = len(binset)-1
-	statcov = TH2D("statcov", "covariance matrix", n, array('d',binset),n,array('d',binset))	
+	statcov = TH2D("statcov", "covariance matrix", n, array('d',binset),n,array('d',binset)) # Declare covariance matrix
+
+	# Fill covariance matrix histogram
 	for i in range(data.GetNbinsX()):
 		 statcov.SetBinContent(i,i,data.GetBinError(i)*data.GetBinError(i)) 
-		 	
+	
+	# Get the unfolding object
 	tsvdunf= TSVDUnfold( data_histo, statcov, Params[0], Params[1], Params[2] )
 
 	unfres = tsvdunf.Unfold( tau )	
@@ -355,22 +393,29 @@ def GetSVD(data_histo,Params, tau, binning):
 	
 	return [unfres,ddist,svdist]
 
+# This is the "Smart" SVD - optimizes tau on the fly. This version is not used. Pseudoexperiments are used.
 def GetSmartSVD(data_histo,Params, binning,forcetau):
+	# Clone data histogram and get binning
 	data=data_histo.Clone()
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
+
+	# Declare and fill covariance
 	statcov = TH2D("statcov", "covariance matrix", n, array('d',binset),n,array('d',binset))	
 	for i in range(data.GetNbinsX()):
 		 statcov.SetBinContent(i,i,data.GetBinError(i)*data.GetBinError(i)) 
-		 	
+	
+	# Do an initial unfolding.	 	
 	tsvdunf_prep= TSVDUnfold( data_histo, statcov, Params[0], Params[1], Params[2] )
 	tsvdunf_prep.SetNormalize( kFALSE ) 
 	unfres_prep = tsvdunf_prep.Unfold( 1 )	
+
 	# Get the distribution of the d to cross check the regularization
 	# - choose kreg to be the point where |d_i| stop being statistically significantly >>1
 	ddist_prep = tsvdunf_prep.GetD()
 	svdist_prep = tsvdunf_prep.GetSV()
 
+	# 
 	OptTau=1
 	OptI=1
 	OptSV=1
@@ -421,6 +466,7 @@ def GetSmartSVD(data_histo,Params, binning,forcetau):
 	
 	return [unfres,ddist,svdist,OptTau,OptI]
 
+# Basic function for getting a value of difference between two histos (summed absolute difference of bins)
 def SimpleDifFromTwoHistos(histo1,histo2,binning):
 	binset=ConvertBinning(binning)
 	n = len(binset)-1	
@@ -434,6 +480,7 @@ def SimpleDifFromTwoHistos(histo1,histo2,binning):
 
 	return dif
 
+# This will return N histograms with the smearing and offset from SmearOffsetHisto - for tau optimization
 def GetNSmearedHistos(inputhisto,binning,N,should_offset):
 	histos=[]
 	for x in range(N):
@@ -442,6 +489,7 @@ def GetNSmearedHistos(inputhisto,binning,N,should_offset):
 		histos.append(SmearOffsetHisto(inputhisto,name,binning,should_offset))
 	return histos
 
+# For a given tau, get a basic SVD for several smeared histos (above), find the average difference for that tau. 
 def TestSVDTau( Params, tau ,histos,binning):
 	DifValues = []
 	InitialDifs=[]
@@ -459,30 +507,32 @@ def TestSVDTau( Params, tau ,histos,binning):
 	DifAverage = sum(Improvements)/(1.0*N)
 	return DifAverage
 	
-
+# This will test multiple values of tau with TestSVDTau, and find the best tau as the smallest difference of GEN wrt controlled unfoldings.
 def FindOptimalTauWithPseudoExp(Params,binning,should_offset):
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
-	bestdif = -9999999999
+	bestdif = -9999999999 # Dummy values to start
 	bsettau=9999999999
 	n = int(round(n-1))
+
+	# Get N histograms with smearing and offset to use for comparison of tau values
 	histoset=GetNSmearedHistos(Params[0],binning,10,should_offset)
 	olddif=99999999999999999999999999
-	for t in range(int(round(n/2))):
+	for t in range(int(round(n/2))): # Only testing taus up to NBins/2. 
 		if t<1: 
 			continue
 		if t>n-1:
 			continue
-		dif=(TestSVDTau(Params,t,histoset,binning))
+		dif=(TestSVDTau(Params,t,histoset,binning)) # Get average dif for this tau. 
 		print '      ...Initial test of tau = '+str(t)+' '*(5-len(str(t)))+'   Chi Improvement = '+str(round(dif,2))+'%'
-		if olddif<0.0 and dif<2.0*olddif:
+		if olddif<0.0 and dif<2.0*olddif: # See if difs are diverging - then you can stop the loop
 			print "        Best tau found at: tau = "+str(int(besttau))+"  ... Terminating tau serach"
 			break		
-		if dif>bestdif:
+		if dif>bestdif: # Seeif this tau is best
 			bestdif=dif
 			besttau=t
 		olddif=dif
-	return besttau
+	return besttau # Return the best tau value
 	
 def GetIdealBinStructure(inputhisto,idealbins):
 	N=inputhisto.GetSize()
@@ -878,6 +928,8 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	CompMax= 0
 	for x in range(h_gen_WJets.GetNbinsX()):
 		v = h_gen_WJets.GetBinContent(x+1)
+		if x==0 or x>=(h_gen_WJets.GetNbinsX() -1):
+			continue
 		if v<0.1:
 			continue
 		if v>999999999:
@@ -886,6 +938,7 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 			CompMin=v
 		if v>CompMax:
 			CompMax=v
+
 
 	CompMin = 0.8*CompMin
 	CompMax = 1.3*CompMax
@@ -1141,7 +1194,7 @@ def tabletolist(table):
 		line=line.replace('|','')
 		line=line.replace('\t',' ')
 		line=line.replace(' +- ','+-')
-		line=line.replace(' - ','-')
+		line=line.replace(' - ','TO')
 		line=line.replace('\n','')
 		
 		for x in range(20):
@@ -1179,7 +1232,7 @@ def getbinning(listedtable):
 		contents.append(element)
 	binning = []
 	for c in contents:
-		edges=c.split('-')
+		edges=c.split('TO')
 		for e in edges:
 			if float(e) not in binning:
 				binning.append(float(e))
@@ -1232,9 +1285,11 @@ def getmeasurement(listedtable):
 		minus_err = []
 		mean = meas_mean[n]
 		errors=[]
+		rel_err = 0
 		for v in range(len(variations)):
 			if mean>0:
 				errors.append((variations[v][n] - mean)/mean)
+				rel_err = (meas_staterr[n])/(meas_mean[n])
 			else: 
 				errors.append(0)
 		#print mean,errors
@@ -1249,7 +1304,7 @@ def getmeasurement(listedtable):
 					return [values[0]]
 				else:
 					return [values[1]]
-			
+		
 		PUerrors = filter_pair([errors[0],errors[1]])
 		LUMIerrors=filter_pair([errors[2],errors[3]])
 		JESerrors=filter_pair([errors[4],errors[5]])
@@ -1258,8 +1313,9 @@ def getmeasurement(listedtable):
 		MERerrors=[errors[9]]
 		SCALEerrors=filter_pair([errors[10],errors[11]])
 		MATCHerrors=filter_pair([errors[12],errors[13]])
+		STATerrors=[rel_err, -rel_err]
 		
-		allerrors=PUerrors+LUMIerrors+JESerrors+JERerrors+MESerrors+MERerrors+SCALEerrors+MATCHerrors
+		allerrors=PUerrors+LUMIerrors+JESerrors+JERerrors+MESerrors+MERerrors+SCALEerrors+MATCHerrors+STATerrors
 		
 		pos_error = 0
 		neg_error = 0
@@ -1292,6 +1348,7 @@ def TexTableFromColumns(columns):
 			line+=c[x] + ' ,& '
 			
 		line+='\n'
+		line=line.replace('TO',' -- ')
 		line=line.replace('& \n',' \\\\\n')
 		table+= line
 	table+='\n'
@@ -1383,7 +1440,7 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalizati
 		Yplus.append(abs(upper)/N)
 		Yminus.append(abs(lower)/N)
 		
-		print c-d,' -- ', c+d, '   ', center, upper, lower
+		#print c-d,' -- ', c+d, '   ', center, upper, lower
 	
 	X = array("d", X)
 	Xplus = array("d", Xplus)
@@ -1425,7 +1482,7 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	
 	
 	
-	Max = max(measurement)*2
+	Max = max(measurement)*10
 	Min = min(measurement)*.5
 	
 	if normalization==0:
@@ -1442,7 +1499,7 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 		minus_errors = expectation_errors[x]
 		style=MadGraphStyle
 		Exp = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
-		Exp.Print()
+		#Exp.Print()
 
 		Exp.SetMaximum(Max)
 		Exp.SetMinimum(Min)
@@ -1485,6 +1542,8 @@ def ParseTablesToFinalResults():
 	for f in allfiles:
 		if 'FINAL' in f:
 			continue
+			
+		print 'Analyzing table: ',f
 		output = f.replace('.txt','FINAL.')
 		table = tabletolist(f)
 
@@ -1511,14 +1570,22 @@ def ParseTablesToFinalResults():
 		if label=='Pt_pfjet2':
 			label = 'Second Leading Jet p_{T} [GeV]'
 			quantity = 'p_{T}'
+
+		if label=='Pt_pfjet3':
+			label = 'Third Leading Jet p_{T} [GeV]'
+			quantity = 'p_{T}'
 			
-		if label=='Eta_pfjet2':
+		if label=='Eta_pfjet1':
 			label = 'Leading Jet #eta'
 			quantity = '#eta'
 			
 		if label=='Eta_pfjet2':
 			label = 'Second Leading Jet #eta'
 			quantity = '#eta'						
+
+		if label=='Eta_pfjet3':
+			label = 'Third Leading Jet #eta'
+			quantity = '#eta'	
 
 		if label=='PFJet40Count':
 			label = 'Jet Count (Exclusive)'
@@ -1535,7 +1602,7 @@ def ParseTablesToFinalResults():
 		FinalHisto(rootbinning,label,quantity, output+'PlotCount.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,0)
 		FinalHisto(rootbinning,label,quantity, output+'PlotXSec.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,4980.0)
 
-		os.system('cat pyplots/Pt_pfjet1FINAL.TexCount.txt')
+		#os.system('cat pyplots/Pt_pfjet1FINAL.TexCount.txt')
 
 main()
 
