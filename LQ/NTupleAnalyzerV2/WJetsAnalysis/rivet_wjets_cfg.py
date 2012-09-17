@@ -27,7 +27,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:ciao_1_1_8BR.root')
+    fileNames = cms.untracked.vstring('/store/group/phys_exotica/darinb/Reco_AOD_Examples/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_GEN_START311_V2-v2_example.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -36,7 +36,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.284.2.4 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('Configuration/GenProduction/python/Hadronizer_MgmMatchTuneZ2_7TeV_madgraph_tauola_cff.py nevts:10000'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -47,7 +47,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.RAWSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('Hadronizer_MgmMatchTuneZ2_7TeV_madgraph_tauola_cff_py_GEN.root'),
+    fileName = cms.untracked.string('output.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('GEN')
@@ -60,36 +60,13 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
 # Additional output definition
 
 # Other statements
-process.GlobalTag.globaltag = 'MC_311_V2::All'
+# process.GlobalTag.globaltag = 'MC_311_V2::All'
+process.GlobalTag.globaltag = 'MC_44_V5::All'
 
-process.generator = cms.EDFilter("Pythia6HadronizerFilter",
-    ExternalDecays = cms.PSet(
-        Tauola = cms.untracked.PSet(
-            UseTauolaPolarization = cms.bool(True),
-            InputCards = cms.PSet(
-                mdtau = cms.int32(0),
-                pjak2 = cms.int32(0),
-                pjak1 = cms.int32(0)
-            )
-        ),
-        parameterSets = cms.vstring('Tauola')
-    ),
-    UseExternalGenerators = cms.untracked.bool(True),
+process.generator = cms.EDFilter("Pythia6GeneratorFilter",
     pythiaPylistVerbosity = cms.untracked.int32(1),
     pythiaHepMCVerbosity = cms.untracked.bool(True),
     comEnergy = cms.double(7000.0),
-    jetMatching = cms.untracked.PSet(
-        MEMAIN_showerkt = cms.double(0),
-        MEMAIN_maxjets = cms.int32(-1),
-        MEMAIN_minjets = cms.int32(-1),
-        MEMAIN_qcut = cms.double(-1),
-        MEMAIN_excres = cms.string(''),
-        MEMAIN_etaclmax = cms.double(-1),
-        MEMAIN_nqmatch = cms.int32(5),
-        outTree_flag = cms.int32(0),
-        scheme = cms.string('Madgraph'),
-        mode = cms.string('auto')
-    ),
     maxEventsToPrint = cms.untracked.int32(0),
     PythiaParameters = cms.PSet(
         pythiaUESettings = cms.vstring('MSTU(21)=1     ! Check on possible errors during program execution', 
@@ -128,11 +105,10 @@ process.generator = cms.EDFilter("Pythia6HadronizerFilter",
 process.generation_step = cms.Path(process.pgen)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
-#process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
+process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.endjob_step)
-#process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.endjob_step,process.RAWSIMoutput_step)
+process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.endjob_step,process.RAWSIMoutput_step)
 # filter all path with the production filter sequence
 for path in process.paths:
 	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
@@ -141,13 +117,14 @@ for path in process.paths:
 
 
 # Automatic addition of the customisation function from Configuration.GenProduction.rivet_customize
+from Configuration.GenProduction.rivet_customize import customise 
 
-def customise(process):
-        process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
-        process.rivetAnalyzer.AnalysisNames = cms.vstring('MC_WJets_TEST')
-        process.generation_step+=process.rivetAnalyzer
+#def customise(process):
+#        process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
+#        process.rivetAnalyzer.AnalysisNames = cms.vstring('MC_WJets_TEST')
+#        process.generation_step+=process.rivetAnalyzer
 #        process.schedule.remove(process.RAWSIMoutput_step)
-        return(process)
+#        return(process)
 
 
 
@@ -155,3 +132,5 @@ process = customise(process)
 
 
 # End of customisation functions
+process.rivetAnalyzer.AnalysisNames = cms.vstring("CMS_WJets_TEST")
+process.rivetAnalyzer.OutputFile = cms.string("out.aida")
