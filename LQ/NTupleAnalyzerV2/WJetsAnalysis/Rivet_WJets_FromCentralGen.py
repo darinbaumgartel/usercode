@@ -22,12 +22,12 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10000)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:ciao_1_1_8BR.root')
+    fileNames = cms.untracked.vstring('/store/group/phys_exotica/darinb/Reco_AOD_Examples/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_GEN_START311_V2-v2_example.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -140,19 +140,24 @@ for path in process.paths:
 
 # customisation of the process
 
-
 # Automatic addition of the customisation function from Configuration.GenProduction.rivet_customize
+#from Configuration.GenProduction.rivet_customize import customise 
 
-def customise(process):
-        process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
-        process.rivetAnalyzer.AnalysisNames = cms.vstring('MC_WJets_TEST')
-        process.generation_step+=process.rivetAnalyzer
-#        process.schedule.remove(process.RAWSIMoutput_step)
-        return(process)
+#def customise(process):
+        #process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
+        #process.rivetAnalyzer.AnalysisNames = cms.vstring('MC_WJets_TEST')
+        #process.rivetAnalyzer.OutputFile = cms.string("output.aida")
+        #process.generation_step+=process.rivetAnalyzer
+##        process.schedule.remove(process.RAWSIMoutput_step)
+        #return(process)
 
 
 
-process = customise(process)
+#process = customise(process)
 
 
 # End of customisation functions
+process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
+process.rivetAnalyzer.AnalysisNames = cms.vstring("CMS_WJets_TEST")
+process.rivetAnalyzer.OutputFile = cms.string("output.aida")
+process.generation_step+=process.rivetAnalyzer
