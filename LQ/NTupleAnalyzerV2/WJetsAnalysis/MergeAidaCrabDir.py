@@ -18,6 +18,7 @@ for x in aidas:
 	aidamerge += ' '+x
 
 
+
 f = open('tempmerge.sh','w')
 f.write('#!/bin/sh\n\ncd /afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_5/src\neval `scramv1 runtime -sh`\ncd -\n\nsource setupRivetProf.sh\n\n'+aidamerge+'\n\nrivet-mkhtml '+aidaout+'\n\n')
 f.close()
@@ -25,3 +26,11 @@ f.close()
 os.system('chmod 777 tempmerge.sh')
 os.system('./tempmerge.sh')
 os.system('rm tempmerge.sh')
+os.system('aida2root '+aidaout)
+
+for x in os.listdir('plots/CMS_WJets_TEST'):
+	if '.pdf' not in x:
+		continue
+		
+	os.system( 'rm plots/CMS_WJets_TEST/'+x.replace('.pdf','.png'))
+	os.system('convert -trim plots/CMS_WJets_TEST/'+x+' plots/CMS_WJets_TEST/'+x.replace('.pdf','.png'))

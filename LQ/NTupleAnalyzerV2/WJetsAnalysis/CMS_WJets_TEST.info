@@ -1,6 +1,6 @@
 Name: CMS_WJets_TEST
 Year: 2011
-Summary: Rates of Jets Produced in Association with W and Z Bosons in pp Collisions at sqrt(s) = 7 TeV
+Summary: Rates of Jets Produced in Association with W Bosons in pp Collisions at sqrt(s) = 7 TeV
 Experiment: CMS
 Collider: LHC
 SpiresID: 
@@ -19,11 +19,10 @@ PtCuts:
   leptons Pt>20GeV and |leading_muon_eta|<2.1,|secondLeading_muon_eta|<2.4 and 
   |electron_eta|<2.5, Jets>30GeV and |eta|<2.4
 Description:
-  A study of jet production in association with W and Z bosons for a jet transverse
-  momentum threshold of 30 GeV of proton-proton collision data at 7 TeV cms energy 
+  A study of jet production in association with W bosons for a jet transverse
+  momentum threshold of 40 GeV of proton-proton collision data at 7 TeV cms energy 
   has been done. The study includes the measurement of the normalized inclusive rates 
-  of jets produced, as well as the ratios of cross-sections and the first test of the 
-  Berends-Giele scaling at sqrt(s) = 7 TeV.
+  of jets produced.
 BibKey: 
    '<Insert SPIRES BibTeX key>'
 BibTeX: 

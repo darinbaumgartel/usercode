@@ -21,6 +21,9 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.default.limit = 10
+
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10000)
 )
@@ -36,7 +39,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('Configuration/GenProduction/python/Hadronizer_MgmMatchTuneZ2_7TeV_madgraph_tauola_cff.py nevts:10000'),
     name = cms.untracked.string('PyReleaseValidation')
 )
