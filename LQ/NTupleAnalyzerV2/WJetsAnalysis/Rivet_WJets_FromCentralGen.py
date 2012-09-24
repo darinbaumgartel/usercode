@@ -25,7 +25,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.MessageLogger.cerr.default.limit = 10
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(1000)
 )
 
 # Input source
@@ -39,7 +39,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('Configuration/GenProduction/python/Hadronizer_MgmMatchTuneZ2_7TeV_madgraph_tauola_cff.py nevts:10000'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -79,21 +79,21 @@ process.generator = cms.EDFilter("Pythia6HadronizerFilter",
         parameterSets = cms.vstring('Tauola')
     ),
     UseExternalGenerators = cms.untracked.bool(True),
-    pythiaPylistVerbosity = cms.untracked.int32(1),
+    pythiaPylistVerbosity = cms.untracked.int32(2),
     pythiaHepMCVerbosity = cms.untracked.bool(True),
     comEnergy = cms.double(7000.0),
-    jetMatching = cms.untracked.PSet(
-        MEMAIN_showerkt = cms.double(0),
-        MEMAIN_maxjets = cms.int32(-1),
-        MEMAIN_minjets = cms.int32(-1),
-        MEMAIN_qcut = cms.double(-1),
-        MEMAIN_excres = cms.string(''),
-        MEMAIN_etaclmax = cms.double(-1),
-        MEMAIN_nqmatch = cms.int32(5),
-        outTree_flag = cms.int32(0),
-        scheme = cms.string('Madgraph'),
-        mode = cms.string('auto')
-    ),
+    # jetMatching = cms.untracked.PSet(
+    #     MEMAIN_showerkt = cms.double(0),
+    #     MEMAIN_maxjets = cms.int32(-1),
+    #     MEMAIN_minjets = cms.int32(-1),
+    #     MEMAIN_qcut = cms.double(30.0),
+    #     # MEMAIN_excres = cms.string(''),
+    #     MEMAIN_etaclmax = cms.double(5.0),
+    #     # MEMAIN_nqmatch = cms.int32(5),
+    #     # outTree_flag = cms.int32(0),
+    #     scheme = cms.string('Madgraph'),
+    #     mode = cms.string('auto')
+    # ),
     maxEventsToPrint = cms.untracked.int32(0),
     PythiaParameters = cms.PSet(
         pythiaUESettings = cms.vstring('MSTU(21)=1     ! Check on possible errors during program execution', 
@@ -162,5 +162,7 @@ for path in process.paths:
 # End of customisation functions
 process.load('GeneratorInterface.RivetInterface.rivetAnalyzer_cfi')
 process.rivetAnalyzer.AnalysisNames = cms.vstring("CMS_WJets_TEST")
+process.rivetAnalyzer.CrossSection = cms.double(26030)
+process.rivetAnalyzer.UseExternalWeight = cms.bool(True)
 process.rivetAnalyzer.OutputFile = cms.string("output.aida")
 process.generation_step+=process.rivetAnalyzer

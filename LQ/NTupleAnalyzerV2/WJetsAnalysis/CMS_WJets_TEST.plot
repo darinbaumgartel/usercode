@@ -152,8 +152,87 @@ FullRange=1
 YMax=10000
 LogY=1
 # END PLOT
-
-
+# BEGIN PLOT /CMS_WJets_TEST/JetETA1Wmunu
+Title=$W \rightarrow \mu \nu$ First Leading Jet $\eta$ at $\sqrt(s)= 7 TeV$
+XLabel=First Leading Jet PseudoRapidity
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/JetETA2Wmunu
+Title=$W \rightarrow \mu \nu$ Second Leading Jet $\eta$ at $\sqrt(s)= 7 TeV$
+XLabel=Second Leading Jet PseudoRapidity
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/JetETA3Wmunu
+Title=$W \rightarrow \mu \nu$ Third Leading Jet $\eta$ at $\sqrt(s)= 7 TeV$
+XLabel=Third Leading Jet PseudoRapidity
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/JetETA4Wmunu
+Title=$W \rightarrow \mu \nu$ Fourth Leading Jet $\eta$ at $\sqrt(s)= 7 TeV$
+XLabel=Fourth Leading Jet PseudoRapidity
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/JetPT1Wmunu
+Title=$W \rightarrow \mu \nu$ First Leading Jet $p_T$ at $\sqrt(s)= 7 TeV$
+XLabel=First Leading Jet Transverse Momentum
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/JetPT2Wmunu
+Title=$W \rightarrow \mu \nu$ Second Leading Jet $p_T$ at $\sqrt(s)= 7 TeV$
+XLabel=Second Leading Jet Transverse Momentum
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/JetPT3Wmunu
+Title=$W \rightarrow \mu \nu$ Third Leading Jet $p_T$ at $\sqrt(s)= 7 TeV$
+XLabel=Third Leading Jet Transverse Momentum
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/JetPT4Wmunu
+Title=$W \rightarrow \mu \nu$ Fourth Leading Jet $p_T$ at $\sqrt(s)= 7 TeV$
+XLabel=Fourth Leading Jet Transverse Momentum
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
+# BEGIN PLOT /CMS_WJets_TEST/njetWmunu
+Title=$W \rightarrow \mu \nu$ Jet Multiplicity at $\sqrt(s)= 7 TeV$
+XLabel=Jet Multiplicity
+YLabel=Unknown
+FullRange=1
+#YMin=0
+YMax=10000
+LogY=1
+# END PLOT
 
 
 

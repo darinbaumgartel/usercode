@@ -10,6 +10,9 @@
 #include "Rivet/Projections/VetoedFinalState.hh"
 #include "Rivet/Projections/InvMassFinalState.hh"
 #include "Rivet/Tools/ParticleIdUtils.hh"
+#include "TTree.h"
+#include "TFile.h"
+#include "TString.h"
 #include <iostream>
 #include <ostream>
 #include <iomanip>
@@ -91,18 +94,72 @@ namespace Rivet
 				_histJetMultRatioWmuPlusMinus = bookDataPointSet(10, 1, 1);
 				_histJetMultRatioWelPlusMinus = bookDataPointSet(9, 1, 1);
 
+				_treeFileName = "rivetTree.root";
+   		 		// Create a file for the Tree
+    			_treeFile = new TFile(_treeFileName, "recreate");
+
+
+
+    			// Book the ntuple.
+
+    			_rivetTree = new TTree("RivetTree", "RivetTree");	
+
+
+    			_rivetTree->Branch("nevt", &_nevt, "nevt/I");	
+    			_rivetTree->Branch("njet_WMuNu", &_njet_WMuNu, "njet_WMuNu/I");
+    			_rivetTree->Branch("evweight", &_evweight, "evweight/D");			
+
+
+    			_rivetTree->Branch("ptmuon", &_ptmuon, "ptmuon/D");			
+    			_rivetTree->Branch("etamuon", &_etamuon, "etamuon/D");			
+    			_rivetTree->Branch("phimuon", &_phimuon, "phimuon/D");			
+
+    			_rivetTree->Branch("ptneutrino", &_ptneutrino, "ptneutrino/D");			
+    			_rivetTree->Branch("etaneutrino", &_etaneutrino, "etaneutrino/D");			
+    			_rivetTree->Branch("phineutrino", &_phineutrino, "phineutrino/D");			
+
+    			_rivetTree->Branch("ptjet1", &_ptjet1, "ptjet1/D");			
+    			_rivetTree->Branch("etajet1", &_etajet1, "etajet1/D");			
+    			_rivetTree->Branch("phijet1", &_phijet1, "phijet1/D");
+
+    			_rivetTree->Branch("ptjet2", &_ptjet2, "ptjet2/D");			
+    			_rivetTree->Branch("etajet2", &_etajet2, "etajet2/D");			
+    			_rivetTree->Branch("phijet2", &_phijet2, "phijet2/D");
+
+    			_rivetTree->Branch("ptjet3", &_ptjet3, "ptjet3/D");			
+    			_rivetTree->Branch("etajet3", &_etajet3, "etajet3/D");			
+    			_rivetTree->Branch("phijet3", &_phijet3, "phijet3/D");
+
+    			_rivetTree->Branch("ptjet4", &_ptjet4, "ptjet4/D");			
+    			_rivetTree->Branch("etajet4", &_etajet4, "etajet4/D");			
+    			_rivetTree->Branch("phijet4", &_phijet4, "phijet4/D");
+
+    			_rivetTree->Branch("ptjet5", &_ptjet5, "ptjet5/D");			
+    			_rivetTree->Branch("etajet5", &_etajet5, "etajet5/D");			
+    			_rivetTree->Branch("phijet5", &_phijet5, "phijet5/D");
+
+    			NZE=0;
+    			NZM=0;
+    			NWE=0;
+    			NWM=0;
+    			NT=0;
+
 			}
 
 			bool ApplyElectronCutsForZee(double pt1, double pt2, double eta1, double eta2)
 			{
+				//return true;
 				bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
 				bool isFid2 = ((fabs(eta2)<1.4442)||((fabs(eta2)>1.566)&&(fabs(eta2)<2.5)));
 				if( isFid1 && isFid2 && pt1>20 && pt2 >10) return true;
+
 				else return false;
 			}
 
 			bool ApplyMuonCutsForZmm(double pt1, double pt2, double eta1, double eta2)
 			{
+				//return true;
+
 				bool isFid1 = ((fabs(eta1)<2.1));
 				bool isFid2 = ((fabs(eta2)<2.4));
 				if( isFid1 && isFid2 && pt1>20 && pt2 >10) return true;
@@ -111,6 +168,8 @@ namespace Rivet
 
 			bool ApplyElectronCutsForWen(double pt1, double eta1)
 			{
+				return true;
+
 				bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
 				if( isFid1 && pt1>20 ) return true;
 				return 0;
@@ -118,6 +177,8 @@ namespace Rivet
 
 			bool ApplyMuonCutsForWmn(double pt1, double eta1)
 			{
+				return true;
+
 				bool isFid1 = ((fabs(eta1)<2.1));
 				if( isFid1 && pt1>45) return true;
 				return 0;
@@ -210,6 +271,8 @@ namespace Rivet
 
 			void analyze(const Event& event)
 			{
+				NT+= 1;
+				//std::cout<<"A: "<<NT<<std::endl;
 				//some flag definitions.
 				bool isZmm =false;
 				bool isZee =false;
@@ -220,7 +283,43 @@ namespace Rivet
 				bool isWenMinus =false;
 				bool isWenPlus  =false;
 
+
+	    		_ptmuon = -5.0;
+	    		_etamuon = -5.0;
+	    		_phimuon = -5.0;
+
+	    		_ptneutrino = -1.0;
+	    		_etaneutrino = -5.0;
+	    		_phineutrino = -5.0;
+
+	    		_ptjet1 = -5.0;
+	    		_etajet1 = -5.0;
+	    		_phijet1 = -5.0;
+
+	    		_ptjet2 = -5.0;
+	    		_etajet2 = -5.0;
+	    		_phijet2 = -5.0;
+
+	    		_ptjet3 = -5.0;
+	    		_etajet3 = -5.0;
+	    		_phijet3 = -5.0;
+
+	    		_ptjet4 = -5.0;
+	    		_etajet4 = -5.0;
+	    		_phijet4 = -5.0;
+
+	    		_ptjet5 = -5.0;
+	    		_etajet5 = -5.0;
+	    		_phijet5 = -5.0;
+
+				_njet_WMuNu = -1;
+				_evweight = -1.0;
+				_nevt = -1;
+
 				const double weight = event.weight();
+
+				_nevt = (event.genEvent()).event_number();
+				_evweight = weight;
 
 				const InvMassFinalState& invMassFinalStateZ = applyProjection<InvMassFinalState>(event, "INVFSZ");
 				const InvMassFinalState& invMassFinalStateW = applyProjection<InvMassFinalState>(event, "INVFSW");
@@ -233,7 +332,7 @@ namespace Rivet
 				const ParticleVector&  ZDecayProducts =  invMassFinalStateZ.particles();
 				const ParticleVector&  WDecayProducts =  invMassFinalStateW.particles();
 
-				if (ZDecayProducts.size() < 2 && WDecayProducts.size() <2) vetoEvent;
+				//if (ZDecayProducts.size() < 2 && WDecayProducts.size() <2) vetoEvent;
 
 				double pt1=-9999.,  pt2=-9999.;
 				double phi1=-9999., phi2=-9999.;
@@ -275,12 +374,19 @@ namespace Rivet
 					}
 				}
 
-				if(isW && mt<20)vetoEvent;
+				// if(isW && ( mt<50 || mt>110)) vetoEvent;
 
 				isZmm = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 13) && (fabs(ZDecayProducts[1].pdgId()) == 13));
 				isZee = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 11) && (fabs(ZDecayProducts[1].pdgId()) == 11));
 				isWmn  = isW && ((fabs(WDecayProducts[0].pdgId()) == 14) || (fabs(WDecayProducts[1].pdgId()) == 14));
 				isWen  = isW && ((fabs(WDecayProducts[0].pdgId()) == 12) || (fabs(WDecayProducts[1].pdgId()) == 12));
+
+				NZE += isZee;
+				NZM += isZmm;
+				NWE += isWen;
+				NWM += isWmn;
+				//std::cout<<NZE<<" "<<NZM<<" "<<NWE<<" "<<NWM<<" "<<std::endl;
+				// std::cout<<isWmn<<"  "<<isWen<<std::endl;
 
 				if(isWmn)
 				{
@@ -312,7 +418,7 @@ namespace Rivet
 				//std::cout<<" ----------- " <<std::endl;
 				//std::cout<<isWmn<<std::endl;
 
-				if(!((isZmm||isZee)||(isWmn||isWen)))vetoEvent;
+				//if(!((isZmm||isZee)||(isWmn||isWen)))vetoEvent;
 
 				bool passBosonConditions = false;
 				if(isZmm)passBosonConditions = ApplyMuonCutsForZmm(pt1,pt2,eta1,eta2);
@@ -320,7 +426,7 @@ namespace Rivet
 				if(isWen)passBosonConditions = ApplyElectronCutsForWen(pt1,eta1);
 				if(isWmn)passBosonConditions = ApplyMuonCutsForWmn(pt1,eta1);
 
-				if(!passBosonConditions)vetoEvent;
+				//if(!passBosonConditions)vetoEvent;
 
 				//Obtain the jets.
 				vector<FourMomentum> finaljet_list;
@@ -330,7 +436,7 @@ namespace Rivet
 					const double jphi = j.momentum().phi();
 					const double jpt = j.momentum().pT();
 					if (fabs(jeta) < 2.4)
-						if(jpt>30)
+						if(jpt>40)
 					{
 						if(isZee)
 						{
@@ -372,6 +478,57 @@ namespace Rivet
 				if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetETA3Wmu,weight,finaljet_list[2].eta());
 				if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetETA4Wmu,weight,finaljet_list[3].eta());
 
+				if (isWmn) {
+
+					_njet_WMuNu = finaljet_list.size();
+					int muind = -1;
+					int nuind=-1;
+					if (fabs(WDecayProducts[0].pdgId()) == 13) muind = 0;
+					if (fabs(WDecayProducts[1].pdgId()) == 13) muind = 1;
+					nuind = 1*(muind==0);
+					_ptmuon  = WDecayProducts[muind].momentum().pT();
+					_etamuon = WDecayProducts[muind].momentum().eta();
+					_phimuon = WDecayProducts[muind].momentum().phi();
+					_ptneutrino  = WDecayProducts[nuind].momentum().pT();
+					_etaneutrino = WDecayProducts[nuind].momentum().eta();
+					_phineutrino = WDecayProducts[nuind].momentum().phi();		
+
+					if (finaljet_list.size()>0){
+						_ptjet1=finaljet_list[0].pT();
+						_etajet1=finaljet_list[0].eta();
+						_phijet1=finaljet_list[0].phi();
+					}
+
+					if (finaljet_list.size()>1){
+						_ptjet2=finaljet_list[1].pT();
+						_etajet2=finaljet_list[1].eta();
+						_phijet2=finaljet_list[1].phi();
+					}
+
+					if (finaljet_list.size()>2){
+						_ptjet3=finaljet_list[2].pT();
+						_etajet3=finaljet_list[2].eta();
+						_phijet3=finaljet_list[2].phi();
+					}
+
+					if (finaljet_list.size()>3){
+						_ptjet4=finaljet_list[3].pT();
+						_etajet4=finaljet_list[3].eta();
+						_phijet4=finaljet_list[3].phi();
+					}
+
+					if (finaljet_list.size()>4){
+						_ptjet5=finaljet_list[4].pT();
+						_etajet5=finaljet_list[4].eta();
+						_phijet5=finaljet_list[4].phi();
+					}
+
+				_rivetTree->Fill();
+
+				}	
+
+
+
 			}
 
 			/// Normalise histograms etc., after the run
@@ -387,6 +544,9 @@ namespace Rivet
 				FillNoverN0(_histJetMultZmu,_histNoverN0Zmu);
 				FillChargeAssymHistogramSet(_histJetMultWmuPlus,_histJetMultWmuMinus, _histJetMultRatioWmuPlusMinus);
 				FillChargeAssymHistogramSet(_histJetMultWelPlus,_histJetMultWelMinus, _histJetMultRatioWelPlusMinus);
+
+				_rivetTree->Write();
+				_treeFile->Close();
 			}
 
 		private:
@@ -432,6 +592,49 @@ namespace Rivet
 			AIDA::IHistogram1D*  _histJetETA2Wmu ;
 			AIDA::IHistogram1D*  _histJetETA3Wmu ;
 			AIDA::IHistogram1D*  _histJetETA4Wmu ;
+
+			TTree* _rivetTree;
+			TString _treeFileName;
+			TFile* _treeFile;
+
+    		int _nevt; 
+    		int _njet_WMuNu;
+    		double _evweight;
+
+    		double _ptmuon;
+    		double _etamuon;
+    		double _phimuon;
+
+    		double _ptneutrino;
+    		double _etaneutrino;
+    		double _phineutrino;
+
+    		double _ptjet1;
+    		double _etajet1;
+    		double _phijet1;
+
+    		double _ptjet2;
+    		double _etajet2;
+    		double _phijet2;
+
+    		double _ptjet3;
+    		double _etajet3;
+    		double _phijet3;
+
+    		double _ptjet4;
+    		double _etajet4;
+    		double _phijet4;
+
+    		double _ptjet5;
+    		double _etajet5;
+    		double _phijet5;
+
+    		int NZE;
+    		int NZM;
+    		int NWE; 
+    		int NWM;
+    		int NT;
+
 	};
 
 	AnalysisBuilder<CMS_WJets_TEST> plugin_CMS_WJets_TEST;
