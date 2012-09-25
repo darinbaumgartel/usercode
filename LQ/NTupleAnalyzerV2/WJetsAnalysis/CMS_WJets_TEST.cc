@@ -168,7 +168,7 @@ namespace Rivet
 
 			bool ApplyElectronCutsForWen(double pt1, double eta1)
 			{
-				return true;
+				//return true;
 
 				bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
 				if( isFid1 && pt1>20 ) return true;
@@ -177,7 +177,7 @@ namespace Rivet
 
 			bool ApplyMuonCutsForWmn(double pt1, double eta1)
 			{
-				return true;
+				//return true;
 
 				bool isFid1 = ((fabs(eta1)<2.1));
 				if( isFid1 && pt1>45) return true;

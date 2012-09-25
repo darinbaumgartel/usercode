@@ -5,7 +5,7 @@ import os
 crabdir = sys.argv[1]
 
 rename =''
-if len(sys.agrv>1):
+if (len(sys.argv)>1):
 	rename = sys.argv[2]
 
 
@@ -24,8 +24,7 @@ if (rename!=''):
 	os.system('mv '+rootout+ ' '+rename+'.root')
 
 	aidaout = rename+'.aida'
-	rootout = rename+'.root'
-	os.system()
+	rootout = rename+'_tree.root'
 
 
 if aidaout in str(os.listdir('.')):
@@ -38,7 +37,7 @@ if rootout in str(os.listdir('.')):
 
 aidamerge = './aidamerge -o '+aidaout
 
-rootmerge = 'hadd '+aidaout
+rootmerge = 'hadd '+rootout
 
 
 for x in aidas:
