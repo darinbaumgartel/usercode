@@ -10,6 +10,16 @@ MuScaleDownDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyz
 MuScaleUpDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuScaleUp_2012_07_20_10_05_48/SummaryFiles/'
 MuSmearDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuSmear_2012_07_21_03_12_15/SummaryFiles/'
 
+# This is the Rivet NTuple for MadGraph
+RIVETMadGraph='/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/RIVET/MadGraph_tree_NEvents_46396089.root'
+
+# This maps the LQAnalyzer branch names to the Rivet branch names due to my total lack of foresight.
+RivetBranchMap=[  ]
+RivetBranchMap.append(['Eta_pfjet','etajet'])
+RivetBranchMap.append(['Pt_pfjet','ptjet'])
+RivetBranchMap.append(['PFJet40Count','njet_WMuNu'])
+
+
 # This is the main (and only) tree in the root files, storing single-valued branches (basically an NTuple, but made as TTree)
 TreeName = "PhysicalVariables"
 
@@ -41,19 +51,19 @@ def main():
 	# Calling on FullAnalysisWithUncertainty - creates all plots, tables, with unfolding, etc. Examples for Jet PT.  
 	# To detail the arguments:
 	# .........................(Gen Variable, Reco Var , X Label, Unfolding Binning, Presentation Binning, selection, weight, switch: 'v'= use ideal variable bins for unfolding, 'c' = use unmodified binning)                                                                                     
-	FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection,weight,'v')
-	FullAnalysisWithUncertainty('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection+j1,weight,'v')
-	FullAnalysisWithUncertainty('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection+j2,weight,'v')
+	# FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection,weight,'v')
+	# FullAnalysisWithUncertainty('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection+j1,weight,'v')
+	# FullAnalysisWithUncertainty('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[50,0,700],[40,50,65,85,110,140,175,215,260,310,365],selection+j2,weight,'v')
 
-	# Further examples  - Jet Count, Transverse Mass, MET
-	FullAnalysisWithUncertainty('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c')	
-	FullAnalysisWithUncertainty('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,0,200],[60,65,70,75,80,85,90,95,100,110,150],selection,weight,'v')
-	FullAnalysisWithUncertainty('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[30,40,50,60,70,80,90,100,115,130,150,170,200,240,280,350],selection,weight,'v')
+	# # Further examples  - Jet Count, Transverse Mass, MET
+	# FullAnalysisWithUncertainty('GenJet40Count','PFJet40Count',"N_{Jet}",[12,-1.5,10.5],[5,-0.5,4.5],selection,weight,'c')	
+	# FullAnalysisWithUncertainty('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[50,0,200],[60,65,70,75,80,85,90,95,100,110,150],selection,weight,'v')
+	# FullAnalysisWithUncertainty('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[30,40,50,60,70,80,90,100,115,130,150,170,200,240,280,350],selection,weight,'v')
 	
-	# Further examples - Jet Etas	
-	FullAnalysisWithUncertainty('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j1,weight,'c')
-	FullAnalysisWithUncertainty('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j2,weight,'c')
-	FullAnalysisWithUncertainty('Eta_genjet3','Eta_pfjet3',"#eta(jet_{3}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j3,weight,'c')
+	# # Further examples - Jet Etas	
+	# FullAnalysisWithUncertainty('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j1,weight,'c')
+	# FullAnalysisWithUncertainty('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j2,weight,'c')
+	# FullAnalysisWithUncertainty('Eta_genjet3','Eta_pfjet3',"#eta(jet_{3}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j3,weight,'c')
 
 	# FullAnalysisWithUncertainty will create .txt files in the pyplots directory. This is the final results. 
 	# Calling ParseTablesToFinalResults() will read these tables and produce fancier TeX tables and root plots.		
@@ -116,24 +126,28 @@ def main():
 
 
 ##########################################################################
-########            All functions and Details Below               ########
+########            Import libraries                              ########
 ##########################################################################
 
 import sys
 import math
 sys.argv.append( '-b' )  # Batch mode - no XWindows - much faster
 from ROOT import * # Load root
+from glob import * # For table parsing
+import csv         # For table parsing
+from itertools import izip  # More for table parsing
+from array import array    
+import numpy
+
+##########################################################################
+########              CleanUp/SetUp ROOT                          ########
+##########################################################################
 gROOT.ProcessLine("gErrorIgnoreLevel = 2001;") # Suppress warnings
 TFormula.SetMaxima(100000,1000,1000000) # Allow big strings for tcuts
-import numpy
 rnd= TRandom3() # Using TRandom3 for random numbers - no profound impact
-##########################################################################
-########              Clean up ROOT  Style                        ########
-##########################################################################
 gROOT.SetStyle('Plain')  # Plain white default for plots
 gStyle.SetOptTitle(0) # No titles
 # Below is for setting TH2D color plots to red-blue heat spectrum
-from array import array 
 NCont = 50
 NRGBs = 5
 stops = array("d",[ 0.00, 0.34, 0.61, 0.84, 1.00])
@@ -640,7 +654,6 @@ def GetRescaling(histo1, histo2,binning,variable):
 			
 	return [scalestring,errorstring]
 
-
 def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileDirectory,tagname):
 
 	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
@@ -709,7 +722,6 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileD
 
 	c1.Print('pyplots/Basic_'+recovariable+'_'+tagname+'.pdf')
 	c1.Print('pyplots/Basic_'+recovariable+'_'+tagname+'.png')
-
 			
 def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,FileDirectory,file_override,tau_override,tagname):
 	
@@ -1075,11 +1087,6 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 
 	return [tau,DataBinInfo,MCBinInfo]
 
-
-
-import csv
-from itertools import izip
-
 def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar):
 
 	[tau,data_standard,mc_standard]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,'',-1,'standard')
@@ -1182,9 +1189,6 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,present
 	os.system('cat table_tmp.txt | column -t -s"," > pyplots/'+recovariable+'.txt')
 	os.system('rm table_tmp.txt')
 
-
-from glob import *
-
 def tabletolist(table):
 	output=[]
 	Nvertical=0
@@ -1260,7 +1264,7 @@ def getcolumn(listedtable,column):
 		error.append(e)
 	texcontents=[ '$ ' +c.replace('+-', '\pm')+' $' for c in contents]
 	return [texcontents,mean,error]
-import math
+
 def getmeasurement(listedtable):
 	[meas_tex, meas_mean, meas_staterr] = getcolumn(listedtable,2)
 	m=3
@@ -1406,9 +1410,17 @@ def NormalizeTexTable(file,norm):
 		newtable += newline
 	return newtable
 
-from array import array
-
 def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalization):
+
+	# print 'binning: ',binning
+	# print 'name: ', name
+	# print 'label: ', label
+	# print 'mean: ', mean
+	# print 'up: ', up
+	# print 'down: ', down
+	# print 'style: ', style
+	# print 'normalization: ', normalization
+
 	binset=ConvertBinning(binning)
 	n = len(binset)-1
 	htest= TH1D('htest','htest',n,array('d',binset))
@@ -1419,7 +1431,7 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalizati
 	Xminus=[]
 	Yplus=[]
 	Yminus=[]
-	
+
 	if normalization==0:
 		N=1.0
 	else:
@@ -1454,6 +1466,9 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalizati
 	hout = TGraphAsymmErrors(n,X,Y,Xminus,Xplus,Yminus,Yplus)
 	
 	hout.SetTitle(name)
+
+	# print 'hout.SetFillStyle(',style[0],')'
+	
 	hout.SetFillStyle(style[0])
 	hout.SetMarkerStyle(style[1])
 	hout.SetMarkerSize(style[2])
@@ -1471,16 +1486,73 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalizati
 	hout.GetYaxis().SetLabelFont(132)
 	return hout
 
+def RivetHisto(rivetfile, rivetvariable, binning,selection, label, style,original_events,normalization, quantity):
+
+	frivet = TFile.Open(rivetfile)
+	trivet = frivet.Get("RivetTree")
+	Name = "MadGraph"*("MadGraph" in rivetfile) + "Pythia"*("Pythia" in rivetfile) + "PROBLEM"*("MadGraph" not in rivetfile and "Pythia" not in rivetfile)
+	hrivet = CreateHisto(Name,Name,trivet,rivetvariable,binning,selection,style,label)
+	print 'Total Entries: ', trivet.GetEntries()
+	print ' hrivet stats:    ', hrivet.GetEntries(), hrivet.Integral(), 
+	acceptance = (1.0*(hrivet.Integral()))/(1.0*original_events)
+	# print 'Acceptance: ', acceptance,
+	scalefactor = (4980.0*31314.0)*acceptance
+	# print 'Scale: ', scalefactor
+	hrivet.Scale(1.0/hrivet.Integral())
+	means=[]
+	errs=[]
+	
+	for x in range(len(binning)-1):
+		means.append(scalefactor*(hrivet.GetBinContent(x+1)))
+		errs.append(scalefactor*(hrivet.GetBinError(x+1)))
+		# print binning[x],'-',binning[x+1],'  ', means[x], '+-',errs[x]
+
+	if normalization==0:
+		label = [label, 'Events/Bin']
+	else:
+		label = [label, 'd#sigma/d'+quantity+' [pb/GeV]']
+
+
+	RivetOutputHisto = CreateHistoFromLists(binning, Name,label, means, errs, errs, style,normalization)
+
+	return RivetOutputHisto
+
+def DivideTGraphs(g1, g2):
+	n = 0
+
+
+	return g1
+
 def FinalHisto(binning, label, quantity, filename ,expectation_means, expectation_errors, expectation_names, measurement, measurement_error_up, measurement_error_down, normalization):
 
-	c1 = TCanvas("c1","",700,500)
-	c1.SetGrid()
-	c1.cd(1).SetLogy()
+	c1 = TCanvas("c1","",700,700)
+
+	pad1 = TPad( 'pad1', 'pad1', 0.0, 0.25, 1.0, 1.0 )#divide canvas into pads
+	pad2 = TPad( 'pad2', 'pad2', 0.0, 0.0, 1.0, 0.25 )
+
+	pad1.Draw()
+	pad2.Draw()
+
+	pad1.SetGrid()
+	pad1.SetLogy()
+	pad1.cd()
+
 	gStyle.SetOptStat(0)
 	MadGraphStyle=[1001,20,.00001,1,4]
+	MadGraphRivetStyle=[0*3004+1001,20,.00001,1,6]
+
 	DataRecoStyle=[0,20,.7,1,1]	
 	
+	rivetname = (filename.split('/')[-1]).split('FINAL')[0]
+	for x in RivetBranchMap:
+		if x[0] in rivetname:
+			rivetname = rivetname.replace(x[0],x[1])
 	
+	madgraph_NOriginal = float(((RIVETMadGraph.split('/')[-1]).split('NEvents_')[-1]).split('.root')[0])
+	# print 'Rivet Origianl Events: '  , madgraph_NOriginal
+	if rivetname == 'njet_WMuNu' or rivetname=='ptjet1' or rivetname=='etajet1':
+		print 'NJET FOUND ' + '*'*50
+		Rivet_MadGraph_Result = RivetHisto(RIVETMadGraph,rivetname,binning,"(ptmuon>45)*(abs(etamuon)<2.1)",label,MadGraphRivetStyle,madgraph_NOriginal,normalization,quantity)
 	
 	Max = max(measurement)*10
 	Min = min(measurement)*.5
@@ -1499,7 +1571,6 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 		minus_errors = expectation_errors[x]
 		style=MadGraphStyle
 		Exp = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
-		#Exp.Print()
 
 		Exp.SetMaximum(Max)
 		Exp.SetMinimum(Min)
@@ -1515,7 +1586,8 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	minus_errors=measurement_error_down
 	style=DataRecoStyle
 	Meas = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
-	
+	if rivetname == 'njet_WMuNu' or rivetname=='ptjet1'or rivetname=='etjet1':
+		Rivet_MadGraph_Result.Draw("2")
 	Meas.Draw("P")
 
 	FixDrawLegend(c1.cd(1).BuildLegend())
@@ -1531,12 +1603,15 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	l1.DrawLatex(0.67,0.58,sqrts)
 	l1.DrawLatex(0.67,0.53,"PRELIMINARY")
 
+	pad2.cd()
+	pad2.SetGrid()
+
+	DivideTGraphs(Meas,Exp).Draw("a2")
 
 	c1.Print(filename+'pdf')
 	c1.Print(filename+'png')
 
-		
-		
+
 def ParseTablesToFinalResults():
 	allfiles = glob('pyplots/*txt')
 	for f in allfiles:
