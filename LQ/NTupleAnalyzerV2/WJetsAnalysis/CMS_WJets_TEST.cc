@@ -109,7 +109,8 @@ namespace Rivet
     			_rivetTree->Branch("njet_WMuNu", &_njet_WMuNu, "njet_WMuNu/I");
     			_rivetTree->Branch("evweight", &_evweight, "evweight/D");			
 
-
+    			_rivetTree->Branch("mt_munu", &_mt_munu, "mt_munu/D");			
+    			
     			_rivetTree->Branch("ptmuon", &_ptmuon, "ptmuon/D");			
     			_rivetTree->Branch("etamuon", &_etamuon, "etamuon/D");			
     			_rivetTree->Branch("phimuon", &_phimuon, "phimuon/D");			
@@ -283,7 +284,7 @@ namespace Rivet
 				bool isWenMinus =false;
 				bool isWenPlus  =false;
 
-
+				_mt_munu = -5.0;
 	    		_ptmuon = -5.0;
 	    		_etamuon = -5.0;
 	    		_phimuon = -5.0;
@@ -332,7 +333,7 @@ namespace Rivet
 				const ParticleVector&  ZDecayProducts =  invMassFinalStateZ.particles();
 				const ParticleVector&  WDecayProducts =  invMassFinalStateW.particles();
 
-				//if (ZDecayProducts.size() < 2 && WDecayProducts.size() <2) vetoEvent;
+				if (ZDecayProducts.size() < 2 && WDecayProducts.size() <2) vetoEvent;
 
 				double pt1=-9999.,  pt2=-9999.;
 				double phi1=-9999., phi2=-9999.;
@@ -374,7 +375,7 @@ namespace Rivet
 					}
 				}
 
-				// if(isW && ( mt<50 || mt>110)) vetoEvent;
+				if(isW && ( mt<50 || mt>110)) vetoEvent;
 
 				isZmm = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 13) && (fabs(ZDecayProducts[1].pdgId()) == 13));
 				isZee = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 11) && (fabs(ZDecayProducts[1].pdgId()) == 11));
@@ -418,7 +419,7 @@ namespace Rivet
 				//std::cout<<" ----------- " <<std::endl;
 				//std::cout<<isWmn<<std::endl;
 
-				//if(!((isZmm||isZee)||(isWmn||isWen)))vetoEvent;
+				if(!((isZmm||isZee)||(isWmn||isWen)))vetoEvent;
 
 				bool passBosonConditions = false;
 				if(isZmm)passBosonConditions = ApplyMuonCutsForZmm(pt1,pt2,eta1,eta2);
@@ -426,34 +427,34 @@ namespace Rivet
 				if(isWen)passBosonConditions = ApplyElectronCutsForWen(pt1,eta1);
 				if(isWmn)passBosonConditions = ApplyMuonCutsForWmn(pt1,eta1);
 
-				//if(!passBosonConditions)vetoEvent;
+				if(!passBosonConditions)vetoEvent;
 
 				//Obtain the jets.
 				vector<FourMomentum> finaljet_list;
 				foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(40.0*GeV))
 				{
-					const double jeta = j.momentum().eta();
-					const double jphi = j.momentum().phi();
-					const double jpt = j.momentum().pT();
-					if (fabs(jeta) < 2.4)
-						if(jpt>40)
+					double jeta = j.momentum().eta();
+					double jphi = j.momentum().phi();
+					double jpt = j.momentum().pT();
+					
+					
+					if ((fabs(jeta) < 2.4) && (jpt>40))
 					{
-						if(isZee)
+						if(isWen||isWmn)
 						{
-							if (deltaR(pt1, phi1, jeta, jphi) > 0.3 && deltaR(pt2, phi2, jeta, jphi) > 0.3)
+							
+							int lindex = 0;
+							
+							if (fabs(WDecayProducts[1].pdgId()) == 13) lindex = 1;
+							
+							double leta = (WDecayProducts[lindex]).momentum().eta();
+							double lphi = (WDecayProducts[lindex]).momentum().phi();
+							
+							if( ((leta-jeta)*(leta-jeta) + (lphi-jphi)*(lphi-jphi)) > 0.3*0.3  )
+							{
 								finaljet_list.push_back(j.momentum());
-							continue;
-						}
-						else if(isWen||isWmn)
-						{
-							if (deltaR(pt1, phi1, jeta, jphi) > 0.3){
-								finaljet_list.push_back(j.momentum());
-								//std::cout<<j.momentum().pT()<<std::endl;
 							}
-							continue;
 						}
-
-						else  finaljet_list.push_back(j.momentum());
 					}
 				}
 
@@ -486,6 +487,7 @@ namespace Rivet
 					if (fabs(WDecayProducts[0].pdgId()) == 13) muind = 0;
 					if (fabs(WDecayProducts[1].pdgId()) == 13) muind = 1;
 					nuind = 1*(muind==0);
+					_mt_munu = mt;
 					_ptmuon  = WDecayProducts[muind].momentum().pT();
 					_etamuon = WDecayProducts[muind].momentum().eta();
 					_phimuon = WDecayProducts[muind].momentum().phi();
@@ -600,6 +602,8 @@ namespace Rivet
     		int _nevt; 
     		int _njet_WMuNu;
     		double _evweight;
+
+			double _mt_munu;
 
     		double _ptmuon;
     		double _etamuon;
