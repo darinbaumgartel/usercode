@@ -5,7 +5,7 @@ import os
 crabdir = sys.argv[1]
 
 rename =''
-if (len(sys.argv)>1):
+if (len(sys.argv)>2):
 	rename = sys.argv[2]
 
 
@@ -14,6 +14,11 @@ aidas = [(crabdir + '/res/'+x.replace('\n','')).replace('//','/') for x in os.po
 
 roots = [(crabdir + '/res/'+x.replace('\n','')).replace('//','/') for x in os.popen('ls -1 '+crabdir+'/res | grep ".root"').readlines()]
 
+N = ((os.popen('cat '+crabdir+'/res/*.stdout | grep "All included subprocesses" | awk \'{s+= $7} END {print s}\'').readlines())[0]).replace('\n','')
+
+# print N
+
+# sys.exit()
 
 aidaout = crabdir.replace('/','')+'.aida'
 
@@ -65,3 +70,6 @@ for x in os.listdir('plots/CMS_WJets_TEST'):
 		
 	os.system( 'rm plots/CMS_WJets_TEST/'+x.replace('.pdf','.png'))
 	os.system('convert -trim plots/CMS_WJets_TEST/'+x+' plots/CMS_WJets_TEST/'+x.replace('.pdf','.png'))
+
+os.system('mv '+rootout + ' '+rootout.replace('.root','_NEvents_'+N+'.root'))
+os.system('mv '+aidaout + ' '+aidaout.replace('.aida','_NEvents_'+N+'.aida'))

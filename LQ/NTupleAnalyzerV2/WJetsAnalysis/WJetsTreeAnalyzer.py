@@ -11,13 +11,15 @@ MuScaleUpDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer
 MuSmearDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuSmear_2012_07_21_03_12_15/SummaryFiles/'
 
 # This is the Rivet NTuple for MadGraph
-RIVETMadGraph='/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/RIVET/MadGraph_tree_NEvents_46396089.root'
+RIVETMadGraph='/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/RIVET/MadGraph_tree_NEvents_59994763.root'
 
 # This maps the LQAnalyzer branch names to the Rivet branch names due to my total lack of foresight.
 RivetBranchMap=[  ]
 RivetBranchMap.append(['Eta_pfjet','etajet'])
 RivetBranchMap.append(['Pt_pfjet','ptjet'])
 RivetBranchMap.append(['PFJet40Count','njet_WMuNu'])
+RivetBranchMap.append(['MT_muon1MET','mt_munu'])
+RivetBranchMap.append(['Pt_MET','ptneutrino'])
 
 
 # This is the main (and only) tree in the root files, storing single-valued branches (basically an NTuple, but made as TTree)
@@ -114,7 +116,8 @@ def main():
 	
 	# Just saving tons of PNG output into a single PDF for easier viewing.
 	os.system("convert pyplots/*.png pyplots/AllPlots.pdf")
-	os.system("convert pyplots/*FINAL*png pyplots/AllFinalPlots.pdf")
+	os.system("convert pyplots/*FINAL*Count.png pyplots/AllFinalCountPlots.pdf")
+	os.system("convert pyplots/*FINAL*XSec.png pyplots/AllFinalXSecPlots.pdf")
 	
 
 
@@ -1425,6 +1428,14 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalizati
 	n = len(binset)-1
 	htest= TH1D('htest','htest',n,array('d',binset))
 
+	for a in range(len(mean)):
+		mean[a] = abs(mean[a])
+	for a in range(len(up)):
+		up[a] = abs(up[a])
+	for a in range(len(down)):
+		down[a] = abs(down[a])
+
+
 	X = []
 	Y = []
 	Xplus=[]
@@ -1484,7 +1495,7 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalizati
 	hout.GetYaxis().SetTitleFont(132)
 	hout.GetXaxis().SetLabelFont(132)
 	hout.GetYaxis().SetLabelFont(132)
-	return hout
+	return [hout,[mean,up,down,binset]]
 
 def RivetHisto(rivetfile, rivetvariable, binning,selection, label, style,original_events,normalization, quantity):
 
@@ -1517,21 +1528,72 @@ def RivetHisto(rivetfile, rivetvariable, binning,selection, label, style,origina
 
 	return RivetOutputHisto
 
-def DivideTGraphs(g1, g2):
+def DivideTGraphs(gv1, gv2,style):
+
+	[mean1,up1,down1,binset1]=gv1
+	[mean2,up2,down2,binset2]=gv2
+
+
+
+	if binset1!=binset2:
+		print "ERROR: CAN'T DIVIDE GRAPHS, EXITING."
+		sys.exit()
+	binset=binset1
+
+	ratmean = []
+	raterr = []
+
+	for x in range(len(binset)-1):
+		m1=mean1[x]
+		m2=mean2[x]
+		u1=up1[x]
+		u2=up2[x]
+		d1=down1[x]
+		d2=down2[x]
+
+		if m2 != 0:
+			rat = m1/m2
+		else: 
+			rat = 1.0 
+		if m1==0:
+			rat = 1
+
+		err_1 = max([u1,d1])
+		err_2 = max([u2,d2])
+
+		frac1 = 0
+		if m1 !=0:
+			frac1 = err_1/m1
+
+
+		frac2 = 0
+		if m2 !=0:
+			frac2 = err_2/m2
+
+		err = rat*( math.sqrt( (frac1)**2 + (frac2)**2  ))
+
+		ratmean.append(rat)
+		raterr.append(err)
+
+		# print  m1,m2,' || ',u1,u2,' || ', d1,d2, ' || ', rat, err, ' || ',err_1, err_2,' || ', frac1, frac2
+
+
 	n = 0
 
-
-	return g1
+	return CreateHistoFromLists(binset, "example",["",""], ratmean,raterr,raterr,style,1.0)[0]
 
 def FinalHisto(binning, label, quantity, filename ,expectation_means, expectation_errors, expectation_names, measurement, measurement_error_up, measurement_error_down, normalization):
 
-	c1 = TCanvas("c1","",700,700)
+	c1 = TCanvas("c1","",700,800)
 
-	pad1 = TPad( 'pad1', 'pad1', 0.0, 0.25, 1.0, 1.0 )#divide canvas into pads
-	pad2 = TPad( 'pad2', 'pad2', 0.0, 0.0, 1.0, 0.25 )
+	pad1 = TPad( 'pad1', 'pad1', 0.0, 0.50, 1.0, 1.0 )#divide canvas into pads
+	pad2 = TPad( 'pad2', 'pad2', 0.0, 0.25, 1.0, 0.5 )
+	pad3 = TPad( 'pad3', 'pad3', 0.0, 0.0, 1.0, 0.25 )
+
 
 	pad1.Draw()
 	pad2.Draw()
+	pad3.Draw()
 
 	pad1.SetGrid()
 	pad1.SetLogy()
@@ -1539,6 +1601,11 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 
 	gStyle.SetOptStat(0)
 	MadGraphStyle=[1001,20,.00001,1,4]
+	MadGraphSubStyle=[3254,21,.7,1,4]
+
+	MadGraphRivetSubStyle=[0*3004+3254,21,.7,1,6]
+
+
 	MadGraphRivetStyle=[0*3004+1001,20,.00001,1,6]
 
 	DataRecoStyle=[0,20,.7,1,1]	
@@ -1550,9 +1617,10 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	
 	madgraph_NOriginal = float(((RIVETMadGraph.split('/')[-1]).split('NEvents_')[-1]).split('.root')[0])
 	# print 'Rivet Origianl Events: '  , madgraph_NOriginal
-	if rivetname == 'njet_WMuNu' or rivetname=='ptjet1' or rivetname=='etajet1':
-		print 'NJET FOUND ' + '*'*50
-		Rivet_MadGraph_Result = RivetHisto(RIVETMadGraph,rivetname,binning,"(ptmuon>45)*(abs(etamuon)<2.1)",label,MadGraphRivetStyle,madgraph_NOriginal,normalization,quantity)
+	# if rivetname == 'njet_WMuNu' or rivetname=='ptjet1' or rivetname=='etajet1':
+	# 	print 'NJET FOUND ' + '*'*50
+		
+	[Rivet_MadGraph_Result,Rivet_MadGraph_Result_verbose] = RivetHisto(RIVETMadGraph,rivetname,binning,"(ptmuon>45)*(abs(etamuon)<2.1)",label,MadGraphRivetStyle,madgraph_NOriginal,normalization,quantity)
 	
 	Max = max(measurement)*10
 	Min = min(measurement)*.5
@@ -1570,7 +1638,7 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 		plus_errors = expectation_errors[x]
 		minus_errors = expectation_errors[x]
 		style=MadGraphStyle
-		Exp = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
+		[Exp,Exp_verbose] = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
 
 		Exp.SetMaximum(Max)
 		Exp.SetMinimum(Min)
@@ -1585,9 +1653,9 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	plus_errors=measurement_error_up
 	minus_errors=measurement_error_down
 	style=DataRecoStyle
-	Meas = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
-	if rivetname == 'njet_WMuNu' or rivetname=='ptjet1'or rivetname=='etjet1':
-		Rivet_MadGraph_Result.Draw("2")
+	[Meas,Meas_verbose] = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
+	# if rivetname == 'njet_WMuNu' or rivetname=='ptjet1'or rivetname=='etajet1':
+	Rivet_MadGraph_Result.Draw("2")
 	Meas.Draw("P")
 
 	FixDrawLegend(c1.cd(1).BuildLegend())
@@ -1605,11 +1673,32 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 
 	pad2.cd()
 	pad2.SetGrid()
+	pad2.Draw()
 
-	DivideTGraphs(Meas,Exp).Draw("a2")
+	grat = DivideTGraphs(Meas_verbose,Exp_verbose,MadGraphSubStyle)
+
+	grat.SetMinimum(0)
+	grat.SetMaximum(2)
+	grat.Draw("ap2")
+
+
+	# if rivetname == 'njet_WMuNu' or rivetname=='ptjet1'or rivetname=='etajet1':
+
+	pad3.cd()
+	pad3.SetGrid()
+	pad3.Draw()
+
+	grat2 = DivideTGraphs(Meas_verbose,Rivet_MadGraph_Result_verbose,MadGraphRivetSubStyle)
+	grat2.SetMinimum(0)
+	grat2.SetMaximum(2)
+	grat2.Draw("ap2")
+
 
 	c1.Print(filename+'pdf')
 	c1.Print(filename+'png')
+
+	# if 'jet1' in filename:
+	#  	sys.exit()
 
 
 def ParseTablesToFinalResults():
