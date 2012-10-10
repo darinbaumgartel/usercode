@@ -11,7 +11,7 @@ MuScaleUpDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer
 MuSmearDirectory = '/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_July18_MuSmear_2012_07_21_03_12_15/SummaryFiles/'
 
 # This is the Rivet NTuple for MadGraph
-RIVETMadGraph='/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/RIVET/MadGraph_tree_NEvents_59994763.root'
+RIVETMadGraph='/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/RIVET/MadGraphJetMatch_tree_NEvents_18380748.root'
 
 # This maps the LQAnalyzer branch names to the Rivet branch names due to my total lack of foresight.
 RivetBranchMap=[  ]
@@ -45,6 +45,7 @@ def main():
 	#MakeUnfoldedPlots('Pt_genmuon1','Pt_muon1',"p_{T}(#mu) [GeV]",[25,45,145],selection,'')
 	
 	# This is the baseline selection - only one muon, fiducial region, MT in W window.
+	selection_noMTcut = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)'
 	selection = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>50)*(MT_muon1MET<110)'
 
 	# This is the baseline weight. Central PU (Not modified for systematics), ILum = 4980/pb, muon HLT eff of 0.92.
@@ -69,7 +70,13 @@ def main():
 
 	# FullAnalysisWithUncertainty will create .txt files in the pyplots directory. This is the final results. 
 	# Calling ParseTablesToFinalResults() will read these tables and produce fancier TeX tables and root plots.		
-	ParseTablesToFinalResults()	
+	
+	# def GetMTWindowRenormalization(recovariable,xlabel,fullbinning,selection,weight,FileDirectory,tagname):
+	WRenorm = GetMTWindowRenormalization('MT_genmuon1genMET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[40,50,60,70,75,80,85,90,95,100,110,140,200,1000],selection_noMTcut,weight,NormalDirectory,'renormalization_controlregion')[0]
+
+	print WRenorm
+
+	ParseTablesToFinalResults(WRenorm)	
 		
 
 
@@ -120,13 +127,9 @@ def main():
 	os.system("convert pyplots/*FINAL*XSec.png pyplots/AllFinalXSecPlots.pdf")
 	
 
-
-
 ####################################################################################################################################################
 ####################################################################################################################################################
 ####################################################################################################################################################
-
-
 
 ##########################################################################
 ########            Import libraries                              ########
@@ -656,6 +659,26 @@ def GetRescaling(histo1, histo2,binning,variable):
 	errorstring+=')'
 			
 	return [scalestring,errorstring]
+
+def GetMTWindowRenormalization(variable,xlabel,fullbinning,selection,weight,FileDirectory,tagname):
+
+	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
+	for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
+		exec('t_'+f.replace(".root\n","")+" = TFile.Open(\""+FileDirectory+"/"+f.replace("\n","")+"\")"+".Get(\""+TreeName+"\")")
+	tmpfile = TFile("tmp.root","RECREATE")	
+	Label=[xlabel,"Events/Bin"]
+
+	MCRecoStyle=[0,20,.00001,1,4]
+	hs_rec_WJets_all=CreateHisto('hs_rec_WJets_all','W+Jets [Reco] (All)',t_WJets_MG,variable,fullbinning,selection+weight,MCRecoStyle,Label)
+	hs_rec_WJets_win=CreateHisto('hs_rec_WJets_win','W+Jets [Reco] (Win)',t_WJets_MG,variable,fullbinning,selection+weight+"*(MT_muon1MET>50)*(MT_muon1MET<110)",MCRecoStyle,Label)
+
+	print hs_rec_WJets_all.Integral()
+	print hs_rec_WJets_win.Integral()	
+
+	# return [0]
+	the_rescaling = GetRescaling(hs_rec_WJets_win, hs_rec_WJets_all, fullbinning,"mt_munu")
+
+	return the_rescaling
 
 def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileDirectory,tagname):
 
@@ -1413,7 +1436,7 @@ def NormalizeTexTable(file,norm):
 		newtable += newline
 	return newtable
 
-def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalization):
+def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalization,plottype):
 
 	# print 'binning: ',binning
 	# print 'name: ', name
@@ -1495,16 +1518,41 @@ def CreateHistoFromLists(binning, name, label, mean, up, down, style,normalizati
 	hout.GetYaxis().SetTitleFont(132)
 	hout.GetXaxis().SetLabelFont(132)
 	hout.GetYaxis().SetLabelFont(132)
+
+	if plottype=="TopPlot":
+		hout.GetYaxis().SetTitleFont(132);
+		hout.GetXaxis().SetTitleSize(.06);
+		hout.GetYaxis().SetTitleSize(.06);
+		hout.GetXaxis().CenterTitle();
+		hout.GetYaxis().CenterTitle();
+		hout.GetXaxis().SetTitleOffset(0.8);
+		hout.GetYaxis().SetTitleOffset(0.8);
+		hout.GetYaxis().SetLabelSize(.05);
+		hout.GetXaxis().SetLabelSize(.05);
+
+
+	if plottype=="SubPlot":
+		hout.GetYaxis().SetTitleFont(132);
+		hout.GetXaxis().SetTitleSize(.13);
+		hout.GetYaxis().SetTitleSize(.13);
+		hout.GetXaxis().CenterTitle();
+		hout.GetYaxis().CenterTitle();		
+		hout.GetXaxis().SetTitleOffset(.28);
+		hout.GetYaxis().SetTitleOffset(.28);
+		hout.GetYaxis().SetLabelSize(.09);
+		hout.GetXaxis().SetLabelSize(.09);
+
 	return [hout,[mean,up,down,binset]]
 
-def RivetHisto(rivetfile, rivetvariable, binning,selection, label, style,original_events,normalization, quantity):
+def RivetHisto(rivetfile, rivetvariable, binning,selection, label, style,original_events,normalization, nmadgraph, quantity, WRenormalizationForRivet):
 
 	frivet = TFile.Open(rivetfile)
 	trivet = frivet.Get("RivetTree")
 	Name = "MadGraph"*("MadGraph" in rivetfile) + "Pythia"*("Pythia" in rivetfile) + "PROBLEM"*("MadGraph" not in rivetfile and "Pythia" not in rivetfile)
-	hrivet = CreateHisto(Name,Name,trivet,rivetvariable,binning,selection,style,label)
+	hrivet = CreateHisto(Name,Name,trivet,rivetvariable,binning,selection+'*'+WRenormalizationForRivet,style,label)
 	print 'Total Entries: ', trivet.GetEntries()
 	print ' hrivet stats:    ', hrivet.GetEntries(), hrivet.Integral(), 
+	print ' In Madgraph:  ', nmadgraph
 	acceptance = (1.0*(hrivet.Integral()))/(1.0*original_events)
 	# print 'Acceptance: ', acceptance,
 	scalefactor = (4980.0*31314.0)*acceptance
@@ -1513,6 +1561,11 @@ def RivetHisto(rivetfile, rivetvariable, binning,selection, label, style,origina
 	means=[]
 	errs=[]
 	
+	rivetscale = nmadgraph/(scalefactor)
+
+	if True:
+		scalefactor=nmadgraph
+
 	for x in range(len(binning)-1):
 		means.append(scalefactor*(hrivet.GetBinContent(x+1)))
 		errs.append(scalefactor*(hrivet.GetBinError(x+1)))
@@ -1524,9 +1577,9 @@ def RivetHisto(rivetfile, rivetvariable, binning,selection, label, style,origina
 		label = [label, 'd#sigma/d'+quantity+' [pb/GeV]']
 
 
-	RivetOutputHisto = CreateHistoFromLists(binning, Name,label, means, errs, errs, style,normalization)
+	RivetOutputHisto = CreateHistoFromLists(binning, Name,label, means, errs, errs, style,normalization,"SubPlot")
 
-	return RivetOutputHisto
+	return [RivetOutputHisto,rivetscale]
 
 def DivideTGraphs(gv1, gv2,style):
 
@@ -1580,15 +1633,15 @@ def DivideTGraphs(gv1, gv2,style):
 
 	n = 0
 
-	return CreateHistoFromLists(binset, "example",["",""], ratmean,raterr,raterr,style,1.0)[0]
+	return CreateHistoFromLists(binset, "example",["","Data / MC"], ratmean,raterr,raterr,style,1.0,"SubPlot")[0]
 
-def FinalHisto(binning, label, quantity, filename ,expectation_means, expectation_errors, expectation_names, measurement, measurement_error_up, measurement_error_down, normalization):
+def FinalHisto(binning, label, quantity, filename ,expectation_means, expectation_errors, expectation_names, measurement, measurement_error_up, measurement_error_down, normalization,WRenormalizationForRivet):
 
 	c1 = TCanvas("c1","",700,800)
 
-	pad1 = TPad( 'pad1', 'pad1', 0.0, 0.50, 1.0, 1.0 )#divide canvas into pads
-	pad2 = TPad( 'pad2', 'pad2', 0.0, 0.25, 1.0, 0.5 )
-	pad3 = TPad( 'pad3', 'pad3', 0.0, 0.0, 1.0, 0.25 )
+	pad1 = TPad( 'pad1', 'pad1', 0.0, 0.53, 1.0, 1.0 )#divide canvas into pads
+	pad2 = TPad( 'pad2', 'pad2', 0.0, 0.28, 1.0, 0.50 )
+	pad3 = TPad( 'pad3', 'pad3', 0.0, 0.03, 1.0, 0.25 )
 
 
 	pad1.Draw()
@@ -1619,8 +1672,8 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	# print 'Rivet Origianl Events: '  , madgraph_NOriginal
 	# if rivetname == 'njet_WMuNu' or rivetname=='ptjet1' or rivetname=='etajet1':
 	# 	print 'NJET FOUND ' + '*'*50
-		
-	[Rivet_MadGraph_Result,Rivet_MadGraph_Result_verbose] = RivetHisto(RIVETMadGraph,rivetname,binning,"(ptmuon>45)*(abs(etamuon)<2.1)",label,MadGraphRivetStyle,madgraph_NOriginal,normalization,quantity)
+	
+	rivetlabel=label	
 	
 	Max = max(measurement)*10
 	Min = min(measurement)*.5
@@ -1638,7 +1691,7 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 		plus_errors = expectation_errors[x]
 		minus_errors = expectation_errors[x]
 		style=MadGraphStyle
-		[Exp,Exp_verbose] = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
+		[Exp,Exp_verbose] = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization,"TopPlot")
 
 		Exp.SetMaximum(Max)
 		Exp.SetMinimum(Min)
@@ -1647,29 +1700,54 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 			Exp.Draw("A2")
 		else:
 			Exp.Draw("2")
+
+	nmadgraph = sum(Exp_verbose[0])
+	[[Rivet_MadGraph_Result,Rivet_MadGraph_Result_verbose], rivetrescale] = RivetHisto(RIVETMadGraph,rivetname,binning,"(ptmuon>45)*(abs(etamuon)<2.1)",rivetlabel,MadGraphRivetStyle,madgraph_NOriginal,normalization,nmadgraph,quantity,WRenormalizationForRivet)
 	
 	name="Measured"
 	mean_value = measurement
 	plus_errors=measurement_error_up
 	minus_errors=measurement_error_down
 	style=DataRecoStyle
-	[Meas,Meas_verbose] = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization)
+	[Meas,Meas_verbose] = CreateHistoFromLists(binning, name,label, mean_value, plus_errors, minus_errors, style,normalization,"TopPlot")
 	# if rivetname == 'njet_WMuNu' or rivetname=='ptjet1'or rivetname=='etajet1':
 	Rivet_MadGraph_Result.Draw("2")
 	Meas.Draw("P")
 
-	FixDrawLegend(c1.cd(1).BuildLegend())
+	# FixDrawLegend(c1.cd(1).BuildLegend())
+
+	leg = TLegend(0.63,0.68,0.89,0.88,"","brNDC");
+	leg.SetTextFont(132);
+	leg.SetFillColor(0);
+	leg.SetBorderSize(0);
+	leg.SetTextSize(.04)
+	leg.AddEntry(Meas,"Data (Unfolded)");
+	leg.AddEntry(Exp,"MadGraph (Unfolding)");
+	leg.AddEntry(Rivet_MadGraph_Result,"MadGraph (Rivet)");
+
+	leg.Draw()
+
 	
 	sqrts = "#sqrt{s} = 7 TeV";
 	l1=TLatex()
 	l1.SetTextAlign(12)
 	l1.SetTextFont(132)
 	l1.SetNDC()
-	l1.SetTextSize(0.04)
+	l1.SetTextSize(0.06)
  
-	l1.DrawLatex(0.67,0.63,"CMS 2011")
-	l1.DrawLatex(0.67,0.58,sqrts)
-	l1.DrawLatex(0.67,0.53,"PRELIMINARY")
+	l1.DrawLatex(0.37,0.94,"CMS 2011  "+sqrts)
+	# l1.DrawLatex(0.13,0.76,sqrts)
+
+	l2=TLatex()
+	l2.SetTextAlign(12)
+	l2.SetTextFont(132)
+	l2.SetNDC()
+	l2.SetTextSize(0.08)
+	# l2.SetTextAngle(45);	
+	l2.DrawLatex(0.6,0.60,"PRELIMINARY")
+	if True:
+		l2.DrawLatex(0.6,0.50,"R_{Rivet} = "+ str(round(rivetrescale,3)))
+
 
 	pad2.cd()
 	pad2.SetGrid()
@@ -1679,7 +1757,11 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 
 	grat.SetMinimum(0)
 	grat.SetMaximum(2)
+
+
 	grat.Draw("ap2")
+
+
 
 
 	# if rivetname == 'njet_WMuNu' or rivetname=='ptjet1'or rivetname=='etajet1':
@@ -1698,10 +1780,9 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	c1.Print(filename+'png')
 
 	# if 'jet1' in filename:
-	#  	sys.exit()
+	# sys.exit()
 
-
-def ParseTablesToFinalResults():
+def ParseTablesToFinalResults(WRenormalizationForRivet):
 	allfiles = glob('pyplots/*txt')
 	for f in allfiles:
 		if 'FINAL' in f:
@@ -1763,8 +1844,8 @@ def ParseTablesToFinalResults():
 			label = 'E_{T}^{miss} [GeV]'
 			quantity = 'E_{T}^{miss}'
 		
-		FinalHisto(rootbinning,label,quantity, output+'PlotCount.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,0)
-		FinalHisto(rootbinning,label,quantity, output+'PlotXSec.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,4980.0)
+		FinalHisto(rootbinning,label,quantity, output+'PlotCount.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,0,WRenormalizationForRivet)
+		FinalHisto(rootbinning,label,quantity, output+'PlotXSec.', prediction_means, prediction_errors, prediction_names, meas_mean, meas_err_plus, meas_err_minus,4980.0,WRenormalizationForRivet)
 
 		#os.system('cat pyplots/Pt_pfjet1FINAL.TexCount.txt')
 

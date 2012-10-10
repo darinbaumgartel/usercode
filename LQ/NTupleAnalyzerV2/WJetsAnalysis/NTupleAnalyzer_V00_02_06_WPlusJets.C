@@ -156,6 +156,11 @@ void placeholder::Loop()
 	BRANCH(pass_passBeamHaloFilterTight);
 	BRANCH(pass_isTrackingFailure);
 
+	// ID Efficiency Informations
+	
+	// vector<int> RecoJetsWithMatchesIDPass;
+	// tree->Branch("RecoJetsWithMatchesIDPass",&RecoJetsWithMatchesIDPass);
+
 	// PFMET
 	BRANCH(MET_pfsig);	BRANCH(MET_pf_charged);
 
@@ -181,10 +186,15 @@ void placeholder::Loop()
 
 	BRANCH(Pt_genmuon1);  BRANCH(Phi_genmuon1);  BRANCH(Eta_genmuon1);  
 	BRANCH(Pt_genmuon2);  BRANCH(Phi_genmuon2);  BRANCH(Eta_genmuon2);  
+
+	BRANCH(Pt_genmuonneutrino1);  BRANCH(Phi_genmuonneutrino1);  BRANCH(Eta_genmuonneutrino1);  
+
 	
 	BRANCH(Pt_genMET);  BRANCH(Phi_genMET);  
 
 	BRANCH(MT_genmuon1genMET);
+	BRANCH(MT_genmuon1genneutrino);
+
 	BRANCH(Pt_W_gen);  BRANCH(Phi_W_gen);
 
 	// Reco Level Variables
@@ -803,7 +813,12 @@ void placeholder::Loop()
 		FailIDPFThreshold = -1.0;
 		TLorentzVector CurrentLepton,CurrentPFJet;
 
+		TLorentzVector thisjet, thismu, thise;
 
+		int muindex = 99;
+		int eindex = 99;
+		int jetindex = 99;
+		
 		// Initial Jet Quality Selection
 		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 		{
@@ -822,11 +837,7 @@ void placeholder::Loop()
 			v_idx_pfjet_prefinal.push_back(ijet);
 		}
 		// Filter out jets that are actually muons or electrons
-		TLorentzVector thisjet, thismu, thise;
 
-		int muindex = 99;
-		int eindex = 99;
-		int jetindex = 99;
 
 		PFJet30Count = 0.0;
 		PFJet40Count = 0.0;
@@ -880,6 +891,8 @@ void placeholder::Loop()
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
 			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
 			GenJetCount=0;        GenJet30Count = 0.0;   GenJet40Count = 0.0;
+			Pt_genmuonneutrino1 = 0;      Phi_genmuonneutrino1 = 0;      Eta_genmuonneutrino1 = 0;
+
 
 			HT_genMG = 0.0;
 
@@ -890,6 +903,9 @@ void placeholder::Loop()
 			ST_genmuongenMETgenjet1234 = 0 ;
 			ST_genmuongenMETgenjet12345 = 0 ;
 			ST_genmuongenMETgenjet123456 = 0 ;
+
+			MT_genmuon1genMET = 0 ;  MT_genmuon1genneutrino = 0;
+			
 
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
@@ -999,6 +1015,14 @@ void placeholder::Loop()
 			
 			MT_genmuon1genMET =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
 			
+			if (GenMuNeutrinos.size()>0)	
+			{	
+				MT_genmuon1genneutrino = TMass(Pt_genmuon1, GenMuNeutrinos[0].Pt() , fabs(Phi_genmuon1 - GenMuNeutrinos[0].Phi()) );
+				Pt_genmuonneutrino1 = GenMuNeutrinos[0].Pt();     
+				Phi_genmuonneutrino1 = GenMuNeutrinos[0].Phi();      
+				Eta_genmuonneutrino1 = GenMuNeutrinos[0].Eta();
+			}
+			
 			TLorentzVector  v_GenMet;
 			v_GenMet.SetPtEtaPhiM ( Pt_genMET, 0, Phi_genMET,0 );
 			Pt_W_gen = (SortedGenMuons[0]+v_GenMet).Pt();
@@ -1028,6 +1052,7 @@ void placeholder::Loop()
 			Pt_muon2 = 0;      Phi_muon2 = 0;      Eta_muon2 = 0;
 	
 			Pt_MET = 0;        Phi_MET = 0;        
+			MT_muon1MET = 0;
 
 	
 			ST_muonMET = 0 ;
@@ -1092,11 +1117,8 @@ void placeholder::Loop()
 			if (HEEPEleCount>=1) Pt_HEEPele1 = ElectronPt->at(v_idx_ele_good_final[0]);
 	
 		if (Pt_muon1<45) continue;
-		//if (Pt_MET<30) continue;
 		if (Pt_muon2>20) continue;
-		//if (MT_muon1MET<50) continue;
 		if (Pt_HEEPele1>20.0) continue;
-		//if (MT_muon1MET>110) continue;
 		tree->Fill();
 	}
 
