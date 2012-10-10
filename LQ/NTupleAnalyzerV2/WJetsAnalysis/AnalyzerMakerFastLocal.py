@@ -117,10 +117,8 @@ f_sub.write('#!/bin/csh')
 thisdir = os.popen('pwd').readlines()[0].replace('\n','')
 person = os.popen('whoami').readlines()[0].replace('\n','')
 thiseos = thisdir+'/'+c2file.replace('.C','')+'_'+tagname+'_'+now
-#os.system(' xrd eoscms mkdir '+ thiseos.replace(c2file.replace('.C','')+'_'+now,''))
+
 os.system(' mkdir '+ thiseos)
-#print(' xrd eoscms mkdir '+ thiseos.replace(c2file.replace('.C','')+'_'+now,''))
-#print(' xrd eoscms mkdir '+ thiseos)
 print (' ')
 print '-------------------------------------------------------------------'
 
@@ -172,20 +170,11 @@ for x in range(len(SignalType)):
 		if SignalType[x] ==thistype:
 			dirList.append(y)
 		
-	#if StagerCheck:	
-		#for cf in dirList:
-			#cf = CastorDirectory[x]+'/' + cf
-			#fstatus = (((os.popen('stager_qry -M '+cf).readlines())[-1]).split(' '))[-1]
-			#os.system('sleep .25')
-			#if 'STAGED' not in fstatus:
-				#os.system('stager_get -M '+cf)
-		
-		
 	newdirList = []
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>8:
+		if len(sublist)>15:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
@@ -199,7 +188,7 @@ for x in range(len(SignalType)):
 		sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/'+c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+'.* .\ncp '+thisdir+'/JSONFilterFunction.* .\ncp '+thisdir+'/ResidualModifier.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+part+' .\nroot -b RootProcesses_'+SignalType[x]+part+'\ncp '+c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+'.root '+thiseos+'/\n')
 		sub_thisroot.close()
 
-		f_sub.write('\nsleep 1\nbsub -R "pool>40000" -o /dev/null -e /dev/null -q 8nh -J job'+SignalType[x]+part+' < sub_'+SignalType[x]+part+'.csh\n')
+		f_sub.write('\nsleep 1\nbsub -R "pool>40000" -o /dev/null -e /dev/null -q 1nd -J job'+SignalType[x]+part+'_'+now+' < sub_'+SignalType[x]+part+'.csh\n')
 
 		f_thisroot =  open("RootProcesses_"+SignalType[x]+part,'w')
 
@@ -285,6 +274,10 @@ for x in range(len(SignalType)):
 	# Note here that "gErrorIgnoreLevel = 3001" stops the issuance of warnings and errors, as a number of known-irrelevant  errors can appear. Use only if you are sure of your code :)
 	RootLinesToAdd = 'gROOT->ProcessLine(\"gErrorIgnoreLevel = 3001;\");\ngROOT->ProcessLine(\".L '+c2file.replace('.C','')+'_'+ SignalType[x] + '.C++\");\ngROOT->ProcessLine(\"'+c2file.replace('.C','')+'_'+ SignalType[x] + ' t\");\ngROOT->ProcessLine(\"t.Loop()\");\ngROOT->ProcessLine(\"gROOT->Reset()\");\n\n'
 	
+	if '--QUICKBREAK' in sys.argv:
+		print "TEST MODE ONLY. HAULTING."
+		sys.exit()
+
 f_sub.close()
 
 os.system('chmod 777 sub*.csh')
@@ -309,14 +302,13 @@ def gather_remaining_jobs():
 	
 	for_submission = []
 	
-	print 'Total, finished', len(listofrootoutputfiles), len(listofcompletedrootfiles)
+	print 'Total: ', len(listofrootoutputfiles), '       Finished: ',len(listofcompletedrootfiles)
 	for x in listofrootoutputfiles:
 		if x not in listofcompletedrootfiles:
 			for_submission.append(x)
 			
 	corresponding_csh = []
 	for x in for_submission:
-		
 		corresponding_csh.append( (os.popen('grep '+x+' sub*part*csh').readlines()[0]).split(':')[0]  )
 
 	bsub_commands = []
@@ -338,8 +330,8 @@ def WaitForJobs():
 	done=0
 	n = 0
 	while done!=1:
-		os.system('sleep 60')
-		jobinfo = os.popen('bjobs').readlines()
+		os.system('sleep 120')
+		jobinfo = os.popen('bjobs -w | grep '+now).readlines()
 		if 'PEND' not in str(jobinfo):
 			n += 1
 		jobinfo = len(jobinfo)
@@ -347,9 +339,9 @@ def WaitForJobs():
 		if jobsleft == -1:
 			done = 1
 		if jobsleft>=0:
-			print  str(jobsleft) +' jobs remaining.'
+			print  str(jobsleft+1) +' jobs remaining.'
 	print '\nJobs Complete. Verifying file output...\n\n'
-	if n > 120:
+	if n > 10:
 		 os.system('bjobs -w | awk \'{if (NR!=1) print $1}\' | xargs bkill')
 		 return
 
@@ -372,10 +364,12 @@ for g in range(len(groups)):
 	for x in range(len(SignalType)):
 		if groups[g] == Group[x]:
 			Contents[g].append(SignalType[x])
+os.system('mkdir '+thiseos+'/SummaryFiles')
 for g in range(len(groups)):
 	haddstring = 'hadd '+thiseos+'/SummaryFiles/'+groups[g]+'.root'
 	for c in Contents[g]:
 		haddstring += ' '+thiseos+'/*'+c.replace('-','_')+'*root'+' '
+	print haddstring
 	os.system(haddstring)
 
 print '-------------------------------------------------------------------'
@@ -388,6 +382,7 @@ call('rm *part*',shell=True)
 print '         Removing batch submission scripts'
 call('rm sub*csh',shell=True)
 print (' ')
+os.system('rm '+thiseos+'/NTupleAnalyzer*part*root')
 print '-------------------------------------------------------------------'
 
 print ('\n\n'+140*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiseos+'/SummaryFiles\n')
@@ -399,8 +394,9 @@ if neucopy == False:
 
 print ('Please wait - transfering output additionally to neu machine. ')
 neudir =  '~/neuhome/LQAnalyzerOutput/'
-os.system('rm '+thistemp+'/*.*')
-os.system('cp -r '+thistemp+' '+neudir)
+os.system('rm '+thiseos+'/*.*')
+os.system('cp -r '+thiseos+' '+neudir)
+os.system('rm '+thiseos+'/SummaryFiles/*root')
 
 print ('Transfer Complete. ')
 
