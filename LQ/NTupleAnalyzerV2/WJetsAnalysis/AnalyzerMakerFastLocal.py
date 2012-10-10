@@ -343,6 +343,7 @@ def WaitForJobs():
 	print '\nJobs Complete. Verifying file output...\n\n'
 	if n > 10:
 		 os.system('bjobs -w | awk \'{if (NR!=1) print $1}\' | xargs bkill')
+		 os.system('sleep 20')
 		 return
 
 def LoopUntilFinished():
