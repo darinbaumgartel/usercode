@@ -141,8 +141,20 @@ for p in possiblemasterdirs:
 		masterdir=p
 
 print '\n\n Reading File List, please wait ...\n\n'
-allfiles = os.popen('cmsLs  -R '+masterdir+' | grep ".root" | awk \'{print $5}\'').readlines()
 
+masterdirlist = masterdir.replace('/','__')+'.txt'
+
+if masterdirlist not in os.listdir('.') or  '--FileRefresh' in sys.argv:
+	print '\n','(Re)'*('--FileRefresh' in sys.argv)+'Generating file list',masterdirlist,' for files in ',masterdir,'\n'
+	allfiles = os.popen('cmsLs  -R '+masterdir+' | grep ".root" | awk \'{print $5}\'').readlines()
+	fmas = open(masterdirlist,'w')
+	for x in allfiles:
+		fmas.write(x+'\n')
+	fmas.close()
+else:
+	print '\n Reading files from: ',masterdirlist
+	print '\n *** NOTE: You can refresh the file list at anytime with the argument: --FileRefresh\n\n'
+	allfiles = [line for line in open(masterdirlist,'r')]
 
 for x in range(len(SignalType)):
 	
@@ -174,7 +186,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>15:
+		if len(sublist)>24:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
