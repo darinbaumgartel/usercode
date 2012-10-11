@@ -286,8 +286,8 @@ void placeholder::Loop()
 		Long64_t ientry = LoadTree(jentry);
 		if (ientry < 0) break;
 		nb = fChain->GetEntry(jentry);   nbytes += nb;
-
-		//if (jentry>5) break;  // comment this!!! testing only !
+		// std::cout<<" -------------------------------------------- "<<std::endl;
+		if (jentry>1000) break;  // comment this!!! testing only !
 
 		// Important Event Informations
 		run_number = run;
@@ -770,6 +770,8 @@ void placeholder::Loop()
 		GlobalMuonCount10GeV = 0.0;
 		TrackerMuonCount=0.0;
 
+
+		// std::cout<<"total muons: "<<MuonPt->size()<<std::endl;
 		for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 		{
 			if (MuonIsGlobal  ->at(imuon) == 1) GlobalMuonCount += 1.0;
@@ -778,10 +780,11 @@ void placeholder::Loop()
 
 			Double_t muonPt = MuonPt->at(imuon);
 			Double_t muonEta = MuonEta->at(imuon);
+			// std::cout<<"   Muon Stats: "<<muonPt<<"  "<<muonEta<<std::endl;
 
 			if (checkPT && (muonPt < 45.0) ) continue;
 			if  ( fabs(muonEta) > 2.1 )      continue;
-
+			// std::cout<<"   OK Muon Found: "<<muonPt<<"  "<<muonEta<<std::endl;
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
@@ -800,6 +803,7 @@ void placeholder::Loop()
 				MuonGlobalTrkValidHits->at(imuon)>=1 ;
 
 			if ( ! (PassGlobalTightPrompt && PassPOGTight) ) continue;
+			// std::cout<<"   Muon Pass ID"<<std::endl;
 			TLorentzVector muon;
 			muon.SetPtEtaPhiM( MuonPt -> at(imuon), MuonEta-> at(imuon),    MuonPhi-> at(imuon),    0);
 			RecoMuons.push_back(muon);
@@ -923,17 +927,44 @@ void placeholder::Loop()
 
 				if ( TMath::Abs(pdgId) == 13 )
 				{
+					// std::cout<<"  Gen Muon:  "<<pdgId<<"  "<<motherIndex<<"  "<<GenParticlePt->at(ip)<<"  "<<GenParticleEta->at(ip)<<"   "<<GenParticlePhi->at(ip)<<std::endl;
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					GenMuons.push_back(thisgenmuon);
+	
+					bool KeepMuon=true;
+					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
+					{
+						if ( (GenMuons[igenmuon].Pt() == thisgenmuon.Pt())&&(GenMuons[igenmuon].Eta() == thisgenmuon.Eta())&&(GenMuons[igenmuon].Phi() == thisgenmuon.Phi()) ) 
+						{	
+							KeepMuon=false;
+							// std::cout<<"     Duplicate muon FLAGGED "<<std::endl;
+						}
+					}
+
+					if (KeepMuon==true) GenMuons.push_back(thisgenmuon);
 				}
 				if ( TMath::Abs(pdgId) == 14 )
 				{
+					// std::cout<<"  Gen Neut:  "<<pdgId<<"  "<<motherIndex<<"  "<<GenParticlePt->at(ip)<<"  "<<GenParticleEta->at(ip)<<"   "<<GenParticlePhi->at(ip)<<std::endl;
+	
 					TLorentzVector thisgenneutrino;
 					thisgenneutrino.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					GenMuNeutrinos.push_back(thisgenneutrino);
+					
+					bool KeepNeutrino=true;
+					for(unsigned int igenneutrino = 0; igenneutrino != GenMuNeutrinos.size(); ++igenneutrino)
+					{
+						if ( (GenMuNeutrinos[igenneutrino].Pt() == thisgenneutrino.Pt())&&(GenMuNeutrinos[igenneutrino].Eta() == thisgenneutrino.Eta())&&(GenMuNeutrinos[igenneutrino].Phi() == thisgenneutrino.Phi()) ) 
+						{	
+							KeepNeutrino=false;
+							// std::cout<<"     Duplicate neutrino FLAGGED "<<std::endl;
+						}
+					}
+
+					if (KeepNeutrino==true) GenMuNeutrinos.push_back(thisgenneutrino);
 				}
 			}
+
+			// std::cout<<"Gen Muons: "<<GenMuons.size()<<"  GenNeutrinos: "<<GenMuNeutrinos.size()<<std::endl;
 
 			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
 			{
@@ -986,7 +1017,7 @@ void placeholder::Loop()
 					}
 				}
 
-				if (closestDR<0.5) matchedrecmuon=GenMuons[closestindex];
+				if (closestDR<0.5) matchedrecmuon=RecoMuons[closestindex];
 				SortedRecoMuons.push_back(matchedrecmuon);
 				SortedGenMuons.push_back(GenMuons[igenmuon]);
 			}
@@ -1001,6 +1032,8 @@ void placeholder::Loop()
 				EmptyMuon.SetPtEtaPhiM(0,0,0,0);
 				SortedGenMuons.push_back(EmptyMuon);
 			}			
+
+			// std::cout<<"Sorted Size Comparison:   Muons"<<SortedRecoMuons.size()<<"  "<<SortedGenMuons.size()<<std::endl;
 
 			// Assign Muon Variables
 			if (SortedGenMuons.size()>=1)   Pt_genmuon1  =  SortedGenMuons[0].Pt();
@@ -1212,13 +1245,17 @@ void placeholder::Loop()
 			if (HEEPEleCount>=1) Pt_HEEPele1 = ElectronPt->at(v_idx_ele_good_final[0]);
 		}	
 
-
+		// std::cout<<Pt_muon1<<"   "<<Pt_muon2<<"   "<<Pt_HEEPele1<<"   "<<tree->GetEntries()<<std::endl;
+		// std::cout<<Pt_pfjet1<<"  "<<Pt_pfjet2<<"  "<<Pt_pfjet3<<"  "<<std::endl;
 		if (Pt_muon1<45) continue;
 		if (Pt_muon2>20) continue;
 		if (Pt_HEEPele1>20.0) continue;
+		// std::cout<<"              .... Filling..."<<std::endl;
 		tree->Fill();
 	}
-
+	std::cout<<"Writing Tree"<<std::endl;
 	tree->Write();
+	std::cout<<"Closing File"<<std::endl;
 	file1->Close();
+	std::cout<<"Done."<<std::endl;
 }
