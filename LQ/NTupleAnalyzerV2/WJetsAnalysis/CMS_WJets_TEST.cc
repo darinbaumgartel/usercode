@@ -107,6 +107,8 @@ namespace Rivet
 
     			_rivetTree->Branch("nevt", &_nevt, "nevt/I");	
     			_rivetTree->Branch("njet_WMuNu", &_njet_WMuNu, "njet_WMuNu/I");
+    			_rivetTree->Branch("nBjet_WMuNu", &_nBjet_WMuNu, "nBjet_WMuNu/I");
+
     			_rivetTree->Branch("evweight", &_evweight, "evweight/D");			
 
     			_rivetTree->Branch("mt_munu", &_mt_munu, "mt_munu/D");			
@@ -122,22 +124,32 @@ namespace Rivet
     			_rivetTree->Branch("ptjet1", &_ptjet1, "ptjet1/D");			
     			_rivetTree->Branch("etajet1", &_etajet1, "etajet1/D");			
     			_rivetTree->Branch("phijet1", &_phijet1, "phijet1/D");
+    			_rivetTree->Branch("dphijet1muon", &_dphijet1muon, "dphijet1muon/D");			
+    			_rivetTree->Branch("isBjet1", &_isBjet1, "isBjet1/D");			
 
     			_rivetTree->Branch("ptjet2", &_ptjet2, "ptjet2/D");			
     			_rivetTree->Branch("etajet2", &_etajet2, "etajet2/D");			
     			_rivetTree->Branch("phijet2", &_phijet2, "phijet2/D");
+    			_rivetTree->Branch("dphijet2muon", &_dphijet2muon, "dphijet2muon/D");			
+    			_rivetTree->Branch("isBjet2", &_isBjet2, "isBjet2/D");			
 
     			_rivetTree->Branch("ptjet3", &_ptjet3, "ptjet3/D");			
     			_rivetTree->Branch("etajet3", &_etajet3, "etajet3/D");			
     			_rivetTree->Branch("phijet3", &_phijet3, "phijet3/D");
+    			_rivetTree->Branch("dphijet3muon", &_dphijet3muon, "dphijet3muon/D");			
+    			_rivetTree->Branch("isBjet3", &_isBjet3, "isBjet3/D");			
 
     			_rivetTree->Branch("ptjet4", &_ptjet4, "ptjet4/D");			
     			_rivetTree->Branch("etajet4", &_etajet4, "etajet4/D");			
     			_rivetTree->Branch("phijet4", &_phijet4, "phijet4/D");
+    			_rivetTree->Branch("dphijet4muon", &_dphijet4muon, "dphijet4muon/D");			
+    			_rivetTree->Branch("isBjet4", &_isBjet4, "isBjet4/D");			
 
     			_rivetTree->Branch("ptjet5", &_ptjet5, "ptjet5/D");			
     			_rivetTree->Branch("etajet5", &_etajet5, "etajet5/D");			
     			_rivetTree->Branch("phijet5", &_phijet5, "phijet5/D");
+    			_rivetTree->Branch("dphijet5muon", &_dphijet5muon, "dphijet5muon/D");			
+    			_rivetTree->Branch("isBjet5", &_isBjet5, "isBjet5/D");			
 
     			NZE=0;
     			NZM=0;
@@ -147,9 +159,16 @@ namespace Rivet
 
 			}
 
+			double DeltaPhi(double phi1, double phi2)
+			{
+				double pi = 3.14159265358;
+				double dphi = fabs(phi1-phi2);
+				if (dphi>pi) dphi = 2.0*pi-dphi;
+				return dphi; 
+			}
+
 			bool ApplyElectronCutsForZee(double pt1, double pt2, double eta1, double eta2)
 			{
-				//return true;
 				bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
 				bool isFid2 = ((fabs(eta2)<1.4442)||((fabs(eta2)>1.566)&&(fabs(eta2)<2.5)));
 				if( isFid1 && isFid2 && pt1>20 && pt2 >10) return true;
@@ -159,8 +178,6 @@ namespace Rivet
 
 			bool ApplyMuonCutsForZmm(double pt1, double pt2, double eta1, double eta2)
 			{
-				//return true;
-
 				bool isFid1 = ((fabs(eta1)<2.1));
 				bool isFid2 = ((fabs(eta2)<2.4));
 				if( isFid1 && isFid2 && pt1>20 && pt2 >10) return true;
@@ -169,8 +186,6 @@ namespace Rivet
 
 			bool ApplyElectronCutsForWen(double pt1, double eta1)
 			{
-				//return true;
-
 				bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
 				if( isFid1 && pt1>20 ) return true;
 				return 0;
@@ -178,8 +193,6 @@ namespace Rivet
 
 			bool ApplyMuonCutsForWmn(double pt1, double eta1)
 			{
-				//return true;
-
 				bool isFid1 = ((fabs(eta1)<2.1));
 				if( isFid1 && pt1>45) return true;
 				return 0;
@@ -296,24 +309,36 @@ namespace Rivet
 	    		_ptjet1 = -5.0;
 	    		_etajet1 = -5.0;
 	    		_phijet1 = -5.0;
+	    		_isBjet1 = -1;
+	    		_dphijet1muon = -1.0;
 
 	    		_ptjet2 = -5.0;
 	    		_etajet2 = -5.0;
 	    		_phijet2 = -5.0;
+	    		_isBjet2 = -1;
+	    		_dphijet2muon = -1.0;
 
 	    		_ptjet3 = -5.0;
 	    		_etajet3 = -5.0;
 	    		_phijet3 = -5.0;
+	    		_isBjet3 = -1;
+	    		_dphijet3muon = -1.0;
 
 	    		_ptjet4 = -5.0;
 	    		_etajet4 = -5.0;
 	    		_phijet4 = -5.0;
+	    		_isBjet4 = -1;
+	    		_dphijet4muon = -1.0;
 
 	    		_ptjet5 = -5.0;
 	    		_etajet5 = -5.0;
 	    		_phijet5 = -5.0;
+	    		_isBjet5 = -1;
+	    		_dphijet5muon = -1.0;
 
 				_njet_WMuNu = -1;
+				_nBjet_WMuNu = -1;
+
 				_evweight = -1.0;
 				_nevt = -1;
 
@@ -375,7 +400,7 @@ namespace Rivet
 					}
 				}
 
-				if(isW && ( mt<50 || mt>110)) vetoEvent;
+				//if(isW && ( mt<50 || mt>110)) vetoEvent;
 
 				isZmm = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 13) && (fabs(ZDecayProducts[1].pdgId()) == 13));
 				isZee = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 11) && (fabs(ZDecayProducts[1].pdgId()) == 11));
@@ -431,6 +456,11 @@ namespace Rivet
 
 				//Obtain the jets.
 				vector<FourMomentum> finaljet_list;
+				vector<int> finaljet_list_btags;
+				vector<FourMomentum> finalBjet_list;
+
+
+				//foreach (const Jet& j, applyProjection<JetAlg>(event, "ANTIKT").jetsByPt(40.0*GeV))
 				foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(40.0*GeV))
 				{
 					double jeta = j.momentum().eta();
@@ -453,6 +483,15 @@ namespace Rivet
 							if( ((leta-jeta)*(leta-jeta) + (lphi-jphi)*(lphi-jphi)) > 0.3*0.3  )
 							{
 								finaljet_list.push_back(j.momentum());
+								if (j.containsBottom())
+								{	
+									finalBjet_list.push_back(j.momentum());
+									finaljet_list_btags.push_back(1);
+								}
+								else
+								{
+									finaljet_list_btags.push_back(0);
+								}	
 							}
 						}
 					}
@@ -482,6 +521,8 @@ namespace Rivet
 				if (isWmn) {
 
 					_njet_WMuNu = finaljet_list.size();
+					_nBjet_WMuNu = finalBjet_list.size();
+					std::cout<<_njet_WMuNu<<" "<<_nBjet_WMuNu<<std::endl;
 					int muind = -1;
 					int nuind=-1;
 					if (fabs(WDecayProducts[0].pdgId()) == 13) muind = 0;
@@ -499,31 +540,42 @@ namespace Rivet
 						_ptjet1=finaljet_list[0].pT();
 						_etajet1=finaljet_list[0].eta();
 						_phijet1=finaljet_list[0].phi();
+						_isBjet1=finaljet_list_btags[0];
+						_dphijet1muon = DeltaPhi(_phijet1,_phimuon);
 					}
 
 					if (finaljet_list.size()>1){
 						_ptjet2=finaljet_list[1].pT();
 						_etajet2=finaljet_list[1].eta();
 						_phijet2=finaljet_list[1].phi();
+						_isBjet2=finaljet_list_btags[1];
+						_dphijet2muon = DeltaPhi(_phijet2,_phimuon);
 					}
 
 					if (finaljet_list.size()>2){
 						_ptjet3=finaljet_list[2].pT();
 						_etajet3=finaljet_list[2].eta();
 						_phijet3=finaljet_list[2].phi();
+						_isBjet3=finaljet_list_btags[2];
+						_dphijet3muon = DeltaPhi(_phijet3,_phimuon);
 					}
 
 					if (finaljet_list.size()>3){
 						_ptjet4=finaljet_list[3].pT();
 						_etajet4=finaljet_list[3].eta();
 						_phijet4=finaljet_list[3].phi();
+						_isBjet4=finaljet_list_btags[3];
+						_dphijet4muon = DeltaPhi(_phijet4,_phimuon);
 					}
 
 					if (finaljet_list.size()>4){
 						_ptjet5=finaljet_list[4].pT();
 						_etajet5=finaljet_list[4].eta();
 						_phijet5=finaljet_list[4].phi();
+						_isBjet5=finaljet_list_btags[4];
+						_dphijet5muon = DeltaPhi(_phijet5,_phimuon);
 					}
+					std::cout<<_dphijet1muon<<" "<<_dphijet2muon<<" "<<_dphijet3muon<<" "<<_dphijet4muon<<" "<<_dphijet5muon<<" "<<std::endl;
 
 				_rivetTree->Fill();
 
@@ -601,6 +653,8 @@ namespace Rivet
 
     		int _nevt; 
     		int _njet_WMuNu;
+    		int _nBjet_WMuNu;
+
     		double _evweight;
 
 			double _mt_munu;
@@ -616,22 +670,32 @@ namespace Rivet
     		double _ptjet1;
     		double _etajet1;
     		double _phijet1;
+    		double _dphijet1muon;
+			double _isBjet1;
 
     		double _ptjet2;
     		double _etajet2;
     		double _phijet2;
+    		double _dphijet2muon;
+			double _isBjet2;
 
     		double _ptjet3;
     		double _etajet3;
     		double _phijet3;
+    		double _dphijet3muon;
+			double _isBjet3;
 
     		double _ptjet4;
     		double _etajet4;
     		double _phijet4;
+    		double _dphijet4muon;
+			double _isBjet4;
 
     		double _ptjet5;
     		double _etajet5;
     		double _phijet5;
+    		double _dphijet5muon;
+			double _isBjet5;
 
     		int NZE;
     		int NZM;
