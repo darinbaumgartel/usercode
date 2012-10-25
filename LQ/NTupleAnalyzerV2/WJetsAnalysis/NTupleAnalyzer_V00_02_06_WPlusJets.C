@@ -227,6 +227,14 @@ void placeholder::Loop()
 	BRANCH(ST_muonMETpfjet12345);
 	BRANCH(ST_muonMETpfjet123456);
 
+	BRANCH(DeltaPhi_genjet1genmuon1);
+	BRANCH(DeltaPhi_genjet2genmuon1);
+	BRANCH(DeltaPhi_genjet3genmuon1);
+	BRANCH(DeltaPhi_genjet4genmuon1);
+	BRANCH(DeltaPhi_genjet5genmuon1);
+	BRANCH(DeltaPhi_genjet6genmuon1);
+
+
 	BRANCH(Pt_genmuon1);  BRANCH(Phi_genmuon1);  BRANCH(Eta_genmuon1);  
 	BRANCH(Pt_genmuon2);  BRANCH(Phi_genmuon2);  BRANCH(Eta_genmuon2);  
 
@@ -949,12 +957,12 @@ void placeholder::Loop()
 
 			vector<TLorentzVector> GenMuons, GenJets, SortedGenMuons, SortedGenJets, GenMuNeutrinos;
 
-			Pt_genjet1 = 0;       Phi_genjet1 = 0;       Eta_genjet1 = 0; 
-			Pt_genjet2 = 0;       Phi_genjet2 = 0;       Eta_genjet2 = 0;
-			Pt_genjet3 = 0;       Phi_genjet3 = 0;       Eta_genjet3 = 0;
-			Pt_genjet4 = 0;       Phi_genjet4 = 0;       Eta_genjet4 = 0;
-			Pt_genjet5 = 0;       Phi_genjet5 = 0;       Eta_genjet5 = 0;
-			Pt_genjet6 = 0;       Phi_genjet6 = 0;       Eta_genjet6 = 0;
+			Pt_genjet1 = 0;       Phi_genjet1 = 0;       Eta_genjet1 = 0; DeltaPhi_genjet1genmuon1 = -1.0;
+			Pt_genjet2 = 0;       Phi_genjet2 = 0;       Eta_genjet2 = 0; DeltaPhi_genjet2genmuon1 = -1.0; 
+			Pt_genjet3 = 0;       Phi_genjet3 = 0;       Eta_genjet3 = 0; DeltaPhi_genjet3genmuon1 = -1.0;
+			Pt_genjet4 = 0;       Phi_genjet4 = 0;       Eta_genjet4 = 0; DeltaPhi_genjet4genmuon1 = -1.0;
+			Pt_genjet5 = 0;       Phi_genjet5 = 0;       Eta_genjet5 = 0; DeltaPhi_genjet5genmuon1 = -1.0;
+			Pt_genjet6 = 0;       Phi_genjet6 = 0;       Eta_genjet6 = 0; DeltaPhi_genjet6genmuon1 = -1.0;
 			
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
 			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
@@ -974,22 +982,23 @@ void placeholder::Loop()
 
 			MT_genmuon1genMET = 0 ;  MT_genmuon1genneutrino = 0;
 			
-			//std::cout<<" ---------------------------------------------- "<<GenParticlePdgId->size()<<std::endl;
+			// std::cout<<" ---------------------------------------------- "<<std::endl;
 
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
 				int pdgId = GenParticlePdgId->at(ip);
 				// std::cout<<ip<<  "   "<<pdgId<<std::endl;
 
-				//int motherIndex = GenParticleMotherIndex->at(ip);
+				int motherIndex = GenParticleMotherIndex->at(ip);
 				//if ( motherIndex == -1 ) continue;
 
 				if ( TMath::Abs(pdgId) == 13 )
 				{
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					//std::cout<<"  GenRecoDR:  "<<thisgenmuon.DeltaR(RecoMuons[0])<<"  gen PT: "<<thisgenmuon.Pt()<<"  rec PT: "<<RecoMuons[0].Pt()<<std::endl;
-	
+					// std::cout<<"  GenRecoDR:  "<<thisgenmuon.DeltaR(RecoMuons[0])<<"  gen PT: "<<thisgenmuon.Pt()<<"  rec PT: "<<RecoMuons[0].Pt()<<std::endl;
+					if (motherIndex>-1) std::cout<<"     "<<GenParticlePdgId->at(motherIndex)<<std::endl;
+
 					bool KeepMuon=true;
 					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
 					{
@@ -1098,26 +1107,32 @@ void placeholder::Loop()
 			if (PFJetCount>=1)	Pt_genjet1  =	SortedGenJets[0].Pt();
 			if (PFJetCount>=1)	Eta_genjet1 =	SortedGenJets[0].Eta();
 			if (PFJetCount>=1)	Phi_genjet1 =	SortedGenJets[0].Phi();
+			if (PFJetCount>=1)	DeltaPhi_genjet1genmuon1 =	fabs(SortedGenJets[0].DeltaPhi(SortedGenMuons[0]));
 
 			if (PFJetCount>=2)	Pt_genjet2  =	SortedGenJets[1].Pt();
 			if (PFJetCount>=2)	Eta_genjet2 =	SortedGenJets[1].Eta();
 			if (PFJetCount>=2)	Phi_genjet2 =	SortedGenJets[1].Phi();
+			if (PFJetCount>=2)	DeltaPhi_genjet2genmuon1 =	fabs(SortedGenJets[1].DeltaPhi(SortedGenMuons[0]));
 
 			if (PFJetCount>=3)	Pt_genjet3  =	SortedGenJets[2].Pt();
 			if (PFJetCount>=3)	Eta_genjet3 =	SortedGenJets[2].Eta();
 			if (PFJetCount>=3)	Phi_genjet3 =	SortedGenJets[2].Phi();
+			if (PFJetCount>=3)	DeltaPhi_genjet3genmuon1 =	fabs(SortedGenJets[2].DeltaPhi(SortedGenMuons[0]));
 
 			if (PFJetCount>=4)	Pt_genjet4  =	SortedGenJets[3].Pt();
 			if (PFJetCount>=4)	Eta_genjet4 =	SortedGenJets[3].Eta();
 			if (PFJetCount>=4)	Phi_genjet4 =	SortedGenJets[3].Phi();
+			if (PFJetCount>=4)	DeltaPhi_genjet4genmuon1 =	fabs(SortedGenJets[3].DeltaPhi(SortedGenMuons[0]));
 
 			if (PFJetCount>=5)	Pt_genjet5  =	SortedGenJets[4].Pt();
 			if (PFJetCount>=5)	Eta_genjet5 =	SortedGenJets[4].Eta();
 			if (PFJetCount>=5)	Phi_genjet5 =	SortedGenJets[4].Phi();
+			if (PFJetCount>=5)	DeltaPhi_genjet5genmuon1 =	fabs(SortedGenJets[4].DeltaPhi(SortedGenMuons[0]));
 
 			if (PFJetCount>=6)	Pt_genjet6  =	SortedGenJets[5].Pt();
 			if (PFJetCount>=6)	Eta_genjet6 =	SortedGenJets[5].Eta();
 			if (PFJetCount>=6)	Phi_genjet6 =	SortedGenJets[5].Phi();
+			if (PFJetCount>=6)	DeltaPhi_genjet6genmuon1 =	fabs(SortedGenJets[5].DeltaPhi(SortedGenMuons[0]));
 
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
