@@ -194,7 +194,7 @@ void placeholder::Loop()
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
 	// BRANCH(weight);
-	BRANCH(weight_pu_central); BRANCH(weight_pu_sysplus8); BRANCH(weight_pu_sysminus8);
+	BRANCH(weight_pu_central); BRANCH(weight_pu_sysplus8); BRANCH(weight_pu_sysminus8); BRANCH(weight_gen);
 	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_passBeamHaloFilterLoose); 
 	BRANCH(pass_passBeamHaloFilterTight);
 	BRANCH(pass_isTrackingFailure);
@@ -383,7 +383,7 @@ void placeholder::Loop()
 			}	
 		}
 		
-
+		weight_gen =weight;
 		weight_pu_central = weight;
 		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_central  *=(0.0136759963465);
 		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_central  *=(0.145092627325);
@@ -997,7 +997,7 @@ void placeholder::Loop()
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
 					// std::cout<<"  GenRecoDR:  "<<thisgenmuon.DeltaR(RecoMuons[0])<<"  gen PT: "<<thisgenmuon.Pt()<<"  rec PT: "<<RecoMuons[0].Pt()<<std::endl;
-					if (motherIndex>-1) std::cout<<"     "<<GenParticlePdgId->at(motherIndex)<<std::endl;
+					// if (motherIndex>-1) std::cout<<"     "<<GenParticlePdgId->at(motherIndex)<<std::endl;
 
 					bool KeepMuon=true;
 					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
@@ -1040,9 +1040,19 @@ void placeholder::Loop()
 			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
 			{
 				//std::cout<<ijet<<"  "<<GenJetPt->at(ijet)<<std::endl;
+
 				if (fabs(GenJetEta->at(ijet))>3.0) continue;
 				TLorentzVector(thisgenjet);
 				thisgenjet.SetPtEtaPhiM(GenJetPt->at(ijet),GenJetEta->at(ijet),GenJetPhi->at(ijet),0.0);
+
+				bool KeepGenJet=true;
+				for(unsigned int igmu = 0; igmu != GenMuons.size(); ++igmu)
+				{
+					if ((GenMuons[igmu]).DeltaR(thisgenjet) < 0.3)		KeepGenJet=false;
+				}
+			
+				if (!KeepGenJet) continue;
+
 				GenJets.push_back(thisgenjet);
 				if (fabs(GenJetEta->at(ijet))>2.4) continue;
 				if (thisgenjet.Pt()>30.0) GenJet30Count+= 1.0;				
