@@ -1820,7 +1820,7 @@ def DivideTGraphs(gv1, gv2,style):
 		possible_window_values = [u1/u2,u1/d2,d1/u2,d1/d2]
 		window = [abs(rat-max(possible_window_values)), abs(rat-min(possible_window_values))]
 		if window[1] > rat: window[1]=rat
-		if window[1] > 5: window[1]=5
+		if window[0] > 5: window[0]=5
 
 		# print rat, window
 		ratmean.append(rat)
