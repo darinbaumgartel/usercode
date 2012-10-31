@@ -72,7 +72,7 @@ def main():
 	
 	# This is the baseline selection - only one muon, fiducial region, MT in W window.
 	selection_noMTcut = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)'
-	selection = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>60)*(MT_muon1MET<100)'
+	basic_selection = '(Pt_muon1>45)*(Pt_muon2<15)*(abs(Eta_muon1)<2.1)*(MT_muon1MET>60)*(MT_muon1MET<100)'
 
 	# This is the baseline weight. Central PU (Not modified for systematics), ILum = 4980/pb, muon HLT eff of 0.92.
 	weight = '*weight_pu_central*4980*0.92'
@@ -80,30 +80,33 @@ def main():
 	# Calling on FullAnalysisWithUncertainty - creates all plots, tables, with unfolding, etc. Examples for Jet PT.  
 	# To detail the arguments:
 	# .........................(Gen Variable, Reco Var , X Label, Unfolding Binning, Presentation Binning, selection, weight, switch: 'v'= use ideal variable bins for unfolding, 'c' = use unmodified binning)                                                                                     
+	[JetScaleFactors,JetRescaleString] = GetJetMultFactors('GenJet40Count','PFJet40Count',"N_{Jet}",[8,-0.5,7.5],[5,-0.5,4.5],basic_selection,weight,'c')
+
+	selection = JetRescaleString+'*'+basic_selection
 
 
-	# FullAnalysisWithUncertainty('DeltaPhi_genjet1genmuon1','DeltaPhi_pfjet1muon1',"#Delta#phi(jet_{1},#mu) [GeV]",[50,0,3.1414927],[16,0,3.1414927],selection+j1,weight,'c')
-	# FullAnalysisWithUncertainty('DeltaPhi_genjet2genmuon1','DeltaPhi_pfjet2muon1',"#Delta#phi(jet_{2},#mu) [GeV]",[50,0,3.1414927],[16,0,3.1414927],selection+j2,weight,'c')
-	# FullAnalysisWithUncertainty('DeltaPhi_genjet3genmuon1','DeltaPhi_pfjet3muon1',"#Delta#phi(jet_{3},#mu) [GeV]",[25,0,3.1414927],[8,0,3.1414927],selection+j3,weight,'c')
-	# FullAnalysisWithUncertainty('DeltaPhi_genjet4genmuon1','DeltaPhi_pfjet4muon1',"#Delta#phi(jet_{4},#mu) [GeV]",[25,0,3.1414927],[4,0,3.1414927],selection+j4,weight,'c')
-	# # F#ullAnalysisWithUncertainty('DeltaPhi_genjet5genmuon1','DeltaPhi_pfjet5muon1',"#Delta#phi(jet_{5},#mu) [GeV]",[25,0,3.1414927],[8,0,3.1414927],selection+j5,weight,'c')
+	FullAnalysisWithUncertainty('DeltaPhi_genjet1genmuon1','DeltaPhi_pfjet1muon1',"#Delta#phi(jet_{1},#mu) [GeV]",[50,0,3.1414927],[16,0,3.1414927],selection+j1,weight,'c')
+	FullAnalysisWithUncertainty('DeltaPhi_genjet2genmuon1','DeltaPhi_pfjet2muon1',"#Delta#phi(jet_{2},#mu) [GeV]",[50,0,3.1414927],[16,0,3.1414927],selection+j2,weight,'c')
+	FullAnalysisWithUncertainty('DeltaPhi_genjet3genmuon1','DeltaPhi_pfjet3muon1',"#Delta#phi(jet_{3},#mu) [GeV]",[25,0,3.1414927],[8,0,3.1414927],selection+j3,weight,'c')
+	FullAnalysisWithUncertainty('DeltaPhi_genjet4genmuon1','DeltaPhi_pfjet4muon1',"#Delta#phi(jet_{4},#mu) [GeV]",[25,0,3.1414927],[4,0,3.1414927],selection+j4,weight,'c')
+	# F#ullAnalysisWithUncertainty('DeltaPhi_genjet5genmuon1','DeltaPhi_pfjet5muon1',"#Delta#phi(jet_{5},#mu) [GeV]",[25,0,3.1414927],[8,0,3.1414927],selection+j5,weight,'c')
 
-	# FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[140,20,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j1,weight,'v')
-	# FullAnalysisWithUncertainty('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[70,20,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j2,weight,'v')
-	# FullAnalysisWithUncertainty('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[35,2,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j3,weight,'v')
-	# FullAnalysisWithUncertainty('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[35,2,720],[40,65,110,175,260,365],selection+j4,weight,'v')
-	# #FullA#nalysisWithUncertainty('Pt_genjet5','Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[35,2,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j5,weight,'v')
-	# # Further examples  - Jet Count, Transverse Mass, MET
-	# FullAnalysisWithUncertainty('GenJet40Count','PFJet40Count',"N_{Jet}",[11,-0.5,10.5],[5,-0.5,4.5],selection,weight,'c')	
-	# FullAnalysisWithUncertainty('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[44,40,150],[60,65,70,75,80,85,90,95,100],selection,weight,'v')
-	# FullAnalysisWithUncertainty('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[30,40,50,60,70,80,90,100,115,130,150,170,200,240,280,350],selection,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet1','Pt_pfjet1',"p_{T}(jet_{1}) [GeV]",[140,20,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j1,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet2','Pt_pfjet2',"p_{T}(jet_{2}) [GeV]",[70,20,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j2,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet3','Pt_pfjet3',"p_{T}(jet_{3}) [GeV]",[35,2,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j3,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genjet4','Pt_pfjet4',"p_{T}(jet_{4}) [GeV]",[35,2,720],[40,65,110,175,260,365],selection+j4,weight,'v')
+	#FullA#nalysisWithUncertainty('Pt_genjet5','Pt_pfjet5',"p_{T}(jet_{5}) [GeV]",[35,2,720],[40,50,65,85,110,140,175,215,260,310,365],selection+j5,weight,'v')
+	# Further examples  - Jet Count, Transverse Mass, MET
+	FullAnalysisWithUncertainty('GenJet40Count','PFJet40Count',"N_{Jet}",[11,-0.5,10.5],[5,-0.5,4.5],basic_selection,weight,'c')	
+	FullAnalysisWithUncertainty('MT_genmuon1genMET','MT_muon1MET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[44,40,150],[60,65,70,75,80,85,90,95,100],selection,weight,'v')
+	FullAnalysisWithUncertainty('Pt_genMET','Pt_MET',"E_{T}^{miss} [GeV]",[100,0,430],[30,40,50,60,70,80,90,100,115,130,150,170,200,240,280,350],selection,weight,'v')
 	
-	# # Further examples - Jet Etas	
-	# FullAnalysisWithUncertainty('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j1,weight,'c')
-	# FullAnalysisWithUncertainty('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j2,weight,'c')
-	# FullAnalysisWithUncertainty('Eta_genjet3','Eta_pfjet3',"#eta(jet_{3}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j3,weight,'c')
-	# FullAnalysisWithUncertainty('Eta_genjet4','Eta_pfjet4',"#eta(jet_{4}) ",[30,-3.0,3.0],[6,-2.4,2.4],selection+j4,weight,'c')
-	# #Fu#llAnalysisWithUncertainty('Eta_genjet5','Eta_pfjet5',"#eta(jet_{5}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j5,weight,'c')
+	# Further examples - Jet Etas	
+	FullAnalysisWithUncertainty('Eta_genjet1','Eta_pfjet1',"#eta(jet_{1}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j1,weight,'c')
+	FullAnalysisWithUncertainty('Eta_genjet2','Eta_pfjet2',"#eta(jet_{2}) ",[60,-3.0,3.0],[24,-2.4,2.4],selection+j2,weight,'c')
+	FullAnalysisWithUncertainty('Eta_genjet3','Eta_pfjet3',"#eta(jet_{3}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j3,weight,'c')
+	FullAnalysisWithUncertainty('Eta_genjet4','Eta_pfjet4',"#eta(jet_{4}) ",[30,-3.0,3.0],[6,-2.4,2.4],selection+j4,weight,'c')
+	#Fu#llAnalysisWithUncertainty('Eta_genjet5','Eta_pfjet5',"#eta(jet_{5}) ",[30,-3.0,3.0],[12,-2.4,2.4],selection+j5,weight,'c')
 
 
 
@@ -112,10 +115,10 @@ def main():
 	
 	# Get W Renormalization for RIVET
 	#WRenorm = GetMTWindowRenormalization('MT_genmuon1genMET',"M_{T}(#mu,E_{T}^{miss}) [GeV]",[40,50,60,70,75,80,85,90,95,100,110,140,200,1000],selection_noMTcut,weight,NormalDirectory,'renormalization_controlregion')[0]
-	WRenorm = "(1.0)"
+	# WRenorm = "(1.0)"
 	# print WRenorm
 
-	ParseTablesToFinalResults(WRenorm,selection)	
+	# ParseTablesToFinalResults(WRenorm,basic_selection)	
 		
 
 
@@ -162,9 +165,9 @@ def main():
 	
 	
 	# Just saving tons of PNG output into a single PDF for easier viewing.
-	os.system("convert pyplots/*.png pyplots/AllPlots.pdf")
-	os.system("convert pyplots/*FINAL*Count.png pyplots/AllFinalCountPlots.pdf")
-	os.system("convert pyplots/*FINAL*XSec.png pyplots/AllFinalXSecPlots.pdf")
+	# os.system("convert pyplots/*.png pyplots/AllPlots.pdf")
+	# os.system("convert pyplots/*FINAL*Count.png pyplots/AllFinalCountPlots.pdf")
+	# os.system("convert pyplots/*FINAL*XSec.png pyplots/AllFinalXSecPlots.pdf")
 	
 
 ####################################################################################################################################################
@@ -1198,6 +1201,36 @@ def MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinni
 	return [tau,DataBinInfo,MCBinInfo]
 
 
+
+
+# FullAnalysisWithUncertainty just runs MakeUnfoldedPlots several times for each systematic variation. The goal is to return final distributions.
+def GetJetMultFactors(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar):
+
+	# This is the standard plot. here we get the optimal tau value. 
+	[tau,data_standard,mc_standard]=MakeUnfoldedPlots(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar,NormalDirectory,'',-1,'JetScaleFactors')
+
+	scalestring = '('
+	scalefactors = []
+
+	for x in range(len(data_standard)): # Loop over bins of the original output table
+		thisbin=(data_standard[x])[0]    # this is the bin X1--X2
+		center = (data_standard[x])[1]   # The is the central value of the unfolded data
+		prediction = (mc_standard[x])[1] # This is the MC prediction
+
+		data = float(center.split()[0])
+		mc = float(prediction.split()[0])
+		scalefactor = 1.0
+		if mc > 0:
+			scalefactor = data/mc
+		scalefactor = str(round(scalefactor,3)) 
+		[binL,binR] = thisbin.split(' - ')
+		bincondition = '*('+genvariable + '>'+binL+')*('+genvariable+'<'+binR+')'
+		scalestring += '+'*(x!=0)+scalefactor+bincondition
+		scalefactors.append(scalefactor)
+	scalestring += ')'
+	return [scalefactors,scalestring]
+
+
 # FullAnalysisWithUncertainty just runs MakeUnfoldedPlots several times for each systematic variation. The goal is to return final distributions.
 def FullAnalysisWithUncertainty(genvariable,recovariable,xlabel, binning,presentationbinning,selection,weight,optvar):
 
@@ -1819,20 +1852,23 @@ def DivideTGraphs(gv1, gv2,style):
 
 		possible_window_values = [u1/u2,u1/d2,d1/u2,d1/d2]
 		window = [abs(rat-max(possible_window_values)), abs(rat-min(possible_window_values))]
-		if window[1] > rat: window[1]=rat
-		if window[0] > 5: window[0]=5
-
+		# print window
+		# if window[1] > rat: window[1]=rat
+		# if window[0] > 5: window[0]=5
+		# print window
 		# print rat, window
 		ratmean.append(rat)
 		raterr_up.append(window[0])
 		raterr_down.append(window[1])
-
+		# print rat
+		# print [rat+window[0],rat-window[1]]
+		
 		yvalues+= [rat+window[0],rat-window[1]]
 
 
-	yup = round((1.4*max(yvalues)),2)
-	ydown = round((0.5*min(yvalues)),2)
-
+	yup = round((1.2*max(yvalues)),2)
+	ydown = round((0.8*min(yvalues)),2)
+	if yup>5: yup=5
 	# print ratmean
 	# print raterr_up
 	# print raterr_down
@@ -2037,7 +2073,7 @@ def ParseTablesToFinalResults(WRenorm,sel):
 			continue
 		# if 'Count' not in f:
 		# 	continue
-		# if "Eta" not in f or 'et4' not in f:
+		# if "Pt" not in f or 'et4' not in f:
 		# 	continue
 			
 		print '\n\nAnalyzing table: ',f
