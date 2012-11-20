@@ -21,8 +21,8 @@ parser.add_option("-b", "--batch", dest="dobatch", help="run in batch mode", met
 parser.add_option("-s", "--sigma", dest="crosssection", help="specify the process cross-section", metavar="SIGMA")
 parser.add_option("-n", "--ntotal", dest="ntotal", help="total number of MC events for the sample", metavar="NTOTAL")
 parser.add_option("-l", "--lumi", dest="lumi", help="integrated luminosity for data taking", metavar="LUMI")
-parser.add_option("-p", "--pileup", dest="pileup", help="path to the pileup input histogram root file", metavar="PILEUP")
 (options, args) = parser.parse_args()
+
 
 # Here we get the file name, and adjust it accordingly for EOS, castor, or local directory
 name = options.filename
@@ -62,9 +62,13 @@ _kinematicvariables += ['M_uujj1','M_uujj2','MT_uvjj1','MT_uvjj2','M_uvjj','MT_u
 _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_evjj']
 _kinematicvariables += ['JetCount','MuonCount','ElectronCount']
 _weights = ['weight_central', 'weight_pu_up', 'weight_pu_down']
-_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1']
+_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure']
 _variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
 
+
+##########################################################################################
+#################     Deal with weights including PDF and Pileup   #######################
+##########################################################################################
 
 def GetPDFWeightVars(T):
 	# Pupose: Determine all the branch names needed to store the PDFWeights 
@@ -82,8 +86,10 @@ def GetPDFWeightVars(T):
 			pdfweights.append('factor_nnpdf_'+str(x+1))			
 		return pdfweights
 
+
 # Use the above function to get the pdfweights
 _pdfweights = GetPDFWeightVars(t)
+
 
 # _pdfLHS will store the lefthand side of an equation to cast all pdfweights
 #  into their appropriate branches
@@ -102,11 +108,65 @@ for b in _pdfweights:
 	exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
 	_pdfLHS += (b+'[0],')
 for b in _flags:
-	exec(b+' = array.array("d",[0])')
+	exec(b+' = array.array("i",[0])')
 	exec('tout.Branch("'+b+'",'+b+',"'+b+'/I")' )
 
 _pdfLHS +=']' 
 _pdfLHS = _pdfLHS.replace(',]',']')
+
+
+def GetPURescalingFactors():
+	# Pupose: To get the pileup reweight factors from the PU_Central.root, PU_Up.root, and PU_Down.root files.
+	#         The MC Truth distribution is taken from https://twiki.cern.ch/twiki/bin/view/CMS/PileupMCReweightingUtilities
+
+	MCDistSummer12 = [2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 
+	       2.464E-03, 3.250E-03, 5.021E-03, 6.644E-03, 8.502E-03, 1.121E-02, 1.518E-02, 2.033E-02, 2.608E-02, 3.171E-02, 3.667E-02, 
+	       4.060E-02, 4.338E-02, 4.520E-02, 4.641E-02, 4.735E-02, 4.816E-02, 4.881E-02, 4.917E-02, 4.909E-02, 4.842E-02, 4.707E-02, 
+	       4.501E-02, 4.228E-02, 3.896E-02, 3.521E-02, 3.118E-02, 2.702E-02, 2.287E-02, 1.885E-02, 1.508E-02, 1.166E-02, 8.673E-03, 
+	       6.190E-03, 4.222E-03, 2.746E-03, 1.698E-03, 9.971E-04, 5.549E-04, 2.924E-04, 1.457E-04, 6.864E-05, 3.054E-05, 1.282E-05, 
+	       5.081E-06, 1.898E-06, 6.688E-07, 2.221E-07, 6.947E-08, 2.047E-08]
+
+	h_pu_central = TFile.Open("PU_Central.root",'read').Get('pileup')
+	h_pu_up = TFile.Open("PU_Up.root",'read').Get('pileup')
+	h_pu_down = TFile.Open("PU_Down.root",'read').Get('pileup')
+
+	bins_pu_central = []
+	bins_pu_up = []
+	bins_pu_down = []
+
+	for x in range(h_pu_up.GetNbinsX()):
+		bin = x +1
+		bins_pu_central.append(h_pu_central.GetBinContent(bin))
+		bins_pu_up.append(h_pu_up.GetBinContent(bin))
+		bins_pu_down.append(h_pu_down.GetBinContent(bin))
+
+
+
+	total_pu_central = sum(bins_pu_central)
+	total_pu_up = sum(bins_pu_up)
+	total_pu_down = sum(bins_pu_down)
+	total_mc = sum(MCDistSummer12)
+
+
+	bins_pu_central_norm = [x/total_pu_central for x in bins_pu_central]
+	bins_pu_up_norm = [x/total_pu_up for x in bins_pu_up]
+	bins_pu_down_norm = [x/total_pu_down for x in bins_pu_down]
+	bins_mc_norm  = [x/total_mc for x in MCDistSummer12]
+
+	scale_pu_central = []
+	scale_pu_up = []
+	scale_pu_down = []
+
+	for x in range(len(bins_mc_norm)):
+		scale_pu_central.append(bins_pu_central_norm[x]/bins_mc_norm[x])
+		scale_pu_up.append(bins_pu_up_norm[x]/bins_mc_norm[x])
+		scale_pu_down.append(bins_pu_down_norm[x]/bins_mc_norm[x])
+
+
+	return [scale_pu_central, scale_pu_up, scale_pu_down]
+
+# Use the above function to get the pu weights
+[CentralWeights,UpperWeights,LowerWeights] =GetPURescalingFactors()
 
 
 ##########################################################################################
@@ -177,6 +237,16 @@ def PassTrigger(T,trigger_identifiers,prescale_threshold):
 			return 1
 	return 0	
 
+def CountVertices(T):
+	vertices = 0
+	for v in range(len(T.VertexZ)):
+		if ( T.VertexIsFake[v] == True ) :  continue
+		if ( T.VertexNDF[v] <= 4.0 ) :  continue
+		if ( abs(T.VertexZ[v]) > 24.0 ) :  continue
+		if ( abs(T.VertexRho[v]) >= 2.0 ) :  continue
+		vertices += 1
+	return vertices	
+
 def GetPUWeight(T,version):
 	# Pupose: Get the pileup weight for an event. Version can indicate the central
 	#         weight, or the Upper or Lower systematics. Needs to be updated for
@@ -184,26 +254,12 @@ def GetPUWeight(T,version):
 	if T.isData:
 		return 1.0
 	N_pu = 0
-	for n in range(len(T.PileUpInteractions)):
+
+	for n in range(len(T.PileUpInteractionsTrue)):
 		if abs(T.PileUpOriginBX[n]==0):
-			N_pu = int(1.0*(T.PileUpInteractions[n]))
+			N_pu = int(1.0*(T.PileUpInteractionsTrue[n]))
 
 	puweight = 0
-	CentralWeights = [0.0136759963465, 0.145092627325, 0.337346053675, 0.603889700177, 0.875723164145, 1.09904167986, 1.25430629491, 
-                     1.34642557836, 1.39979322363, 1.43532953354, 1.47049703593, 1.51604545424, 1.57633567564, 1.64932013381, 
-                     1.74029438919, 1.83791180719, 1.94039579764, 2.04245281118, 2.13680461818, 2.22395017393, 2.29776136337, 
-                     2.34107958833, 2.37047306281, 2.38365361416, 2.37251953266, 2.33390734715, 2.28287109918, 2.18527775378, 
-                     2.09984989719, 2.02417217124, 1.89559469244, 1.73994553659, 1.60146781888, 1.5415176127, 1.38880554853]
-	UpperWeights =   [0.00924647898767, 0.103765308587, 0.254901026276, 0.480371942144, 0.729944556297, 0.954968986548, 1.13004026908, 
-                     1.25116215302, 1.3354960398, 1.40112202125, 1.46629994308, 1.54467848996, 1.64461047702, 1.7680582782, 
-                     1.9248181748, 2.10637260323, 2.31374222506, 2.54319600245, 2.78724430301, 3.04707340275, 3.31429303739, 
-                     3.56161966349, 3.80974218256, 4.05230970884, 4.27119855299, 4.45358283315, 4.6210083076, 4.69553893978, 
-                     4.79226541944, 4.90898557824, 4.88722270965, 4.77074865948, 4.67125617297, 4.78457737387, 4.58784771674,]
-	LowerWeights =   [0.0201084522235, 0.201872953791, 0.444291440305, 0.754784951423, 1.04300038865, 1.25373948702, 1.37815071794, 
-                     1.43249643277, 1.44824842983, 1.44760397441, 1.44595859288, 1.45056585209, 1.46233900245, 1.47682664198, 
-                     1.49703207679, 1.51206676472, 1.52066555932, 1.51950731213, 1.50475499659, 1.47887521537, 1.43996103898, 
-                     1.38034035275, 1.31320230704, 1.2392809902, 1.15650697488, 1.06581520421, 0.975973223375, 0.874112959041, 
-                     0.785480306938, 0.707777917329, 0.619354107892, 0.531056657066, 0.456479768112, 0.410264344317, 0.345060491391]
 
 	puweights = CentralWeights
 	if version=='SysUp':
@@ -216,6 +272,7 @@ def GetPUWeight(T,version):
 		puweight=puweights[N_pu]
 
 	return puweight
+
 
 def FillPDFWeights(T):
 	# Pupose: Given the _pdfLHS stored at the begging when branches were created,
@@ -347,7 +404,7 @@ def HEEPElectrons(T,met,variation):
 
 	for n in range(len(_ElectronPt)):
 		Pass = True
-		Pass *= (T.ElectronPtHeep[n] > 20)
+		Pass *= (T.ElectronPtHeep[n] > 35)
 		Pass *= abs(T.ElectronEta[n])<2.1
 
 		barrel = (abs(T.ElectronEta[n]))<1.442
@@ -359,11 +416,9 @@ def HEEPElectrons(T,met,variation):
 			Pass *= T.ElectronDeltaEtaTrkSC[n] < 0.005
 			Pass *= T.ElectronDeltaPhiTrkSC[n] < 0.06
 			Pass *= T.ElectronHoE[n] < 0.05
-			# Pass *= T.ElectronSigmaIEtaIEta[n] < 0.03
 			Pass *= ((T.ElectronE2x5OverE5x5[n] > 0.94) or (T.ElectronE1x5OverE5x5[n] > 0.83) )
-			# I HAVE NO IDEA IF THESE ARE THE RIGHT VARIABLES BELOW
 			Pass *= T.ElectronHcalIsoD1DR03[n] <  (2.0 + 0.03*_ElectronPt[n] + 0.28*T.rhoForHEEP)
-			Pass *= T.ElectronEcalIsoDR03 < 5.0
+			Pass *= T.ElectronTrkIsoDR03 < 5.0
 			Pass *= T.ElectronMissingHits[n] <=1
 			Pass *= T.ElectronLeadVtxDistXY<0.02
 
@@ -373,13 +428,11 @@ def HEEPElectrons(T,met,variation):
 			Pass *= T.ElectronDeltaPhiTrkSC[n] < 0.06
 			Pass *= T.ElectronHoE[n] < 0.05
 			Pass *= T.ElectronSigmaIEtaIEta[n] < 0.03
-			# Pass *= (T.ElectronE2x5OverE5x5[n] > 0.94) or (T.ElectronE1x5OverE5x5[n] > 0.83) 
-			# I HAVE NO IDEA IF THESE ARE THE RIGHT VARIABLES BELOW
 			if _ElectronPt[n]<50:
 				Pass *= (T.ElectronHcalIsoD1DR03[n] < (2.5 + 0.28*T.rhoForHEEP))
 			else:
 				Pass *= (T.ElectronHcalIsoD1DR03[n] < (2.5 + 0.03*(_ElectronPt[n]-50.0) + 0.28*T.rhoForHEEP))
-			Pass *= T.ElectronEcalIsoDR03 < 5.0
+			Pass *= T.ElectronTrkIsoDR03 < 5.0
 			Pass *= T.ElectronMissingHits[n] <=1
 			Pass *= T.ElectronLeadVtxDistXY<0.05
 
@@ -589,7 +642,7 @@ for n in range(N):
 	t.GetEntry(n)
 	if n > 100:  # Testing....
 		break
-	if n%1000==0:
+	if n%10==0:
 		print 'Procesing event',n, 'of', N # where we are in the loop...
 
 	## ===========================  BASIC SETUP  ============================= ##
@@ -605,6 +658,12 @@ for n in range(N):
 	event_number = t.event
 	lumi_number  = t.ls
 	pass_HLTMu40_eta2p1[0] = PassTrigger(t,["HLT_Mu40_eta2p1_v"],1)
+	GoodVertexCount[0] = CountVertices(t)
+	passBeamscraping[0] = 1*(t.isBeamScraping)
+	passHBHENoisefilter[0] = 1*(t.passHBHENoiseFilter)
+	passBPTX0[0] = 1*(t.isBPTX0)
+	passBeamHaloFilter[0] = 1*(t.passBeamHaloFilterTight)
+	passTrackingFailure[0] = 1*(1-t.isTrackingFailure)
 
 
 	## ===========================  Calculate everything!  ============================= ##
