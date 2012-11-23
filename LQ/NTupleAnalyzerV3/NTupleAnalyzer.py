@@ -21,6 +21,7 @@ parser.add_option("-b", "--batch", dest="dobatch", help="run in batch mode", met
 parser.add_option("-s", "--sigma", dest="crosssection", help="specify the process cross-section", metavar="SIGMA")
 parser.add_option("-n", "--ntotal", dest="ntotal", help="total number of MC events for the sample", metavar="NTOTAL")
 parser.add_option("-l", "--lumi", dest="lumi", help="integrated luminosity for data taking", metavar="LUMI")
+parser.add_option("-j", "--json", dest="json", help="json file for certified run:lumis", metavar="JSON")
 (options, args) = parser.parse_args()
 
 
@@ -62,7 +63,7 @@ _kinematicvariables += ['M_uujj1','M_uujj2','MT_uvjj1','MT_uvjj2','M_uvjj','MT_u
 _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_evjj']
 _kinematicvariables += ['JetCount','MuonCount','ElectronCount']
 _weights = ['weight_central', 'weight_pu_up', 'weight_pu_down']
-_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure']
+_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure','passTriggerObjectMatching']
 _variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
 
 
@@ -182,6 +183,52 @@ def PrintBranchesAndExit(T):
 	sys.exit()
 
 # PrintBranchesAndExit(t)
+
+def GetRunLumiList():
+	print options.json
+	jfile = open(options.json,'r')
+	flatjson = ''
+	for line in jfile:
+		flatjson+=line.replace('\n','')
+	flatjson = flatjson.replace("}","")
+	flatjson = flatjson.replace("{","")
+	flatjson = flatjson.replace(":","")
+	flatjson = flatjson.replace(" ","")
+	flatjson = flatjson.replace("\t","")
+
+	jinfo = flatjson.split('"')
+	strjson = ''
+	for j in jinfo:
+		strjson += j
+	strjson = strjson.replace('\n[',' [')
+	strjson = strjson.replace(']],',']]\n')
+	strjson = strjson.replace('[[',' [[')
+
+	pairs = []
+	for line in strjson.split('\n'):
+		pair = []
+		line = line.split(' ')
+		exec('arun = '+line[0])
+		exec('alumis = '+line[1])
+		verboselumis = []
+		for r in alumis:
+			verboselumis +=  range(r[0],r[1]+1)
+
+		pair.append(arun)
+		pair.append(verboselumis)
+		pairs.append(pair)
+	return pairs
+
+GoodRunLumis = GetRunLumiList()
+
+def CheckRunLumiCert(r,l):
+	for _rl in GoodRunLumis:
+		if _rl[0]==r:
+			for _l in _rl[1]:
+				if _l == l:
+					return True
+	return False
+
 
 def GeomFilterCollection(collection_to_clean,good_collection,dRcut):
 	# Pupose: Take a collection of TLorentzVectors that you want to clean (arg 1)
@@ -640,9 +687,9 @@ for n in range(N):
 
 	# Get the entry
 	t.GetEntry(n)
-	if n > 100:  # Testing....
-		break
-	if n%10==0:
+	# if n > 1000:  # Testing....
+	# 	break
+	if n%1000==0:
 		print 'Procesing event',n, 'of', N # where we are in the loop...
 
 	## ===========================  BASIC SETUP  ============================= ##
@@ -664,6 +711,7 @@ for n in range(N):
 	passBPTX0[0] = 1*(t.isBPTX0)
 	passBeamHaloFilter[0] = 1*(t.passBeamHaloFilterTight)
 	passTrackingFailure[0] = 1*(1-t.isTrackingFailure)
+	passTriggerObjectMatching[0] = 1*(True in t.MuonHLTSingleMuonMatched)
 
 
 	## ===========================  Calculate everything!  ============================= ##
@@ -684,7 +732,10 @@ for n in range(N):
 	# BE MINDFUL: Just because the central (non-systematic) quantity meets the skim, does not mean 
 	# that the systematic varied quantity will, and that will throw off systematics calculations later.
 	# Make sure your skim is looser than any selection you will need afterward!
-	if (St_uujj[0] < 200) and (St_uvjj[0] < 200): continue
+
+	if ( (t.isData==True) and (CheckRunLumiCert(t.run,t.lumi) == False) ) : continue
+
+	if (St_uujj[0] < 250) and (St_uvjj[0] < 250): continue
 
 	# Fill output tree with event
 	tout.Fill()
