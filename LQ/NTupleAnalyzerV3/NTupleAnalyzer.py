@@ -22,6 +22,8 @@ parser.add_option("-s", "--sigma", dest="crosssection", help="specify the proces
 parser.add_option("-n", "--ntotal", dest="ntotal", help="total number of MC events for the sample", metavar="NTOTAL")
 parser.add_option("-l", "--lumi", dest="lumi", help="integrated luminosity for data taking", metavar="LUMI")
 parser.add_option("-j", "--json", dest="json", help="json file for certified run:lumis", metavar="JSON")
+parser.add_option("-d", "--dir", dest="dir", help="output directory", metavar="DIR")
+
 (options, args) = parser.parse_args()
 
 
@@ -41,7 +43,7 @@ t = fin.Get("rootTupleTree/tree")
 N = t.GetEntries()
 
 # Create the output file and tree "PhysicalVariables"
-fout = TFile.Open(name.split('/')[-1].replace('.root','_tree.root'),"RECREATE")
+fout = TFile.Open(options.dir+'/'+name.split('/')[-1].replace('.root','_tree.root'),"RECREATE")
 tout=TTree("PhysicalVariables","PhysicalVariables")
 
 
