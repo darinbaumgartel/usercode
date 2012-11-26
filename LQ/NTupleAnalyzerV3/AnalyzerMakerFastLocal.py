@@ -230,7 +230,7 @@ def MakeJobs(njobs):
 
 		subber.close()
 		os.system('chmod 777 '+thiseos+'/subber_'+str(Nj)+'.tcsh')
-		os.system( 'bsub -q 1nd -o /dev/null -e /dev/null -J job_'+str(Nj)+'_'+now+' < '+thiseos+'/subber_'+str(Nj)+'.tcsh')
+		os.system( 'bsub -q 8nh -o /dev/null -e /dev/null -J job_'+str(Nj)+'_'+now+' < '+thiseos+'/subber_'+str(Nj)+'.tcsh')
 		os.system('sleep 0.4')
 	return len(jlist)
 
@@ -238,7 +238,7 @@ keep_going = 1
 
 while keep_going != 0:
 	print 'Launching jobs...'
-	keep_going = MakeJobs(30)
+	keep_going = MakeJobs(10)
 	if keep_going == 0:
 		break
 
@@ -264,6 +264,7 @@ while keep_going != 0:
 			 print "\nJobs taking too long. Killing remaining jobs. \n"
 			 break
 
+os.system('rm '+thiseos+'/subber_*tcsh')
 
 if 'Counter' in pyfile:
 	txtfiles = os.popen('ls -1 '+thiseos+' | grep txt').readlines()
