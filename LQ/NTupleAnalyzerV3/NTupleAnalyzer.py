@@ -8,7 +8,7 @@ import math
 from optparse import OptionParser
 startTime = datetime.now()
 tRand = TRandom3()
-
+from random import randint
 
 ##########################################################################################
 #################      SETUP OPTIONS - File, Normalization, etc    #######################
@@ -23,9 +23,10 @@ parser.add_option("-n", "--ntotal", dest="ntotal", help="total number of MC even
 parser.add_option("-l", "--lumi", dest="lumi", help="integrated luminosity for data taking", metavar="LUMI")
 parser.add_option("-j", "--json", dest="json", help="json file for certified run:lumis", metavar="JSON")
 parser.add_option("-d", "--dir", dest="dir", help="output directory", metavar="DIR")
+parser.add_option("-p", "--pdf", dest="pdf", help="option to produce pdf uncertainties", metavar="PDF")
 
 (options, args) = parser.parse_args()
-
+dopdf = int(options.pdf)==1
 
 # Here we get the file name, and adjust it accordingly for EOS, castor, or local directory
 name = options.filename
@@ -42,12 +43,6 @@ fin = TFile.Open(name,"READ")
 t = fin.Get("rootTupleTree/tree")
 N = t.GetEntries()
 
-# Create the output file and tree "PhysicalVariables"
-fout = TFile.Open(options.dir+'/'+name.split('/')[-1].replace('.root','_tree.root'),"RECREATE")
-tout=TTree("PhysicalVariables","PhysicalVariables")
-
-
-
 ##########################################################################################
 #################      PREPARE THE VARIABLES FOR THE OUTPUT TREE   #######################
 ##########################################################################################
@@ -61,61 +56,21 @@ _kinematicvariables += ['Eta_muon1','Eta_muon2','Eta_ele1','Eta_ele2','Eta_jet1'
 _kinematicvariables += ['Phi_muon1','Phi_muon2','Phi_ele1','Phi_ele2','Phi_jet1','Phi_jet2','Phi_miss']
 _kinematicvariables += ['St_uujj','St_uvjj']
 _kinematicvariables += ['St_eejj','St_evjj']
+_kinematicvariables += ['M_uu','MT_uv']
+_kinematicvariables += ['DR_muon1muon2','DPhi_muon1met','DPhi_jet1met']
 _kinematicvariables += ['M_uujj1','M_uujj2','MT_uvjj1','MT_uvjj2','M_uvjj','MT_uvjj']
 _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_evjj']
 _kinematicvariables += ['JetCount','MuonCount','ElectronCount']
 _weights = ['weight_central', 'weight_pu_up', 'weight_pu_down']
 _flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure','passTriggerObjectMatching']
 _variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
+_variations = ['']  # For quicker tests
 
 
 ##########################################################################################
 #################     Deal with weights including PDF and Pileup   #######################
 ##########################################################################################
 
-def GetPDFWeightVars(T):
-	# Pupose: Determine all the branch names needed to store the PDFWeights 
-	#         for CTEQ, MSTW, and NNPDF in flat (non vector) form. 
-	if T.isData:
-		return []
-	else:
-		T.GetEntry(1)
-		pdfweights=[]
-		for x in range(len(T.PDFCTEQWeights)):
-			pdfweights.append('factor_cteq_'+str(x+1))
-		for x in range(len(T.PDFMSTWWeights)):
-			pdfweights.append('factor_mstw_'+str(x+1))		
-		for x in range(len(T.PDFNNPDFWeights)):
-			pdfweights.append('factor_nnpdf_'+str(x+1))			
-		return pdfweights
-
-
-# Use the above function to get the pdfweights
-_pdfweights = GetPDFWeightVars(t)
-
-
-# _pdfLHS will store the lefthand side of an equation to cast all pdfweights
-#  into their appropriate branches
-_pdfLHS = '['
-
-# Below all the branches are created, everything is a double except for flags
-for b in _kinematicvariables:
-	for v in _variations:
-		exec(b+v+' = array.array("d",[0])')
-		exec('tout.Branch("'+b+v+'",'+b+v+',"'+b+v+'/D")' )
-for b in _weights:
-	exec(b+' = array.array("d",[0])')
-	exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
-for b in _pdfweights:
-	exec(b+' = array.array("d",[0])')
-	exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
-	_pdfLHS += (b+'[0],')
-for b in _flags:
-	exec(b+' = array.array("i",[0])')
-	exec('tout.Branch("'+b+'",'+b+',"'+b+'/I")' )
-
-_pdfLHS +=']' 
-_pdfLHS = _pdfLHS.replace(',]',']')
 
 
 def GetPURescalingFactors():
@@ -170,6 +125,63 @@ def GetPURescalingFactors():
 
 # Use the above function to get the pu weights
 [CentralWeights,UpperWeights,LowerWeights] =GetPURescalingFactors()
+
+
+tmpfout = options.dir+'/'+str(randint(100000000,1000000000))+'.root'
+finalfout = options.dir+'/'+name.split('/')[-1].replace('.root','_tree.root')
+
+# Create the output file and tree "PhysicalVariables"
+fout = TFile.Open(tmpfout,"RECREATE")
+tout=TTree("PhysicalVariables","PhysicalVariables")
+
+
+
+
+def GetPDFWeightVars(T):
+	# Pupose: Determine all the branch names needed to store the PDFWeights 
+	#         for CTEQ, MSTW, and NNPDF in flat (non vector) form. 
+	if T.isData:
+		return []
+	else:
+		T.GetEntry(1)
+		pdfweights=[]
+		for x in range(len(T.PDFCTEQWeights)):
+			pdfweights.append('factor_cteq_'+str(x+1))
+		for x in range(len(T.PDFMSTWWeights)):
+			pdfweights.append('factor_mstw_'+str(x+1))		
+		for x in range(len(T.PDFNNPDFWeights)):
+			pdfweights.append('factor_nnpdf_'+str(x+1))			
+		return pdfweights
+
+
+# Use the above function to get the pdfweights
+_pdfweights = GetPDFWeightVars(t)
+
+
+# _pdfLHS will store the lefthand side of an equation to cast all pdfweights
+#  into their appropriate branches
+_pdfLHS = '['
+
+# Below all the branches are created, everything is a double except for flags
+for b in _kinematicvariables:
+	for v in _variations:
+		exec(b+v+' = array.array("d",[0])')
+		exec('tout.Branch("'+b+v+'",'+b+v+',"'+b+v+'/D")' )
+for b in _weights:
+	exec(b+' = array.array("d",[0])')
+	exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
+if dopdf:
+	for b in _pdfweights:
+		exec(b+' = array.array("d",[0])')
+		exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
+		_pdfLHS += (b+'[0],')
+for b in _flags:
+	exec(b+' = array.array("i",[0])')
+	exec('tout.Branch("'+b+'",'+b+',"'+b+'/I")' )
+
+_pdfLHS +=']' 
+_pdfLHS = _pdfLHS.replace(',]',']')
+
 
 
 ##########################################################################################
@@ -544,7 +556,7 @@ def LooseIDJets(T,met,variation):
 	jets=[]
 	jetinds = []
 	for n in range(len(_PFJetPt)):
-		if _PFJetPt[n]>40 and abs(T.PFJetEta[n])<2.4 and T.PFJetPassLooseID[n]==1:
+		if _PFJetPt[n]>40 and abs(T.PFJetEta[n])<2.6 and T.PFJetPassLooseID[n]==1:
 			j = TLorentzVector()
 			j.SetPtEtaPhiM(_PFJetPt[n],T.PFJetEta[n],T.PFJetPhi[n],0)
 			jets.append(j)
@@ -653,6 +665,13 @@ def FullKinematicCalculation(T,variation):
 	_steejj = ST([electrons[0],electrons[1],jets[0],jets[1]])
 	_stevjj = ST([electrons[0],met,jets[0],jets[1]])
 
+
+	_Muu = (muons[0]+muons[1]).M()
+	_MTuv = TransMass(muons[0],met)
+	_DRuu = (muons[0]).DeltaR(muons[1])
+	_DPHIuv = abs((muons[0]).DeltaPhi(met))
+	_DPHIj1v = abs((jets[0]).DeltaPhi(met))
+
 	[_Muujj1, _Muujj2] = GetLLJJMasses(muons[0],muons[1],jets[0],jets[1])
 	[[_MTuvjj1, _MTuvjj2], [_Muvjj, _MTuvjj]] = GetLVJJMasses(muons[0],met,jets[0],jets[1])
 
@@ -665,6 +684,8 @@ def FullKinematicCalculation(T,variation):
 	toreturn += [_phimu1,_phimu2,_phiel1,_phiel2,_phij1,_phij2,_phimet]
 	toreturn += [_stuujj,_stuvjj]
 	toreturn += [_steejj,_stevjj]
+	toreturn += [_Muu,_MTuv]
+	toreturn += [_DRuu,_DPHIuv,_DPHIj1v]
 	toreturn += [_Muujj1, _Muujj2]
 	toreturn += [_MTuvjj1, _MTuvjj2,_Muvjj, _MTuvjj]
 	toreturn += [_Meejj1, _Meejj2]
@@ -679,7 +700,8 @@ def FullKinematicCalculation(T,variation):
 ##########################################################################################
 
 # Please don't edit here. It is static. The kinematic calulations are the only thing to edit!
-
+lumisection = array.array("i",[0])
+t.SetBranchAddress("ls",lumisection)
 for n in range(N):
 
 	# This is the loop over events. Due to the heavy use of functions and automation of 
@@ -700,12 +722,15 @@ for n in range(N):
 	weight_central[0] = startingweight*GetPUWeight(t,'Central')
 	weight_pu_down[0] = startingweight*GetPUWeight(t,'SysDown')
 	weight_pu_up[0] = startingweight*GetPUWeight(t,'SysUp')
-	exec(FillPDFWeights(t))
+	if dopdf:
+		exec(FillPDFWeights(t))
 	
 	# Event Flags
-	run_number   = t.run
-	event_number = t.event
-	lumi_number  = t.ls
+
+
+	run_number[0]   = t.run
+	event_number[0] = t.event
+	lumi_number[0]  = lumisection[0]
 	pass_HLTMu40_eta2p1[0] = PassTrigger(t,["HLT_Mu40_eta2p1_v"],1)
 	GoodVertexCount[0] = CountVertices(t)
 	passBeamscraping[0] = 1*(t.isBeamScraping)
@@ -735,16 +760,21 @@ for n in range(N):
 	# that the systematic varied quantity will, and that will throw off systematics calculations later.
 	# Make sure your skim is looser than any selection you will need afterward!
 
-	if ( (t.isData==True) and (CheckRunLumiCert(t.run,t.lumi) == False) ) : continue
-
+	if (Pt_muon1[0] < 40): continue
+	if (Pt_muon2[0] < 40) and (Pt_miss < 45): continue
+	if (Pt_jet1 < 110): continue
+	if (Pt_jet2 < 35): continue
 	if (St_uujj[0] < 250) and (St_uvjj[0] < 250): continue
-
+	if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : continue
 	# Fill output tree with event
 	tout.Fill()
 
 # All done. Write and close file.
-fout.Write()
+tout.Write()
 fout.Close()
 
 # Timing, for debugging and optimization
 print(datetime.now()-startTime)
+
+print ('mv '+tmpfout+' '+finalfout)
+os.system('mv '+tmpfout+' '+finalfout)

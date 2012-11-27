@@ -13,6 +13,7 @@ import sys
 a = sys.argv
 tagname = 'default'
 json = ''
+dopdf = '0'
 for x in range(len(a)):
 	if a[x] == '-i':
 		ifile = a[x+1]
@@ -22,6 +23,8 @@ for x in range(len(a)):
 		tagname = a[x+1]
 	if a[x] == '-j':
 		json = a[x+1]
+	if a[x] == '-p':
+		dopdf = a[x+1]
 
 if pyfile == ''  or ifile == '' or json == '':
 	print 'Must specify input python script, .csv file, and json file, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv -py NTupleAnalyzer.py \n   Exiting   \n\n'
@@ -192,7 +195,10 @@ for x in range(len(SignalType)):
 	print 'Preparing '+ SignalType[x],':', len(fcont),'files.'
 
 	for f in fcont:
-		jobs.append('python '+pyfile.replace('\n','')+' -f '+f.replace('\n','')+' -s '+sigma+' -n '+Norig+' -j '+json + ' -l 1.0 -d '+thiseos.replace('\n',''))
+		jobs.append('python '+pyfile.replace('\n','')+' -f '+f.replace('\n','')+' -s '+sigma+' -n '+Norig+' -j '+json + ' -l 1.0 -p '+dopdf+' -d '+thiseos.replace('\n',''))
+# for j in jobs:
+# 	print j
+print 'jobs: ',len(jobs)
 
 def MakeJobs(njobs):
 	Nj = 0
@@ -220,6 +226,7 @@ def MakeJobs(njobs):
 	if len(jobset)>0:
 		jobgroups.append(jobset)
 
+	print 'subbing: ',len(jobgroups),'jobs.'
 	for j in jobgroups:
 		Nj += 1
 		subber = open(thiseos+'/subber_'+str(Nj)+'.tcsh','w')
@@ -230,7 +237,7 @@ def MakeJobs(njobs):
 
 		subber.close()
 		os.system('chmod 777 '+thiseos+'/subber_'+str(Nj)+'.tcsh')
-		os.system( 'bsub -q 8nh -o /dev/null -e /dev/null -J job_'+str(Nj)+'_'+now+' < '+thiseos+'/subber_'+str(Nj)+'.tcsh')
+		os.system( 'bsub -q 1nd -o /dev/null -e /dev/null -J job_'+str(Nj)+'_'+now+' < '+thiseos+'/subber_'+str(Nj)+'.tcsh')
 		os.system('sleep 0.4')
 	return len(jlist)
 
@@ -238,7 +245,7 @@ keep_going = 1
 
 while keep_going != 0:
 	print 'Launching jobs...'
-	keep_going = MakeJobs(10)
+	keep_going = MakeJobs(25)
 	if keep_going == 0:
 		break
 
@@ -288,25 +295,34 @@ if 'Counter' in pyfile:
 	print 'Output is in ',thisdir+ '/'+ifile.replace('.','_EventCountLog.'),' ...'
 	os.system('cat '+thisdir+ '/'+ifile.replace('.','_EventCountLog.'))
 
-if 'Analyz' in pyfile:
-	groups = []
-	for x in range(len(SignalType)):
-		if Group[x] not in groups:
-			groups.append(Group[x])
-	Contents = []
-	for g in groups:
-		Contents.append([])
-	for g in range(len(groups)):
-		for x in range(len(SignalType)):
-			if groups[g] == Group[x]:
-				Contents[g].append(SignalType[x])
-	os.system('mkdir '+thiseos+'/SummaryFiles')
-	for g in range(len(groups)):
-		haddstring = 'hadd '+thiseos+'/SummaryFiles/'+groups[g]+'.root'
-		for c in Contents[g]:
-			haddstring += ' '+thiseos+'/*'+c.replace('-','_')+'*root'+' '
-		print haddstring
-		os.system(haddstring)
+# if 'Analyz' in pyfile:
+# 	groups = []
+# 	for x in range(len(SignalType)):
+# 		if Group[x] not in groups:
+# 			groups.append(Group[x])
+# 	Contents = []
+# 	for g in groups:
+# 		Contents.append([])
+# 	for g in range(len(groups)):
+# 		for x in range(len(SignalType)):
+# 			if groups[g] == Group[x]:
+# 				Contents[g].append(SignalType[x])
+# 	os.system('mkdir '+thiseos+'/SummaryFiles')
+# 	for g in range(len(groups)):
+# 		haddstring = 'hadd '+thiseos+'/SummaryFiles/'+groups[g]+'.root'
+# 		for c in Contents[g]:
+# 			haddstring += ' '+thiseos+'/*'+c.replace('-','_')+'*root'+' '
+# 		print haddstring
+# 		os.system(haddstring)
+
+
+
+
+
+
+
+
+
 
 
 # subjobs = ''
