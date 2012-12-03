@@ -150,14 +150,93 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 	return isgood;
 }
 
-vector<bool> BTags(float pt, bool isdata,float tchpt, float ssvhpt,float jpt,float jpbt)
+vector<bool> BTagTCHPT(float pt, bool isdata,float discrim)
 {
 
+	vector<bool> tags;
+	float discrim_cut = 3.41;
 
-	// float tchpt   = PFJetTrackCountingHighPurBTag->at(ij);
-	// float ssvhpt  = PFJetSimpleSecondaryVertexHighPurBTag->at(ij);
-	// float jpt     = PFJetJetProbabilityBTag->at(ij);
-	// float jpbt    = PFJetJetBProbabilityBTag->at(ij);
+	float eff_central  = 0.895596*((1.+(9.43219e-05*pt))/(1.+(-4.63927e-05*pt)));
+
+	float mistag_central = (1.20711+(0.000681067*pt)) + (-1.57062e-06*(pt*pt)) + (2.83138e-10*(pt*(pt*pt)));
+	float mistag_down    = (1.03418+(0.000428273*pt)) + (-5.43024e-07*(pt*pt)) + (-6.18061e-10*(pt*(pt*pt)));
+	float mistag_up      = (1.38002+(0.000933875*pt)) + (-2.59821e-06*(pt*pt)) + (1.18434e-09*(pt*(pt*pt)));
+	float mistag_nominal = 0.00284;
+
+	float efferr = 0.0;
+
+	if (pt >=  30. && pt <  40.) efferr =  0.0543376;
+	if (pt >=  40. && pt <  50.) efferr =  0.0534339;
+	if (pt >=  50. && pt <  60.) efferr =   0.0266156;
+	if (pt >=  60. && pt <  70.) efferr =  0.0271337;
+	if (pt >=  70. && pt <  80.) efferr =  0.0276364;
+	if (pt >=  80. && pt < 100.) efferr =  0.0308838;
+	if (pt >= 100. && pt < 120.) efferr =  0.0381656;
+	if (pt >= 120. && pt < 160.) efferr =  0.0336979;
+	if (pt >= 160. && pt < 210.) efferr =  0.0336773;
+	if (pt >= 210. && pt < 260.) efferr =  0.0347688;
+	if (pt >= 260. && pt < 320.) efferr =  0.0376865;
+	if (pt >= 320. && pt < 400.) efferr =  0.0556052;
+	if (pt >= 400. && pt < 500.) efferr =  0.0598105;
+	if (pt >= 500. && pt < 670.) efferr =  0.0861122 ;
+
+	float eff_up = eff_central + efferr;
+	float eff_down = eff_central - efferr;
+
+	float rand_efftag = rr->Rndm();
+	float rand_mistag = rr->Rndm();
+
+	bool untag_central  = rand_efftag > eff_central;
+	bool untag_up       = rand_efftag > eff_up;
+	bool untag_down     = rand_efftag > eff_down;
+
+	bool forcemistag_central = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_central); 
+	bool forcemistag_up      = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_up); 
+	bool forcemistag_down    = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_down); 
+
+	bool basic_tag = discrim > discrim_cut;
+
+	bool tag_central  = basic_tag;
+	bool tag_eff_up   = basic_tag;
+	bool tag_eff_down = basic_tag;
+	bool tag_mis_up   = basic_tag;
+	bool tag_mis_down = basic_tag;
+	
+	if (isdata)
+	{
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		return tags;
+	}
+
+	if ( (tag_central == true ) && (untag_central == true) )         tag_central = false;
+	if ( (tag_central == false) && (forcemistag_central == true) )   tag_central = true;
+
+	if ( (tag_eff_up == true ) && (untag_up == true) )               tag_eff_up = false;
+	if ( (tag_eff_up == false) && (forcemistag_central == true) )    tag_eff_up = true;
+
+	if ( (tag_eff_down == true ) && (untag_down == true) )           tag_eff_down = false;
+	if ( (tag_eff_down == false) && (forcemistag_central == true) )  tag_eff_down = true;
+
+	if ( (tag_mis_up == true ) && (untag_central == true) )          tag_mis_up = false;
+	if ( (tag_mis_up == false) && (forcemistag_up == true) )     tag_mis_up = true;
+
+	if ( (tag_mis_down == true ) && (untag_central == true) )        tag_mis_down = false;
+	if ( (tag_mis_down == false) && (forcemistag_down == true) ) tag_mis_down = true;
+
+	tags.push_back(tag_central);
+	tags.push_back(tag_eff_up);
+	tags.push_back(tag_eff_down);
+	tags.push_back(tag_mis_up);
+	tags.push_back(tag_mis_down);
+	return tags;
+}
+
+vector<bool> BTags(float pt, bool isdata,float tchpt, float ssvhpt,float jpt,float jpbt)
+{
 
 	float sf_tchpt  = 0.895596*((1.+(9.43219e-05*pt))/(1.+(-4.63927e-05*pt)));
 	float sf_ssvhpt = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
@@ -181,9 +260,6 @@ vector<bool> BTags(float pt, bool isdata,float tchpt, float ssvhpt,float jpt,flo
 	bool tag_ssvhpt  = (ssvhpt > 2.00)*(!toss_ssvhpt);
 	bool tag_jpt     = (jpt > 0.79)*(!toss_jpt);
 	bool tag_jpbt    = (jpbt > 3.74)*(!toss_jpbt);
-
-	// std::cout<<tchpt<<" "<<sf_tchpt<<" "<<tag_tchpt<<std::endl;
-	// if (toss_tchpt==true) std::cout<<"                 *******************************"<<std::endl;
 
 	vector<bool> tags;
 
@@ -231,6 +307,11 @@ void placeholder::Loop()
 	BRANCH(PFJet30JPTCountMod);
 	BRANCH(PFJet30JPBTCountMod);
 
+	BRANCH(PFJet30TCHPTCountCentral);
+	BRANCH(PFJet30TCHPTCountEffUp);
+	BRANCH(PFJet30TCHPTCountEffDown);
+	BRANCH(PFJet30TCHPTCountMisUp);
+	BRANCH(PFJet30TCHPTCountMisDown);
 
 	// Event Information
 	UInt_t run_number,event_number,ls_number;
@@ -963,6 +1044,17 @@ void placeholder::Loop()
 		PFJet30TCHPTCount = 0.0;
 		PFJet30SSVHEMCount = 0.0;
 
+		PFJet30JPTCountMod = 0.0;
+		PFJet30JPBTCountMod = 0.0;
+		PFJet30TCHPTCountMod = 0.0;
+		PFJet30SSVHPTCountMod = 0.0;
+
+		PFJet30TCHPTCountCentral = 0.0;
+		PFJet30TCHPTCountEffUp = 0.0;
+		PFJet30TCHPTCountEffDown = 0.0;
+		PFJet30TCHPTCountMisUp = 0.0;
+		PFJet30TCHPTCountMisDown = 0.0;
+
 		for(unsigned int ijet=0; ijet<v_idx_pfjet_prefinal.size(); ijet++)
 		{
 			jetindex = v_idx_pfjet_prefinal[ijet];
@@ -1009,20 +1101,27 @@ void placeholder::Loop()
 				float jpbt    = PFJetJetBProbabilityBTag->at(jetindex);
 
 				vector<bool> btags = BTags(thisjet.Pt(),isData,tchpt,ssvhpt,jpt,jpbt);
+				vector<bool> btags_tchpt = BTagTCHPT(thisjet.Pt(),isData,tchpt);
 
 				PFJet30TCHPTCountMod  += 1.0*btags[0];
 				PFJet30SSVHPTCountMod += 1.0*btags[1];
 				PFJet30JPTCountMod    += 1.0*btags[2];
 				PFJet30JPBTCountMod   += 1.0*btags[3];
 
+				PFJet30TCHPTCountCentral += 1.0*(btags_tchpt[0]);
+				PFJet30TCHPTCountEffUp   += 1.0*(btags_tchpt[1]);
+				PFJet30TCHPTCountEffDown += 1.0*(btags_tchpt[2]);
+				PFJet30TCHPTCountMisUp   += 1.0*(btags_tchpt[3]);
+				PFJet30TCHPTCountMisDown += 1.0*(btags_tchpt[4]);
+
+
 				PFJet30Count += 1.0;
 				PFJet30TCHPTCount += 1.0*(PFJetTrackCountingHighPurBTag->at(jetindex) > 3.41);
 				PFJet30SSVHEMCount += 1.0*(PFJetSimpleSecondaryVertexHighEffBTag->at(jetindex) > 1.74);
 
 			}
-
-
-
+			// std::cout<<PFJet30TCHPTCountMod<<" "<<PFJet30SSVHPTCountMod<<std::endl;
+			// std::cout<<"  "<<PFJet30TCHPTCountCentral<<"  "<<PFJet30TCHPTCountEffUp<<"  "<<PFJet30TCHPTCountEffDown<<"  "<<PFJet30TCHPTCountMisUp<<"  "<<PFJet30TCHPTCountMisDown<<std::endl;
 		}
 
 		PFJetCount = 1.0*v_idx_pfjet_final.size();
