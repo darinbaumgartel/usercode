@@ -9,11 +9,13 @@ TTJets_HadronicMGDecays,88.2168,10537444,TTBarDBin,/store/group/phys_exotica/lep
 TTJets_SemiLeptMGDecays,87.8864,11229902,TTBarDBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/hsaka/RootNtuple-V00-03-09-Summer12MC_TTJets_SemiLeptMGDecays_20121022_221217/
 TT_CT10_TuneZ2star_8TeV-powheg-tauola,225.197,21627802,TTBarPowheg,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_TTBar_POWHEG_20121010_215603/
 DYJetsToLL,3503.71,30459503,ZJetsInc,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/darinb/RootNtuple-V00-03-08-Summer12MC_DYJetsToLL_MG_20121008_040459/
+DYJetsToLL,3503.71,30459503,ZJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple_skim/eberry/RootNtuple-V00-03-09-Summer12MC_DY0JetsToLL_MG/
 DY1JetsToLL,666.2997,24045248,ZJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/
 DY2JetsToLL,214.9737,2352304,ZJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/
-DY3JetsToLL,60.69147,11015445,ZJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/
+DY3JetsToLL,60.69147,10990967,ZJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/
 DY4JetsToLL,27.364608,6402827,ZJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/
 WJetsToLNu,36257.2,18393090,WJetsInc,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-08-Summer12MC_WJetsToLNu_MG_20121010_215658/
+WJetsToLNu,36257.2,18352217,WJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple_skim/eberry/RootNtuple-V00-03-09-Summer12MC_W0JetsToLNu_MG/
 W1JetsToLNu,6440.58,22987323,WJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-07-Summer12MC_WNJetsToLNu_MG_20121004_195332/
 W2JetsToLNu,2087.225,33969266,WJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-07-Summer12MC_WNJetsToLNu_MG_20121004_195332/
 W3JetsToLNu,619.0113,15500655,WJetsJBin,/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-07-Summer12MC_WNJetsToLNu_MG_20121004_195332/

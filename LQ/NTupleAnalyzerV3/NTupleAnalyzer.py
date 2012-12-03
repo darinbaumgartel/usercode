@@ -9,6 +9,7 @@ from optparse import OptionParser
 startTime = datetime.now()
 tRand = TRandom3()
 from random import randint
+import os
 
 ##########################################################################################
 #################      SETUP OPTIONS - File, Normalization, etc    #######################
@@ -40,8 +41,27 @@ startingweight = float(options.crosssection)*float(options.lumi)/float(options.n
 
 # Get the file, tree, and number of entries
 fin = TFile.Open(name,"READ")
-t = fin.Get("rootTupleTree/tree")
+to = fin.Get("rootTupleTree/tree")
+No = to.GetEntries()
+
+indicator = ((name.split('_'))[-1]).replace('.root','')
+
+junkfile1 = str(randint(100000000,1000000000))+indicator+'junk.root'
+
+fj1 = TFile.Open(junkfile1,'RECREATE')
+t1 = to.CopyTree('PFJetPt[]>45')
+Nj1 = t1.GetEntries()
+
+junkfile2 = str(randint(100000000,1000000000))+indicator+'junk.root'
+
+fj2 = TFile.Open(junkfile2,'RECREATE')
+t = t1.CopyTree('MuonPt[]>45')
 N = t.GetEntries()
+
+
+print No
+print Nj1
+print N
 
 ##########################################################################################
 #################      PREPARE THE VARIABLES FOR THE OUTPUT TREE   #######################
@@ -60,9 +80,9 @@ _kinematicvariables += ['M_uu','MT_uv']
 _kinematicvariables += ['DR_muon1muon2','DPhi_muon1met','DPhi_jet1met']
 _kinematicvariables += ['M_uujj1','M_uujj2','MT_uvjj1','MT_uvjj2','M_uvjj','MT_uvjj']
 _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_evjj']
-_kinematicvariables += ['JetCount','MuonCount','ElectronCount']
-_weights = ['weight_central', 'weight_pu_up', 'weight_pu_down']
-_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure','passTriggerObjectMatching']
+_kinematicvariables += ['JetCount','MuonCount','ElectronCount','GenJetCount']
+_weights = ['weight_nopu','weight_central', 'weight_pu_up', 'weight_pu_down']
+_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure','passTriggerObjectMatching','passDataCert']
 _variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
 _variations = ['']  # For quicker tests
 
@@ -77,12 +97,19 @@ def GetPURescalingFactors():
 	# Pupose: To get the pileup reweight factors from the PU_Central.root, PU_Up.root, and PU_Down.root files.
 	#         The MC Truth distribution is taken from https://twiki.cern.ch/twiki/bin/view/CMS/PileupMCReweightingUtilities
 
-	MCDistSummer12 = [2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 
-	       2.464E-03, 3.250E-03, 5.021E-03, 6.644E-03, 8.502E-03, 1.121E-02, 1.518E-02, 2.033E-02, 2.608E-02, 3.171E-02, 3.667E-02, 
-	       4.060E-02, 4.338E-02, 4.520E-02, 4.641E-02, 4.735E-02, 4.816E-02, 4.881E-02, 4.917E-02, 4.909E-02, 4.842E-02, 4.707E-02, 
-	       4.501E-02, 4.228E-02, 3.896E-02, 3.521E-02, 3.118E-02, 2.702E-02, 2.287E-02, 1.885E-02, 1.508E-02, 1.166E-02, 8.673E-03, 
-	       6.190E-03, 4.222E-03, 2.746E-03, 1.698E-03, 9.971E-04, 5.549E-04, 2.924E-04, 1.457E-04, 6.864E-05, 3.054E-05, 1.282E-05, 
-	       5.081E-06, 1.898E-06, 6.688E-07, 2.221E-07, 6.947E-08, 2.047E-08]
+	# MCDistSummer12 = [2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 
+	#        2.464E-03, 3.250E-03, 5.021E-03, 6.644E-03, 8.502E-03, 1.121E-02, 1.518E-02, 2.033E-02, 2.608E-02, 3.171E-02, 3.667E-02, 
+	#        4.060E-02, 4.338E-02, 4.520E-02, 4.641E-02, 4.735E-02, 4.816E-02, 4.881E-02, 4.917E-02, 4.909E-02, 4.842E-02, 4.707E-02, 
+	#        4.501E-02, 4.228E-02, 3.896E-02, 3.521E-02, 3.118E-02, 2.702E-02, 2.287E-02, 1.885E-02, 1.508E-02, 1.166E-02, 8.673E-03, 
+	#        6.190E-03, 4.222E-03, 2.746E-03, 1.698E-03, 9.971E-04, 5.549E-04, 2.924E-04, 1.457E-04, 6.864E-05, 3.054E-05, 1.282E-05, 
+	#        5.081E-06, 1.898E-06, 6.688E-07, 2.221E-07, 6.947E-08, 2.047E-08]
+
+	MCDistSummer12 = [2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 1.999E-03, 6.097E-03, 1.046E-02, 1.383E-02, 
+                      1.685E-02, 2.055E-02, 2.572E-02, 3.262E-02, 4.121E-02, 4.977E-02, 5.539E-02, 5.725E-02, 5.607E-02, 5.312E-02, 5.008E-02, 4.763E-02, 
+                      4.558E-02, 4.363E-02, 4.159E-02, 3.933E-02, 3.681E-02, 3.406E-02, 3.116E-02, 2.818E-02, 2.519E-02, 2.226E-02, 1.946E-02, 1.682E-02, 
+                      1.437E-02, 1.215E-02, 1.016E-02, 8.400E-03, 6.873E-03, 5.564E-03, 4.457E-03, 3.533E-03, 2.772E-03, 2.154E-03, 1.656E-03, 1.261E-03, 
+                      9.513E-04, 7.107E-04, 5.259E-04, 3.856E-04, 2.801E-04, 2.017E-04, 1.439E-04, 1.017E-04, 7.126E-05, 4.948E-05, 3.405E-05, 2.322E-05, 
+                      1.570E-05, 5.005E-06]
 
 	h_pu_central = TFile.Open("PU_Central.root",'read').Get('pileup')
 	h_pu_up = TFile.Open("PU_Up.root",'read').Get('pileup')
@@ -111,6 +138,8 @@ def GetPURescalingFactors():
 	bins_pu_down_norm = [x/total_pu_down for x in bins_pu_down]
 	bins_mc_norm  = [x/total_mc for x in MCDistSummer12]
 
+
+
 	scale_pu_central = []
 	scale_pu_up = []
 	scale_pu_down = []
@@ -120,15 +149,19 @@ def GetPURescalingFactors():
 		scale_pu_up.append(bins_pu_up_norm[x]/bins_mc_norm[x])
 		scale_pu_down.append(bins_pu_down_norm[x]/bins_mc_norm[x])
 
-
+	# print scale_pu_central
+	# print scale_pu_down
+	# print scale_pu_up
 	return [scale_pu_central, scale_pu_up, scale_pu_down]
 
 # Use the above function to get the pu weights
 [CentralWeights,UpperWeights,LowerWeights] =GetPURescalingFactors()
 
-
-tmpfout = options.dir+'/'+str(randint(100000000,1000000000))+'.root'
-finalfout = options.dir+'/'+name.split('/')[-1].replace('.root','_tree.root')
+print ' ** ',name
+indicator = ((name.split('_'))[-1]).replace('.root','')
+tmpfout = str(randint(100000000,1000000000))+indicator+'.root'
+# finalfout = options.dir+'/'+name.split('/')[-1].replace('.root','_tree.root')
+finalfout = options.dir+'/'+(name.split('/')[-2]+'__'+name.split('/')[-1].replace('.root','_tree.root'))
 
 # Create the output file and tree "PhysicalVariables"
 fout = TFile.Open(tmpfout,"RECREATE")
@@ -176,7 +209,7 @@ if dopdf:
 		exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
 		_pdfLHS += (b+'[0],')
 for b in _flags:
-	exec(b+' = array.array("i",[0])')
+	exec(b+' = array.array("I",[0])')
 	exec('tout.Branch("'+b+'",'+b+',"'+b+'/I")' )
 
 _pdfLHS +=']' 
@@ -199,7 +232,7 @@ def PrintBranchesAndExit(T):
 # PrintBranchesAndExit(t)
 
 def GetRunLumiList():
-	print options.json
+	# print options.json
 	jfile = open(options.json,'r')
 	flatjson = ''
 	for line in jfile:
@@ -331,7 +364,7 @@ def GetPUWeight(T,version):
 	NRange = range(len(puweights))
 	if N_pu in NRange:
 		puweight=puweights[N_pu]
-
+	# print puweight
 	return puweight
 
 
@@ -556,7 +589,7 @@ def LooseIDJets(T,met,variation):
 	jets=[]
 	jetinds = []
 	for n in range(len(_PFJetPt)):
-		if _PFJetPt[n]>40 and abs(T.PFJetEta[n])<2.6 and T.PFJetPassLooseID[n]==1:
+		if _PFJetPt[n]>40 and abs(T.PFJetEta[n])<2.4 and T.PFJetPassLooseID[n]==1:
 			j = TLorentzVector()
 			j.SetPtEtaPhiM(_PFJetPt[n],T.PFJetEta[n],T.PFJetPhi[n],0)
 			jets.append(j)
@@ -678,6 +711,10 @@ def FullKinematicCalculation(T,variation):
 	[_Meejj1, _Meejj2] = GetLLJJMasses(electrons[0],electrons[1],jets[0],jets[1])
 	[[_MTevjj1, _MTevjj2], [_Mevjj, _MTevjj]] = GetLVJJMasses(electrons[0],met,jets[0],jets[1])
 
+	_genjetcount = 0
+	if T.isData==0:
+		_genjetcount = len(T.GenJetPt)
+
 	# This MUST have the same structure as _kinematic variables!
 	toreturn = [_ptmu1,_ptmu2,_ptel1,_ptel2,_ptj1,_ptj2,_ptmet]
 	toreturn += [_etamu1,_etamu2,_etael1,_etael2,_etaj1,_etaj2,_etamet]
@@ -690,7 +727,7 @@ def FullKinematicCalculation(T,variation):
 	toreturn += [_MTuvjj1, _MTuvjj2,_Muvjj, _MTuvjj]
 	toreturn += [_Meejj1, _Meejj2]
 	toreturn += [_MTevjj1, _MTevjj2,_Mevjj, _MTevjj]	
-	toreturn += [_jetcount,_mucount,_elcount]
+	toreturn += [_jetcount,_mucount,_elcount,_genjetcount]
 	return toreturn
 
 
@@ -717,11 +754,12 @@ for n in range(N):
 		print 'Procesing event',n, 'of', N # where we are in the loop...
 
 	## ===========================  BASIC SETUP  ============================= ##
-
+	# print '-----'
 	# Assign Weights
 	weight_central[0] = startingweight*GetPUWeight(t,'Central')
 	weight_pu_down[0] = startingweight*GetPUWeight(t,'SysDown')
 	weight_pu_up[0] = startingweight*GetPUWeight(t,'SysUp')
+	weight_nopu[0] = startingweight
 	if dopdf:
 		exec(FillPDFWeights(t))
 	
@@ -729,7 +767,8 @@ for n in range(N):
 
 
 	run_number[0]   = t.run
-	event_number[0] = t.event
+	# event_number[0] = int(t.event)
+	event_number[0] = 100
 	lumi_number[0]  = lumisection[0]
 	pass_HLTMu40_eta2p1[0] = PassTrigger(t,["HLT_Mu40_eta2p1_v"],1)
 	GoodVertexCount[0] = CountVertices(t)
@@ -739,6 +778,11 @@ for n in range(N):
 	passBeamHaloFilter[0] = 1*(t.passBeamHaloFilterTight)
 	passTrackingFailure[0] = 1*(1-t.isTrackingFailure)
 	passTriggerObjectMatching[0] = 1*(True in t.MuonHLTSingleMuonMatched)
+
+	passDataCert[0] = 1
+
+	if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : 	passDataCert[0] = 0
+
 
 
 	## ===========================  Calculate everything!  ============================= ##
@@ -760,12 +804,12 @@ for n in range(N):
 	# that the systematic varied quantity will, and that will throw off systematics calculations later.
 	# Make sure your skim is looser than any selection you will need afterward!
 
-	if (Pt_muon1[0] < 40): continue
-	if (Pt_muon2[0] < 40) and (Pt_miss < 45): continue
-	if (Pt_jet1 < 110): continue
-	if (Pt_jet2 < 35): continue
-	if (St_uujj[0] < 250) and (St_uvjj[0] < 250): continue
-	if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : continue
+	if (Pt_muon1[0] < 45): continue
+	if (Pt_muon2[0] < 45) and (Pt_miss < 45): continue
+	if (Pt_jet1 < 45): continue
+	if (Pt_jet2 < 45): continue
+	if (St_uujj[0] < 260) and (St_uvjj[0] < 260): continue
+	# if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : continue
 	# Fill output tree with event
 	tout.Fill()
 
@@ -778,3 +822,5 @@ print(datetime.now()-startTime)
 
 print ('mv '+tmpfout+' '+finalfout)
 os.system('mv '+tmpfout+' '+finalfout)
+os.system('rm '+junkfile1)
+os.system('rm '+junkfile2)

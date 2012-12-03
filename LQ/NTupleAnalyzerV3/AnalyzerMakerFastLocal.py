@@ -7,13 +7,23 @@
 import os # For direcory scanning abilities, etc
 from time import strftime
 import sys
-
+import random
 
 
 a = sys.argv
 tagname = 'default'
 json = ''
 dopdf = '0'
+nsplit = 25
+bq = '1nd'
+override_dir = ''
+
+helpmessage = 'OPTIONS SUMMARY: \n -i  CSVFILE.csv \n -py ANALYZER.py \n -t  TAGNAME (optional) [default "default"] ' 
+helpmessage += '\n -j  JSONFILE (needed, but ignored for MC) \n -p  0 or 1 (optional boolean to store PDF uncertainties in trees) [default 0] \n -q  Batch Queue (optional) [default "1nd"] '
+helpmessage += ' \n -d  /path/to/directory (optional override output dir, use only when you have incomplete output in exisitng dir) '
+helpmessage += ' \n -s 25  (number of files to analyzer per batch job)'
+helpmessage += ' \n -h  (show this message)'
+helpmessage += '\n'
 for x in range(len(a)):
 	if a[x] == '-i':
 		ifile = a[x+1]
@@ -25,6 +35,18 @@ for x in range(len(a)):
 		json = a[x+1]
 	if a[x] == '-p':
 		dopdf = a[x+1]
+	if a[x] == '-s':
+		nsplit = int(a[x+1])
+	if a[x] == '-q':
+		bq = (a[x+1])
+	if a[x] == '-d':
+		override_dir = (a[x+1])
+	if a[x] == '--help':
+		print helpmessage
+		sys.exit()
+	if a[x] == '-h':
+		print helpmessage
+		sys.exit()
 
 if pyfile == ''  or ifile == '' or json == '':
 	print 'Must specify input python script, .csv file, and json file, e.g.:\n\npython AnalyzerMakerFast.py -i NTupleInfoSpring2011.csv -py NTupleAnalyzer.py \n   Exiting   \n\n'
@@ -67,6 +89,15 @@ f_sub.write('#!/bin/csh')
 thisdir = os.popen('pwd').readlines()[0].replace('\n','')
 person = os.popen('whoami').readlines()[0].replace('\n','')
 thiseos = thisdir+'/'+c2file.replace('.py','')+'_'+tagname+'_'+now
+
+
+if override_dir != '':
+	if override_dir[-1] == '/':
+		override_dir = override_dir[:-1]
+	if '/' not in override_dir:
+		override_dir = thisdir + '/'+override_dir
+	thiseos = override_dir
+
 
 os.system(' mkdir '+ thiseos)
 print ' \n-------------------------------------------------------------------'
@@ -176,6 +207,8 @@ else:
 
 # sys.exit()
 
+# thiseos = '/afs/cern.ch/work/d/darinb/NTupleAnalyzerV3/NTupleAnalyzer_quicktest_2012_11_27_19_12_31'
+
 jobs = []
 
 for x in range(len(SignalType)):
@@ -195,10 +228,13 @@ for x in range(len(SignalType)):
 	print 'Preparing '+ SignalType[x],':', len(fcont),'files.'
 
 	for f in fcont:
-		jobs.append('python '+pyfile.replace('\n','')+' -f '+f.replace('\n','')+' -s '+sigma+' -n '+Norig+' -j '+json + ' -l 1.0 -p '+dopdf+' -d '+thiseos.replace('\n',''))
-# for j in jobs:
-# 	print j
+		jobs.append('python '+pyfile.replace('\n','')+' -f '+f.replace('\n','').replace('//','/')+' -s '+sigma+' -n '+Norig+' -j '+json + ' -l 1.0 -p '+dopdf+' -d '+thiseos.replace('\n',''))
+
+# Some NTuple sets have larger files then others. Avoid grouping of large files by shuffling. 
+random.shuffle(jobs)
+
 print 'jobs: ',len(jobs)
+
 
 def MakeJobs(njobs):
 	Nj = 0
@@ -206,18 +242,41 @@ def MakeJobs(njobs):
 	jlist = []
 	jstr = str(os.popen('ls '+thiseos).readlines())
 	for j in jobs:
-		filesig = (((j.split(' -f ')[-1]).split(' ')[0]).split('/')[-1]).replace('.root','')
+		filesig1 = (((j.split(' -f ')[-1]).split(' ')[0]))
+		filesig = filesig1.split('/')[-2]+'__'+filesig1.split('/')[-1].replace('.root','')
+			# .replace('/','___').)replace('.root','')
+		# print filesig
 		if filesig not in jstr:
+			# print '**', filesig
+			# sys.exit()
+			# print j
 			jlist.append(j)
+		# else:
+		# 	print 'file found'
 
 	bsubs = []
 
 	jobgroups = []
 	jobset = []
 	nj=0
+
+	bjq = bq
+	if len(jlist) < 1000:
+		njobs = 10
+	if len(jlist) < 500:
+		njobs = 5
+		bjq = '8nh'
+	if len(jlist) < 200:
+		njobs = 3
+		bjq = '8nh'
+	if len(jlist) < 50:
+		njobs = 1
+		bjq = '8nh'
+
 	for ii in range(len(jlist)):
 		nj += 1
-		if nj > njobs:
+		if nj >= njobs:
+			jobset.append(jlist[ii])
 			jobgroups.append(jobset)
 			jobset = []
 			nj=0
@@ -230,22 +289,32 @@ def MakeJobs(njobs):
 	for j in jobgroups:
 		Nj += 1
 		subber = open(thiseos+'/subber_'+str(Nj)+'.tcsh','w')
-		subber.write('#!/bin/tcsh\n\ncd /afs/cern.ch/work/d/darinb/CMSSW_4_2_8/src\ncmsenv\n\n')
-		subber.write('\ncd '+thisdir+'\n\n')
+		# subber.write('#!/bin/tcsh\n\ncd /afs/cern.ch/work/d/darinb/CMSSW_4_2_8/src\ncmsenv\n\n')
+		# subber.write('\ncd '+thisdir+'\n\n')
+		subber.write('#!/bin/tcsh\n\ncd /afs/cern.ch/work/d/darinb/CMSSW_4_2_8/src\ncmsenv\ncd -\n\n')
+		subber.write('\ncp '+thisdir+'/'+pyfile+' .')
+		subber.write('\ncp '+thisdir+'/'+json+' .')
+		subber.write('\ncp '+thisdir+'/PU*root .\n\n')
+
+
 		for x in j:
 			subber.write(x+'\n')
 
 		subber.close()
 		os.system('chmod 777 '+thiseos+'/subber_'+str(Nj)+'.tcsh')
-		os.system( 'bsub -q 1nd -o /dev/null -e /dev/null -J job_'+str(Nj)+'_'+now+' < '+thiseos+'/subber_'+str(Nj)+'.tcsh')
+
+		os.system( 'bsub -R "pool>40000" -q '+bjq+'  -o /dev/null -e /dev/null -J job_'+str(Nj)+'_'+now+' < '+thiseos+'/subber_'+str(Nj)+'.tcsh')
 		os.system('sleep 0.4')
+		# sys.exit()
+
 	return len(jlist)
+
 
 keep_going = 1
 
 while keep_going != 0:
 	print 'Launching jobs...'
-	keep_going = MakeJobs(25)
+	keep_going = MakeJobs(nsplit)
 	if keep_going == 0:
 		break
 
@@ -278,9 +347,17 @@ if 'Counter' in pyfile:
 	countlog = open(thisdir+ '/'+ifile.replace('.','_EventCountLog.'),'w')
 	for x in range(len(SignalType)):
 		print 'Collecting results for',SignalType[x]
+		subdirsig = EOSDirectory[x]
+		subdirsig = subdirsig.split('/')
+		subdir = subdirsig[-1]
+		if subdir =='':
+			subdir = subdirsig[-2]
+
 		sigfiles = []
+		print SignalType[x], subdir
+		# sys.exit()
 		for ftxt in txtfiles:
-			if SignalType[x] in ftxt:
+			if SignalType[x] in ftxt and subdir in ftxt:
 				sigfiles.append(ftxt)
 		OCount = 0
 		for s in sigfiles:
@@ -295,155 +372,72 @@ if 'Counter' in pyfile:
 	print 'Output is in ',thisdir+ '/'+ifile.replace('.','_EventCountLog.'),' ...'
 	os.system('cat '+thisdir+ '/'+ifile.replace('.','_EventCountLog.'))
 
-# if 'Analyz' in pyfile:
-# 	groups = []
-# 	for x in range(len(SignalType)):
-# 		if Group[x] not in groups:
-# 			groups.append(Group[x])
-# 	Contents = []
-# 	for g in groups:
-# 		Contents.append([])
-# 	for g in range(len(groups)):
-# 		for x in range(len(SignalType)):
-# 			if groups[g] == Group[x]:
-# 				Contents[g].append(SignalType[x])
-# 	os.system('mkdir '+thiseos+'/SummaryFiles')
-# 	for g in range(len(groups)):
-# 		haddstring = 'hadd '+thiseos+'/SummaryFiles/'+groups[g]+'.root'
-# 		for c in Contents[g]:
-# 			haddstring += ' '+thiseos+'/*'+c.replace('-','_')+'*root'+' '
-# 		print haddstring
-# 		os.system(haddstring)
+
+
+def listsplit(l, n):
+    return [l[i:i+n] for i in range(0, len(l), n)]
+
+def splithadd(hstring):
+	lscoms = hstring.split( ' ' )[2:]
+	allfiles = []
+	for a in lscoms:
+		print a
+		morefiles = files = [x.replace('\n','') for x in os.popen('find '+a).readlines()]
+		allfiles += morefiles
+
+	fileblocks = listsplit(allfiles,100)
+
+	haddout = hstring.split( ' ' )[1]
+
+	nn = 0
+	haddouts = []
+	for block in fileblocks:
+		nn +=1
+		newhaddout = haddout.replace('.root','_part'+str(nn)+'.root')
+		HADD = 'hadd '+newhaddout 
+		for b in block:
+			HADD += ' '+b
+		os.system( HADD )
+		haddouts.append(newhaddout)
+
+	finalhadd = 'hadd '+haddout 
+	for hh in haddouts:
+		finalhadd += ' '+hh
+	os.system( finalhadd )
+
+
+if 'Analyz' in pyfile:
+	os.system('mkdir '+thiseos+'/SummaryFiles')	
+	groups = []
+	for x in range(len(SignalType)):
+		if Group[x] not in groups:
+			groups.append(Group[x])	
+	haddstructure = []
+	for g in groups:	
+
+		allfiles = []
+		haddstring = 'hadd '+thiseos+'/SummaryFiles/'+g+'.root'
+
+		for x in range(len(SignalType)):
+			if Group[x] != g:
+				continue
+			subdirsig = EOSDirectory[x]
+			subdirsig = subdirsig.split('/')
+			subdir = subdirsig[-1]
+			if subdir =='':
+				subdir = subdirsig[-2]
+
+			signifier = thiseos+'/'+subdir+'*'+SignalType[x]+'*.root'
+			haddstring += ' '+signifier
+
+		for x in range(10):
+			haddsring = haddstring.replace('//','/')
+
+		splithadd(haddstring)
+		os.system('rm '+thiseos+'/SummaryFiles/*part*root')
 
 
 
-
-
-
-
-
-
-
-
-# subjobs = ''
-# if '--autorun' in sys.argv:
-# 	subjobs='y'
-# while subjobs != 'y' and subjobs != 'n':
-# 	subjobs = raw_input('\n\n  Would you like to automatically submit and check jobs now? (answer y/n):  ')
-# if subjobs == 'n':
-# 	print '\n\n Jobs can be submitted now using the submission command:\n\n    ./sub_AllAnalyzer.csh\n'
-# 	print '\n If you wish to test functionality, run a single root process like:\n'
-# 	print '  root -l RootProcesses_TTJetspart1of4  (or whatever RootProcesses file you have available)\n\n'
-# 	sys.exit()
-
-# #os.system('./sub_AllAnalyzer.csh')   ##FIXME
-
-# def gather_remaining_jobs():
-# 	listofrootoutputfiles = [ x.replace('\n','') for x in os.popen('cat sub*part**.csh | grep ".root" | awk \'{print $2}\'').readlines() ]
-# 	listofcompletedrootfiles = os.listdir(thiseos)
-	
-# 	for_submission = []
-	
-# 	print 'Total: ', len(listofrootoutputfiles), '       Finished: ',len(listofcompletedrootfiles)
-# 	for x in listofrootoutputfiles:
-# 		if x not in listofcompletedrootfiles:
-# 			for_submission.append(x)
-			
-# 	corresponding_csh = []
-# 	for x in for_submission:
-# 		corresponding_csh.append( (os.popen('grep '+x+' sub*part*csh').readlines()[0]).split(':')[0]  )
-
-# 	bsub_commands = []
-	
-# 	for x in corresponding_csh:
-# 		bsub_commands.append( (os.popen('grep '+x+' sub_AllAnalyzer.csh').readlines()[0]).split(':')[-1]  ) 
-	
-# 	for b in bsub_commands:
-# 		os.system(b)
-# 		os.system('sleep .2')
-		
-# 	if bsub_commands == []:
-# 		return 1
-# 	else:
-# 		return 0
-
-
-# def WaitForJobs():
-# 	done=0
-# 	n = 0
-# 	while done!=1:
-# 		os.system('sleep 120')
-# 		jobinfo = os.popen('bjobs -w | grep '+now).readlines()
-# 		if 'PEND' not in str(jobinfo):
-# 			n += 1
-# 		jobinfo = len(jobinfo)
-# 		jobsleft = jobinfo -1
-# 		if jobsleft == -1:
-# 			done = 1
-# 		if jobsleft>=0:
-# 			print  str(jobsleft+1) +' jobs remaining.'
-
-# 		if n > 65:
-# 			 os.system('bjobs -w | awk \'{if (NR!=1) print $1}\' | xargs bkill')
-# 			 os.system('sleep 20')
-# 			 print "\nJobs taking too long. Killing remaining jobs. \n"
-# 			 break
-
-# 	print 'Checking the file output...\n\n'
-
-
-# def LoopUntilFinished():
-# 	execute = 0
-# 	while execute != 1:
-# 		execute = gather_remaining_jobs()
-# 		WaitForJobs()
-		
-# LoopUntilFinished()
-
-# groups = []
-# for x in range(len(SignalType)):
-# 	if Group[x] not in groups:
-# 		groups.append(Group[x])
-# Contents = []
-# for g in groups:
-# 	Contents.append([])
-# for g in range(len(groups)):
-# 	for x in range(len(SignalType)):
-# 		if groups[g] == Group[x]:
-# 			Contents[g].append(SignalType[x])
-# os.system('mkdir '+thiseos+'/SummaryFiles')
-# for g in range(len(groups)):
-# 	haddstring = 'hadd '+thiseos+'/SummaryFiles/'+groups[g]+'.root'
-# 	for c in Contents[g]:
-# 		haddstring += ' '+thiseos+'/*'+c.replace('-','_')+'*root'+' '
-# 	print haddstring
-# 	os.system(haddstring)
-
-# print '-------------------------------------------------------------------'
-# print '         Cleaning up temporary files\n'
-# from subprocess import call
-# print '         Removing Root Run Processes' 
-# call('rm RootProcess*',shell=True)
-# print '         Removing Temporary C/h modules'
-# call('rm *part*',shell=True)
-# print '         Removing batch submission scripts'
-# call('rm sub*csh',shell=True)
-# print (' ')
-# os.system('rm '+thiseos+'/NTupleAnalyzer*part*root')
-# print '-------------------------------------------------------------------'
-
-# print ('\n\n'+140*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiseos+'/SummaryFiles\n')
-# os.system('ls '+thiseos+'/SummaryFiles')
-# print ('\n\n'+140*'*'+ '\n\n')
-
-# if neucopy == False:
-# 	sys.exit()
-
-# print ('Please wait - transfering output additionally to neu machine. ')
-# neudir =  '~/neuhome/LQAnalyzerOutput/'
-# os.system('rm '+thiseos+'/*.*')
-# os.system('cp -r '+thiseos+' '+neudir)
-# os.system('rm '+thiseos+'/SummaryFiles/*root')
-
-# print ('Transfer Complete. ')
-
+print ('\n\n'+140*'*'+ '\n\n      Analysis Complete. A full set of output files can be found in  \n\n       '+thiseos+'/SummaryFiles\n')
+os.system('ls '+thiseos+'/SummaryFiles')
+print ('\n\n'+140*'*'+ '\n\n')
