@@ -150,8 +150,14 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 	return isgood;
 }
 
-vector<bool> BTagTCHPT(float pt, bool isdata,float discrim)
+vector<bool> BTagTCHPT(float pt, bool isdata,float discrim, float eta, int evt)
 {
+
+	double dseedmod = fabs(eta*eta*1000000+42);
+	int dseed = int(floor(abs(dseedmod)));
+	int evtseed = abs( int(floor((1.0*evt)+10000)) -42 );
+	
+	rr->SetSeed(evtseed + dseed );
 
 	vector<bool> tags;
 	float discrim_cut = 3.41;
@@ -1101,7 +1107,8 @@ void placeholder::Loop()
 				float jpbt    = PFJetJetBProbabilityBTag->at(jetindex);
 
 				vector<bool> btags = BTags(thisjet.Pt(),isData,tchpt,ssvhpt,jpt,jpbt);
-				vector<bool> btags_tchpt = BTagTCHPT(thisjet.Pt(),isData,tchpt);
+				vector<bool> btags_tchpt = BTagTCHPT(thisjet.Pt(),isData,tchpt,thisjet.Eta(), event);
+
 
 				PFJet30TCHPTCountMod  += 1.0*btags[0];
 				PFJet30SSVHPTCountMod += 1.0*btags[1];
@@ -1127,6 +1134,7 @@ void placeholder::Loop()
 		PFJetCount = 1.0*v_idx_pfjet_final.size();
 		//std::cout<<PFJet40Count<<"  "<<PFJet40SSVHEMCount<<"  "<<PFJet40TCHPTCount<<std::endl;
 
+		// std::cout<<" --------------- "<<std::endl;
 
 		//========================     Generator Level Module  ================================//
 
