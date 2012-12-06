@@ -53,7 +53,7 @@ namespace Rivet
 				vidsW.push_back(make_pair(ANTIMUON, NU_MU));
 
 				FinalState fsW(-MAXRAPIDITY,MAXRAPIDITY);
-				InvMassFinalState invfsW(fsW, vidsW, 50*GeV, 110*GeV);
+				InvMassFinalState invfsW(fsW, vidsW, 50*GeV, 99990*GeV);
 				addProjection(invfsW, "INVFSW");
 
 				VetoedFinalState vfs(fs);
@@ -80,10 +80,10 @@ namespace Rivet
 				_histJetMultWelPlus = bookHistogram1D("njetWePlus", 5, -0.5, 4.5);
 				_histJetMultWelMinus = bookHistogram1D("njetWeMinus", 5, -0.5, 4.5);
 
-				_histJetPT1Wmu    = bookHistogram1D("JetPT1Wmunu", 26,40,300);
-				_histJetPT2Wmu    = bookHistogram1D("JetPT2Wmunu", 26,40,300);
-				_histJetPT3Wmu    = bookHistogram1D("JetPT3Wmunu", 13,40,300);
-				_histJetPT4Wmu    = bookHistogram1D("JetPT4Wmunu", 13,40,300);
+				_histJetPT1Wmu    = bookHistogram1D("JetPT1Wmunu", 26,30,300);
+				_histJetPT2Wmu    = bookHistogram1D("JetPT2Wmunu", 26,30,300);
+				_histJetPT3Wmu    = bookHistogram1D("JetPT3Wmunu", 13,30,300);
+				_histJetPT4Wmu    = bookHistogram1D("JetPT4Wmunu", 13,30,300);
 
 				_histJetETA1Wmu    = bookHistogram1D("JetETA1Wmunu", 12,-2.4,2.4);
 				_histJetETA2Wmu    = bookHistogram1D("JetETA2Wmunu", 12,-2.4,2.4);
@@ -461,7 +461,7 @@ namespace Rivet
 
 
 				//foreach (const Jet& j, applyProjection<JetAlg>(event, "ANTIKT").jetsByPt(40.0*GeV))
-				foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(40.0*GeV))
+				foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV))
 				{
 					double jeta = j.momentum().eta();
 					double jphi = j.momentum().phi();
@@ -522,7 +522,7 @@ namespace Rivet
 
 					_njet_WMuNu = finaljet_list.size();
 					_nBjet_WMuNu = finalBjet_list.size();
-					std::cout<<_njet_WMuNu<<" "<<_nBjet_WMuNu<<std::endl;
+					//std::cout<<_njet_WMuNu<<" "<<_nBjet_WMuNu<<std::endl;
 					int muind = -1;
 					int nuind=-1;
 					if (fabs(WDecayProducts[0].pdgId()) == 13) muind = 0;
@@ -575,7 +575,7 @@ namespace Rivet
 						_isBjet5=finaljet_list_btags[4];
 						_dphijet5muon = DeltaPhi(_phijet5,_phimuon);
 					}
-					std::cout<<_dphijet1muon<<" "<<_dphijet2muon<<" "<<_dphijet3muon<<" "<<_dphijet4muon<<" "<<_dphijet5muon<<" "<<std::endl;
+				//	std::cout<<_dphijet1muon<<" "<<_dphijet2muon<<" "<<_dphijet3muon<<" "<<_dphijet4muon<<" "<<_dphijet5muon<<" "<<std::endl;
 
 				_rivetTree->Fill();
 
