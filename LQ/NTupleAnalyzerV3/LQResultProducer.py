@@ -9,7 +9,6 @@ NormalDirectory = 'NTupleAnalyzer_JBinfirstRun_2012_12_02_20_35_32/SummaryFiles'
 
 TreeName = "PhysicalVariables"
 
-version_name = 'Testing'
 
 lumi = 12200.0
 
@@ -20,15 +19,19 @@ passfilter = '*(GoodVertexCount>0)*(passBeamscraping>0)*(pass_HLTMu40_eta2p1>0)*
 passfilter = '*(passDataCert > 0)*(GoodVertexCount>0)*(pass_HLTMu40_eta2p1>0)'
 preselectionmumu = '((Pt_muon1>45)*(Pt_muon2>45)*(Pt_jet1>125)*(Pt_jet2>45)*(St_uujj>300)*(M_uu>50)*(DR_muon1muon2>0.3))'
 preselectionmunu = '((Pt_muon1>45)*(Pt_muon2<45.0)*(Pt_miss>55)*(Pt_jet1>125)*(Pt_jet2>45)*(Pt_ele1<45.0)*(St_uvjj>300)*(DPhi_muon1met>0.8)*(DPhi_jet1met>0.5)*(MT_uv>50.0))'
-# preselectionmumu_lightjet = '((Pt_muon1>45)*(Pt_muon2>45)*(Pt_jet1>45)*(Pt_jet2>45)*(St_uujj>300)*(M_uu>50)*(DR_muon1muon2>0.3))'
-# preselectionmunu_lightjet = '((Pt_muon1>45)*(Pt_muon2<45.0)*(Pt_miss>55)*(Pt_jet1>45)*(Pt_jet2>45)*(Pt_ele1<45.0)*(St_uvjj>300)*(DPhi_muon1met>0.8)*(DPhi_jet1met>0.5)*(MT_uv>50.0))'
+preselectionmumu_lightjet = '((Pt_muon1>45)*(Pt_muon2>45)*(Pt_jet1>45)*(Pt_jet2>45)*(St_uujj>300)*(M_uu>50)*(DR_muon1muon2>0.3))'
+preselectionmunu_lightjet = '((Pt_muon1>45)*(Pt_muon2<45.0)*(Pt_miss>55)*(Pt_jet1>45)*(Pt_jet2>45)*(Pt_ele1<45.0)*(St_uvjj>300)*(DPhi_muon1met>0.8)*(DPhi_jet1met>0.5)*(MT_uv>50.0))'
 preselectionmumu+=passfilter
 preselectionmunu+=passfilter
+preselectionmumu_lightjet+=passfilter
+preselectionmunu_lightjet+=passfilter
 datafilter = '*(passBPTX0>0)*(passBeamHaloFilter>0)*(passBeamscraping>0)*(passTrackingFailure>0)'
 
 ##########################################################################
 ########      Put all uses of the plotting funcs into main()      ########
 ##########################################################################
+
+
 
 def main():
 
@@ -64,11 +67,25 @@ def main():
 	# quickplottest(version_name)
 	# sys.exit()
 
+	version_name = 'Testing_highpt'
+	os.system('mkdir Results_'+version_name)
+
 	[[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
 	[[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
 
 	MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1700','M_uujj2:100:10:1700','M_uu:120:10:300'],preselectionmumu,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'','uujj')
 	MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1700','M_uvjj:100:10:1700','MT_uv:120:10:300'],preselectionmunu,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'','uvjj')
+
+
+
+	version_name = 'Testing_lowpt'
+	os.system('mkdir Results_'+version_name)
+
+	[[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
+	[[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
+
+	MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1700','M_uujj2:100:10:1700','M_uu:120:10:300'],preselectionmumu_lightjet,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'','uujj')
+	MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1700','M_uvjj:100:10:1700','MT_uv:120:10:300'],preselectionmunu_lightjet,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'','uvjj')
 
 	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
 	# CreateMuMuBDTs(['Pt_jet1','Pt_jet2','M_muon1muon2','Pt_muon1','Pt_muon2'],preselectionmumu,NormalWeightMuMu,NormalDirectory,Rz_uujj, Rw_uvjj,Rtt_uujj)
@@ -140,7 +157,6 @@ for n in range(len(sys.argv)):
 
 # os.system('rm -r Results_'+version_name)
 
-os.system('mkdir Results_'+version_name)
 
 ##########################################################################
 ########            All functions and Details Below               ########
@@ -944,13 +960,9 @@ def MakeSmoothCuts(vals,vnames,versionname,chan):
 		hout.GetXaxis().SetLabelSize(.05);
 		hout.Draw("AP")
 		
-		ft = TF1("ft","[0]*(x*x) + [1]*x + [2]", 0, 2);
-		ft.SetParName(0,"p0");
-		ft.SetParName(1,"p1");
-		ft.SetParName(2,"p2");
-		ft.SetParameter(0, 1);
-		ft.SetParameter(1, 0.05);
-		ft.SetParameter(2, 0.2);
+		# ft = TF1("ft","[0]*(x*x) + [1]*x + [2]", 0, 2); # second degree pol
+		# ft = TF1("ft","[0] + [1]*[1]*tanh(x+[2]) + [3]*[3]*x",250,1250)  # linear+tanh monotonic
+		ft = TF1("ft","[1]*x + [0]", 250,1250 )  # linear
 		hout.Fit('ft')
 
 		betterfits = []
