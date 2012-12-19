@@ -78,13 +78,13 @@ _kinematicvariables += ['St_uujj','St_uvjj']
 _kinematicvariables += ['St_eejj','St_evjj']
 _kinematicvariables += ['M_uu','MT_uv']
 _kinematicvariables += ['DR_muon1muon2','DPhi_muon1met','DPhi_jet1met']
-_kinematicvariables += ['M_uujj1','M_uujj2','MT_uvjj1','MT_uvjj2','M_uvjj','MT_uvjj']
+_kinematicvariables += ['M_uujj1','M_uujj2','M_uujjavg','MT_uvjj1','MT_uvjj2','M_uvjj','MT_uvjj']
 _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_evjj']
 _kinematicvariables += ['JetCount','MuonCount','ElectronCount','GenJetCount']
 _weights = ['weight_nopu','weight_central', 'weight_pu_up', 'weight_pu_down']
 _flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure','passTriggerObjectMatching','passDataCert']
 _variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
-_variations = ['']  # For quicker tests
+# _variations = ['']  # For quicker tests
 
 
 ##########################################################################################
@@ -599,7 +599,7 @@ def LooseIDJets(T,met,variation):
 def MetVector(T):
 	# Purpose: Creates a TLorentzVector represting the MET. No pseudorapidith, obviously.
 	met = TLorentzVector()
-	met.SetPtEtaPhiM(T.PFMET[0],0,T.PFMETPhi[0],0)
+	met.SetPtEtaPhiM(T.PFMETType01XYCor[0],0,T.PFMETPhiType01XYCor[0],0)
 	return met
 
 def GetLLJJMasses(l1,l2,j1,j2):
@@ -711,6 +711,8 @@ def FullKinematicCalculation(T,variation):
 	[_Meejj1, _Meejj2] = GetLLJJMasses(electrons[0],electrons[1],jets[0],jets[1])
 	[[_MTevjj1, _MTevjj2], [_Mevjj, _MTevjj]] = GetLVJJMasses(electrons[0],met,jets[0],jets[1])
 
+	_Muujjavg = 0.5*(_Muujj1+_Muujj2)
+
 	_genjetcount = 0
 	if T.isData==0:
 		_genjetcount = len(T.GenJetPt)
@@ -723,7 +725,7 @@ def FullKinematicCalculation(T,variation):
 	toreturn += [_steejj,_stevjj]
 	toreturn += [_Muu,_MTuv]
 	toreturn += [_DRuu,_DPHIuv,_DPHIj1v]
-	toreturn += [_Muujj1, _Muujj2]
+	toreturn += [_Muujj1, _Muujj2,_Muujjavg]
 	toreturn += [_MTuvjj1, _MTuvjj2,_Muvjj, _MTuvjj]
 	toreturn += [_Meejj1, _Meejj2]
 	toreturn += [_MTevjj1, _MTevjj2,_Mevjj, _MTevjj]	
@@ -804,11 +806,11 @@ for n in range(N):
 	# that the systematic varied quantity will, and that will throw off systematics calculations later.
 	# Make sure your skim is looser than any selection you will need afterward!
 
-	if (Pt_muon1[0] < 45): continue
-	if (Pt_muon2[0] < 45) and (Pt_miss < 45): continue
-	if (Pt_jet1 < 45): continue
-	if (Pt_jet2 < 45): continue
-	if (St_uujj[0] < 260) and (St_uvjj[0] < 260): continue
+	if (Pt_muon1[0] < 40): continue
+	if (Pt_muon2[0] < 40) and (Pt_miss < 35): continue
+	if (Pt_jet1 < 100): continue
+	if (Pt_jet2 < 35): continue
+	if (St_uujj[0] < 250) and (St_uvjj[0] < 250): continue
 	# if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : continue
 	# Fill output tree with event
 	tout.Fill()
