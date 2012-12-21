@@ -194,16 +194,23 @@ masterdirlist = masterdir.replace('/','__')+'.txt'
 if masterdirlist not in os.listdir('.') or  '--FileRefresh' in sys.argv:
 	print '\n','(Re)'*('--FileRefresh' in sys.argv)+'Generating file list',masterdirlist,' for files in ',masterdir,'\n'
 	# allfiles = os.popen('cmsLs  -R '+masterdir+' | grep ".root" | awk \'{print $5}\'').readlines()
-	allfiles = GetGoodFiles(masterdir)
+	_allfiles = GetGoodFiles(masterdir)
 	print len(allfiles)
 	fmas = open(masterdirlist,'w')
-	for x in allfiles:
+	for x in _allfiles:
 		fmas.write(x+'\n')
 	fmas.close()
 else:
 	print '\n Reading files from: ',masterdirlist
 	print '\n *** NOTE: You can refresh the file list at anytime with the argument: --FileRefresh\n\n'
-	allfiles = [line for line in open(masterdirlist,'r')]
+	_allfiles = [line for line in open(masterdirlist,'r')]
+
+blacklist = ['/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/DY3JetsToLL_M-50_TuneZ2Star_8TeV-madgraph__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_17_2_9nV.root']
+
+allfiles = []
+for a in _allfiles:
+	if a.replace('\n','') not in blacklist:
+		allfiles.append(a)
 
 # sys.exit()
 
@@ -392,12 +399,16 @@ def splithadd(hstring):
 	nn = 0
 	haddouts = []
 	for block in fileblocks:
+		rmcoms = []
 		nn +=1
 		newhaddout = haddout.replace('.root','_part'+str(nn)+'.root')
 		HADD = 'hadd '+newhaddout 
 		for b in block:
 			HADD += ' '+b
+			rmcoms.append('rm '+b)
 		os.system( HADD )
+		for rmcom in rmcoms:
+			os.system(rmcom)
 		haddouts.append(newhaddout)
 
 	finalhadd = 'hadd '+haddout 
