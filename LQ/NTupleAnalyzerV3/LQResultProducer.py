@@ -6,7 +6,8 @@ import random
 # Directory where root files are kept and the tree you want to get root files from
 
 NormalDirectory = 'NTupleAnalyzer_JBinfirstRun_2012_12_02_20_35_32/SummaryFiles'
-
+NormalDirectory = 'NTupleAnalyzer_MetCorrPlusSys_2012_12_19_23_03_19/SummaryFiles'
+NormalDirectory = 'NTupleAnalyzer_Dec20_2012_12_20_21_44_21/SummaryFiles'
 TreeName = "PhysicalVariables"
 
 
@@ -19,12 +20,8 @@ passfilter = '*(GoodVertexCount>0)*(passBeamscraping>0)*(pass_HLTMu40_eta2p1>0)*
 passfilter = '*(passDataCert > 0)*(GoodVertexCount>0)*(pass_HLTMu40_eta2p1>0)'
 preselectionmumu = '((Pt_muon1>45)*(Pt_muon2>45)*(Pt_jet1>125)*(Pt_jet2>45)*(St_uujj>300)*(M_uu>50)*(DR_muon1muon2>0.3))'
 preselectionmunu = '((Pt_muon1>45)*(Pt_muon2<45.0)*(Pt_miss>55)*(Pt_jet1>125)*(Pt_jet2>45)*(Pt_ele1<45.0)*(St_uvjj>300)*(DPhi_muon1met>0.8)*(DPhi_jet1met>0.5)*(MT_uv>50.0))'
-preselectionmumu_lightjet = '((Pt_muon1>45)*(Pt_muon2>45)*(Pt_jet1>45)*(Pt_jet2>45)*(St_uujj>300)*(M_uu>50)*(DR_muon1muon2>0.3))'
-preselectionmunu_lightjet = '((Pt_muon1>45)*(Pt_muon2<45.0)*(Pt_miss>55)*(Pt_jet1>45)*(Pt_jet2>45)*(Pt_ele1<45.0)*(St_uvjj>300)*(DPhi_muon1met>0.8)*(DPhi_jet1met>0.5)*(MT_uv>50.0))'
 preselectionmumu+=passfilter
 preselectionmunu+=passfilter
-preselectionmumu_lightjet+=passfilter
-preselectionmunu_lightjet+=passfilter
 datafilter = '*(passBPTX0>0)*(passBeamHaloFilter>0)*(passBeamscraping>0)*(passTrackingFailure>0)'
 
 ##########################################################################
@@ -37,14 +34,26 @@ def main():
 
 
 	ptbinning = [40,60]
+	ptbinning2 = [40,60]
+	metbinnging2 = [0,5]
+
 	stbinning = [250,275]
 	bosonbinning = [50,60,70,80,90,100,110,120]
+	bosonzoombinning = [70,60,130]
 	lqbinning = [50,60]
+	etabinning = [26,-2.6,2.6]
+	drbinning = [35,0,7]
+	phibinning = [26,-3.1416,3.1416]
+	dphibinning = [26,0,3.1416]
 
 	for x in range(40):
 		if ptbinning[-1] < 1500:
 			ptbinning.append(ptbinning[-1]+(ptbinning[-1] - ptbinning[-2])*1.2)
-		if stbinning[-1] < 2800:
+		if ptbinning2[-1] < 700:
+			ptbinning2.append(ptbinning2[-1]+(ptbinning2[-1] - ptbinning2[-2])*1.2)
+		if metbinning2[-1] < 700:
+			metbinning2.append(metbinning2[-1]+(metbinning2[-1] - metbinning2[-2])*1.2)		
+		if stbinning[-1] < 3200:
 			stbinning.append(stbinning[-1]+(stbinning[-1] - stbinning[-2])*1.2)
 		if bosonbinning[-1]<1000:
 			bosonbinning.append(bosonbinning[-1]+ (bosonbinning[-1] - bosonbinning[-2])*1.2 )
@@ -57,6 +66,7 @@ def main():
 	# bosonbinning = [50,50,550]
 	# lqbinning = [50,150,1650]
 	vbinning = [60,0,60]
+	nbinning = [10,0,10]
 
 	# UpdateFilesWithMVA(NormalDirectory,['Pt_jet1','Pt_jet2','M_muon1muon2','Pt_muon1','Pt_muon2'])
 	# exit()
@@ -67,25 +77,63 @@ def main():
 	# quickplottest(version_name)
 	# sys.exit()
 
-	version_name = 'Testing_highpt'
-	os.system('mkdir Results_'+version_name)
+	# version_name = 'Testing_highpt'
+	# os.system('mkdir Results_'+version_name)
 
-	[[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
-	[[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
-
-	MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1700','M_uujj2:100:10:1700','M_uu:120:10:300'],preselectionmumu,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'','uujj')
-	MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1700','M_uvjj:100:10:1700','MT_uv:120:10:300'],preselectionmunu,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'','uvjj')
+	# [[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
+	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
 
 
+	# MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1900','M_uujj2:100:10:1900','M_uu:120:10:330'],preselectionmumu,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'','uujj')
+	# MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1900','M_uvjj:100:10:1900','MT_uv:120:10:330'],preselectionmunu,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'','uvjj')
 
-	version_name = 'Testing_lowpt'
-	os.system('mkdir Results_'+version_name)
 
-	[[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
-	[[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
+	# version_name = 'Testing_lowpt'
+	# os.system('mkdir Results_'+version_name)
 
-	MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1700','M_uujj2:100:10:1700','M_uu:120:10:300'],preselectionmumu_lightjet,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'','uujj')
-	MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1700','M_uvjj:100:10:1700','MT_uv:120:10:300'],preselectionmunu_lightjet,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'','uvjj')
+	# [[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
+	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
+
+	# # MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1900','M_uujj2:100:10:1900','M_uu:120:10:330'],preselectionmumu_lightjet,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'','uujj')
+	# MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1900','M_uvjj:100:10:1900','MT_uv:120:10:330'],preselectionmunu_lightjet,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'','uvjj')
+
+
+	# sys.exit()
+
+
+	# WITH PRE-EXISTING LOGS
+
+	# version_name = 'Testing_highpt'
+	# os.system('mkdir Results_'+version_name)
+
+	# ReDoOptFits('Results_Testing_highpt/Opt_uujjCuts.txt')
+	# ReDoOptFits('Results_Testing_highpt/Opt_uvjjCuts.txt')
+	# ReDoOptFits('Results_Testing_lowpt/Opt_uujjCuts.txt')
+	# ReDoOptFits('Results_Testing_lowpt/Opt_uvjjCuts.txt')
+
+
+	# [[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
+	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
+
+
+	# MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1900','M_uujj2:100:10:1900','M_uu:120:10:330'],preselectionmumu,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'Results_Testing_highpt/Log_uujjCuts.txt','uujj')
+	# MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1900','M_uvjj:100:10:1900','MT_uv:120:10:330'],preselectionmunu,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'Results_Testing_highpt/Log_uvjjCuts.txt','uvjj')
+
+
+	# version_name = 'Testing_lowpt'
+	# os.system('mkdir Results_'+version_name)
+
+	# [[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
+	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
+
+	# MuMuOptCutFile = OptimizeCuts3D(['St_uujj:250:10:1900','M_uujj2:100:10:1900','M_uu:120:10:330'],preselectionmumu_lightjet,NormalWeightMuMu,version_name,[Rz_uujj,Rtt_uujj,Rw_uvjj],'Results_Testing_lowpt/Log_uujjCuts.txt','uujj')
+	# MuNuOptCutFile = OptimizeCuts3D(['St_uvjj:250:10:1900','M_uvjj:100:10:1900','MT_uv:120:10:330'],preselectionmunu_lightjet,NormalWeightMuNu,version_name,[Rz_uujj,Rtt_uvjj,Rw_uvjj],'Results_Testing_lowpt/Log_uvjjCuts.txt','uvjj')
+
+
+	# sys.exit()
+
+
+
 
 	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
 	# CreateMuMuBDTs(['Pt_jet1','Pt_jet2','M_muon1muon2','Pt_muon1','Pt_muon2'],preselectionmumu,NormalWeightMuMu,NormalDirectory,Rz_uujj, Rw_uvjj,Rtt_uujj)
@@ -93,48 +141,110 @@ def main():
 	# MuMuOptCutFile = 'cuttest.txt'
 	# QuickTable(MuMuOptCutFile, preselectionmumu,NormalWeightMuMu,1.0,1.0,1.0)
 
-	# QuickTable(MuMuOptCutFile, preselectionmumu,NormalWeightMuMu,Rz_uujj, Rw_uvjj,Rtt_uujj)
+	# GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
+	# GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
 
-	sys.exit()
-	lqmass = 700
+	print ' ------------ '
 
-	MakeBasicPlot("Pt_jet1","p_{T}(jet_{1}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("Pt_jet2","p_{T}(jet_{2}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("Pt_muon1","p_{T}(#mu_{1}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("Pt_muon2","p_{T}(#mu_{2}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("St_uujj","S_{T}^{#mu #mu j j} [GeV]",stbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("M_uu","M^{#mu #mu} [GeV]",bosonbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("M_uujj1","M^{#mu j}_{1} [GeV]",lqbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("M_uujj2","M^{#mu j}_{2} [GeV]",lqbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
-	MakeBasicPlot("GoodVertexCount","N_{Vertices}",vbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,lqmass)
+	version_name = 'Testing_MetJetFix'
+	os.system('mkdir Results_'+version_name)
 
-	sys.exit()
+	[[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu, NormalDirectory, '(M_uu>70)*(M_uu<110)*(Pt_miss<100)', '(M_uu>70)*(M_uu<110)*(Pt_miss>100)')
+	[[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>70)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>70)*(MT_uv<110)*(JetCount>3.5)')
+
+	MuMuOptCutFile = 'Results_Testing_highpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt'
+	MuNuOptCutFile = 'Results_Testing_highpt/Opt_uvjjCuts_Smoothed_pol2cutoff.txt'
 
 
-	# MakeBasicPlot("Pt_jet1","p_{T}(jet_{1}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("Pt_jet2","p_{T}(jet_{2}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("Pt_muon1","p_{T}(#mu_{1}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("Pt_muon2","p_{T}(#mu_{2}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("St_uujj","S_{T}^{#mu #mu j j} [GeV]",stbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("M_uu","M^{#mu #mu} [GeV]",bosonbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("M_uujj1","M^{#mu j}_{1} [GeV]",lqbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("M_uujj2","M^{#mu j}_{2} [GeV]",lqbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
-	# MakeBasicPlot("GoodVertexCount","N_{Vertices}",vbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','lljj',Rz_uujj, Rw_uvjj,Rtt_uujj)
+	# QuickTable('Results_Testing_highpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt', preselectionmumu,NormalWeightMuMu,Rz_uujj, Rw_uvjj,Rtt_uujj)
+	# QuickTable('Results_Testing_highpt/Opt_uvjjCuts_Smoothed_pol2cutoff.txt', preselectionmunu,NormalWeightMuNu,Rz_uujj, Rw_uvjj,Rtt_uvjj)
+
+
+	# [[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
+	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
+
+
+	# QuickTable('Results_Testing_lowpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt', preselectionmumu_lightjet,NormalWeightMuMu,Rz_uujj, Rw_uvjj,Rtt_uujj)
+	# QuickTable('Results_Testing_lowpt/Opt_uvjjCuts_Smoothed_pol2cutoff.txt', preselectionmunu_lightjet,NormalWeightMuNu,Rz_uujj, Rw_uvjj,Rtt_uvjj)
 
 
 
-	# MakeBasicPlot("Pt_jet1","p_{T}(jet_{1}) [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("Pt_jet2","p_{T}(jet_{2}) [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("Pt_muon1","p_{T}(#mu_{1}) [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("Pt_miss","E_{T}^{miss} [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("St_uvjj","S_{T}^{#mu #nu j j} [GeV]",stbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("MT_uv","M_{T}^{#mu #nu} [GeV]",bosonbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("MT_uvjj","M_{T}^{#mu j} [GeV]",lqbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("M_uvjj","M^{#mu j} [GeV]",lqbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj)
-	# MakeBasicPlot("GoodVertexCount","N_{Vertices}",vbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','lvjj',Rz_uujj, Rw_uvjj,Rtt_uujj)
+	# sys.exit()
+	# for lqmass in [300,500,700,900]:
+	# for lqmass in [500,900]:
+
+
+	# 	MakeBasicPlot("St_uujj","S_{T}^{#mu #mu j j} [GeV]",stbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,version_name,lqmass)
+	# 	# MakeBasicPlot("M_uu","M^{#mu #mu} [GeV]",bosonbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,version_name,lqmass)
+	# 	MakeBasicPlot("M_uujj2","M^{#mu j}_{2} [GeV]",lqbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'final','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,MuMuOptCutFile,version_name,lqmass)
+	# 	MakeBasicPlot("St_uvjj","S_{T}^{#mu #nu j j} [GeV]",stbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'final','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,MuNuOptCutFile,version_name,lqmass)
+	# 	# MakeBasicPlot("MT_uv","M_{T}^{#mu #nu} [GeV]",bosonbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'final','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,MuNuOptCutFile,version_name,lqmass)
+	# 	MakeBasicPlot("M_uvjj","M^{#mu j} [GeV]",lqbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'final','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,MuNuOptCutFile,version_name,lqmass)
+	# sys.exit()
+
+
+	MakeBasicPlot("Pt_jet1","p_{T}(jet_{1}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Pt_jet2","p_{T}(jet_{2}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Pt_muon1","p_{T}(#mu_{1}) [GeV]",ptbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Pt_muon2","p_{T}(#mu_{2}) [GeV]",ptbinning2,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Pt_miss","E_{T}^{miss} [GeV]",metbinning2,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	
+	MakeBasicPlot("Eta_jet1","#eta(jet_{1}) [GeV]",etabinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Eta_jet2","#eta(jet_{2}) [GeV]",etabinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Eta_muon1","#eta(#mu_{1}) [GeV]",etabinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Eta_muon2","#eta(#mu_{2}) [GeV]",etabinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)	
+
+	MakeBasicPlot("Phi_jet1","#phi(jet_{1}) [GeV]",phibinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Phi_jet2","#phi(jet_{2}) [GeV]",phibinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Phi_muon1","#phi(#mu_{1}) [GeV]",phibinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("Phi_muon2","#phi(#mu_{2}) [GeV]",phibinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)	
+
+	MakeBasicPlot("St_uujj","S_{T}^{#mu #mu j j} [GeV]",stbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("M_uu","M^{#mu #mu} [GeV]",bosonbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("M_uu","M^{#mu #mu} [GeV]",bosonzoombinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standardzoom','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("M_uujj1","M^{#mu j}_{1} [GeV]",lqbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("M_uujj2","M^{#mu j}_{2} [GeV]",lqbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("GoodVertexCount","N_{Vertices}",vbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("JetCount","N_{jet}",nbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("MuonCount","N_{#mu}",nbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+	MakeBasicPlot("ElectronCount","N_{e}",nbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+
+	MakeBasicPlot("DR_muon1muon2","#DeltaR(#mu_1,#mu_2)",drbinning,preselectionmumu,NormalWeightMuMu,NormalDirectory,'standard','uujj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
 
 
 
+	MakeBasicPlot("Pt_jet1","p_{T}(jet_{1}) [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Pt_jet2","p_{T}(jet_{2}) [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Pt_muon1","p_{T}(#mu_{1}) [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Pt_miss","E_{T}^{miss} [GeV]",ptbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+
+	MakeBasicPlot("Eta_jet1","#eta(jet_{1}) [GeV]",etabinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Eta_jet2","#eta(jet_{2}) [GeV]",etabinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Eta_muon1","#eta(#mu_{1}) [GeV]",etabinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+
+	MakeBasicPlot("Phi_jet1","#phi(jet_{1}) [GeV]",phibinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Phi_jet2","#phi(jet_{2}) [GeV]",phibinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Phi_muon1","#phi(#mu_{1}) [GeV]",phibinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("Phi_miss","#phi^{miss} [GeV]",phibinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+
+	MakeBasicPlot("St_uvjj","S_{T}^{#mu #nu j j} [GeV]",stbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("MT_uv","M_{T}^{#mu #nu} [GeV]",bosonbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("MT_uv","M_{T}^{#mu #nu} [GeV]",bosonzoombinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standardzoom','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+
+	MakeBasicPlot("MT_uvjj","M_{T}^{#mu j} [GeV]",lqbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("M_uvjj","M^{#mu j} [GeV]",lqbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("GoodVertexCount","N_{Vertices}",vbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uujj,'',version_name,500)
+
+	MakeBasicPlot("JetCount","N_{jet}",nbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("MuonCount","N_{#mu}",nbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("ElectronCount","N_{e}",nbinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+
+	MakeBasicPlot("DPhi_muon1met","#Delta #phi (#mu_{1},E_{T}^{miss})",dphibinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+	MakeBasicPlot("DPhi_jet1met","#Delta #phi(j_{1},E_{T}^{miss})",dphibinning,preselectionmunu,NormalWeightMuNu,NormalDirectory,'standard','uvjj',Rz_uujj, Rw_uvjj,Rtt_uvjj,'',version_name,500)
+
+
+
+	# sys.exit()
 	os.system('echo Combining Figures; convert -density 800 Results_'+version_name+'/*png Results_'+version_name+'/AllPlots.pdf')
 
 ####################################################################################################################################################
@@ -303,7 +413,7 @@ def QuickTableLine(treestruc,selection,scalefacs,ftex,fcsv):
 	_s = QuickIntegral(_stree,selection,scalefacs[0])
 	_bs = [QuickIntegral(_btrees[b],selection,scalefacs[1][b]) for b in range(len(_btrees))]
 	_bt = QuickMultiIntegral(_btrees,selection,scalefacs[1])
-	_d = QuickIntegral (_dtree,selection,scalefacs[2])
+	_d = QuickEntries (_dtree,selection,scalefacs[2])
 
 	texline = ''
 	for x in _bs:
@@ -319,6 +429,9 @@ def QuickTableLine(treestruc,selection,scalefacs,ftex,fcsv):
 	csvline += csventry(_d)+' , '
 	csvline += csventry(_s)+'  '
 
+	print selection
+	print texline 
+
 	f = open(ftex,'a')
 	f.write(texline+'\n')
 	f.close()
@@ -329,8 +442,29 @@ def QuickTableLine(treestruc,selection,scalefacs,ftex,fcsv):
 
 def QuickTable(optimlog, selection, weight,rz,rw,rt):
 	selection = selection+'*'+weight
-	texfile = 'Table_'+optimlog.replace('.txt','tex')
-	csvfile = 'Table_'+optimlog.replace('.txt','csv')
+	texfile = optimlog.replace('.txt','_table.tex')
+	csvfile = optimlog.replace('.txt','_table.csv')
+
+	headers = ['TTBar','Z+Jets','W+Jets','sTop','VV','Tot BG','Data','Signal']
+
+
+	f = open(texfile,'w')
+	header = '  '
+	for h in headers:
+		header += h + '&'
+	header = header[:-1]
+	header += '\\\\'
+	f.write(header+'\n')
+	f.close()
+
+	f = open(csvfile,'w')
+	header = ' '
+	for h in headers:
+		header += h + ','
+	header = header[:-1]	
+	f.write(header+'\n')
+	f.close()
+
 
 	for line in open(optimlog,'r'):
 		print 'processing table line for optimization:', line
@@ -347,26 +481,9 @@ def QuickTable(optimlog, selection, weight,rz,rw,rt):
 		exec('treefeed = ['+chan+']')
 		treefeed.append([t_TTBarDBin,t_ZJetsJBin,t_WJetsJBin,t_SingleTop,t_DiBoson])
 		treefeed.append(t_SingleMuData)
-		headers = ['TTBar','Z+Jets','sTop','VV','Tot BG','Data','Signal']
 		scalefacs = [1,[rt,rz,rw,1,1],1]
-		QuickTableLine(treefeed,selection,scalefacs,texfile,csvfile)
+		QuickTableLine(treefeed,this_sel,scalefacs,texfile,csvfile)
 
-	f = open(ftex,'w')
-	header = ' -- & '
-	for h in headers:
-		header += h + '&'
-	header = header[:-1]
-	header += '\\\\'
-	f.write(header+'\n')
-	f.close()
-
-	f = open(fcsv,'w')
-	header = ' -- ,'
-	for h in headers:
-		header += h + ','
-	header = header[:-1]	
-	f.write(header+'\n')
-	f.close()
 
 
 def GetScaleFactors(n1,n2,a1,a2,b1,b2,o1,o2):
@@ -491,7 +608,7 @@ def GetMuNuScaleFactors( selection, FileDirectory, controlregion_1, controlregio
 
 
 
-def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileDirectory,tagname,channel, zscale, wscale, ttscale,cutlog,plotmass):
+def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileDirectory,tagname,channel, zscale, wscale, ttscale,cutlog,version_name,plotmass):
 
 	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
 	# for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
@@ -507,6 +624,7 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileD
 	pad1.Draw()
 	pad2.Draw()
 	pad1.cd()
+	pad1.SetGrid()
 	# These are the style parameters for certain plots - [FillStyle,MarkerStyle,MarkerSize,LineWidth,Color]
 	MCRecoStyle=[0,20,.00001,1,4]
 	DataRecoStyle=[0,20,.7,1,1]
@@ -524,6 +642,7 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileD
 	SignalStyle2=[0,22,0.7,3,38]
 
 	if tagname == 'final':
+		print 'cat '+cutlog+' | grep '+channel+str(plotmass)
 		fsel = ((os.popen('cat '+cutlog+' | grep '+channel+str(plotmass)).readlines())[0]).replace('\n','')
 		fsel = (fsel.split("="))[-1]
 		fsel = '*'+fsel.replace(" ","")
@@ -623,6 +742,7 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileD
 
 	pad2.cd()
 	# pad2.SetLogy()
+	pad2.SetGrid()
 
 	RatHistDen =CreateHisto('RatHisDen','RatHistDen',t_SingleMuData,recovariable,presentationbinning,'0',DataRecoStyle,Label)
 
@@ -656,8 +776,12 @@ def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,weight,FileD
 	unity=TLine(RatHistNum.GetXaxis().GetXmin(), 1.0 , RatHistNum.GetXaxis().GetXmax(),1.0)
 	unity.Draw("SAME")	
 	print 'Saving...  ',
-	c1.Print('Results_'+version_name+'/Basic_'+channel+'_'+recovariable+'_'+tagname+'.pdf')
-	c1.Print('Results_'+version_name+'/Basic_'+channel+'_'+recovariable+'_'+tagname+'.png')
+	if 'final' not in tagname:
+		c1.Print('Results_'+version_name+'/Basic_'+channel+'_'+recovariable+'_'+tagname+'.pdf')
+		c1.Print('Results_'+version_name+'/Basic_'+channel+'_'+recovariable+'_'+tagname+'.png')
+	else:
+		c1.Print('Results_'+version_name+'/Basic_'+channel+'_'+recovariable+'_'+tagname+str(plotmass)+'.pdf')
+		c1.Print('Results_'+version_name+'/Basic_'+channel+'_'+recovariable+'_'+tagname+str(plotmass)+'.png')		
 	print 'Done.'
 
 
@@ -843,9 +967,22 @@ def OptimizeCuts3D(variablespace,presel,weight,tag,scalefacs,cutfile,channel):
 		os.system('rm '+ftmpname)
 		cutfile = logfile
 	
+	print 'Getting log ... '
+	# flog = open('loglog.txt','w')
+
+	nf = os.popen('cat '+cutfile+' | wc -l').readlines()[0]
+	nf = int(nf)
+	nd = 0
 	for c in open(cutfile):
+		nd += 1
+		if nd%100000==0:
+			print str(round( (1.0*nd)/(1.0*nf),2 )), '% complete'
+		# print '** ',c
+		# flog.write('** '+c)
 		exec(c)
 
+	# flog.close()
+	
 	SIGS = []
 	BAKS = []
 
@@ -881,12 +1018,51 @@ def OptimizeCuts3D(variablespace,presel,weight,tag,scalefacs,cutfile,channel):
 
 	optimlog.close()
 
-	cuts = MakeSmoothCuts(valuetable,[minvar[0],hvars[0][0], hvars[1][0]],tag,channel)
+	print 'Performing fits ...'
+	cuts = MakeSmoothCuts(valuetable,[minvar[0],hvars[0][0], hvars[1][0]],tag,channel,'lin')
+	cuts = MakeSmoothCuts(valuetable,[minvar[0],hvars[0][0], hvars[1][0]],tag,channel,'lintanh')
+	cuts = MakeSmoothCuts(valuetable,[minvar[0],hvars[0][0], hvars[1][0]],tag,channel,'pol2')
+	cuts = MakeSmoothCuts(valuetable,[minvar[0],hvars[0][0], hvars[1][0]],tag,channel,'pol2cutoff')
+	cuts = MakeSmoothCuts(valuetable,[minvar[0],hvars[0][0], hvars[1][0]],tag,channel,'lincutoff')
+
 	return cuts
 
+def ReDoOptFits(OptFile):
+	tag = OptFile.split('/')[0]
+	tag = tag.replace('Results_','')
+	valuetable = []
+	for line in open(OptFile):
+		valueline = []
+		channel = line.split('jj')[0]
+		channel = channel.split('LQ')[1]
+		channel += 'jj'
+		mass = float(line.split('jj')[1].split('=')[0].replace(' ',''))
 
+		varnames = line.split('=')[-1]
+		varnames = varnames.replace(')','')
+		varnames = varnames.replace('(','')
+		varnames = varnames.split('*')
+		varwords = []
+		varvals = []
+		for v in varnames:
+			v = v.split('>')
+			varwords.append(v[0].replace(' ',''))
+			varvals.append(float(v[1]))
+		valueline = [mass]
+		for v in varvals:
+			valueline.append(v)
+		valuetable.append(valueline)
+	# print tag,channel, varwords
+	# for v in valuetable:
+	# 	print v
 
-def MakeSmoothCuts(vals,vnames,versionname,chan):
+	# cuts = MakeSmoothCuts(valuetable,varwords,tag,channel,'lin')
+	# cuts = MakeSmoothCuts(valuetable,varwords,tag,channel,'lintanh')
+	# cuts = MakeSmoothCuts(valuetable,varwords,tag,channel,'pol2')
+	cuts = MakeSmoothCuts(valuetable,varwords,tag,channel,'pol2cutoff')
+	# cuts = MakeSmoothCuts(valuetable,varwords,tag,channel,'lincutoff')		
+
+def MakeSmoothCuts(vals,vnames,versionname,chan,rawmethod):
 
 	xnames = []
 	for x in vnames:
@@ -910,11 +1086,23 @@ def MakeSmoothCuts(vals,vnames,versionname,chan):
 		if "M_uvjj" in a :  x = "M^{#mu j}"
 		xnames.append(x)
 
-	n = len(vals)
-	_vals = sorted(vals,key=lambda vals: vals[0])
+	_allvals = sorted(vals,key=lambda vals: vals[0])
+
+
+	if 'cutoff' in rawmethod:
+		_vals = []
+		for v in _allvals:
+			if v[0] <= 1000:
+				_vals.append(v)
+	else:
+		_vals=_allvals
+
+	for v in _vals:
+		print v
 
 	yinds = []
 	masses = []
+
 	for v in range(len(_vals[0])):
 		if v == 0: 
 			for v in _vals:
@@ -922,8 +1110,16 @@ def MakeSmoothCuts(vals,vnames,versionname,chan):
 			continue
 		yinds.append(v)
 
-	print masses
-	# print '*'
+	allmasses = []
+
+	for v in range(len(_allvals[0])):
+		if v == 0: 
+			for v in _allvals:
+				allmasses.append(v[0])	
+
+	n = len(masses)
+
+	method = rawmethod.replace('cutoff','')
 	optim_res=[masses]
 	for y in yinds:
 
@@ -937,6 +1133,8 @@ def MakeSmoothCuts(vals,vnames,versionname,chan):
 		c1 = TCanvas("c1","",700,500)
 		c1.cd(1).SetGrid()
 
+		print X
+		print Y
 		hout = TGraph(n,X,Y)
 		hout.GetYaxis().SetTitle(xnames[y-1]+' Threshold [GeV]')
 		hout.GetXaxis().SetTitle('LQ Mass [GeV]')
@@ -960,23 +1158,24 @@ def MakeSmoothCuts(vals,vnames,versionname,chan):
 		hout.GetXaxis().SetLabelSize(.05);
 		hout.Draw("AP")
 		
-		# ft = TF1("ft","[0]*(x*x) + [1]*x + [2]", 0, 2); # second degree pol
-		# ft = TF1("ft","[0] + [1]*[1]*tanh(x+[2]) + [3]*[3]*x",250,1250)  # linear+tanh monotonic
-		ft = TF1("ft","[1]*x + [0]", 250,1250 )  # linear
+		if method == 'lin':
+			ft = TF1("ft","[1]*x + [0]", 250,1250 )  # linear
+		if method == 'lintanh':
+			ft = TF1("ft","[0] + [1]*[1]*tanh(x+[2]) + [3]*[3]*x",250,1250) 		#linear+tanh monotonic
+		if method == 'pol2':
+			ft = TF1("ft","[0] + [1]*x + [2]*(x*x)", 250, 1250); # second degree pol
 		hout.Fit('ft')
 
 		betterfits = []
-		# print vnames[y-1]
-		for m in masses:
+		for m in allmasses:
 			orig_val = ft.Eval(m)
 			new_val = round_to(orig_val,5)
 			betterfits.append(new_val)
-			# print m, hout.Eval(m), ft.Eval(m), round_to(ft.Eval(m),5)
 		optim_res.append(betterfits)
-		c1.Print('Results_'+versionname+'/Optimization_'+chan+'_'+vnames[y-1]+'.pdf')
-		c1.Print('Results_'+versionname+'/Optimization_'+chan+'_'+vnames[y-1]+'.png')
+		c1.Print('Results_'+versionname+'/Optimization_'+chan+'_'+vnames[y-1]+'_'+rawmethod+'.pdf')
+		c1.Print('Results_'+versionname+'/Optimization_'+chan+'_'+vnames[y-1]+'_'+rawmethod+'.png')
 
-	optimlog = open('Results_'+versionname+'/Opt_'+chan+'Cuts_Smoothed.txt','w')
+	optimlog = open('Results_'+versionname+'/Opt_'+chan+'Cuts_Smoothed_'+rawmethod+'.txt','w')	
 
 	for x in range(len(optim_res[0])):
 		cutstr = ''
