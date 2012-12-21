@@ -83,7 +83,8 @@ _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_e
 _kinematicvariables += ['JetCount','MuonCount','ElectronCount','GenJetCount']
 _weights = ['weight_nopu','weight_central', 'weight_pu_up', 'weight_pu_down']
 _flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure','passTriggerObjectMatching','passDataCert']
-_variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
+_variations = ['','JESup','JESdown','MESup','MESdown','JERup','JERdown','MER']
+# _variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
 # _variations = ['']  # For quicker tests
 
 
@@ -543,12 +544,14 @@ def HEEPElectrons(T,met,variation):
 			electroninds.append(n)
 	return [electrons,electroninds,met]
 
-def JERModifiedPt(pt,eta,phi,T):
-	# Pupose: Dummy function for the moment. Input is pt/eta/phi of a jet. 
+def JERModifiedPt(pt,eta,phi,T,modtype):
+	# Pupose: Modify reco jets based on genjets. Input is pt/eta/phi of a jet. 
 	#         The jet will be matched to a gen jet, and the difference
 	#         between reco and gen will be modified according to appropriate
-	#         pt/eta dependent scale factors (STILL NEEDED). 
+	#         pt/eta dependent scale factors. 
 	#         The modified jet PT is returned.
+	#         https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1336.html
+	#         https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
 	bestn = -1
 	bestdpt = 0
 	bestdR = 9999999.9
@@ -566,24 +569,44 @@ def JERModifiedPt(pt,eta,phi,T):
 	if bestdR>0.5:
 		return pt
 
-	adjustmentfactor = 0.1
+	abseta = abs(eta)
+	if abseta >= 0   : jfacs = [  0.05200 , 0.11515 , -0.00900 ]
+	if abseta >= 0.5 : jfacs = [  0.05700 , 0.11427 , 0.00200  ]
+	if abseta >= 1.1 : jfacs = [  0.09600 , 0.16125 , 0.03400  ]
+	if abseta >= 1.7 : jfacs = [  0.13400 , 0.22778 , 0.04900  ]
+	if abseta >= 2.3 : jfacs = [  0.28800 , 0.48838 , 0.13500  ]
+
+	if modtype == '':
+		adjustmentfactor = jfacs[0]
+	if modtype == 'up':
+		adjustmentfactor = jfacs[1]
+	if modtype == 'down':
+		adjustmentfactor = jfacs[2]
+
 	ptadjustment = adjustmentfactor*bestdpt
 	pt += ptadjustment
 	return pt
 
-def LooseIDJets(T,met,variation):
+def LooseIDJets(T,met,variation,isdata):
 	# Pupose: Gets the collection of jets passing loose PFJet ID. 
 	#         Returns jets as TLorentzVectors, and indices corrresponding
 	#         to the surviving jetss of the jet collection. 
 	#         Also returns modified MET for systematic variations.	
 
+	if variation!='JERup' and variation!='JERdown':
+		# _PFJetPt = [JERModifiedPt(T.PFJetPt[n],T.PFJetEta[n],T.PFJetPhi[n],T,'') for n in range(len(T.PFJetPt))] 	
+		_PFJetPt = [pt for pt in T.PFJetPt]				
+	if variation=='JERup':	
+		_PFJetPt = [JERModifiedPt(T.PFJetPt[n],T.PFJetEta[n],T.PFJetPhi[n],T,'up') for n in range(len(T.PFJetPt))] 
+	if variation=='JERdown':	
+		_PFJetPt = [JERModifiedPt(T.PFJetPt[n],T.PFJetEta[n],T.PFJetPhi[n],T,'down') for n in range(len(T.PFJetPt))] 		
+
 	if variation=='JESup':	
-		_PFJetPt = [ T.PFJetPt[n]*(1.0+T.PFJetJECUnc[n]) for n in range(len(T.PFJetPt))]
-	elif variation=='JESdown':	
-		_PFJetPt = [ T.PFJetPt[n]*(1.0-T.PFJetJECUnc[n]) for n in range(len(T.PFJetPt))]
-	elif variation=='JER':	
-		_PFJetPt = [JERModifiedPt(T.PFJetPt[n],T.PFJetEta[n],T.PFJetPhi[n],T) for n in range(len(T.PFJetPt))] 
-	else:	
+		_PFJetPt = [ _PFJetPt[n]*(1.0+T.PFJetJECUnc[n]) for n in range(len(_PFJetPt))]
+	if variation=='JESdown':	
+		_PFJetPt = [ _PFJetPt[n]*(1.0-T.PFJetJECUnc[n]) for n in range(len(_PFJetPt))]
+
+	if (isdata):
 		_PFJetPt = [pt for pt in T.PFJetPt]	
 
 	jets=[]
@@ -663,7 +686,7 @@ def FullKinematicCalculation(T,variation):
 	[muons,goodmuoninds,met] = TightIDMuons(T,met,variation)
 	[electrons,electroninds,met] = HEEPElectrons(T,met,variation)
 	# ID Jets and filter from muons
-	[jets,jetinds,met] = LooseIDJets(T,met,variation)
+	[jets,jetinds,met] = LooseIDJets(T,met,variation,T.isData)
 	jets = GeomFilterCollection(jets,muons,0.3)
 	jets = GeomFilterCollection(jets,electrons,0.3)
 	# Empty lorenz vector for bookkeeping
@@ -806,10 +829,10 @@ for n in range(N):
 	# that the systematic varied quantity will, and that will throw off systematics calculations later.
 	# Make sure your skim is looser than any selection you will need afterward!
 
-	if (Pt_muon1[0] < 40): continue
-	if (Pt_muon2[0] < 40) and (Pt_miss < 35): continue
-	if (Pt_jet1 < 100): continue
-	if (Pt_jet2 < 35): continue
+	if (Pt_muon1[0] < 41): continue
+	if (Pt_muon2[0] < 41) and (Pt_miss < 35): continue
+	if (Pt_jet1 < 110): continue
+	if (Pt_jet2 < 40): continue
 	if (St_uujj[0] < 250) and (St_uvjj[0] < 250): continue
 	# if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : continue
 	# Fill output tree with event
