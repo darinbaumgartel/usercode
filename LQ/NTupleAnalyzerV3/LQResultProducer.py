@@ -8,6 +8,7 @@ import random
 NormalDirectory = 'NTupleAnalyzer_JBinfirstRun_2012_12_02_20_35_32/SummaryFiles'
 NormalDirectory = 'NTupleAnalyzer_MetCorrPlusSys_2012_12_19_23_03_19/SummaryFiles'
 NormalDirectory = 'NTupleAnalyzer_Dec20_2012_12_20_21_44_21/SummaryFiles'
+NormalDirectory = 'NTupleAnalyzer_Dec27_2012_12_28_04_31_00/SummaryFiles'
 TreeName = "PhysicalVariables"
 
 
@@ -16,13 +17,15 @@ lumi = 12200.0
 NormalWeightMuMu = str(lumi)+'*weight_central'
 NormalWeightMuNu = str(lumi)+'*weight_central'
 
-passfilter = '*(GoodVertexCount>0)*(passBeamscraping>0)*(pass_HLTMu40_eta2p1>0)*(passBPTX0>0)*(passBeamHaloFilter>0)*(passTrackingFailure>0)'
-passfilter = '*(passDataCert > 0)*(GoodVertexCount>0)*(pass_HLTMu40_eta2p1>0)'
+passfilter =  '*(passDataCert*passPrimaryVertex*pass_HLTMu40_eta2p1)'
+passfilter += '*(passBeamScraping*passPhysDeclared*passBeamHalo*passHBHENoiseFilter*passTrackingFailure)'
+# passfilter += '*(passEcalDeadCellBE*passEcalDeadCellTP*passBadEESuperCrystal*passEcalLaserCorr*passHcalLaserEvent)'
+passfilter += '*(passEcalDeadCellBE*passEcalDeadCellTP*passBadEESuperCrystal*passHcalLaserEvent)'
+# passEcalLaserCorr is bad in data
 preselectionmumu = '((Pt_muon1>45)*(Pt_muon2>45)*(Pt_jet1>125)*(Pt_jet2>45)*(St_uujj>300)*(M_uu>50)*(DR_muon1muon2>0.3))'
 preselectionmunu = '((Pt_muon1>45)*(Pt_muon2<45.0)*(Pt_miss>55)*(Pt_jet1>125)*(Pt_jet2>45)*(Pt_ele1<45.0)*(St_uvjj>300)*(DPhi_muon1met>0.8)*(DPhi_jet1met>0.5)*(MT_uv>50.0))'
 preselectionmumu+=passfilter
 preselectionmunu+=passfilter
-datafilter = '*(passBPTX0>0)*(passBeamHaloFilter>0)*(passBeamscraping>0)*(passTrackingFailure>0)'
 
 ##########################################################################
 ########      Put all uses of the plotting funcs into main()      ########
@@ -35,7 +38,7 @@ def main():
 
 	ptbinning = [40,60]
 	ptbinning2 = [40,60]
-	metbinnging2 = [0,5]
+	metbinning2 = [0,5]
 
 	stbinning = [250,275]
 	bosonbinning = [50,60,70,80,90,100,110,120]
@@ -144,16 +147,16 @@ def main():
 	# GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
 	# GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
 
-	print ' ------------ '
+	# print ' ------------ '
 
-	version_name = 'Testing_MetJetFix'
+	version_name = 'Testing_Dec27'
 	os.system('mkdir Results_'+version_name)
 
-	[[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu, NormalDirectory, '(M_uu>70)*(M_uu<110)*(Pt_miss<100)', '(M_uu>70)*(M_uu<110)*(Pt_miss>100)')
-	[[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>70)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>70)*(MT_uv<110)*(JetCount>3.5)')
+	# [[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu, NormalDirectory, '(M_uu>70)*(M_uu<110)*(Pt_miss<100)', '(M_uu>100)*(Pt_miss>=100)')
+	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu, NormalDirectory, '(MT_uv>70)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>70)*(MT_uv<110)*(JetCount>3.5)')
 
-	MuMuOptCutFile = 'Results_Testing_highpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt'
-	MuNuOptCutFile = 'Results_Testing_highpt/Opt_uvjjCuts_Smoothed_pol2cutoff.txt'
+	# MuMuOptCutFile = 'Results_Testing_highpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt'
+	# MuNuOptCutFile = 'Results_Testing_highpt/Opt_uvjjCuts_Smoothed_pol2cutoff.txt'
 
 
 	# QuickTable('Results_Testing_highpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt', preselectionmumu,NormalWeightMuMu,Rz_uujj, Rw_uvjj,Rtt_uujj)
@@ -167,7 +170,11 @@ def main():
 	# QuickTable('Results_Testing_lowpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt', preselectionmumu_lightjet,NormalWeightMuMu,Rz_uujj, Rw_uvjj,Rtt_uujj)
 	# QuickTable('Results_Testing_lowpt/Opt_uvjjCuts_Smoothed_pol2cutoff.txt', preselectionmunu_lightjet,NormalWeightMuNu,Rz_uujj, Rw_uvjj,Rtt_uvjj)
 
+	# SysTable('Results_Testing_Dec27/Opt_uvjjCuts_Smoothed_pol2cutoff.txt', preselectionmunu,NormalWeightMuNu,0.85, 0.85,0.85,'')
+	FullAnalysis('Results_Testing_Dec27/Opt_uujjCuts_Smoothed_pol2cutoff.txt', preselectionmumu,preselectionmunu,NormalDirectory,NormalWeightMuMu)
+	FullAnalysis('Results_Testing_Dec27/Opt_uvjjCuts_Smoothed_pol2cutoff.txt', preselectionmumu,preselectionmunu,NormalDirectory,NormalWeightMuNu)
 
+	sys.exit()
 
 	# sys.exit()
 	# for lqmass in [300,500,700,900]:
@@ -379,6 +386,15 @@ def QuickIntegral(tree,selection,scalefac):
 	E = h.GetBinError(1)
 	return [I,E]
 
+def QuickSysIntegral(tree,selection,scalefac):
+
+	h = TH1D('h','h',1,-1,3)
+	h.Sumw2()
+	tree.Project('h','1.0',selection+'*'+str(scalefac))
+	I = h.Integral()
+	E = h.GetEntries()
+	return str([I,int(E)])
+
 def QuickMultiIntegral(trees,selection,scalefacs):
 
 	h = TH1D('h','h',1,-1,3)
@@ -401,6 +417,15 @@ def QuickEntries(tree,selection,scalefac):
 	tree.Project('h','1.0',selection)
 	I = h.GetEntries()
 	return [1.0*I*scalefac, math.sqrt(1.0*I*scalefac)]
+
+def QuickSysEntries(tree,selection,scalefac):
+
+	h = TH1D('h','h',1,-1,3)
+	h.Sumw2()
+	tree.Project('h','1.0',selection)
+	I = h.GetEntries()
+	return str([int(1.0*I*scalefac),int(1.0*I*scalefac)]) 
+
 
 def texentry(measurement):
 	return '$ '+str(round(measurement[0],2))+' \\pm '+str(round(measurement[1],2))+' $'
@@ -467,7 +492,7 @@ def QuickTable(optimlog, selection, weight,rz,rw,rt):
 
 
 	for line in open(optimlog,'r'):
-		print 'processing table line for optimization:', line
+		print '  ..processing table line for optimization:  ', line
 		fsel = line.replace('\n','')
 		masschan = fsel.split('=')[0]
 		masschan = masschan.replace('\n','')
@@ -484,6 +509,143 @@ def QuickTable(optimlog, selection, weight,rz,rw,rt):
 		scalefacs = [1,[rt,rz,rw,1,1],1]
 		QuickTableLine(treefeed,this_sel,scalefacs,texfile,csvfile)
 
+
+def QuickSysTableLine(treestruc,selection,scalefacs,fsys,chan):
+	[_stree,_dtree,_btrees] = treestruc
+	_s = QuickSysIntegral(_stree,selection,scalefacs[0])
+	_bs = [QuickSysIntegral(_btrees[b],selection,scalefacs[1][b]) for b in range(len(_btrees))]
+	_d = QuickSysEntries (_dtree,selection,scalefacs[2])
+
+	sysline = 'L_'+chan + ' = ['
+	sysline += (_s)+' , '
+	sysline += (_d)+' , '
+	for x in _bs:
+		sysline += ' '+(x)
+		if x != _bs[-1]:
+			sysline += ' , '
+	sysline += ' ]'
+
+	print selection.replace('\n','')
+	print ' '
+
+	f = open(fsys,'a')
+	f.write(sysline+'\n')
+	f.close()
+
+def ModSelection(selection,sysmethod):
+	_kinematicvariables = ['Pt_muon1','Pt_muon2','Pt_ele1','Pt_ele2','Pt_jet1','Pt_jet2','Pt_miss']
+	_kinematicvariables += ['Eta_muon1','Eta_muon2','Eta_ele1','Eta_ele2','Eta_jet1','Eta_jet2','Eta_miss']
+	_kinematicvariables += ['Phi_muon1','Phi_muon2','Phi_ele1','Phi_ele2','Phi_jet1','Phi_jet2','Phi_miss']
+	_kinematicvariables += ['St_uujj','St_uvjj']
+	_kinematicvariables += ['St_eejj','St_evjj']
+	_kinematicvariables += ['M_uujj1','M_uujj2','M_uujjavg','MT_uvjj1','MT_uvjj2','M_uvjj','MT_uvjj']
+	_kinematicvariables += ['M_uu','MT_uv']
+	_kinematicvariables += ['DR_muon1muon2','DPhi_muon1met','DPhi_jet1met']
+	# _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_evjj']
+	# _kinematicvariables += ['JetCount','MuonCount','ElectronCount','GenJetCount']
+	_weights = ['weight_nopu','weight_central', 'weight_pu_up', 'weight_pu_down']
+	_variations = ['','JESup','JESdown','MESup','MESdown','JERup','JERdown','MER']	
+	selsplit = []
+	selchars = ''
+	alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
+	for s in selection:
+		if s not in alphabet:
+			selsplit.append(selchars)
+			selchars = s
+			selsplit.append(selchars)
+			selchars = ''
+		else:
+			selchars += s
+	selsplit.append(selchars)
+	outsel = ''
+	for v in _variations:
+		if sysmethod == v:
+			for sobj in selsplit:
+				for k in _kinematicvariables:
+					if sobj == k:
+						sobj = k+sysmethod
+				outsel += sobj
+	if outsel != '':
+		selection=outsel
+
+	if sysmethod == 'LUMIup':
+		selection = '(1.044)*'+selection
+	if sysmethod == 'LUMIdown':
+		selection = '(0.956)*'+selection
+	if sysmethod == 'PUup':
+		selection = selection.replace('weight_central','weight_pu_up')
+	if sysmethod == 'PUdown':
+		selection = selection.replace('weight_central','weight_pu_down')
+
+	return selection
+
+
+def SysTable(optimlog, selection_uujj,selection_uvjj,NormalDirectory, weight,sysmethod):
+	selection_uujj = selection_uujj+'*'+weight
+	selection_uvjj = selection_uvjj+'*'+weight
+	selection_uujj = ModSelection(selection_uujj,sysmethod)
+	selection_uvjj = ModSelection(selection_uvjj,sysmethod)
+
+	[[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( selection_uujj, NormalDirectory, '(M_uu>70)*(M_uu<110)*(Pt_miss<100)', '(M_uu>100)*(Pt_miss>=100)')
+	[[Rw_uvjj,Rw_uvjj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( selection_uvjj, NormalDirectory, '(MT_uv>70)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>70)*(MT_uv<110)*(JetCount>3.5)')
+
+
+	if 'uujj' in optimlog:
+		[rz,rw,rt] = [Rz_uujj,Rw_uvjj,Rtt_uujj]
+		[_e_rz,_e_rw,_e_rt] = [Rz_uujj_err,Rw_uvjj_err,Rtt_uujj_err]
+
+		selection = selection_uujj
+	if 'uvjj' in optimlog:
+		[rz,rw,rt] = [Rz_uujj,Rw_uvjj,Rtt_uvjj]
+		[_e_rz,_e_rw,_e_rt] = [Rz_uujj_err,Rw_uvjj_err,Rtt_uvjj_err]	
+		selection = selection_uvjj
+
+	if sysmethod == 'ZNORMup':     rz += _e_rz 
+	if sysmethod == 'ZNORMdown':   rz += -_e_rz 
+	if sysmethod == 'WNORMup': 	   rw += _e_rw
+	if sysmethod == 'WNORMdown':   rw += -_e_rw 
+	if sysmethod == 'TTNORMup':    rt += _e_rt
+	if sysmethod == 'TTNORMdown':  rt += -_e_rt 	
+	sysfile = optimlog.replace('.txt','_systable_'+sysmethod+'.txt')
+
+	headers = ['Signal','Data','TTBar','ZJets','WJets','sTop','VV']
+
+
+	f = open(sysfile,'w')
+	header = 'headers = '+str(headers)
+	f.write(header+'\n')
+	f.close()
+
+
+	for line in open(optimlog,'r'):
+		line = line.replace('\n','')
+		print 'processing table line for optimization:  ', line
+		fsel = line.replace('\n','')
+		fsel = ModSelection(fsel,sysmethod)
+		masschan = fsel.split('=')[0]
+		masschan = masschan.replace('\n','')
+		masschan = masschan.replace(' ','')
+		mass = masschan.split('jj')[-1]
+		chan = 't_'+masschan.split('_')[-1]
+		fsel = (fsel.split("="))[-1]
+		fsel = '*'+fsel.replace(" ","")
+		this_sel = '('+selection+fsel+')'
+
+		exec('treefeed = ['+chan+']')
+		treefeed.append(t_SingleMuData)
+		treefeed.append([t_TTBarDBin,t_ZJetsJBin,t_WJetsJBin,t_SingleTop,t_DiBoson])
+		scalefacs = [1,[rt,rz,rw,1,1],1]
+		QuickSysTableLine(treefeed,this_sel,scalefacs,sysfile,chan)
+		# break
+
+def FullAnalysis(optimlog,selection_uujj,selection_uvjj,NormalDirectory,weight):
+
+	_Variations = ['','JESup','JESdown','MESup','MESdown','JERup','JERdown','MER','LUMIup','LUMIdown','PUup','PUdown','ZNORMup','ZNORMdown','WNORMup','WNORMdown','TTNORMup','TTNORMdown']	
+
+	for v in _Variations:
+		print ' -'*50
+		print 'Processing table for variation: ',v
+		SysTable(optimlog, selection_uujj, selection_uvjj,NormalDirectory, weight,v)
 
 
 def GetScaleFactors(n1,n2,a1,a2,b1,b2,o1,o2):
@@ -535,7 +697,9 @@ def PrintRuns():
 def GetMuMuScaleFactors( selection, FileDirectory, controlregion_1, controlregion_2):
 	# for f in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines():
 	# 	exec('t_'+f.replace(".root\n","")+" = TFile.Open(\""+FileDirectory+"/"+f.replace("\n","")+"\")"+".Get(\""+TreeName+"\")")
-
+	# print QuickEntries(t_SingleMuData,selection + '*' + controlregion_1,1.0)
+	# print QuickIntegral(t_ZJetsJBin,selection + '*' + controlregion_1,1.0)
+	# sys.exit()
 	N1 = QuickEntries(t_SingleMuData,selection + '*' + controlregion_1,1.0)
 	N2 = QuickEntries(t_SingleMuData,selection + '*' + controlregion_2,1.0)
 

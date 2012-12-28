@@ -49,13 +49,13 @@ indicator = ((name.split('_'))[-1]).replace('.root','')
 junkfile1 = str(randint(100000000,1000000000))+indicator+'junk.root'
 
 fj1 = TFile.Open(junkfile1,'RECREATE')
-t1 = to.CopyTree('PFJetPt[]>45')
+t1 = to.CopyTree('PFJetPt[]>100')
 Nj1 = t1.GetEntries()
 
 junkfile2 = str(randint(100000000,1000000000))+indicator+'junk.root'
 
 fj2 = TFile.Open(junkfile2,'RECREATE')
-t = t1.CopyTree('MuonPt[]>45')
+t = t1.CopyTree('MuonPt[]>40')
 N = t.GetEntries()
 
 
@@ -82,7 +82,9 @@ _kinematicvariables += ['M_uujj1','M_uujj2','M_uujjavg','MT_uvjj1','MT_uvjj2','M
 _kinematicvariables += ['M_eejj1','M_eejj2','MT_evjj1','MT_evjj2','M_evjj','MT_evjj']
 _kinematicvariables += ['JetCount','MuonCount','ElectronCount','GenJetCount']
 _weights = ['weight_nopu','weight_central', 'weight_pu_up', 'weight_pu_down']
-_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount','passBeamscraping','passHBHENoisefilter','passBPTX0','passBeamHaloFilter','passTrackingFailure','passTriggerObjectMatching','passDataCert']
+_flags = ['run_number','event_number','lumi_number','pass_HLTMu40_eta2p1','GoodVertexCount']
+_flags += ['passPrimaryVertex','passBeamScraping','passHBHENoiseFilter','passBPTX0','passBeamHalo','passTrackingFailure','passTriggerObjectMatching','passDataCert']
+_flags += ['passBadEESuperCrystal','passEcalDeadCellBE','passEcalDeadCellTP','passEcalLaserCorr','passHcalLaserEvent','passPhysDeclared']
 _variations = ['','JESup','JESdown','MESup','MESdown','JERup','JERdown','MER']
 # _variations = ['','JESup','JESdown','MESup','MESdown','EESup','EESdown','JER','MER','EER']
 # _variations = ['']  # For quicker tests
@@ -97,13 +99,6 @@ _variations = ['','JESup','JESdown','MESup','MESdown','JERup','JERdown','MER']
 def GetPURescalingFactors():
 	# Pupose: To get the pileup reweight factors from the PU_Central.root, PU_Up.root, and PU_Down.root files.
 	#         The MC Truth distribution is taken from https://twiki.cern.ch/twiki/bin/view/CMS/PileupMCReweightingUtilities
-
-	# MCDistSummer12 = [2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 
-	#        2.464E-03, 3.250E-03, 5.021E-03, 6.644E-03, 8.502E-03, 1.121E-02, 1.518E-02, 2.033E-02, 2.608E-02, 3.171E-02, 3.667E-02, 
-	#        4.060E-02, 4.338E-02, 4.520E-02, 4.641E-02, 4.735E-02, 4.816E-02, 4.881E-02, 4.917E-02, 4.909E-02, 4.842E-02, 4.707E-02, 
-	#        4.501E-02, 4.228E-02, 3.896E-02, 3.521E-02, 3.118E-02, 2.702E-02, 2.287E-02, 1.885E-02, 1.508E-02, 1.166E-02, 8.673E-03, 
-	#        6.190E-03, 4.222E-03, 2.746E-03, 1.698E-03, 9.971E-04, 5.549E-04, 2.924E-04, 1.457E-04, 6.864E-05, 3.054E-05, 1.282E-05, 
-	#        5.081E-06, 1.898E-06, 6.688E-07, 2.221E-07, 6.947E-08, 2.047E-08]
 
 	MCDistSummer12 = [2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 1.999E-03, 6.097E-03, 1.046E-02, 1.383E-02, 
                       1.685E-02, 2.055E-02, 2.572E-02, 3.262E-02, 4.121E-02, 4.977E-02, 5.539E-02, 5.725E-02, 5.607E-02, 5.312E-02, 5.008E-02, 4.763E-02, 
@@ -126,20 +121,15 @@ def GetPURescalingFactors():
 		bins_pu_up.append(h_pu_up.GetBinContent(bin))
 		bins_pu_down.append(h_pu_down.GetBinContent(bin))
 
-
-
 	total_pu_central = sum(bins_pu_central)
 	total_pu_up = sum(bins_pu_up)
 	total_pu_down = sum(bins_pu_down)
 	total_mc = sum(MCDistSummer12)
 
-
 	bins_pu_central_norm = [x/total_pu_central for x in bins_pu_central]
 	bins_pu_up_norm = [x/total_pu_up for x in bins_pu_up]
 	bins_pu_down_norm = [x/total_pu_down for x in bins_pu_down]
 	bins_mc_norm  = [x/total_mc for x in MCDistSummer12]
-
-
 
 	scale_pu_central = []
 	scale_pu_up = []
@@ -150,9 +140,6 @@ def GetPURescalingFactors():
 		scale_pu_up.append(bins_pu_up_norm[x]/bins_mc_norm[x])
 		scale_pu_down.append(bins_pu_down_norm[x]/bins_mc_norm[x])
 
-	# print scale_pu_central
-	# print scale_pu_down
-	# print scale_pu_up
 	return [scale_pu_central, scale_pu_up, scale_pu_down]
 
 # Use the above function to get the pu weights
@@ -795,17 +782,40 @@ for n in range(N):
 	# event_number[0] = int(t.event)
 	event_number[0] = 100
 	lumi_number[0]  = lumisection[0]
-	pass_HLTMu40_eta2p1[0] = PassTrigger(t,["HLT_Mu40_eta2p1_v"],1)
 	GoodVertexCount[0] = CountVertices(t)
-	passBeamscraping[0] = 1*(t.isBeamScraping)
-	passHBHENoisefilter[0] = 1*(t.passHBHENoiseFilter)
-	passBPTX0[0] = 1*(t.isBPTX0)
-	passBeamHaloFilter[0] = 1*(t.passBeamHaloFilterTight)
-	passTrackingFailure[0] = 1*(1-t.isTrackingFailure)
-	passTriggerObjectMatching[0] = 1*(True in t.MuonHLTSingleMuonMatched)
+
+
+
+
+	if t.isData == True:
+		pass_HLTMu40_eta2p1[0] = PassTrigger(t,["HLT_Mu40_eta2p1_v"],1)         # Data Only
+		passTriggerObjectMatching[0]  = 1*(True in t.MuonHLTSingleMuonMatched)  # Data Only
+		passBPTX0[0]                  = 1*(t.isBPTX0)          # Unused, Data only: MC = 0
+		passBeamScraping[0]           = 1*(1-t.isBeamScraping) # Used, Data only
+		passTrackingFailure[0]        = 1*(1-t.isTrackingFailure) # Used, Data only
+		passBadEESuperCrystal[0]      = 1*(1-t.passBadEESupercrystalFilter) # Used, Data only
+		passEcalLaserCorr[0]          = 1*(t.passEcalLaserCorrFilter) # Used, Data only
+		passHcalLaserEvent[0]         = 1*(1-t.passHcalLaserEventFilter) # Used, Data only
+		passPhysDeclared[0]           = 1*(t.isPhysDeclared)
+
+	else:
+		pass_HLTMu40_eta2p1[0] = PassTrigger(t,["HLT_Mu40_eta2p1_v"],1)        
+		passTriggerObjectMatching[0]  = 1
+		passBPTX0[0]                  = 1
+		passBeamScraping[0]           = 1
+		passTrackingFailure[0]        = 1
+		passBadEESuperCrystal[0]      = 1
+		passEcalLaserCorr[0]          = 1
+		passHcalLaserEvent[0]         = 1
+		passPhysDeclared[0]           = 1
+	
+	passPrimaryVertex[0]          = 1*(t.isPrimaryVertex)     # checked, data+MC
+	passHBHENoiseFilter[0]        = 1*(t.passHBHENoiseFilter) # checked, data+MC
+	passBeamHalo[0]               = 1*(t.passBeamHaloFilterTight) # checked, data+MC
+	passEcalDeadCellBE[0]         = 1*(1-t.passEcalDeadCellBoundaryEnergyFilter) # Checked, data + MC
+	passEcalDeadCellTP[0]         = 1*(1-t.passEcalDeadCellTriggerPrimitiveFilter) # Checked, data + MC
 
 	passDataCert[0] = 1
-
 	if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : 	passDataCert[0] = 0
 
 
@@ -834,7 +844,6 @@ for n in range(N):
 	if (Pt_jet1 < 110): continue
 	if (Pt_jet2 < 40): continue
 	if (St_uujj[0] < 250) and (St_uvjj[0] < 250): continue
-	# if ( (t.isData==True) and (CheckRunLumiCert(t.run,lumisection[0]) == False) ) : continue
 	# Fill output tree with event
 	tout.Fill()
 
