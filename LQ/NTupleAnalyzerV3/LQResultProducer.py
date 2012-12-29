@@ -2,6 +2,7 @@ import os,sys
 
 import math
 import random
+from glob import glob
 
 # Directory where root files are kept and the tree you want to get root files from
 
@@ -165,7 +166,16 @@ def main():
 
 	# [[Rz_uujj,Rz_uujj_err],[Rtt_uujj,Rtt_uujj_err]] = GetMuMuScaleFactors( NormalWeightMuMu+'*'+preselectionmumu_lightjet, NormalDirectory, '(M_uu>80)*(M_uu<100)', '(M_uu>100)*(Pt_miss>60)')
 	# [[Rw_uvjj,Rw_uujj_err],[Rtt_uvjj,Rtt_uvjj_err]] = GetMuNuScaleFactors( NormalWeightMuNu+'*'+preselectionmunu_lightjet, NormalDirectory, '(MT_uv>60)*(MT_uv<110)*(JetCount<3.5)', '(MT_uv>60)*(MT_uv<110)*(JetCount>3.5)')
+	
+	uujjcards = ParseFinalCards('Results_Testing_Dec27/Opt_uujjCuts_Smoothed_pol2cutoff_systable*.txt')
+	uvjjcards = ParseFinalCards('Results_Testing_Dec27/Opt_uvjjCuts_Smoothed_pol2cutoff_systable*.txt')
 
+	print uujjcards
+	print uvjjcards
+	finalcards = FixFinalCards([uujjcards,uvjjcards])
+	print finalcards
+
+	sys.exit()
 
 	# QuickTable('Results_Testing_lowpt/Opt_uujjCuts_Smoothed_pol2cutoff.txt', preselectionmumu_lightjet,NormalWeightMuMu,Rz_uujj, Rw_uvjj,Rtt_uujj)
 	# QuickTable('Results_Testing_lowpt/Opt_uvjjCuts_Smoothed_pol2cutoff.txt', preselectionmunu_lightjet,NormalWeightMuNu,Rz_uujj, Rw_uvjj,Rtt_uvjj)
@@ -521,9 +531,8 @@ def QuickSysTableLine(treestruc,selection,scalefacs,fsys,chan):
 	sysline += (_d)+' , '
 	for x in _bs:
 		sysline += ' '+(x)
-		if x != _bs[-1]:
-			sysline += ' , '
-	sysline += ' ]'
+		sysline += ' , '
+	sysline = sysline[0:-2]+' ]'
 
 	print selection.replace('\n','')
 	print ' '
@@ -645,6 +654,9 @@ def FullAnalysis(optimlog,selection_uujj,selection_uvjj,NormalDirectory,weight):
 	for v in _Variations:
 		print ' -'*50
 		print 'Processing table for variation: ',v
+		if (optimlog.replace('.txt','_systable_'+v+'.txt')) in str(os.popen('ls '+optimlog.replace('.txt','_systable_'+v+'.txt')).readlines()):
+			print 'Already present ... skipping. '
+			continue
 		SysTable(optimlog, selection_uujj, selection_uvjj,NormalDirectory, weight,v)
 
 
@@ -1431,5 +1443,183 @@ def CreateMuMuBDTs(variables,preselection,weight,FileDirectory,zscale,ttscale,ws
 
 	QuickBDT('LQToCMu_M_500',t_LQToCMu_M_500,t_ZJets_Sherpa, t_WJets_Sherpa, t_DiBoson, t_SingleTop, t_TTBar,  variables,preselection,'lljj',weight,zscale,ttscale,wscale)
 
+
+def CompareMeanSys(m,s1,s2):
+	_m = []
+	_s1 = []
+	_s2 = []
+	for x in range(len(m)):
+		if x == 1:
+			continue
+		_m.append(m[x][0])
+		_s1.append(s1[x][0])
+		_s2.append(s2[x][0])
+
+	systematics = []
+
+	for x in range(len(_m)):
+		syst = 1
+		mavg = _m[x]
+		sv1 = _s1[x]
+		sv2 = _s2[x]
+		d1 = abs(sv1-mavg)
+		d2 = abs(sv2-mavg)
+		diff = max([d1,d2])
+		if diff > 0 and mavg > 0:
+			syst = 1 + diff/mavg
+		systematics.append(syst)
+	outline = ' '
+	for s in systematics:
+		outline += str(s) + ' '
+	return outline
+
+
+def ParseFinalCards(cardcoll):
+	chan = '' + 'uujj'*('uujj' in cardcoll)+ 'uvjj'*('uvjj' in cardcoll) 
+	tables = glob(cardcoll)
+	systypes = []
+	for t in tables:
+		sys = (t.split('_')[-1]).replace('.txt','')
+		systypes.append(sys)
+	variations = []
+	for s in systypes:
+		s = s.replace('up','')
+		s = s.replace('down','')
+		if s not in variations:
+			variations.append(s)
+	# for v in variations:
+	# 	print v
+	T = ''
+	for n in range(len(systypes)):
+		if systypes[n]=='':
+			T = tables[n]
+
+	cardnames = []
+	for line in open(T,'r'):
+		if 'L_' in line:
+			cardname = line.split(' = ')[0]
+			cardname = cardname.split('_')[-1] 
+			cardnames.append(cardname)
+		# print ' * ',line
+		exec(line)
+
+	configlines = ['','imax 1','jmax '+str(len(headers)-2),'kmax '+str(len(headers)-1+len(variations)-1),'','bin 1','']
+
+	nc = 0
+	standardweights = []
+
+	finalcards = cardcoll.replace('*','_ALL_')
+	finalcards = finalcards.replace('systable','finalcards')
+	fout = open(finalcards,'w')
+
+
+	for card in cardnames:
+		allcards = [line.replace('\n','') for line in os.popen('grep '+card+' '+cardcoll).readlines()]
+		nc += 1
+		mcard = ''
+		scards = []
+		for a in allcards:
+			if T in a:
+				mcard = a
+			else:
+				scards.append(a)
+			
+		statlines = []
+
+		# print headers
+		# print mcard
+		exec ('minfo = '+mcard.split('=')[-1])
+		# print minfo
+		# print ' \n '
+		weights = []
+		nums = []
+		rates = []
+		for entry in minfo:
+			if entry[1] > 0.001:
+				weights.append((1.0*entry[0])/(1.0*entry[1]))
+			else:
+				weights.append(0)
+			nums.append(int(entry[1]))
+			rates.append(entry[0])
+		if nc ==1:
+			standardweights = weights
+		statlines = []
+		spacers = -1
+		rateline = 'rate '
+		for h in range(len(headers)):
+			head = headers[h]
+			if 'Data' in head:
+				continue
+			spacers += 1
+			nmc = nums[h]
+			w = weights[h]
+			if w <0.0000000001:
+				w = standardweights[h]
+			nmc = str(int(nmc))
+			w = str(w)
+			r = str(rates[h])
+			statline = 'stat_'+head+' gmN '+nmc + (' - ')*spacers +' ' + w +' '+(' - ')*(len(headers) -2 - spacers)
+			if nmc > 0:
+				statlines.append(statline)
+			rateline += ' '+r
+
+
+		obsline = 'observation '+str(minfo[1][1])
+		binline = 'bin '+(' 1 ')*(len(headers)-1)
+		procline1 = 'process  '+card
+		for hh in headers:
+			if 'Sig' in hh or 'Data' in hh:
+				continue
+			procline1 += ' '+hh
+		procline2 = 'process  0 '+(' 1 ')*(len(headers)-2)
+
+		syslines = []
+		for v in variations:
+			if v == '':
+				continue
+			sysline = v + '  lnN  '
+			this_sysset = []
+			for ss in scards:
+				if v in ss:
+					this_sysset.append(ss)
+			if len(this_sysset) == 1:
+				this_sysset.append(this_sysset[0])
+			exec ('sys1 = '+this_sysset[0].split('=')[-1])
+			exec ('sys2 = '+this_sysset[1].split('=')[-1])
+			sysline += CompareMeanSys(minfo,sys1,sys2)
+			syslines.append(sysline)
+
+
+		fout.write( card + '.txt\n\n')
+		for configline in configlines:
+			fout.write( configline+'\n')
+		fout.write( obsline+'\n')
+		fout.write( ' '+'\n')
+		fout.write( binline+'\n')
+		fout.write( procline1+'\n')
+		fout.write( procline2+'\n')
+		fout.write( ' '+'\n')
+		fout.write( rateline+'\n')
+		fout.write( ' '+'\n')
+		for sysline in syslines:
+			fout.write( sysline+'\n')
+		fout.write( ' '+'\n')
+		for statline in statlines:
+			fout.write( statline+'\n')
+		fout.write( '\n'*3)
+
+	fout.close()
+	return finalcards
+
+def FixFinalCards(cardsets):
+	f = cardsets[0].split('/')[0]+'/FinalCards.txt'
+	fout = open(f,'w')
+	for c in cardsets:
+		for line in open(c,'r'):
+			line = line.replace('uujj','_M_')
+			line = line.replace('uvjj','_BetaHalf_M_')
+			fout.write(line)
+	fout.close()
+	return f
 
 main()
