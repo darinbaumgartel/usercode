@@ -195,7 +195,7 @@ if masterdirlist not in os.listdir('.') or  '--FileRefresh' in sys.argv:
 	print '\n','(Re)'*('--FileRefresh' in sys.argv)+'Generating file list',masterdirlist,' for files in ',masterdir,'\n'
 	# allfiles = os.popen('cmsLs  -R '+masterdir+' | grep ".root" | awk \'{print $5}\'').readlines()
 	_allfiles = GetGoodFiles(masterdir)
-	print len(allfiles)
+	print len(_allfiles)
 	fmas = open(masterdirlist,'w')
 	for x in _allfiles:
 		fmas.write(x+'\n')
@@ -293,6 +293,7 @@ def MakeJobs(njobs):
 		jobgroups.append(jobset)
 
 	print 'subbing: ',len(jobgroups),'jobs.'
+	os.system('rm '+thiseos+'/subber_*.tcsh')
 	for j in jobgroups:
 		Nj += 1
 		subber = open(thiseos+'/subber_'+str(Nj)+'.tcsh','w')
@@ -348,6 +349,8 @@ while keep_going != 0:
 			 break
 
 os.system('rm '+thiseos+'/subber_*tcsh')
+
+#sys.exit()
 
 if 'Counter' in pyfile:
 	txtfiles = os.popen('ls -1 '+thiseos+' | grep txt').readlines()
