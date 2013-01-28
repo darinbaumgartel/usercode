@@ -352,14 +352,14 @@ void placeholder::Loop()
 	BRANCH(Pt_genjet4);  BRANCH(Phi_genjet4);  BRANCH(Eta_genjet4);  
 	BRANCH(Pt_genjet5);  BRANCH(Phi_genjet5);  BRANCH(Eta_genjet5);  
 	BRANCH(Pt_genjet6);  BRANCH(Phi_genjet6);  BRANCH(Eta_genjet6);  
+
+	BRANCH(Pt_genjet1_bare);  BRANCH(Phi_genjet1_bare);  BRANCH(Eta_genjet1_bare);  
+	BRANCH(Pt_genjet2_bare);  BRANCH(Phi_genjet2_bare);  BRANCH(Eta_genjet2_bare);  
+	BRANCH(Pt_genjet3_bare);  BRANCH(Phi_genjet3_bare);  BRANCH(Eta_genjet3_bare);  
+	BRANCH(Pt_genjet4_bare);  BRANCH(Phi_genjet4_bare);  BRANCH(Eta_genjet4_bare);  
+	BRANCH(Pt_genjet5_bare);  BRANCH(Phi_genjet5_bare);  BRANCH(Eta_genjet5_bare);  
+	BRANCH(Pt_genjet6_bare);  BRANCH(Phi_genjet6_bare);  BRANCH(Eta_genjet6_bare);  
 	
-	BRANCH(ST_muonMET);
-	BRANCH(ST_muonMETpfjet1);
-	BRANCH(ST_muonMETpfjet12);
-	BRANCH(ST_muonMETpfjet123);
-	BRANCH(ST_muonMETpfjet1234);
-	BRANCH(ST_muonMETpfjet12345);
-	BRANCH(ST_muonMETpfjet123456);
 
 	BRANCH(DeltaPhi_genjet1genmuon1);
 	BRANCH(DeltaPhi_genjet2genmuon1);
@@ -368,22 +368,43 @@ void placeholder::Loop()
 	BRANCH(DeltaPhi_genjet5genmuon1);
 	BRANCH(DeltaPhi_genjet6genmuon1);
 
+	BRANCH(DeltaPhi_genjet1genmuon1_bare);
+	BRANCH(DeltaPhi_genjet2genmuon1_bare);
+	BRANCH(DeltaPhi_genjet3genmuon1_bare);
+	BRANCH(DeltaPhi_genjet4genmuon1_bare);
+	BRANCH(DeltaPhi_genjet5genmuon1_bare);
+	BRANCH(DeltaPhi_genjet6genmuon1_bare);
+
+	BRANCH(ST_genmuongenMET);
+	BRANCH(ST_genmuongenMETgenjet1);
+	BRANCH(ST_genmuongenMETgenjet12);
+	BRANCH(ST_genmuongenMETgenjet123);
+	BRANCH(ST_genmuongenMETgenjet1234);
+	BRANCH(ST_genmuongenMETgenjet12345);
+	BRANCH(ST_genmuongenMETgenjet123456);
+	
+	BRANCH(ST_genmuongenMET_bare);
+	BRANCH(ST_genmuongenMETgenjet1_bare);
+	BRANCH(ST_genmuongenMETgenjet12_bare);
+	BRANCH(ST_genmuongenMETgenjet123_bare);
+	BRANCH(ST_genmuongenMETgenjet1234_bare);
+	BRANCH(ST_genmuongenMETgenjet12345_bare);
+	BRANCH(ST_genmuongenMETgenjet123456_bare);
+	
 
 	BRANCH(Pt_genmuon1);  BRANCH(Phi_genmuon1);  BRANCH(Eta_genmuon1);  
 	BRANCH(Pt_genmuon2);  BRANCH(Phi_genmuon2);  BRANCH(Eta_genmuon2);  
 
-	BRANCH(Pt_genmuonneutrino1);  BRANCH(Phi_genmuonneutrino1);  BRANCH(Eta_genmuonneutrino1);  
-
-	
+	BRANCH(Pt_genmuonneutrino1);  BRANCH(Phi_genmuonneutrino1);  BRANCH(Eta_genmuonneutrino1);  	
 	BRANCH(Pt_genMET);  BRANCH(Phi_genMET);  
 
 	BRANCH(MT_genmuon1genMET);
 	BRANCH(MT_genmuon1genneutrino);
-
 	BRANCH(Pt_W_gen);  BRANCH(Phi_W_gen);
 
-	// Reco Level Variables
-	
+
+
+	// Reco Level Variables	
 	BRANCH(Pt_pfjet1);  BRANCH(Phi_pfjet1);  BRANCH(Eta_pfjet1);  BRANCH(SSVHEM_pfjet1);  BRANCH(TCHPT_pfjet1);
 	BRANCH(Pt_pfjet2);  BRANCH(Phi_pfjet2);  BRANCH(Eta_pfjet2);  BRANCH(SSVHEM_pfjet2);  BRANCH(TCHPT_pfjet2);  
 	BRANCH(Pt_pfjet3);  BRANCH(Phi_pfjet3);  BRANCH(Eta_pfjet3);  BRANCH(SSVHEM_pfjet3);  BRANCH(TCHPT_pfjet3);  
@@ -398,16 +419,20 @@ void placeholder::Loop()
 	BRANCH(DeltaPhi_pfjet5muon1);
 	BRANCH(DeltaPhi_pfjet6muon1);
 
-	BRANCH(ST_genmuongenMET);
-	BRANCH(ST_genmuongenMETgenjet1);
-	BRANCH(ST_genmuongenMETgenjet12);
-	BRANCH(ST_genmuongenMETgenjet123);
-	BRANCH(ST_genmuongenMETgenjet1234);
-	BRANCH(ST_genmuongenMETgenjet12345);
-	BRANCH(ST_genmuongenMETgenjet123456);
-	
+
+	BRANCH(ST_muonMET);
+	BRANCH(ST_muonMETpfjet1);
+	BRANCH(ST_muonMETpfjet12);
+	BRANCH(ST_muonMETpfjet123);
+	BRANCH(ST_muonMETpfjet1234);
+	BRANCH(ST_muonMETpfjet12345);
+	BRANCH(ST_muonMETpfjet123456);
+
+
+
 	BRANCH(Pt_muon1);  BRANCH(Phi_muon1);  BRANCH(Eta_muon1);  
 	BRANCH(Pt_muon2);  BRANCH(Phi_muon2);  BRANCH(Eta_muon2);  
+	BRANCH(TrkRelIso_muon1);
 	
 	BRANCH(Pt_MET);  BRANCH(Phi_MET);  
 
@@ -966,6 +991,7 @@ void placeholder::Loop()
 		Muon25Count = 0.0;
 		TrackerMuonCount=0.0;
 		
+		Double_t muoniso = 1.0;
 		for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 		{
 			if (MuonIsGlobal  ->at(imuon) == 1) GlobalMuonCount += 1.0;
@@ -997,9 +1023,9 @@ void placeholder::Loop()
 			TLorentzVector muon;
 			muon.SetPtEtaPhiM( MuonPt -> at(imuon), MuonEta-> at(imuon),    MuonPhi-> at(imuon),    0);
 			RecoMuons.push_back(muon);
+			if (muoniso > 0.999) muoniso = ((MuonTrackerIsoSumPT->at(imuon))/muonPt);
 			v_idx_muon_final.push_back(imuon);
 			Muon25Count += 1.0;
-			// if (checkPT && (muonPt < 25.0) ) continue;
 			if (v_idx_muon_final.size()>=1) checkPT=false;
 		}						 // loop over muons
 
@@ -1141,7 +1167,7 @@ void placeholder::Loop()
 		if (!isData)
 		{
 
-			vector<TLorentzVector> GenMuons, GenJets, SortedGenMuons, SortedGenJets, GenMuNeutrinos;
+			vector<TLorentzVector> GenMuons, GenJets, GenJetsBare, SortedGenMuons, SortedGenJets, GenMuNeutrinos;
 
 			Pt_genjet1 = 0;       Phi_genjet1 = 0;       Eta_genjet1 = 0; DeltaPhi_genjet1genmuon1 = -1.0;
 			Pt_genjet2 = 0;       Phi_genjet2 = 0;       Eta_genjet2 = 0; DeltaPhi_genjet2genmuon1 = -1.0; 
@@ -1150,6 +1176,13 @@ void placeholder::Loop()
 			Pt_genjet5 = 0;       Phi_genjet5 = 0;       Eta_genjet5 = 0; DeltaPhi_genjet5genmuon1 = -1.0;
 			Pt_genjet6 = 0;       Phi_genjet6 = 0;       Eta_genjet6 = 0; DeltaPhi_genjet6genmuon1 = -1.0;
 			
+			Pt_genjet1_bare = 0;       Phi_genjet1_bare = 0;       Eta_genjet1_bare = 0; DeltaPhi_genjet1genmuon1_bare = -1.0;
+			Pt_genjet2_bare = 0;       Phi_genjet2_bare = 0;       Eta_genjet2_bare = 0; DeltaPhi_genjet2genmuon1_bare = -1.0; 
+			Pt_genjet3_bare = 0;       Phi_genjet3_bare = 0;       Eta_genjet3_bare = 0; DeltaPhi_genjet3genmuon1_bare = -1.0;
+			Pt_genjet4_bare = 0;       Phi_genjet4_bare = 0;       Eta_genjet4_bare = 0; DeltaPhi_genjet4genmuon1_bare = -1.0;
+			Pt_genjet5_bare = 0;       Phi_genjet5_bare = 0;       Eta_genjet5_bare = 0; DeltaPhi_genjet5genmuon1_bare = -1.0;
+			Pt_genjet6_bare = 0;       Phi_genjet6_bare = 0;       Eta_genjet6_bare = 0; DeltaPhi_genjet6genmuon1_bare = -1.0;
+
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
 			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
 			GenJetCount=0;        GenJet30Count = 0.0;  
@@ -1166,6 +1199,14 @@ void placeholder::Loop()
 			ST_genmuongenMETgenjet12345 = 0 ;
 			ST_genmuongenMETgenjet123456 = 0 ;
 
+			ST_genmuongenMET_bare = 0 ;
+			ST_genmuongenMETgenjet1_bare = 0 ;
+			ST_genmuongenMETgenjet12_bare = 0 ;
+			ST_genmuongenMETgenjet123_bare = 0 ;
+			ST_genmuongenMETgenjet1234_bare = 0 ;
+			ST_genmuongenMETgenjet12345_bare = 0 ;
+			ST_genmuongenMETgenjet123456_bare = 0 ;
+
 			MT_genmuon1genMET = 0 ;  MT_genmuon1genneutrino = 0;
 			
 			// std::cout<<" ---------------------------------------------- "<<std::endl;
@@ -1173,17 +1214,12 @@ void placeholder::Loop()
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
 				int pdgId = GenParticlePdgId->at(ip);
-				// std::cout<<ip<<  "   "<<pdgId<<std::endl;
-
 				int motherIndex = GenParticleMotherIndex->at(ip);
-				//if ( motherIndex == -1 ) continue;
 
 				if ( TMath::Abs(pdgId) == 13 )
 				{
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					// std::cout<<"  GenRecoDR:  "<<thisgenmuon.DeltaR(RecoMuons[0])<<"  gen PT: "<<thisgenmuon.Pt()<<"  rec PT: "<<RecoMuons[0].Pt()<<std::endl;
-					// if (motherIndex>-1) std::cout<<"     "<<GenParticlePdgId->at(motherIndex)<<std::endl;
 
 					bool KeepMuon=true;
 					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
@@ -1191,7 +1227,6 @@ void placeholder::Loop()
 						if ( (GenMuons[igenmuon].Pt() == thisgenmuon.Pt())&&(GenMuons[igenmuon].Eta() == thisgenmuon.Eta())&&(GenMuons[igenmuon].Phi() == thisgenmuon.Phi()) ) 
 						{	
 							KeepMuon=false;
-							// std::cout<<"     Duplicate muon FLAGGED "<<std::endl;
 						}
 					}
 
@@ -1199,8 +1234,6 @@ void placeholder::Loop()
 				}
 				if ( TMath::Abs(pdgId) == 14 )
 				{
-					// std::cout<<"  Gen Neut:  "<<pdgId<<"  "<<motherIndex<<"  "<<GenParticlePt->at(ip)<<"  "<<GenParticleEta->at(ip)<<"   "<<GenParticlePhi->at(ip)<<std::endl;
-	
 					TLorentzVector thisgenneutrino;
 					thisgenneutrino.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
 					
@@ -1210,22 +1243,16 @@ void placeholder::Loop()
 						if ( (GenMuNeutrinos[igenneutrino].Pt() == thisgenneutrino.Pt())&&(GenMuNeutrinos[igenneutrino].Eta() == thisgenneutrino.Eta())&&(GenMuNeutrinos[igenneutrino].Phi() == thisgenneutrino.Phi()) ) 
 						{	
 							KeepNeutrino=false;
-							// std::cout<<"     Duplicate neutrino FLAGGED "<<std::endl;
 						}
 					}
 
 					if (KeepNeutrino==true) GenMuNeutrinos.push_back(thisgenneutrino);
 				}
-				// if ( TMath::Abs(pdgId) == 11 ) std::cout<<" ELECTRON FOUND "<<std::endl;
-				// if ( TMath::Abs(pdgId) == 14 ) std::cout<<" TAU FOUND "<<std::endl;
-
 			}
 
-			// std::cout<<"Gen Muons: "<<GenMuons.size()<<"  GenNeutrinos: "<<GenMuNeutrinos.size()<<std::endl;
 
 			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
 			{
-				//std::cout<<ijet<<"  "<<GenJetPt->at(ijet)<<std::endl;
 
 				if (fabs(GenJetEta->at(ijet))>3.0) continue;
 				TLorentzVector(thisgenjet);
@@ -1241,7 +1268,9 @@ void placeholder::Loop()
 
 				GenJets.push_back(thisgenjet);
 				if (fabs(GenJetEta->at(ijet))>2.4) continue;
-				if (thisgenjet.Pt()>30.0) GenJet30Count+= 1.0;				
+				if (thisgenjet.Pt()>30.0) continue;
+					GenJet30Count+= 1.0;				
+					GenJetsBare.push_back(thisgenjet);
 			}
 			
 			GenJetCount = 1.0*(GenJets.size());
@@ -1329,6 +1358,41 @@ void placeholder::Loop()
 			if (PFJetCount>=6)	Phi_genjet6 =	SortedGenJets[5].Phi();
 			if (PFJetCount>=6)	DeltaPhi_genjet6genmuon1 =	fabs(SortedGenJets[5].DeltaPhi(SortedGenMuons[0]));
 
+
+
+			// Assign Bare Jet Variables		
+			if (GenJet30Count>=1)	Pt_genjet1_bare  =	GenJetsBare[0].Pt();
+			if (GenJet30Count>=1)	Eta_genjet1_bare =	GenJetsBare[0].Eta();
+			if (GenJet30Count>=1)	Phi_genjet1_bare =	GenJetsBare[0].Phi();
+			if (GenJet30Count>=1)	DeltaPhi_genjet1genmuon1_bare =	fabs(GenJetsBare[0].DeltaPhi(SortedGenMuons[0]));
+
+			if (GenJet30Count>=2)	Pt_genjet2_bare  =	GenJetsBare[1].Pt();
+			if (GenJet30Count>=2)	Eta_genjet2_bare =	GenJetsBare[1].Eta();
+			if (GenJet30Count>=2)	Phi_genjet2_bare =	GenJetsBare[1].Phi();
+			if (GenJet30Count>=2)	DeltaPhi_genjet2genmuon1_bare =	fabs(GenJetsBare[1].DeltaPhi(SortedGenMuons[0]));
+
+			if (GenJet30Count>=3)	Pt_genjet3_bare  =	GenJetsBare[2].Pt();
+			if (GenJet30Count>=3)	Eta_genjet3_bare =	GenJetsBare[2].Eta();
+			if (GenJet30Count>=3)	Phi_genjet3_bare =	GenJetsBare[2].Phi();
+			if (GenJet30Count>=3)	DeltaPhi_genjet3genmuon1_bare =	fabs(GenJetsBare[2].DeltaPhi(SortedGenMuons[0]));
+
+			if (GenJet30Count>=4)	Pt_genjet4_bare  =	GenJetsBare[3].Pt();
+			if (GenJet30Count>=4)	Eta_genjet4_bare =	GenJetsBare[3].Eta();
+			if (GenJet30Count>=4)	Phi_genjet4_bare =	GenJetsBare[3].Phi();
+			if (GenJet30Count>=4)	DeltaPhi_genjet4genmuon1_bare =	fabs(GenJetsBare[3].DeltaPhi(SortedGenMuons[0]));
+
+			if (GenJet30Count>=5)	Pt_genjet5_bare  =	GenJetsBare[4].Pt();
+			if (GenJet30Count>=5)	Eta_genjet5_bare =	GenJetsBare[4].Eta();
+			if (GenJet30Count>=5)	Phi_genjet5_bare =	GenJetsBare[4].Phi();
+			if (GenJet30Count>=5)	DeltaPhi_genjet5genmuon1_bare =	fabs(GenJetsBare[4].DeltaPhi(SortedGenMuons[0]));
+
+			if (GenJet30Count>=6)	Pt_genjet6_bare  =	GenJetsBare[5].Pt();
+			if (GenJet30Count>=6)	Eta_genjet6_bare =	GenJetsBare[5].Eta();
+			if (GenJet30Count>=6)	Phi_genjet6_bare =	GenJetsBare[5].Phi();
+			if (GenJet30Count>=6)	DeltaPhi_genjet6genmuon1_bare =	fabs(GenJetsBare[5].DeltaPhi(SortedGenMuons[0]));
+
+
+
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
 			
@@ -1354,6 +1418,14 @@ void placeholder::Loop()
 			ST_genmuongenMETgenjet1234 = ST_genmuongenMETgenjet123 + Pt_genjet4 ;
 			ST_genmuongenMETgenjet12345 = ST_genmuongenMETgenjet1234 + Pt_genjet5 ;
 			ST_genmuongenMETgenjet123456 = ST_genmuongenMETgenjet12345 + Pt_genjet6 ;
+		
+			ST_genmuongenMET_bare = Pt_genMET+Pt_genmuon1 ;
+			ST_genmuongenMETgenjet1_bare = ST_genmuongenMET + Pt_genjet1_bare ;
+			ST_genmuongenMETgenjet12_bare = ST_genmuongenMETgenjet1 + Pt_genjet2_bare ;
+			ST_genmuongenMETgenjet123_bare = ST_genmuongenMETgenjet12 + Pt_genjet3_bare ;
+			ST_genmuongenMETgenjet1234_bare = ST_genmuongenMETgenjet123 + Pt_genjet4_bare ;
+			ST_genmuongenMETgenjet12345_bare = ST_genmuongenMETgenjet1234 + Pt_genjet5_bare ;
+			ST_genmuongenMETgenjet123456_bare = ST_genmuongenMETgenjet12345 + Pt_genjet6_bare ;
 		}
 
 
@@ -1438,6 +1510,7 @@ void placeholder::Loop()
 			Phi_MET = PFMETPhi->at(0);
 			
 			MT_muon1MET =  TMass(Pt_muon1,Pt_MET, fabs(Phi_muon1 - Phi_MET) );
+			TrkRelIso_muon1 =muoniso;
 			
 			TLorentzVector  v_Met;
 			v_Met.SetPtEtaPhiM ( Pt_MET, 0, Phi_MET,0 );
@@ -1461,9 +1534,9 @@ void placeholder::Loop()
 	
 		bool skipevent = true;
 
-		if (Pt_muon1>45) skipevent = false;
+		if ((Pt_muon1>45)||(Pt_genmuon1>45)) skipevent = false;
 		// if ((Muon25Count>0)&&(HEEPEle25Count>0)) skipevent = false;
-		if (Pt_muon2>25) skipevent = true;				
+		// if (Pt_muon2>25) skipevent = true;				
 
 		//std::cout<<skipevent<<std::endl;
 		if (skipevent) continue;
