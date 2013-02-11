@@ -206,6 +206,9 @@ else:
 	_allfiles = [line for line in open(masterdirlist,'r')]
 
 blacklist = ['/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/DY3JetsToLL_M-50_TuneZ2Star_8TeV-madgraph__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_17_2_9nV.root']
+blacklist.append('/store/group/phys_exotica/leptonsPlusJets/RootNtuple/eberry/RootNtuple-V00-03-09-Summer12MC_DYNJetsToLL_MG_20121104_171728/DY4JetsToLL_M-50_TuneZ2Star_8TeV-madgraph__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_426_1_dk8.root')
+blacklist.append('/store/group/phys_exotica/leptonsPlusJets/RootNtuple/darinb/RootNtuple-V00-03-08-Summer12MC_WJetsToLNu_Systematics_MG_20130103_171750/WJetsToLNu_matchingup_8TeV-madgraph-tauola__Summer12_DR53X-PU_S10_START53_V7A-v1__AODSIM_235_1_aqW.root')
+
 
 allfiles = []
 for a in _allfiles:
@@ -225,6 +228,9 @@ for x in range(len(SignalType)):
 	sigma = Xsections[x]
 	Norig = N_orig[x]
 	group = Group[x]
+	thisjson = json
+	if len(CustomJson[x]) > 2:
+		thisjson = CustomJson[x]
 
 
 	fcont = []
@@ -235,19 +241,36 @@ for x in range(len(SignalType)):
 	print 'Preparing '+ SignalType[x],':', len(fcont),'files.'
 
 	for f in fcont:
-		jobs.append('python '+pyfile.replace('\n','')+' -f '+f.replace('\n','').replace('//','/')+' -s '+sigma+' -n '+Norig+' -j '+json + ' -l 1.0 -p '+dopdf+' -d '+thiseos.replace('\n',''))
+		jobs.append('python '+pyfile.replace('\n','')+' -f '+f.replace('\n','').replace('//','/')+' -s '+sigma+' -n '+Norig+' -j '+thisjson + ' -l 1.0 -p '+dopdf+' -d '+thiseos.replace('\n',''))
 
 # Some NTuple sets have larger files then others. Avoid grouping of large files by shuffling. 
 random.shuffle(jobs)
 
 print 'jobs: ',len(jobs)
 
+def FolderizeOutput(MainFolder):
+	foldername = MainFolder+'/outputdir'+str(random.randint(1,999999999))
+	os.system('mkdir '+foldername)
+	foldername += '/'
+	mvs = ['mv '+MainFolder+'/'+x.replace('\n','') + ' '+foldername  for x in os.popen('ls '+MainFolder+' | grep -v Summary | grep txt').readlines()]
+	mvs += ['mv '+MainFolder+'/'+x.replace('\n','') + ' '+foldername  for x in os.popen('ls '+MainFolder+' | grep -v Summary | grep root').readlines()]
+	lenmvs = str(len(mvs))
+	print 'Relocating '+lenmvs+' files to avoid afs directory limits.'
+	nn=0
+	for mv in mvs:
+		nn+=1
+		if nn%100 == 0:
+			print 'Moved',nn,'of',lenmvs,'files.'
+		os.system( mv )
+	# os.system('mv '+MainFolder+'/*root '+foldername)
+	# os.system('mv '+MainFolder+'/*txt '+foldername)
+	# sys.exit()
 
 def MakeJobs(njobs):
 	Nj = 0
 
 	jlist = []
-	jstr = str(os.popen('ls '+thiseos).readlines())
+	jstr = str(os.popen('find '+thiseos).readlines())
 	for j in jobs:
 		filesig1 = (((j.split(' -f ')[-1]).split(' ')[0]))
 		filesig = filesig1.split('/')[-2]+'__'+filesig1.split('/')[-1].replace('.root','')
@@ -269,12 +292,12 @@ def MakeJobs(njobs):
 
 	bjq = bq
 	if len(jlist) < 1000:
-		njobs = 10
-	if len(jlist) < 500:
 		njobs = 5
+	if len(jlist) < 500:
+		njobs = 3
 		bjq = '8nh'
 	if len(jlist) < 200:
-		njobs = 3
+		njobs = 2
 		bjq = '8nh'
 	if len(jlist) < 50:
 		njobs = 1
@@ -293,6 +316,11 @@ def MakeJobs(njobs):
 		jobgroups.append(jobset)
 
 	print 'subbing: ',len(jobgroups),'jobs.'
+	findircont =   str(os.popen('ls '+thiseos).readlines())
+	if '.txt' in findircont or '.root' in findircont:
+		FolderizeOutput(thiseos)
+
+	FolderizeOutput(thiseos)
 	os.system('rm '+thiseos+'/subber_*.tcsh')
 	for j in jobgroups:
 		Nj += 1
@@ -302,9 +330,11 @@ def MakeJobs(njobs):
 		subber.write('#!/bin/tcsh\n\ncd /afs/cern.ch/work/d/darinb/CMSSW_4_2_8/src\ncmsenv\ncd -\n\n')
 		subber.write('\ncp '+thisdir+'/'+pyfile+' .')
 		subber.write('\ncp '+thisdir+'/'+json+' .')
+		subber.write('\ncp '+thisdir+'/*json .')
 		subber.write('\ncp '+thisdir+'/PU*root .\n\n')
 
-
+		if Nj*njobs>5000:
+			continue
 		for x in j:
 			subber.write(x+'\n')
 
@@ -331,7 +361,7 @@ while keep_going != 0:
 	done=0
 	ncheck = 0
 	while done!=1:
-		os.system('sleep 120')
+		os.system('sleep 60')
 		jobinfo = os.popen('bjobs -w | grep '+now).readlines()
 		if 'PEND' not in str(jobinfo):
 			ncheck += 1
@@ -342,18 +372,33 @@ while keep_going != 0:
 		if jobsleft>=0:
 			print  str(jobsleft+1) +' jobs remaining.'
 
-		if ncheck > 65:
-			 os.system('bjobs -w | awk \'{if (NR!=1) print $1}\' | xargs bkill')
-			 os.system('sleep 20')
+		if (ncheck > 200) or ((ncheck>45) and jobsleft<3):
 			 print "\nJobs taking too long. Killing remaining jobs. \n"
+			 os.system('bjobs -w | grep '+now+' |awk \'{if (NR!=1) print $1}\' | xargs bkill')
+			 os.system('sleep 10')
 			 break
 
 os.system('rm '+thiseos+'/subber_*tcsh')
 
 #sys.exit()
 
+findircont =   str(os.popen('ls '+thiseos).readlines())
+
+if '.txt' in findircont or '.root' in findircont:
+	FolderizeOutput(thiseos)
+
+if '--merge' not in sys.argv:
+	print "\nMerging not demanded. Finishing. Gather files with \'--merge\'\n"
+	sys.exit()
+	
+print 'Merging results...'
+
 if 'Counter' in pyfile:
-	txtfiles = os.popen('ls -1 '+thiseos+' | grep txt').readlines()
+	rms = []
+	txtfiles = [x.split(thiseos+'/')[-1] for x in os.popen('find '+thiseos+' | grep txt').readlines()]
+	# for t in txtfiles:
+	# 	print t
+	# 	sys.exit()
 	countlog = open(thisdir+ '/'+ifile.replace('.','_EventCountLog.'),'w')
 	for x in range(len(SignalType)):
 		print 'Collecting results for',SignalType[x]
@@ -371,7 +416,14 @@ if 'Counter' in pyfile:
 				sigfiles.append(ftxt)
 		OCount = 0
 		for s in sigfiles:
-			scount = (os.popen('cat '+thiseos+'/'+s).readlines()[0]).replace(' ','')
+			# print 'cat '+thiseos+'/'+s
+			scount = os.popen('cat '+thiseos+'/'+s).readlines()	
+			if len(scount) < 1:
+				rms.append('rm '+thiseos+'/'+s)
+				scount = '0.0'
+			else:
+				scount = scount[0].replace(' ','')
+			# scount = (os.popen('cat '+thiseos+'/'+s).readlines()[0]).replace(' ','')
 			scount = scount.replace('\n','')
 			scount = float(scount)
 			OCount += scount
@@ -381,7 +433,10 @@ if 'Counter' in pyfile:
 	countlog.close()
 	print 'Output is in ',thisdir+ '/'+ifile.replace('.','_EventCountLog.'),' ...'
 	os.system('cat '+thisdir+ '/'+ifile.replace('.','_EventCountLog.'))
-
+	print '\n\n\n'
+	for r in rms:
+		print r
+		os.system(r)
 
 
 def listsplit(l, n):
@@ -395,7 +450,7 @@ def splithadd(hstring):
 		morefiles = files = [x.replace('\n','') for x in os.popen('find '+a).readlines()]
 		allfiles += morefiles
 
-	fileblocks = listsplit(allfiles,100)
+	fileblocks = listsplit(allfiles,25)
 
 	haddout = hstring.split( ' ' )[1]
 
@@ -409,16 +464,20 @@ def splithadd(hstring):
 		for b in block:
 			HADD += ' '+b
 			rmcoms.append('rm '+b)
+
 		os.system( HADD )
-		for rmcom in rmcoms:
-			os.system(rmcom)
+		if '--forceDelete' in sys.argv:
+			for rmcom in rmcoms:
+				os.system(rmcom)
 		haddouts.append(newhaddout)
 
 	finalhadd = 'hadd '+haddout 
 	for hh in haddouts:
 		finalhadd += ' '+hh
 	os.system( finalhadd )
+	os.system('rm '+thiseos+'/SummaryFiles/*part*root')
 
+# sys.exit()
 
 if 'Analyz' in pyfile:
 	os.system('mkdir '+thiseos+'/SummaryFiles')	
@@ -441,7 +500,7 @@ if 'Analyz' in pyfile:
 			if subdir =='':
 				subdir = subdirsig[-2]
 
-			signifier = thiseos+'/'+subdir+'*'+SignalType[x]+'*.root'
+			signifier = thiseos+'/output*/'+subdir+'*'+SignalType[x]+'*.root'
 			haddstring += ' '+signifier
 
 		for x in range(10):
