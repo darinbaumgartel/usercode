@@ -528,14 +528,14 @@ def TightIDCocktailMuons(T,met,variation,isdata):
 		Pass *= (_MuonCocktailPt[n] > 20)       # OK
 		Pass *= abs(T.MuonCocktailEta[n])<2.1    # OK 
 		# Pass *= T.MuonCocktailIsGlobal[n]      # OK - demanded for CT
-		Pass *= T.MuonBestTrackVtxDistXY[nequiv[n]] < 0.2     # Fixed
-		Pass *= T.MuonBestTrackVtxDistZ[nequiv[n]] < 0.5      #Fixed 
+		Pass *= abs(T.MuonBestTrackVtxDistXY[nequiv[n]]) < 0.2     # Fixed
+		Pass *= abs(T.MuonBestTrackVtxDistZ[nequiv[n]]) < 0.5      #Fixed 
 		if nonisoswitch != True:
 			Pass *= (T.MuonTrackerIsoSumPT[nequiv[n]]/_MuonCocktailPt[n])<0.1
 		Pass *= T.MuonStationMatches[nequiv[n]]>1  # OK
 		Pass *= T.MuonTrkPixelHits[nequiv[n]]>=1  # OK 
 		Pass *= T.MuonGlobalTrkValidHits[nequiv[n]]>=1
-		Pass *= T.MuonTrackLayersWithMeasurement[nequiv[n]] > 5  # TESTING MUST BE 8 YOU MUST FIX THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		Pass *= T.MuonTrackLayersWithMeasurement[nequiv[n]] > 8  # TESTING MUST BE 8 YOU MUST FIX THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		if (Pass):
 			NewMu = TLorentzVector()
