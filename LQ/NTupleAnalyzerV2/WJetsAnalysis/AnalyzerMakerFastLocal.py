@@ -186,7 +186,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>9:
+		if len(sublist)>12:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
@@ -200,7 +200,7 @@ for x in range(len(SignalType)):
 		sub_thisroot.write('#!/bin/csh\ncd '+thisdir+'\neval `scramv1 runtime -csh`\ncd -\ncp '+thisdir+'/'+c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+'.* .\ncp '+thisdir+'/JSONFilterFunction.* .\ncp '+thisdir+'/ResidualModifier.* .\ncp '+thisdir+'/RootProcesses_'+SignalType[x]+part+' .\nroot -b RootProcesses_'+SignalType[x]+part+'\ncp '+c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+'.root '+thiseos+'/\n')
 		sub_thisroot.close()
 
-		f_sub.write('\nsleep 1\nbsub -R "pool>40000" -o /dev/null -e /dev/null -q 8nh -J job'+SignalType[x]+part+'_'+now+' < sub_'+SignalType[x]+part+'.csh\n')
+		f_sub.write('\nsleep 1\nbsub -R "pool>30000" -o /dev/null -e /dev/null -q 1nd -J job'+SignalType[x]+part+'_'+now+' < sub_'+SignalType[x]+part+'.csh\n')
 
 		f_thisroot =  open("RootProcesses_"+SignalType[x]+part,'w')
 
@@ -353,7 +353,7 @@ def WaitForJobs():
 		if jobsleft>=0:
 			print  str(jobsleft+1) +' jobs remaining.'
 
-		if n > 10:
+		if n > 65:
 			 os.system('bjobs -w | awk \'{if (NR!=1) print $1}\' | xargs bkill')
 			 os.system('sleep 20')
 			 print "\nJobs taking too long. Killing remaining jobs. \n"
