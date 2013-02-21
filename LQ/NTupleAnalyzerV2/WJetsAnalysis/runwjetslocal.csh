@@ -1,4 +1,6 @@
-#!/bin/csh
+
+
+# JUST RUN THESE COMMANDS. Make sure to cmsenv before you run anything!
 
 python AnalyzerMakerFastLocal.py -c NTupleAnalyzer_V00_02_06_WPlusJets.C -h NTupleAnalyzer_V00_02_06_WPlusJets.h -i NTupleInfo2011_V00_02_06_WPlusJets_withsys_EOS.csv --autorun   -t WJetsAnalysis_5fb_Feb20  
 cp -r *Feb20* ~/neuhome/LQAnalyzerOutput/ && rm -r *Feb20*
