@@ -879,7 +879,7 @@ void placeholder::Loop()
 					MuonIsGlobal ->at(imuon) == 1 &&
 					MuonIsTracker ->at(imuon) == 1 &&
 					//fabs(MuonRelIso->at(imuon)) < 0.1 &&
-					(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
+					//(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
 					//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
 					MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 	
@@ -1021,7 +1021,7 @@ void placeholder::Loop()
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
 				//fabs(MuonRelIso->at(imuon)) < 0.1 &&
-				(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
+				// (((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
 				//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 
@@ -1393,7 +1393,6 @@ void placeholder::Loop()
 			if (GenJet30Count>=5)	Eta_genjet5_bare =	GenJetsBare[4].Eta();
 			if (GenJet30Count>=5)	Phi_genjet5_bare =	GenJetsBare[4].Phi();
 			if (GenJet30Count>=5)	DeltaPhi_genjet5genmuon1_bare =	fabs(GenJetsBare[4].DeltaPhi(SortedGenMuons[0]));
-
 
 
 
