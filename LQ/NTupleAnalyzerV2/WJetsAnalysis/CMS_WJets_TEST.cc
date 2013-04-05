@@ -10,6 +10,7 @@
 #include "Rivet/Projections/VetoedFinalState.hh"
 #include "Rivet/Projections/InvMassFinalState.hh"
 #include "Rivet/Tools/ParticleIdUtils.hh"
+#include "Rivet/Projections/MissingMomentum.hh"
 #include "TTree.h"
 #include "TFile.h"
 #include "TString.h"
@@ -41,6 +42,9 @@ namespace Rivet
 				vector<pair<PdgId,PdgId> > vidsZ;
 				vidsZ.push_back(make_pair(ELECTRON, POSITRON));
 				vidsZ.push_back(make_pair(MUON, ANTIMUON));
+
+      			MissingMomentum missing(fs);
+      			addProjection(missing, "MET");
 
 				FinalState fsZ(-MAXRAPIDITY,MAXRAPIDITY);
 				InvMassFinalState invfsZ(fsZ, vidsZ, 60*GeV, 120*GeV);
@@ -112,6 +116,8 @@ namespace Rivet
     			_rivetTree->Branch("evweight", &_evweight, "evweight/D");			
 
     			_rivetTree->Branch("mt_munu", &_mt_munu, "mt_munu/D");			
+    			_rivetTree->Branch("mt_mumet", &_mt_mumet, "mt_mumet/D");			
+
     			
     			_rivetTree->Branch("ptmuon", &_ptmuon, "ptmuon/D");			
     			_rivetTree->Branch("etamuon", &_etamuon, "etamuon/D");			
@@ -120,6 +126,9 @@ namespace Rivet
     			_rivetTree->Branch("ptneutrino", &_ptneutrino, "ptneutrino/D");			
     			_rivetTree->Branch("etaneutrino", &_etaneutrino, "etaneutrino/D");			
     			_rivetTree->Branch("phineutrino", &_phineutrino, "phineutrino/D");			
+
+    			_rivetTree->Branch("ptmet", &_ptmet, "ptmet/D");			
+    			_rivetTree->Branch("phimet", &_phimet, "phimet/D");	
 
     			_rivetTree->Branch("ptjet1", &_ptjet1, "ptjet1/D");			
     			_rivetTree->Branch("etajet1", &_etajet1, "etajet1/D");			
@@ -194,7 +203,7 @@ namespace Rivet
 			bool ApplyMuonCutsForWmn(double pt1, double eta1)
 			{
 				bool isFid1 = ((fabs(eta1)<2.1));
-				if( isFid1 && pt1>45) return true;
+				if( isFid1 && pt1>20) return true;
 				return 0;
 			}
 
@@ -288,6 +297,9 @@ namespace Rivet
 				NT+= 1;
 				//std::cout<<"A: "<<NT<<std::endl;
 				//some flag definitions.
+
+
+
 				bool isZmm =false;
 				bool isZee =false;
 				bool isWmn =false;
@@ -301,6 +313,9 @@ namespace Rivet
 	    		_ptmuon = -5.0;
 	    		_etamuon = -5.0;
 	    		_phimuon = -5.0;
+	    		_ptmet = -5.0;
+	    		_phimet = -5.0;
+	    		_mt_mumet = -5.0;
 
 	    		_ptneutrino = -1.0;
 	    		_etaneutrino = -5.0;
@@ -343,7 +358,7 @@ namespace Rivet
 				_nevt = -1;
 
 				const double weight = event.weight();
-
+				//std::cout<<"&&&  "<<event.weight()<<std::endl;
 				_nevt = (event.genEvent()).event_number();
 				_evweight = weight;
 
@@ -460,15 +475,18 @@ namespace Rivet
 				vector<FourMomentum> finalBjet_list;
 
 
+				// std::cout<<" ------------------- "<<std::endl;
 				//foreach (const Jet& j, applyProjection<JetAlg>(event, "ANTIKT").jetsByPt(40.0*GeV))
 				foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV))
 				{
 					double jeta = j.momentum().eta();
 					double jphi = j.momentum().phi();
 					double jpt = j.momentum().pT();
+
+					// std::cout<<jpt<<std::endl;
 					
 					
-					if ((fabs(jeta) < 2.4) && (jpt>40))
+					if ((fabs(jeta) < 2.4) && (jpt>30))
 					{
 						if(isWen||isWmn)
 						{
@@ -479,8 +497,11 @@ namespace Rivet
 							
 							double leta = (WDecayProducts[lindex]).momentum().eta();
 							double lphi = (WDecayProducts[lindex]).momentum().phi();
-							
-							if( ((leta-jeta)*(leta-jeta) + (lphi-jphi)*(lphi-jphi)) > 0.3*0.3  )
+							// std::cout<<" * "<<lindex<<"  "<<(WDecayProducts[0]).momentum().pT()<<"  "<<(WDecayProducts[1]).momentum().pT()<<std::endl;
+
+							double delta_phi = DeltaPhi(lphi,jphi);
+
+							if( ((leta-jeta)*(leta-jeta) + (delta_phi*delta_phi)) > 0.3*0.3  )
 							{
 								finaljet_list.push_back(j.momentum());
 								if (j.containsBottom())
@@ -492,6 +513,7 @@ namespace Rivet
 								{
 									finaljet_list_btags.push_back(0);
 								}	
+								// std::cout<<"   "<<jpt<<std::endl;
 							}
 						}
 					}
@@ -535,6 +557,18 @@ namespace Rivet
 					_ptneutrino  = WDecayProducts[nuind].momentum().pT();
 					_etaneutrino = WDecayProducts[nuind].momentum().eta();
 					_phineutrino = WDecayProducts[nuind].momentum().phi();		
+
+    			  	const MissingMomentum& met = applyProjection<MissingMomentum>(event, "MET");
+   				   	_ptmet = met.visibleMomentum().pT();
+   				   	_phimet = met.visibleMomentum().phi();
+   				   	_phimet -= 3.1415926;
+   				   	if (_phimet < 0.0) _phimet += 2.0*3.1415926;
+					_mt_mumet = sqrt(2.0*_ptmuon*_ptmet*(1.0-cos(_phimet-_phimuon)));
+
+					// std::cout<<_ptneutrino<<"  "<<_ptmet<<std::endl;
+					// std::cout<<_phineutrino<<"  "<<_phimet<<std::endl;
+					// std::cout<<_mt_munu<<"  "<<_mt_mumet<<std::endl;
+					// std::cout<<"   ------------    "<<std::endl;
 
 					if (finaljet_list.size()>0){
 						_ptjet1=finaljet_list[0].pT();
@@ -658,6 +692,9 @@ namespace Rivet
     		double _evweight;
 
 			double _mt_munu;
+			double _mt_mumet;
+			double _ptmet;
+			double _phimet;
 
     		double _ptmuon;
     		double _etamuon;
