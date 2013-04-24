@@ -414,21 +414,13 @@ if do_combo == 1:
 			ocard = pair[1]
 		if 'BetaHalf' not in pair[0]:
 			bcard = pair[1]
-			ocard = pair[0]
-		if '850' in bcard:
-			card850 = bcard			
+			ocard = pair[0]	
 
-		if '900' not in str(m):
-			os.system('combineCards.py '+bcard+ ' '+ocard+ '  > TMPComboCards/combocard_COMBO_M_'+m+'.cfg ' )
-			os.system('combineCards.py '+bcard+' > TMPComboCards/combocard_COMBO_BetaHalf_M_'+m+'.cfg ' )
-			os.system('combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' )
-			print 'combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' 
-		if '900' in str(m):
-			os.system('combineCards.py '+ocard+ '  > TMPComboCards/combocard_COMBO_M_'+m+'.cfg ' )
-			os.system('combineCards.py '+card850+' > TMPComboCards/combocard_COMBO_BetaHalf_M_'+m+'.cfg ' )
-			os.system('combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' )
-
+		os.system('combineCards.py '+bcard+ ' '+ocard+ '  > TMPComboCards/combocard_COMBO_M_'+m+'.cfg ' )
+		os.system('combineCards.py '+bcard+' > TMPComboCards/combocard_COMBO_BetaHalf_M_'+m+'.cfg ' )
+		os.system('combineCards.py '+ocard+' > TMPComboCards/combocard_COMBO_BetaOne_M_'+m+'.cfg ' )
 		print pair
+
 	for m in uniquecardmasses:
 		combocards.append('TMPComboCards/combocard_COMBO_M_'+m+'.cfg')
 
@@ -509,7 +501,7 @@ if do_combo == 1:
 							line2 += xpart + '    '
 						line2 += '\n'
 						line = line2
-					if  'stat' in line and 'sig' in line and 'gmN' in line:
+					if  'stat' in line and 'Signal' in line and 'gmN' in line:
 						linesplit = line.split()
 						print linesplit
 						for nsp in range(len(linesplit)):
@@ -546,9 +538,11 @@ if do_combo == 1:
 			
 			## Estimate the r values with Asymptotic CLs
 			EstimationInformation0 = [' r < 0.0000']
-			rmax = 1000.0
+			rmax = 10000.0
 			breaker = False 
+			ntry = 0
 			while 'r < 0.0000' in str(EstimationInformation0):
+				ntry += 1
 				print 'combine '+ESTIMATIONMETHOD+' '+newcard +' --rMax '+str(rmax)
 				EstimationInformation0 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard +' --rMax '+str(rmax)).readlines()
 				
@@ -563,16 +557,19 @@ if do_combo == 1:
 							thisrval = float(thisrval)
 							if thisrval>effrmax:
 								effrmax = thisrval
-					rmax = effrmax*15.0
+					rmax = effrmax*2.0
 					EstimationInformation0 = [' r < 0.0000']
-					breaker = True
-				rmax = rmax/5.0
+					if ntry > 3:
+						breaker = True
 
 
 			EstimationInformation1 = [' r < 0.0000']
-			rmax = 1000.0
+			rmax = 10000.0
 			breaker = False 
+			ntry = 0
+
 			while 'r < 0.0000' in str(EstimationInformation1):
+				ntry += 1				
 				print 'combine '+ESTIMATIONMETHOD+' '+newcard_BetaOne +' --rMax '+str(rmax)
 				EstimationInformation1 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard_BetaOne +' --rMax '+str(rmax)).readlines()
 				
@@ -587,16 +584,18 @@ if do_combo == 1:
 							thisrval = float(thisrval)
 							if thisrval>effrmax:
 								effrmax = thisrval
-					rmax = effrmax*15.0
+					rmax = effrmax*2.0
 					EstimationInformation1 = [' r < 0.0000']
-					breaker = True
-				rmax = rmax/5.0
-				
+					if ntry > 3:
+						breaker = True
 				
 			EstimationInformation2 = [' r < 0.0000']
-			rmax = 1000.0
+			rmax = 10000.0
 			breaker = False 
+			ntry = 0
+
 			while 'r < 0.0000' in str(EstimationInformation2):
+				ntry += 1
 				print 'combine '+ESTIMATIONMETHOD+' '+newcard_BetaHalf +' --rMax '+str(rmax)
 				EstimationInformation2 = os.popen('combine '+ESTIMATIONMETHOD+' '+newcard_BetaHalf +' --rMax '+str(rmax)).readlines()
 				
@@ -611,11 +610,10 @@ if do_combo == 1:
 							thisrval = float(thisrval)
 							if thisrval>effrmax:
 								effrmax = thisrval
-					rmax = effrmax*15.0
+					rmax = effrmax*2.0
 					EstimationInformation2 = [' r < 0.0000']
-					breaker = True
-				rmax = rmax/5.0				
-
+					if ntry > 3:
+						breaker = True
 			
 			expectedlines0 = []
 			for line in EstimationInformation0:
@@ -799,15 +797,6 @@ mTh = [ 0.200E+03,0.210E+03,0.220E+03,0.230E+03,0.240E+03,0.250E+03,0.260E+03,0.
 xsTh = [ 0.174E+02,0.134E+02,0.105E+02,0.827E+01,0.657E+01,0.526E+01,0.424E+01,0.344E+01,0.230E+01,0.189E+01,0.157E+01,0.130E+01,0.109E+01,0.914E+00,0.770E+00,0.650E+00,0.551E+00,0.469E+00,0.400E+00,0.342E+00,0.294E+00,0.253E+00,0.218E+00,0.188E+00,0.163E+00,0.142E+00,0.123E+00,0.107E+00,0.937E-01,0.820E-01,0.719E-01,0.631E-01,0.555E-01,0.489E-01,0.431E-01,0.381E-01,0.337E-01,0.298E-01,0.265E-01,0.235E-01,0.209E-01,0.186E-01,0.166E-01,0.148E-01,0.132E-01,0.118E-01,0.106E-01,0.946E-02,0.848E-02,0.761E-02,0.683E-02,0.614E-02,0.552E-02,0.497E-02,0.448E-02,0.404E-02,0.364E-02,0.329E-02,0.297E-02,0.269E-02,0.243E-02,0.220E-02,0.199E-02,0.181E-02,0.164E-02,0.149E-02,0.135E-02,0.123E-02,0.111E-02,0.101E-02,0.922E-03,0.839E-03,0.764E-03,0.696E-03,0.634E-03,0.578E-03,0.527E-03,0.481E-03,0.439E-03,0.401E-03,0.366E-03,0.335E-03,0.306E-03,0.280E-03,0.256E-03,0.234E-03,0.214E-03,0.196E-03,0.180E-03,0.165E-03,0.151E-03,0.138E-03,0.127E-03,0.116E-03,0.107E-03,0.980E-04,0.899E-04,0.825E-04,0.758E-04,0.696E-04,0.639E-04,0.587E-04,0.540E-04,0.496E-04,0.456E-04,0.419E-04,0.385E-04,0.355E-04,0.326E-04,0.300E-04,0.276E-04,0.254E-04,0.234E-04,0.215E-04,0.198E-04,0.182E-04,0.168E-04,0.155E-04,0.142E-04,0.131E-04,0.121E-04,0.111E-04,0.103E-04,0.945E-05,0.871E-05,0.802E-05,0.740E-05,0.682E-05,0.628E-05,0.579E-05,0.534E-05,0.492E-05,0.454E-05,0.418E-05,0.385E-05,0.355E-05,0.328E-05,0.302E-05,0.278E-05,0.257E-05,0.237E-05,0.218E-05,0.201E-05,0.186E-05,0.171E-05,0.158E-05,0.145E-05,0.134E-05,0.124E-05,0.114E-05,0.105E-05,0.968E-06,0.893E-06,0.823E-06,0.758E-06,0.699E-06,0.644E-06,0.594E-06,0.547E-06,0.504E-06,0.465E-06,0.428E-06,0.394E-06,0.363E-06,0.335E-06,0.308E-06,0.284E-06,0.261E-06,0.241E-06,0.222E-06,0.204E-06,0.188E-06,0.173E-06,0.159E-06,0.147E-06,0.135E-06,0.124E-06,0.114E-06,0.105E-06,0.965E-07,0.888E-07,0.816E-07,0.750E-07,0.690E-07,0.634E-07,0.583E-07,0.535E-07,0.492E-07,0.452E-07,0.415E-07,0.381E-07,0.349E-07,0.321E-07,0.294E-07,0.270E-07,0.248E-07,0.227E-07,0.208E-07,0.191E-07,0.175E-07,0.160E-07,0.147E-07,0.134E-07,0.123E-07,0.113E-07,0.103E-07,0.943E-08,0.862E-08,0.788E-08,0.720E-08,0.658E-08,0.601E-08,0.549E-08,0.501E-08,0.457E-08,0.417E-08,0.381E-08,0.347E-08,0.316E-08,0.288E-08,0.262E-08,0.239E-08,0.217E-08,0.198E-08,0.180E-08,0.163E-08,0.148E-08,0.135E-08,0.122E-08,0.111E-08,0.101E-08,0.913E-09,0.827E-09,0.749E-09,0.678E-09,0.614E-09,0.555E-09,0.502E-09,0.453E-09,0.409E-09,0.369E-09,0.333E-09,0.300E-09,0.270E-09,0.243E-09,0.219E-09,0.197E-09,0.177E-09,0.159E-09,0.143E-09,0.128E-09,0.115E-09,0.103E-09,0.919E-10,0.821E-10,0.734E-10,0.655E-10,0.585E-10,0.521E-10,0.464E-10,0.413E-10,0.368E-10,0.327E-10,0.290E-10,0.257E-10,0.228E-10,0.202E-10,0.178E-10,0.158E-10,0.139E-10,0.123E-10,0.108E-10,0.950E-11,0.835E-11,0.733E-11,0.643E-11,0.563E-11,0.493E-11,0.431E-11 ]
 
 
-# mTh = [ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850,900]
-# xsTh = [  53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732,.000436]
-
-# mThold= [ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850]
-# xsThold = [  53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732]
-
-
-
-
 
 #### BETA ONE CHANNEL
 if do_BetaOne == 1:
@@ -935,8 +924,6 @@ if do_BetaHalf == 1:
 	print band2sigma
 	print '\n'
 	
-	
-	
 
 
 #### COMBINATION CHANNEL
@@ -945,8 +932,7 @@ if do_combo == 1:
 	print "*"*40 + '\n COMBINATION ASYMPTOTIC CLS RESULTS\n' +"*"*40
 
 					
-	mTh = [ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850,900]
-	xsTh = [  53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732,.000436]
+
 	sigma = []
 	fac = 1.0
 	for x in range(len(mTh)):
@@ -987,16 +973,18 @@ if do_combo == 1:
 	from ROOT import *
 	from array import array
 		
-	mTh = array("d",[ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850,900])
-	xsTh = array("d",[  53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732,.000436])
+
+	#xx = (spline.Eval(310));
+	M_th=[ xm for xm in mTh]
+	X_th=[ xx for xx in xsTh]
+		
+	mTh = array("d",mTh)
+	xsTh = array("d",xsTh)
 	
-	
+
 	g = TGraph(len(mTh),mTh,xsTh);
 	spline = TSpline3("xsection",g) 
-	#xx = (spline.Eval(310));
-	M_th=[ 150, 200, 250, 300, 350, 400,450,500,550,600,650,700,750,800,850,900]
-	X_th=[  53.3, 11.9, 3.47, 1.21, 0.477, .205,.0949,.0463,.0236,.0124,.00676,.00377,.00215,.00124,.000732,.000436]
-		
+	
 		
 	def sigmaval(mval):
 		return spline.Eval(mval)
@@ -1004,7 +992,7 @@ if do_combo == 1:
 	
 	def mval(sigma):
 		testm = 150
-		oldtestm = 800
+		oldtestm = 1300
 		inc = 50
 		dif = 55
 		olddif = 000
@@ -1012,7 +1000,7 @@ if do_combo == 1:
 			testsigma = sigmaval(testm)
 			olddif = dif
 			dif = testsigma -sigma
-			if testm>1000:
+			if testm>1200:
 				break
 			if dif*olddif <= 0.0:
 				inc = -inc/2.3
@@ -1125,7 +1113,7 @@ if do_combo == 1:
 		mlist = []
 		for limit_set in clist:
 			fitted_limits = loggraph(masses,limit_set)
-			goodm = get_simple_intersection(logtheory,fitted_limits,250,900)
+			goodm = get_simple_intersection(logtheory,fitted_limits,300,1300)
 			mlist.append(str(round(goodm[0],2)))
 		return mlist
 		

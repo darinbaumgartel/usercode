@@ -29,17 +29,24 @@ Double_t y_pdf[202] = {10.00648,7.732,6.06582,4.78163,3.80393,3.0482,2.45901,1.9
  string title = ";M_{LQ} (GeV);#sigma#times2#beta(1-#beta) (pb)";
 
  // integrated luminosity
- string lint = "12.2 fb^{-1}";
+ string lint = "19.6 fb^{-1}";
 
 
 
-Double_t mData[18] = {300.0 , 350.0 , 400.0 , 450.0 , 500.0 , 550.0 , 600.0 , 650.0 , 750.0 , 800.0 , 850.0 , 900.0 , 950.0 , 1000.0 , 1050.0 , 1100.0 , 1150.0 , 1200.0 }; 
-Double_t x_shademasses[36] = {300.0 , 350.0 , 400.0 , 450.0 , 500.0 , 550.0 , 600.0 , 650.0 , 750.0 , 800.0 , 850.0 , 900.0 , 950.0 , 1000.0 , 1050.0 , 1100.0 , 1150.0 , 1200.0 , 1200.0 , 1150.0 , 1100.0 , 1050.0 , 1000.0 , 950.0 , 900.0 , 850.0 , 800.0 , 750.0 , 650.0 , 600.0 , 550.0 , 500.0 , 450.0 , 400.0 , 350.0 , 300.0 }; 
-Double_t xsUp_expected[18] = {0.1112265 , 0.042812 , 0.0204003 , 0.0104972 , 0.0068142 , 0.004562135 , 0.003401625 , 0.00241296 , 0.001668352 , 0.001465781 , 0.00100983 , 0.000907586 , 0.0008629691 , 0.00084945835 , 0.000769408 , 0.0007100775 , 0.00068081425 , 0.00062868636 }; 
-Double_t xsUp_observed[18] = {0.1350405 , 0.058366 , 0.0338238 , 0.0142625 , 0.0086551 , 0.00506856 , 0.0054755 , 0.00349074 , 0.001853824 , 0.0015509195 , 0.001038202 , 0.001118171 , 0.0011731536 , 0.0012228094 , 0.0011056128 , 0.00102441075 , 0.00097725775 , 0.00090478608 }; 
-Double_t y_1sigma[36]={0.0802305 , 0.0309155 , 0.0147231 , 0.0075795 , 0.00492 , 0.00329284 , 0.002454575 , 0.00174108 , 0.001204 , 0.0010578425 , 0.000728734 , 0.000654985 , 0.0006227782 , 0.00061302875 , 0.000555264 , 0.00051244875 , 0.00049132795 , 0.00045370848 , 0.00087324684 , 0.00094564995 , 0.000986304 , 0.0010687104 , 0.00117988235 , 0.0011986721 , 0.001260682 , 0.00140261 , 0.0020359265 , 0.00231728 , 0.00335148 , 0.00472585 , 0.0063357 , 0.0094669 , 0.01458035 , 0.0283347 , 0.0594825 , 0.154413 }; 
-Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982 , 0.00247394 , 0.001845925 , 0.00130944 , 0.000905184 , 0.0007952985 , 0.000547842 , 0.0004924255 , 0.000468209 , 0.0004608693 , 0.0004174464 , 0.00038525025 , 0.0003693747 , 0.0003410922 , 0.00116022156 , 0.00125642075 , 0.00131043825 , 0.0014199296 , 0.0015676293 , 0.001592608 , 0.001674984 , 0.001863532 , 0.002705064 , 0.00307888 , 0.00445302 , 0.006278025 , 0.00841743 , 0.0125788 , 0.01937255 , 0.0376371 , 0.079002 , 0.2051595 }; 
+// Double_t mData[19] = {300.0 , 350.0 , 400.0 , 450.0 , 500.0 , 550.0 , 600.0 , 650.0 , 700.0 , 750.0 , 800.0 , 850.0 , 900.0 , 950.0 , 1000.0 , 1050.0 , 1100.0 , 1150.0 , 1200.0 }; 
+// Double_t x_shademasses[38] = {300.0 , 350.0 , 400.0 , 450.0 , 500.0 , 550.0 , 600.0 , 650.0 , 700.0 , 750.0 , 800.0 , 850.0 , 900.0 , 950.0 , 1000.0 , 1050.0 , 1100.0 , 1150.0 , 1200.0 , 1200.0 , 1150.0 , 1100.0 , 1050.0 , 1000.0 , 950.0 , 900.0 , 850.0 , 800.0 , 750.0 , 700.0 , 650.0 , 600.0 , 550.0 , 500.0 , 450.0 , 400.0 , 350.0 , 300.0 }; 
+// Double_t xsUp_expected[19] = {0.1363635 , 0.0466235 , 0.0232218 , 0.0114752 , 0.0071545 , 0.004773325 , 0.0032007 , 0.00241626 , 0.0019614775 , 0.001677984 , 0.001431887 , 0.000993922 , 0.00087668 , 0.0007442526 , 0.00071247675 , 0.000644096 , 0.00059968425 , 0.00057116065 , 0.00053554764 }; 
+// Double_t xsUp_observed[19] = {0.156492 , 0.055979 , 0.031977 , 0.0153872 , 0.009512 , 0.005967195 , 0.00474465 , 0.0034089 , 0.002903976 , 0.002397472 , 0.002038213 , 0.001399002 , 0.001110899 , 0.0011344479 , 0.001189366 , 0.001074624 , 0.0010066815 , 0.0009586665 , 0.00090357504 }; 
+// Double_t y_1sigma[38]={0.0983745 , 0.033649 , 0.016758 , 0.0082804 , 0.0051619 , 0.003445845 , 0.00231005 , 0.00174372 , 0.00141546 , 0.001210944 , 0.0010333635 , 0.000717336 , 0.000632664 , 0.0005371248 , 0.00051418225 , 0.000464832 , 0.0004327785 , 0.0004121961 , 0.00038649228 , 0.00074387436 , 0.00079334615 , 0.00083296125 , 0.000894656 , 0.0009896279 , 0.0010337687 , 0.0012177065 , 0.001380552 , 0.0019888515 , 0.00233072 , 0.00272438 , 0.0033561 , 0.0044462 , 0.006630935 , 0.0099343 , 0.01593325 , 0.0322677 , 0.064757 , 0.189378 }; 
+// Double_t y_2sigma[38]={0.0739935 , 0.0252945 , 0.0126027 , 0.0062266 , 0.0038827 , 0.00259031 , 0.00173665 , 0.00131076 , 0.0010642585 , 0.000910336 , 0.000776872 , 0.000539232 , 0.0004756595 , 0.0004037946 , 0.00038654395 , 0.0003494528 , 0.00032535525 , 0.0003098827 , 0.0002905626 , 0.0009883374 , 0.0010540677 , 0.00110669625 , 0.001188672 , 0.00131485895 , 0.0013735293 , 0.0016178685 , 0.001834258 , 0.0026425215 , 0.003096576 , 0.003620077 , 0.00445896 , 0.0059079 , 0.00880964 , 0.013202 , 0.0211737 , 0.0428526 , 0.086009 , 0.2516535 }; 
 
+
+Double_t mData[19] = {300.0 , 350.0 , 400.0 , 450.0 , 500.0 , 550.0 , 600.0 , 650.0 , 700.0 , 750.0 , 800.0 , 850.0 , 900.0 , 950.0 , 1000.0 , 1050.0 , 1100.0 , 1150.0 , 1200.0 }; 
+Double_t x_shademasses[38] = {300.0 , 350.0 , 400.0 , 450.0 , 500.0 , 550.0 , 600.0 , 650.0 , 700.0 , 750.0 , 800.0 , 850.0 , 900.0 , 950.0 , 1000.0 , 1050.0 , 1100.0 , 1150.0 , 1200.0 , 1200.0 , 1150.0 , 1100.0 , 1050.0 , 1000.0 , 950.0 , 900.0 , 850.0 , 800.0 , 750.0 , 700.0 , 650.0 , 600.0 , 550.0 , 500.0 , 450.0 , 400.0 , 350.0 , 300.0 }; 
+Double_t xsUp_expected[19] = {0.1373085 , 0.0470085 , 0.0233586 , 0.01151595 , 0.0071504 , 0.004760395 , 0.00319835 , 0.00241494 , 0.00195577 , 0.001671264 , 0.0014266415 , 0.000988264 , 0.000863954 , 0.0007399414 , 0.0007084066 , 0.0006422528 , 0.0005981085 , 0.00056788645 , 0.00053013276 }; 
+Double_t xsUp_observed[19] = {0.1575315 , 0.056364 , 0.0320796 , 0.01541165 , 0.0094997 , 0.00594349 , 0.0047141 , 0.00337788 , 0.0028685895 , 0.002370816 , 0.002009699 , 0.00138211 , 0.001094436 , 0.0011151109 , 0.00115465945 , 0.0010432512 , 0.00097443225 , 0.0009235491 , 0.00086238924 }; 
+Double_t y_1sigma[38]={0.0991305 , 0.0339185 , 0.0168606 , 0.00830485 , 0.0051578 , 0.00343507 , 0.002308875 , 0.00174306 , 0.001411655 , 0.001206016 , 0.0010295975 , 0.000713154 , 0.0006235235 , 0.0005339865 , 0.0005112349 , 0.0004635008 , 0.00043164 , 0.0004098314 , 0.00038258424 , 0.00073635756 , 0.00078879865 , 0.000830775 , 0.0008920832 , 0.0009839738 , 0.0010277774 , 0.0012000315 , 0.00137268 , 0.0019815885 , 0.002321312 , 0.00271677 , 0.00335478 , 0.004442675 , 0.006613695 , 0.0099302 , 0.0159903 , 0.0324387 , 0.065296 , 0.190701 }; 
+Double_t y_2sigma[38]={0.074466 , 0.025487 , 0.0126711 , 0.0062429 , 0.0038786 , 0.002583845 , 0.001735475 , 0.0013101 , 0.0010612145 , 0.000906752 , 0.0007740475 , 0.000536198 , 0.000468741 , 0.0004014488 , 0.00038433845 , 0.0003484544 , 0.0003245055 , 0.0003081065 , 0.00028762548 , 0.00097834632 , 0.0010480222 , 0.00110379225 , 0.0011852544 , 0.00130736025 , 0.0013655092 , 0.0015944365 , 0.001823762 , 0.0026328375 , 0.003084256 , 0.0036098035 , 0.00445698 , 0.0059032 , 0.008785935 , 0.0131938 , 0.02124705 , 0.043092 , 0.0867405 , 0.253449 }; 
 
 
   // turn on/off batch mode
@@ -56,6 +63,8 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
  c->cd();
  
  TH2F *bg = new TH2F("bg",title.c_str(), 500, 300., 1200., 500., 0.0001, 50.);
+  bg->GetXaxis()->CenterTitle();
+ bg->GetYaxis()->CenterTitle();
  bg->SetStats(kFALSE);
  bg->SetTitleOffset(1.,"X");
  bg->SetTitleOffset(1.15,"Y");
@@ -71,7 +80,7 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
  xsTh_vs_m->SetMarkerStyle(22);
  xsTh_vs_m->SetMarkerColor(kBlue);
 
- TGraph *xsData_vs_m_expected = new TGraph(18, mData, xsUp_expected);
+ TGraph *xsData_vs_m_expected = new TGraph(19, mData, xsUp_expected);
  xsData_vs_m_expected->SetMarkerStyle(0);
  xsData_vs_m_expected->SetMarkerColor(kBlack);
  xsData_vs_m_expected->SetLineColor(kBlack);
@@ -79,7 +88,7 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
  xsData_vs_m_expected->SetLineStyle(7);
  xsData_vs_m_expected->SetMarkerSize(0.001);
 
- TGraph *xsData_vs_m_observed = new TGraph(18, mData, xsUp_observed);
+ TGraph *xsData_vs_m_observed = new TGraph(19, mData, xsUp_observed);
  xsData_vs_m_observed->SetMarkerStyle(21);
  xsData_vs_m_observed->SetMarkerColor(kBlack);
  xsData_vs_m_observed->SetLineColor(kBlack);
@@ -87,13 +96,13 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
  xsData_vs_m_observed->SetLineStyle(1);
  xsData_vs_m_observed->SetMarkerSize(1);
  
- Double_t xsUp_observed_logY[18], xsUp_expected_logY[18], xsTh_logY[101];
- for (int ii = 0; ii<18; ++ii) xsUp_observed_logY[ii] = log10(xsUp_observed[ii]);
- for (int ii = 0; ii<18; ++ii) xsUp_expected_logY[ii] = log10(xsUp_expected[ii]);
+ Double_t xsUp_observed_logY[19], xsUp_expected_logY[19], xsTh_logY[101];
+ for (int ii = 0; ii<19; ++ii) xsUp_observed_logY[ii] = log10(xsUp_observed[ii]);
+ for (int ii = 0; ii<19; ++ii) xsUp_expected_logY[ii] = log10(xsUp_expected[ii]);
  for (int ii = 0; ii<101; ++ii) xsTh_logY[ii] = log10(xsTh[ii]);
  TGraph *xsTh_vs_m_log = new TGraph(101, mTh, xsTh_logY);
- TGraph *xsData_vs_m_expected_log = new TGraph(18, mData, xsUp_expected_logY);
- TGraph *xsData_vs_m_observed_log = new TGraph(18, mData, xsUp_observed_logY);
+ TGraph *xsData_vs_m_expected_log = new TGraph(19, mData, xsUp_expected_logY);
+ TGraph *xsData_vs_m_observed_log = new TGraph(19, mData, xsUp_observed_logY);
  
 
 
@@ -154,9 +163,9 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
 
 
 
- TGraph *exshade1 = new TGraph(36,x_shademasses,y_1sigma);
+ TGraph *exshade1 = new TGraph(38,x_shademasses,y_1sigma);
  exshade1->SetFillColor(kGreen);
- TGraph *exshade2 = new TGraph(36,x_shademasses,y_2sigma);
+ TGraph *exshade2 = new TGraph(38,x_shademasses,y_2sigma);
  exshade2->SetFillColor(kYellow);
 
  exshade2->Draw("f");
@@ -189,17 +198,17 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
 
 
 
- TLegend *legend = new TLegend(.37,.66,.94,.92);
+ TLegend *legend = new TLegend(.37,.62,.92,.88);
  
   legend->SetBorderSize(1);
  legend->SetFillColor(0);
  //legend->SetFillStyle(0);
- legend->SetTextFont(132);
+ legend->SetTextFont(42);
  legend->SetMargin(0.15);
  legend->SetHeader("LQ #bar{LQ} #rightarrow #mu#nujj");
  legend->AddEntry(p2,"ATLAS exclusion (1.03 fb^{-1}, 7 TeV)","f");
  legend->AddEntry(pl,"CMS exclusion (5.0 fb^{-1}, 7TeV)","f");
- legend->AddEntry(p3,"CMS exclusion (12.2 fb^{-1}, 8 TeV)","f");
+ legend->AddEntry(p3,"CMS exclusion (19.6 fb^{-1}, 8 TeV)","f");
  legend->AddEntry(xsTh_vs_m,"#sigma_{theory}#times2#beta(1-#beta) with unc., (#beta=1/2)","lf");
  legend->AddEntry(xsData_vs_m_expected, "Expected 95% CL upper limit","lp");
  legend->AddEntry(xsData_vs_m_observed, "Observed 95% CL upper limit","lp");
@@ -207,7 +216,7 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
 
  TLatex l1;
   l1.SetTextAlign(12);
- l1.SetTextFont(132);
+ l1.SetTextFont(42);
  l1.SetNDC();
  l1.SetTextSize(0.04);
  
@@ -218,11 +227,16 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
  // l1.DrawLatex(stamp_x,stamp_y - 0.05,"#sqrt{s} = 8 TeV");
  
  //l1.DrawLatex(0.7,0.53,"CMS 2011");
+
  //l1.DrawLatex(0.7,0.48,"#sqrt{s} = 7 TeV");
 
- l1.DrawLatex(0.76,0.58,"CMS 2012");
- l1.DrawLatex(0.76,0.53,"Preliminary");
- l1.DrawLatex(0.76,0.48,"#sqrt{s} = 8 TeV");
+ l1.DrawLatex(0.14,0.93,"CMS Preliminary          #sqrt{s} = 8 TeV         19.6 fb^{-1}");
+
+
+ // l1.DrawLatex(0.76,0.58,"CMS 2012");
+ // l1.DrawLatex(0.76,0.53,"Preliminary");
+ // l1.DrawLatex(0.76,0.48,"#sqrt{s} = 8 TeV");
+ // l1.DrawLatex(0.76,0.43,"19.6 fb^{-1}");
 
 //  TLatex l2;
 //  l2.SetTextAlign(12);
@@ -231,6 +245,8 @@ Double_t y_2sigma[36]={0.060291 , 0.0232155 , 0.0110637 , 0.00569685 , 0.0036982
 //  l2.SetNDC();
 //  l2.DrawLatex(0.4,0.485,"EXO-10-005 scaled to #sqrt{s} = 7 TeV");
 
+ c->RedrawAxis();
+ legend->Draw();
  c->SetGridx();
  c->SetGridy();
 
@@ -338,7 +354,7 @@ void setTDRStyle() {
 
 
   // Margins:
-  tdrStyle->SetPadTopMargin(0.05);
+  tdrStyle->SetPadTopMargin(0.1);
   tdrStyle->SetPadBottomMargin(0.13);
   tdrStyle->SetPadLeftMargin(0.13);
   tdrStyle->SetPadRightMargin(0.05);
@@ -355,7 +371,7 @@ void setTDRStyle() {
   // For the axis titles:
 
   tdrStyle->SetTitleColor(1, "XYZ");
-  tdrStyle->SetTitleFont(132, "XYZ");
+  tdrStyle->SetTitleFont(42, "XYZ");
   tdrStyle->SetTitleSize(0.06, "XYZ");
   tdrStyle->SetTitleXOffset(0.9);
   tdrStyle->SetTitleYOffset(1.05);
@@ -363,9 +379,9 @@ void setTDRStyle() {
   // For the axis labels:
 
   tdrStyle->SetLabelColor(1, "XYZ");
-  tdrStyle->SetLabelFont(132, "XYZ");
+  tdrStyle->SetLabelFont(42, "XYZ");
   tdrStyle->SetLabelOffset(0.007, "XYZ");
-  tdrStyle->SetLabelSize(0.05, "XYZ");
+  tdrStyle->SetLabelSize(0.04, "XYZ");
 
   // For the axis:
 
