@@ -78,11 +78,15 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
 	are uncorrelated. 
 
    
-##################################################################
+##################################################
+#                                                #                
+#    NEW: QUICK RESULTS WITH ASYMPTOTIC CLS      #
+#                                                #
+##################################################
 
-    NEW: QUICK RESULTS WITH ASYMPTOTIC CLS
-
-##################################################################
+#
+#   FOR SIGMA VS M LIMIT PLOTS  
+#
 
 0) Follow steps (1) and (2) of the normal method above to set up the working area and make your FinalCards.txt
 
@@ -94,8 +98,10 @@ https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideHiggsAnalysisCombinedLimit
 	
 
 
+#
+#   FOR COMBINATION BETA VS M LIMIT PLOTS 
+#
 
-COMBINATION NOT YET IMPLEMENTED ... IGNORE BELOW
 
 2) You can also run the Combination asymptotically. Every beta value takes about as long as step (1), and 
    it's good to use many beta values. So a quick fix is to batch this. 
@@ -105,7 +111,7 @@ COMBINATION NOT YET IMPLEMENTED ... IGNORE BELOW
    
        python AsympBatcher.py --do_Combo -q 8nh -n 1 -c LimitTest --Asymptotic_Only
 
-   B) Then run the additional script to scan the contents of the "BatcherResults" directory. Results output to screen.
+   B) When Jobs from (A) are done, run the additional script to scan the contents of the "BatcherResults" directory. Results output to screen.
   
        python AsympBatcherParser.py 
        
