@@ -86,18 +86,23 @@ Double_t SmearObject(Double_t PT, Double_t fraction)
 
 Double_t JERFactor(Double_t J_ETA)
 {
-if ((abs(J_ETA)<0.5))                     return rr->Gaus(1.052,0.063);
-if ((abs(J_ETA)>0.5)&&(abs(J_ETA)<1.1))   return rr->Gaus(1.057,0.057);
-if ((abs(J_ETA)>1.1)&&(abs(J_ETA)<1.7))   return rr->Gaus(1.096,0.065);
-if ((abs(J_ETA)>1.7)&&(abs(J_ETA)<2.3))   return rr->Gaus(1.134,0.094);
-if ((abs(J_ETA)>2.3)&&(abs(J_ETA)<5.0))   return rr->Gaus(1.288,0.200);
+// if ((abs(J_ETA)<0.5))                     return rr->Gaus(1.052,0.063);
+// if ((abs(J_ETA)>0.5)&&(abs(J_ETA)<1.1))   return rr->Gaus(1.057,0.057);
+// if ((abs(J_ETA)>1.1)&&(abs(J_ETA)<1.7))   return rr->Gaus(1.096,0.065);
+// if ((abs(J_ETA)>1.7)&&(abs(J_ETA)<2.3))   return rr->Gaus(1.134,0.094);
+// if ((abs(J_ETA)>2.3)&&(abs(J_ETA)<5.0))   return rr->Gaus(1.288,0.200);
+if ((abs(J_ETA)<0.5))                     return 1.052+0.063;
+if ((abs(J_ETA)>=0.5)&&(abs(J_ETA)<1.1))   return 1.057+0.057;
+if ((abs(J_ETA)>=1.1)&&(abs(J_ETA)<1.7))   return 1.096+0.065;
+if ((abs(J_ETA)>=1.7)&&(abs(J_ETA)<2.3))   return 1.134+0.094;
+if ((abs(J_ETA)>=2.3)&&(abs(J_ETA)<5.0))   return 1.288+0.200;
 return 1.0;
 }
 
 Double_t GetRecoGenJetScaleFactor(Double_t RecoPT,Double_t GenPT, Double_t SmearFactor)
 {
 	Double_t deltaPT = ((RecoPT-GenPT)*SmearFactor);
-	return (RecoPT+deltaPT)/RecoPT;
+	return (GenPT+deltaPT)/RecoPT;
 }
 
 
@@ -328,7 +333,7 @@ void placeholder::Loop()
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
 	// BRANCH(weight);
-	BRANCH(weight_pu_central); BRANCH(weight_pu_sysplus8); BRANCH(weight_pu_sysminus8); BRANCH(weight_gen);
+	BRANCH(weight_pu_central); BRANCH(weight_pu_sysplus); BRANCH(weight_pu_sysminus); BRANCH(weight_gen);
 	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_passBeamHaloFilterLoose); 
 	BRANCH(pass_passBeamHaloFilterTight);
 	BRANCH(pass_isTrackingFailure);
@@ -432,7 +437,7 @@ void placeholder::Loop()
 
 	BRANCH(Pt_muon1);  BRANCH(Phi_muon1);  BRANCH(Eta_muon1);  
 	BRANCH(Pt_muon2);  BRANCH(Phi_muon2);  BRANCH(Eta_muon2);  
-	BRANCH(TrkRelIso_muon1);
+	BRANCH(RelIso_muon1);
 	
 	BRANCH(Pt_MET);  BRANCH(Phi_MET);  
 
@@ -441,15 +446,16 @@ void placeholder::Loop()
 	
 
 	// Trigger and other
-	BRANCH(LowestUnprescaledTriggerPass); 
+	BRANCH(Mu24Pass); 
+	BRANCH(Mu24PassPrescale); 
+
 	BRANCH(IsoMu24Pass); 
 
-
-	Double_t LowestUnprescaledTrigger=0.0;//BRANCH(LowestUnprescaledTrigger); 
-	Double_t Closest40UnprescaledTrigger=0.0;//BRANCH(Closest40UnprescaledTrigger);
-	Double_t Closest40UnprescaledTriggerPass=0.0;//BRANCH(Closest40UnprescaledTriggerPass);
 	Double_t HLTIsoMu24Pass=0.0;//RANCH(HLTIsoMu24Pass);
-	Double_t HLTMu40TriggerPass=0.0;//BRANCH(HLTMu40TriggerPass);
+	Double_t HLTMu24Pass=0.0;//RANCH(HLTIsoMu24Pass);
+	Double_t HLTMu24PassPrescale=0.0;//RANCH(HLTIsoMu24Pass);
+
+	Double_t HLTMu24TriggerPass=0.0;//BRANCH(HLTMu24TriggerPass);
 	Double_t HT_genMG=0.0;//BRANCH(HT_genMG);
 	
 	//===================================================================================================
@@ -583,86 +589,83 @@ void placeholder::Loop()
 		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_central  *=(1.38880554853);
 		if (N_PileUpInteractions > 34.5) weight_pu_central *= 0.0;
 		
+		weight_pu_sysplus = weight;
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysplus *=(0.0112175149831);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysplus *=(0.121087734395);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysplus *=(0.287818611927);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pu_sysplus *=(0.527626529094);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pu_sysplus *=(0.783696354059);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pu_sysplus *=(1.00650439276);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pu_sysplus *=(1.17348981006);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pu_sysplus *=(1.28401095679);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pu_sysplus *=(1.357600308);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pu_sysplus *=(1.41316079322);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pu_sysplus *=(1.46840359255);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pu_sysplus *=(1.53584652637);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pu_sysplus *=(1.62231760959);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pu_sysplus *=(1.7281969113);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pu_sysplus *=(1.86149776904);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pu_sysplus *=(2.01240230333);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pu_sysplus *=(2.18057433714);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pu_sysplus *=(2.36135499357);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pu_sysplus *=(2.54687256712);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pu_sysplus *=(2.73766248268);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pu_sysplus *=(2.92573330254);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pu_sysplus *=(3.08732938139);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pu_sysplus *=(3.24129022175);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pu_sysplus *=(3.38259901992);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pu_sysplus *=(3.49697385281);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pu_sysplus *=(3.57554823181);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pu_sysplus *=(3.63731823179);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pu_sysplus *=(3.62307016401);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pu_sysplus *=(3.62434601903);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pu_sysplus *=(3.63862461648);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pu_sysplus *=(3.55010065753);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pu_sysplus *=(3.39605083666);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pu_sysplus *=(3.25850301355);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pu_sysplus *=(3.27052653183);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_sysplus *=(3.07305167562);
 
-		// std::cout<<extraweight<<"  "<<lumi<<"  "<<xsection<<"  "<<Events_Orig<<"  "<<weight<<"  "<<weight_pu_central<<std::endl;
 
-		
-		weight_pu_sysplus8 = weight;
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysplus8 *=(0.00924647898767);
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysplus8 *=(0.103765308587);
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysplus8 *=(0.254901026276);
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pu_sysplus8 *=(0.480371942144);
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pu_sysplus8 *=(0.729944556297);
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pu_sysplus8 *=(0.954968986548);
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pu_sysplus8 *=(1.13004026908);
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pu_sysplus8 *=(1.25116215302);
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pu_sysplus8 *=(1.33545960398);
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pu_sysplus8 *=(1.40112202125);
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pu_sysplus8 *=(1.46629994308);
-		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pu_sysplus8 *=(1.54467848996);
-		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pu_sysplus8 *=(1.64461047702);
-		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pu_sysplus8 *=(1.7680582782);
-		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pu_sysplus8 *=(1.9248181748);
-		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pu_sysplus8 *=(2.10637260323);
-		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pu_sysplus8 *=(2.31374222506);
-		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pu_sysplus8 *=(2.54319600245);
-		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pu_sysplus8 *=(2.78724430301);
-		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pu_sysplus8 *=(3.04707340275);
-		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pu_sysplus8 *=(3.31429303739);
-		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pu_sysplus8 *=(3.56161966349);
-		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pu_sysplus8 *=(3.80974218256);
-		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pu_sysplus8 *=(4.05230970884);
-		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pu_sysplus8 *=(4.27119855299);
-		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pu_sysplus8 *=(4.45358283315);
-		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pu_sysplus8 *=(4.6210083076);
-		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pu_sysplus8 *=(4.69553893978);
-		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pu_sysplus8 *=(4.79226541944);
-		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pu_sysplus8 *=(4.90898557824);
-		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pu_sysplus8 *=(4.88722270965);
-		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pu_sysplus8 *=(4.77074865948);
-		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pu_sysplus8 *=(4.67125617297);
-		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pu_sysplus8 *=(4.78457737387);
-		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_sysplus8 *=(4.58784771674);
-		if (N_PileUpInteractions > 34.5) weight_pu_sysplus8 *= 0.0;
-		
-		
-		weight_pu_sysminus8 = weight;
-		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysminus8 *=(0.0201084522235);
-		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysminus8 *=(0.201872953791);
-		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysminus8 *=(0.444291440305);
-		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pu_sysminus8 *=(0.754784951423);
-		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pu_sysminus8 *=(1.04300038865);
-		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pu_sysminus8 *=(1.25373948702);
-		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pu_sysminus8 *=(1.37815071794);
-		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pu_sysminus8 *=(1.43249643277);
-		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pu_sysminus8 *=(1.44824842983);
-		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pu_sysminus8 *=(1.44760397441);
-		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pu_sysminus8 *=(1.44595859288);
-		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pu_sysminus8 *=(1.45056585209);
-		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pu_sysminus8 *=(1.46233900245);
-		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pu_sysminus8 *=(1.47682664198);
-		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pu_sysminus8 *=(1.49703207679);
-		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pu_sysminus8 *=(1.51206676472);
-		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pu_sysminus8 *=(1.52066555932);
-		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pu_sysminus8 *=(1.51950731213);
-		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pu_sysminus8 *=(1.50475499659);
-		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pu_sysminus8 *=(1.47887521537);
-		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pu_sysminus8 *=(1.43996103898);
-		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pu_sysminus8 *=(1.38034035275);
-		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pu_sysminus8 *=(1.31320230704);
-		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pu_sysminus8 *=(1.2392809902);
-		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pu_sysminus8 *=(1.15650697488);
-		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pu_sysminus8 *=(1.06581520421);
-		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pu_sysminus8 *=(0.975973223375);
-		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pu_sysminus8 *=(0.874112959041);
-		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pu_sysminus8 *=(0.785480306938);
-		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pu_sysminus8 *=(0.707777917329);
-		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pu_sysminus8 *=(0.619354107892);
-		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pu_sysminus8 *=(0.531056657066);
-		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pu_sysminus8 *=(0.456479768112);
-		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pu_sysminus8 *=(0.410264344317);
-		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_sysminus8 *=(0.345060491391);
-		if (N_PileUpInteractions > 34.5) weight_pu_sysminus8 *= 0.0;
+		weight_pu_sysminus = weight;
+
+		if ((N_PileUpInteractions > -0.5)*(N_PileUpInteractions < 0.5)) weight_pu_sysminus *=(0.0174672651878);
+		if ((N_PileUpInteractions > 0.5)*(N_PileUpInteractions < 1.5)) weight_pu_sysminus *=(0.178898832821);
+		if ((N_PileUpInteractions > 1.5)*(N_PileUpInteractions < 2.5)) weight_pu_sysminus *=(0.401652393124);
+		if ((N_PileUpInteractions > 2.5)*(N_PileUpInteractions < 3.5)) weight_pu_sysminus *=(0.695533833086);
+		if ((N_PileUpInteractions > 3.5)*(N_PileUpInteractions < 4.5)) weight_pu_sysminus *=(0.978362056364);
+		if ((N_PileUpInteractions > 4.5)*(N_PileUpInteractions < 5.5)) weight_pu_sysminus *=(1.19500460721);
+		if ((N_PileUpInteractions > 5.5)*(N_PileUpInteractions < 6.5)) weight_pu_sysminus *=(1.33210542995);
+		if ((N_PileUpInteractions > 6.5)*(N_PileUpInteractions < 7.5)) weight_pu_sysminus *=(1.4014869583);
+		if ((N_PileUpInteractions > 7.5)*(N_PileUpInteractions < 8.5)) weight_pu_sysminus *=(1.4320486024);
+		if ((N_PileUpInteractions > 8.5)*(N_PileUpInteractions < 9.5)) weight_pu_sysminus *=(1.44568599859);
+		if ((N_PileUpInteractions > 9.5)*(N_PileUpInteractions < 10.5)) weight_pu_sysminus *=(1.45867953698);
+		if ((N_PileUpInteractions > 10.5)*(N_PileUpInteractions < 11.5)) weight_pu_sysminus *=(1.47958829465);
+		if ((N_PileUpInteractions > 11.5)*(N_PileUpInteractions < 12.5)) weight_pu_sysminus *=(1.5104596995);
+		if ((N_PileUpInteractions > 12.5)*(N_PileUpInteractions < 13.5)) weight_pu_sysminus *=(1.54748743432);
+		if ((N_PileUpInteractions > 13.5)*(N_PileUpInteractions < 14.5)) weight_pu_sysminus *=(1.59422320097);
+		if ((N_PileUpInteractions > 14.5)*(N_PileUpInteractions < 15.5)) weight_pu_sysminus *=(1.63924419015);
+		if ((N_PileUpInteractions > 15.5)*(N_PileUpInteractions < 16.5)) weight_pu_sysminus *=(1.68076565709);
+		if ((N_PileUpInteractions > 16.5)*(N_PileUpInteractions < 17.5)) weight_pu_sysminus *=(1.71442150291);
+		if ((N_PileUpInteractions > 17.5)*(N_PileUpInteractions < 18.5)) weight_pu_sysminus *=(1.7349217562);
+		if ((N_PileUpInteractions > 18.5)*(N_PileUpInteractions < 19.5)) weight_pu_sysminus *=(1.74389791031);
+		if ((N_PileUpInteractions > 19.5)*(N_PileUpInteractions < 20.5)) weight_pu_sysminus *=(1.73791143581);
+		if ((N_PileUpInteractions > 20.5)*(N_PileUpInteractions < 21.5)) weight_pu_sysminus *=(1.70611386863);
+		if ((N_PileUpInteractions > 21.5)*(N_PileUpInteractions < 22.5)) weight_pu_sysminus *=(1.66307074529);
+		if ((N_PileUpInteractions > 22.5)*(N_PileUpInteractions < 23.5)) weight_pu_sysminus *=(1.60874288266);
+		if ((N_PileUpInteractions > 23.5)*(N_PileUpInteractions < 24.5)) weight_pu_sysminus *=(1.53939902456);
+		if ((N_PileUpInteractions > 24.5)*(N_PileUpInteractions < 25.5)) weight_pu_sysminus *=(1.45511270561);
+		if ((N_PileUpInteractions > 25.5)*(N_PileUpInteractions < 26.5)) weight_pu_sysminus *=(1.3670186575);
+		if ((N_PileUpInteractions > 26.5)*(N_PileUpInteractions < 27.5)) weight_pu_sysminus *=(1.25636754216);
+		if ((N_PileUpInteractions > 27.5)*(N_PileUpInteractions < 28.5)) weight_pu_sysminus *=(1.15870268872);
+		if ((N_PileUpInteractions > 28.5)*(N_PileUpInteractions < 29.5)) weight_pu_sysminus *=(1.07173897222);
+		if ((N_PileUpInteractions > 29.5)*(N_PileUpInteractions < 30.5)) weight_pu_sysminus *=(0.962813980476);
+		if ((N_PileUpInteractions > 30.5)*(N_PileUpInteractions < 31.5)) weight_pu_sysminus *=(0.847622106151);
+		if ((N_PileUpInteractions > 31.5)*(N_PileUpInteractions < 32.5)) weight_pu_sysminus *=(0.748135881033);
+		if ((N_PileUpInteractions > 32.5)*(N_PileUpInteractions < 33.5)) weight_pu_sysminus *=(0.690478414815);
+		if ((N_PileUpInteractions > 33.5)*(N_PileUpInteractions < 34.5)) weight_pu_sysminus *=(0.596395110807);
+
+
 		
 
 
@@ -671,20 +674,16 @@ void placeholder::Loop()
 		string hltmu ("HLT_Mu");
 		string hltisomu ("HLT_IsoMu24");
 		string eta2p1 ("eta2p1");
-		string hltmu40 ("HLT_Mu40_v");
-		string hltmu40eta2p1 ("HLT_Mu40_eta2p1_v");
+		string hltmu24 ("HLT_Mu24");
+		string hltmu24eta2p1 ("HLT_Mu24_eta2p1_v");
 
-		LowestUnprescaledTrigger = -1.;
-		LowestUnprescaledTriggerPass = -1.;
-		Closest40UnprescaledTrigger = -1.;
-		Closest40UnprescaledTrigger = -1.;
-		HLTMu40TriggerPass = -1.;
-		
+		HLTMu24TriggerPass = -1.;
 		
 		vector <double> SingleMuThresholds;
 		vector <int> SingleMuPrescales;
 		vector <int> SingleMuPasses;
 
+		// std::cout<<" - - - - - - - - - - "<<run<<"  muon pt = "<< MuonPt->at(0)<<std::endl;
 		HLTIsoMu24Pass = 0;
 		for(unsigned int iHLT = 0; iHLT != HLTInsideDatasetTriggerNames->size(); ++iHLT)
 		{
@@ -692,59 +691,37 @@ void placeholder::Loop()
 			bool isSingleMuTrigger = (thishlt.compare(0,11,hltisomu)==0) && (thishlt.length()>7) && (thishlt.length()<24);
 			if (!isSingleMuTrigger) continue;			
 			// std::cout<<thishlt<<"   "<<HLTInsideDatasetTriggerPrescales->at(iHLT)<<std::endl;
-			if (!(HLTInsideDatasetTriggerPrescales->at(iHLT)) == 1) continue;
+			// if (!(HLTInsideDatasetTriggerPrescales->at(iHLT)) == 1) continue;
+			// std::cout<<"  -- using, pass= "<<HLTInsideDatasetTriggerDecisions->at(iHLT)<<std::endl;
 			HLTIsoMu24Pass = HLTInsideDatasetTriggerDecisions->at(iHLT);
 			if (HLTIsoMu24Pass  > 0) break;
 		}
 		IsoMu24Pass = HLTIsoMu24Pass;
 
+		HLTMu24Pass = 0;
+		HLTMu24PassPrescale = 0;
 
 		for(unsigned int iHLT = 0; iHLT != HLTInsideDatasetTriggerNames->size(); ++iHLT)
 		{
 			string thishlt = HLTInsideDatasetTriggerNames->at(iHLT);
-			bool isSingleMuTrigger = (thishlt.compare(0,6,hltmu)==0) && (thishlt.length()>7) && (thishlt.length()<20);
-			if (!isSingleMuTrigger) continue;
+			bool isSingleMuTrigger = (thishlt.compare(0,8,hltmu24)==0) && (thishlt.length()>7) && (thishlt.length()<14);
+			if (!isSingleMuTrigger) continue;			
+			// std::cout<<thishlt<<"   "<<HLTInsideDatasetTriggerPrescales->at(iHLT)<<std::endl;
+			HLTMu24PassPrescale = double(HLTInsideDatasetTriggerPrescales->at(iHLT));
+			HLTMu24Pass = HLTInsideDatasetTriggerDecisions->at(iHLT);
+			if (HLTIsoMu24Pass  > 0) break;
+		}
+		Mu24Pass = HLTMu24Pass;
+		Mu24PassPrescale = HLTMu24PassPrescale;
 
-			string onesplace,tensplace;	
-			onesplace = thishlt[7];
-			tensplace = thishlt[6];
-			bool notrigger = (onesplace=="_" || tensplace=="_");
-			if (notrigger) continue;
-			
-			std::string thresh = tensplace+onesplace+".0";
-			double triggervalue  = ::atof(thresh.c_str());
-			SingleMuThresholds.push_back(triggervalue);
-			SingleMuPrescales.push_back(HLTInsideDatasetTriggerPrescales->at(iHLT));
-			SingleMuPasses.push_back(HLTInsideDatasetTriggerDecisions->at(iHLT));
-			
-			if ((!(thishlt.compare(0,10,hltmu40)==0))&&(!(thishlt.compare(0,17,hltmu40eta2p1)==0))) continue;
-			
-			if (( HLTInsideDatasetTriggerPrescales->at(iHLT) == 1) && HLTMu40TriggerPass < 1.0) HLTMu40TriggerPass = HLTInsideDatasetTriggerDecisions->at(iHLT);
-			
-		}
-		
-		for(unsigned int iHLTmu = 0; iHLTmu !=SingleMuThresholds.size(); ++iHLTmu)
-		{
-			
-			if (LowestUnprescaledTrigger < 0 && SingleMuPrescales[iHLTmu] ==1) 
-			{
-				LowestUnprescaledTriggerPass = 1.0*SingleMuPasses[iHLTmu];
-				LowestUnprescaledTrigger = 1.0*SingleMuThresholds[iHLTmu];
-			}
-			if (SingleMuPrescales[iHLTmu] ==1 && SingleMuThresholds[iHLTmu] < 40.01)
-			{
-				Closest40UnprescaledTrigger = 1.0*SingleMuThresholds[iHLTmu];
-				Closest40UnprescaledTriggerPass = 1.0*SingleMuPasses[iHLTmu];
-			}
-		}
-		//std::cout<<LowestUnprescaledTriggerPass<<"  "<<LowestUnprescaledTrigger<<"              "<<Closest40UnprescaledTrigger<<"  "<<Closest40UnprescaledTriggerPass<<std::endl;
-		
+		//std::cout<<Mu24Pass<<"   "<<Mu24PassPrescale<<std::endl;
+
 		
 		//========================     Jet Rescaling / Smearing Sequence   ================================//
 
 		TLorentzVector JetAdjustedMET;
-		JetAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
-		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
+		JetAdjustedMET.SetPtEtaPhiM(PFMETType1Cor->at(0),0.0,PFMETPhiType1Cor->at(0),0);
+		//std::cout<<PFMETType1Cor->at(0)<<"  "<<(*PFMETType1Cor)[0]<<"      "<<PFMETPhiType1Cor->at(0)<<"  "<<(*PFMETPhiType1Cor)[0]<<std::endl;
 		//std::cout<<(*PFJetPt)[0]<<"  "<<(*PFJetPtRaw)[0]<<std::endl;
 		if (!isData)
 		{
@@ -828,15 +805,15 @@ void placeholder::Loop()
 						ClosestGenJetPT = GenJetPt->at(igenjet);
 					}
 				}
-			
-				Double_t Standard_rescale = 0.0;
+				Double_t Standard_rescale = 1.0;
 				if (false)
 				{
-					if (SmallestDeltaR<0.5) Standard_rescale = 0.1;
+					if (SmallestDeltaR<0.5) Standard_rescale = 1.1;
 				}
 				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
 				NewJetPT *=JetAdjustmentFactor;
 				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+
 
 		
 				if (JetSmearFactor > 0.0){
@@ -856,14 +833,14 @@ void placeholder::Loop()
 				(*PFJetPt)[ijet] = NewJetPT ;	
 			}
 		}
-		// std::cout<<(*PFMET)[0] - JetAdjustedMET.Pt()<<std::endl;
-		(*PFMET)[0] = JetAdjustedMET.Pt();
-		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
+		// std::cout<<(*PFMETType1Cor)[0] - JetAdjustedMET.Pt()<<std::endl;
+		(*PFMETType1Cor)[0] = JetAdjustedMET.Pt();
+		(*PFMETPhiType1Cor)[0] = JetAdjustedMET.Phi();
 		
 		//========================     Muon Rescaling / Smearing Sequence   ================================//
 
 		TLorentzVector MuAdjustedMET;
-		MuAdjustedMET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0);
+		MuAdjustedMET.SetPtEtaPhiM(PFMETType1Cor->at(0),0.0,PFMETPhiType1Cor->at(0),0);
 		
 		if (!isData)
 		{
@@ -878,9 +855,7 @@ void placeholder::Loop()
 				bool PassGlobalTightPrompt =
 					MuonIsGlobal ->at(imuon) == 1 &&
 					MuonIsTracker ->at(imuon) == 1 &&
-					//fabs(MuonRelIso->at(imuon)) < 0.1 &&
-					//(((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
-					//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
+					// MuonRelIso->at(imuon) < 0.15 &&
 					MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 	
 				bool PassPOGTight =
@@ -899,8 +874,8 @@ void placeholder::Loop()
 				(*MuonPt)[imuon] = NewMuonPT ;	
 			}
 		}
-		(*PFMET)[0] = MuAdjustedMET.Pt();
-		(*PFMETPhi)[0] = MuAdjustedMET.Phi();
+		(*PFMETType1Cor)[0] = MuAdjustedMET.Pt();
+		(*PFMETPhiType1Cor)[0] = MuAdjustedMET.Phi();
 
 		//========================    CaloJet Matching to PFJET   ================================//
 
@@ -1020,9 +995,7 @@ void placeholder::Loop()
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
 				MuonIsTracker ->at(imuon) == 1 &&
-				//fabs(MuonRelIso->at(imuon)) < 0.1 &&
-				// (((MuonTrackerIsoSumPT->at(imuon))/muonPt) < 0.1) &&                             // Disable for EWK
-				//((MuonHcalIso->at(imuon) + MuonTrkIso->at(imuon))/muonPt) < 0.15;  // Enable for EWK
+				//MuonRelIso->at(imuon) < 0.15 &&
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 
 			bool PassPOGTight =
@@ -1036,7 +1009,7 @@ void placeholder::Loop()
 			TLorentzVector muon;
 			muon.SetPtEtaPhiM( MuonPt -> at(imuon), MuonEta-> at(imuon),    MuonPhi-> at(imuon),    0);
 			RecoMuons.push_back(muon);
-			if (muoniso > 0.999) muoniso = ((MuonTrackerIsoSumPT->at(imuon))/muonPt);
+			if (muoniso > 0.999) muoniso = MuonRelIso->at(imuon);
 			v_idx_muon_final.push_back(imuon);
 			Muon25Count += 1.0;
 			if (v_idx_muon_final.size()>=1) checkPT=false;
@@ -1226,11 +1199,17 @@ void placeholder::Loop()
 
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
+				// std::cout<<"size check "<<GenParticlePdgId->size()<<"  "<<GenParticlePt->size()<<std::endl;	
 				int pdgId = GenParticlePdgId->at(ip);
-				int motherIndex = GenParticleMotherIndex->at(ip);
-
-				if ( TMath::Abs(pdgId) == 13 )
+				// std::cout<<pdgId<<"  "<<GenParticlePt->at(ip)<<std::endl;
+				if ( TMath::Abs(pdgId) == 13 || TMath::Abs(pdgId) == 713 )
 				{
+					// std::cout<<"  kept mu size: "<<GenMuons.size()<<std::endl;
+					if (TMath::Abs(pdgId) == 713) 
+						{
+							GenMuons.erase (GenMuons.begin(),GenMuons.end());
+							// std::cout<<"  kept mu size after erasure: "<<GenMuons.size()<<std::endl;
+						}				
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
 
@@ -1245,6 +1224,8 @@ void placeholder::Loop()
 
 					if (KeepMuon==true) GenMuons.push_back(thisgenmuon);
 				}
+				// std::cout<<"  Final  mu size: "<<GenMuons.size()<<std::endl;
+
 				if ( TMath::Abs(pdgId) == 14 )
 				{
 					TLorentzVector thisgenneutrino;
@@ -1396,6 +1377,7 @@ void placeholder::Loop()
 
 
 
+
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
 			
@@ -1503,11 +1485,11 @@ void placeholder::Loop()
 			if (PFJetCount>=5)	DeltaPhi_pfjet5muon1 =	fabs(RecoJets[4].DeltaPhi(RecoMuons[0]));			
 
 
-			Pt_MET = PFMET->at(0);
-			Phi_MET = PFMETPhi->at(0);
+			Pt_MET = PFMETType1Cor->at(0);
+			Phi_MET = PFMETPhiType1Cor->at(0);
 			
 			MT_muon1MET =  TMass(Pt_muon1,Pt_MET, fabs(Phi_muon1 - Phi_MET) );
-			TrkRelIso_muon1 =muoniso;
+			RelIso_muon1 =muoniso;
 			
 			TLorentzVector  v_Met;
 			v_Met.SetPtEtaPhiM ( Pt_MET, 0, Phi_MET,0 );
@@ -1530,7 +1512,8 @@ void placeholder::Loop()
 	
 		bool skipevent = true;
 
-		if ((Pt_muon1>25)||(Pt_genmuon1>25)) skipevent = false;
+		if ((Pt_muon1>25)&&(Pt_pfjet1>30)) skipevent = false;
+
 		// if ((Muon25Count>0)&&(HEEPEle25Count>0)) skipevent = false;
 		if (Pt_muon2>25) skipevent = true;				
 
