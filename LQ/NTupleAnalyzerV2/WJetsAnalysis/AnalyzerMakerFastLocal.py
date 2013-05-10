@@ -24,6 +24,7 @@ newmures = '0.0'
 
 StagerCheck = 0
 a = sys.argv
+
 for x in range(len(a)):
 	if a[x] == '-i':
 		ifile = a[x+1]
@@ -186,7 +187,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>12:
+		if len(sublist)>6:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
