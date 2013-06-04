@@ -159,6 +159,6 @@ print to.GetEntries(), to.GetEntries("Pt_genmuon1<0.0001")
 
 os.system('mv '+ntuplefile+' '+ntuplefile.replace(".root","_.roobak"))
 os.system('mv '+ntuplefile.replace(".root","_out.root")+' '+ntuplefile)
-
+to.Write()
 fo.Close()
 

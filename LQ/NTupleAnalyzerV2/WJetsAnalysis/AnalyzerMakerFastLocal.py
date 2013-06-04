@@ -144,6 +144,7 @@ for p in possiblemasterdirs:
 print '\n\n Reading File List, please wait ...\n\n'
 
 masterdirlist = masterdir.replace('/','__')+'.txt'
+masterdirlist = 'masterdirlist.txt'
 
 if masterdirlist not in os.listdir('.') or  '--FileRefresh' in sys.argv:
 	print '\n','(Re)'*('--FileRefresh' in sys.argv)+'Generating file list',masterdirlist,' for files in ',masterdir,'\n'
@@ -187,7 +188,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>6:
+		if len(sublist)>4:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
@@ -219,6 +220,7 @@ for x in range(len(SignalType)):
 		s1 = s1.replace('crosssection', str(float(Xsections[x])))
 		s1 = s1.replace('desired_luminosity', str(float(1.0)))
 		s1 = s1.replace('FILEINPUT', path + '/' + dirList[0] )
+		s1 = s1.replace('DRESSEDREPLACEMENTFILE', str(DressedFile[x]) )
 		s1 = s1.replace('MassOfLQ', str(float(MassOfLQ[x])))
 		s1 = s1.replace('MyCustomHTCut', str(float(HTRemoveIfGreater[x])))
 

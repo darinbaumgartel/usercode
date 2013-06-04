@@ -23,12 +23,8 @@
 	//        Initial Setup and Special Functions
 	//===================================================================================================
 
-// TFile *dfile;
-TFile *dfile= new TFile("/afs/cern.ch/work/d/darinb/LQAnalyzerOutput/GenTuples/GenPatch_MadGraphDressedMuskim.root","READ");
-// TTree *dtree;
-TTree *dtree= (TTree*)dfile->Get("rootTupleTree/tree");
 
-int ND = dtree->GetEntries(); 
+// int ND = dtree->GetEntries(); 
 
 TRandom3* rr = new TRandom3();
 
@@ -342,7 +338,30 @@ vector<bool> BTags(float pt, bool isdata,float tchpt, float ssvhpt,float jpt,flo
 
 void placeholder::Loop()
 {
-// std::cout<<" ~~~~~~~~~~~ "<<dtree->GetEntries()<<std::endl;
+
+
+	// TFile *dfile= new TFile("DRESSEDREPLACEMENTFILE","READ");
+	// TTree *dtree= (TTree*)dfile->Get("ModVariables");
+
+	// dtree->BuildIndex("devent");
+
+	// UInt_t          devent;
+	// float dRegMuonPt;
+	// float dRegMuonEta;
+	// float dRegMuonPhi;
+	// float dDressedMuonPt;
+	// float dDressedMuonEta;
+	// float dDressedMuonPhi;
+
+	// dtree->SetBranchAddress("devent",&devent);
+	// dtree->SetBranchAddress("dRegMuonPt",&dRegMuonPt);
+	// dtree->SetBranchAddress("dRegMuonEta",&dRegMuonEta);
+	// dtree->SetBranchAddress("dRegMuonPhi",&dRegMuonPhi);
+	// dtree->SetBranchAddress("dDressedMuonPt",&dDressedMuonPt);
+	// dtree->SetBranchAddress("dDressedMuonEta",&dDressedMuonEta);
+	// dtree->SetBranchAddress("dDressedMuonPhi",&dDressedMuonPhi);
+
+
 
 	//===================================================================================================
 	//      MAKE TREE FOR PLACEHOLDER SIGNAL/BG TYPE AND DECLARE VARIABLES
@@ -457,17 +476,20 @@ void placeholder::Loop()
 	BRANCH(ST_genmuongenMETgenjet123_bare);
 	BRANCH(ST_genmuongenMETgenjet1234_bare);
 	BRANCH(ST_genmuongenMETgenjet12345_bare);
-	BRANCH(HT_genjets_bare);
 
 	
 
 	BRANCH(Pt_genmuon1);  BRANCH(Phi_genmuon1);  BRANCH(Eta_genmuon1);  
 	BRANCH(Pt_genmuon2);  BRANCH(Phi_genmuon2);  BRANCH(Eta_genmuon2);  
+	BRANCH(Pt_genmuon1_bare);  BRANCH(Phi_genmuon1_bare);  BRANCH(Eta_genmuon1_bare);  
+
 
 	BRANCH(Pt_genmuonneutrino1);  BRANCH(Phi_genmuonneutrino1);  BRANCH(Eta_genmuonneutrino1);  	
 	BRANCH(Pt_genMET);  BRANCH(Phi_genMET);  
 
 	BRANCH(MT_genmuon1genMET);
+
+	BRANCH(MT_genmuon1genMET_bare);	
 	BRANCH(MT_genmuon1genneutrino);
 	BRANCH(Pt_W_gen);  BRANCH(Phi_W_gen);
 
@@ -519,7 +541,6 @@ void placeholder::Loop()
 	Double_t HLTMu24PassPrescale=0.0;//RANCH(HLTIsoMu24Pass);
 
 	Double_t HLTMu24TriggerPass=0.0;//BRANCH(HLTMu24TriggerPass);
-	Double_t HT_genMG=0.0;//BRANCH(HT_genMG);
 	
 	//===================================================================================================
 	//===================================================================================================
@@ -560,6 +581,7 @@ void placeholder::Loop()
 		// Important Event Informations
 		run_number = run;
 		event_number = event;
+		int nevent = 1*event;
 		ls_number = ls;
 		bx = bunch;
 		float extraweight = 1.0;
@@ -820,14 +842,15 @@ void placeholder::Loop()
 					if (ThisLepton.Pt() < 20) continue;
 					JetLepDR = ThisLepton.DeltaR(ThisPFJet);
 					if (JetLepDR < .3) consider = false;
+					break; // lead muon only
 				}
-				for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
-				{
-					TLorentzVector ThisLepton;	
-					ThisLepton.SetPtEtaPhiM(ElectronPt->at(iele),ElectronEta->at(iele),ElectronPhi->at(iele),0.0);
-					JetLepDR = ThisLepton.DeltaR(ThisPFJet);
-					if (JetLepDR < .3) consider = false;
-				}
+				// for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
+				// {
+				// 	TLorentzVector ThisLepton;	
+				// 	ThisLepton.SetPtEtaPhiM(ElectronPt->at(iele),ElectronEta->at(iele),ElectronPhi->at(iele),0.0);
+				// 	JetLepDR = ThisLepton.DeltaR(ThisPFJet);
+				// 	if (JetLepDR < .3) consider = false;
+				// }
 				
 				if (!consider) continue;
 				
@@ -1180,6 +1203,7 @@ void placeholder::Loop()
 				thismu.SetPtEtaPhiM(MuonPt->at(muindex),MuonEta->at(muindex),MuonPhi->at(muindex),0);
 				if (thismu.Pt()<25.0) continue;
 				if (thismu.DeltaR(thisjet) < 0.3)		KeepJet=false;
+				break; // lead muon only
 			}
 
 			// for(unsigned int imu=0; imu<v_idx_muon_final.size(); imu++)
@@ -1272,12 +1296,14 @@ void placeholder::Loop()
 
 
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
+			Pt_genmuon1_bare = 0;      Phi_genmuon1_bare = 0;      Eta_genmuon1_bare = 0;
+
 			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
 			GenJetCount=0;        GenJet30Count = 0.0;  
 			Pt_genmuonneutrino1 = 0;      Phi_genmuonneutrino1 = 0;      Eta_genmuonneutrino1 = 0;
 
 
-			HT_genMG = 0.0;
+			HT_genjets = 0.0;
 
 			ST_genmuongenMET = 0 ;
 			ST_genmuongenMETgenjet1 = 0 ;
@@ -1296,7 +1322,7 @@ void placeholder::Loop()
 
 
 			MT_genmuon1genMET = 0 ;  MT_genmuon1genneutrino = 0;
-			
+			MT_genmuon1genMET_bare = 0; 
 			// std::cout<<" ---------------------------------------------- "<<std::endl;
 
 			Phi_Wtrue = 99.9; Phi_Ztrue=99.9;
@@ -1328,25 +1354,25 @@ void placeholder::Loop()
 			}
 
 
-			std::cout<<" ------- EVENT ------- "<<std::endl;
-
+			// std::cout<<" --------------------------------- "<<std::endl;
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
 				// std::cout<<"size check "<<GenParticlePdgId->size()<<"  "<<GenParticlePt->size()<<std::endl;	
 				int pdgId = GenParticlePdgId->at(ip);
 				// std::cout<<pdgId<<"  "<<GenParticlePt->at(ip)<<std::endl;
-				if ( TMath::Abs(pdgId) == 13 || TMath::Abs(pdgId) == 713 )
+				// if ( TMath::Abs(pdgId) == 13 || TMath::Abs(pdgId) == 713 )
+				if (  TMath::Abs(pdgId) == 713 )
 				{
 					// std::cout<<"  kept mu size: "<<GenMuons.size()<<std::endl;
-					if (TMath::Abs(pdgId) == 713) 
-						{
-							GenMuons.erase (GenMuons.begin(),GenMuons.end());
-							// std::cout<<"  kept mu size after erasure: "<<GenMuons.size()<<std::endl;
-							std::cout<<"   -> dressed: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
-						}				
+					// if (TMath::Abs(pdgId) == 713) 
+					// 	{
+					// 		GenMuons.erase (GenMuons.begin(),GenMuons.end());
+					// 		// std::cout<<"  kept mu size after erasure: "<<GenMuons.size()<<std::endl;
+					// 		// std::cout<<"   -> dressed: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
+					// 	}				
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-							std::cout<<"   -> any: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
+					// std::cout<<"   -> any: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
 
 					bool KeepMuon=true;
 					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
@@ -1358,8 +1384,10 @@ void placeholder::Loop()
 					}
 
 					if (KeepMuon==true) GenMuons.push_back(thisgenmuon);
+					// break;
 				}
 				// std::cout<<"  Final  mu size: "<<GenMuons.size()<<std::endl;
+
 
 				if ( TMath::Abs(pdgId) == 14 )
 				{
@@ -1379,6 +1407,16 @@ void placeholder::Loop()
 				}
 			}
 
+			// int dentry = dtree->GetEntryWithIndex(nevent);
+
+			// if (dDressedMuonPt > 0.0)
+			// {
+			// 	TLorentzVector thisdressedmuon;
+			// 	thisdressedmuon.SetPtEtaPhiM(dDressedMuonPt,dDressedMuonEta,dDressedMuonPhi,0.0);
+			// 	GenMuons.push_back(thisdressedmuon);
+			// }
+
+			int GenMuonCount = GenMuons.size();
 
 			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
 			{
@@ -1391,16 +1429,18 @@ void placeholder::Loop()
 				for(unsigned int igmu = 0; igmu != GenMuons.size(); ++igmu)
 				{
 					if ((GenMuons[igmu]).DeltaR(thisgenjet) < 0.3)		KeepGenJet=false;
+					break; // lead muon only
 				}
 			
 				if (!KeepGenJet) continue;
 
 				GenJets.push_back(thisgenjet);
 				if (fabs(GenJetEta->at(ijet))>2.4) continue;
+				// std::cout<<thisgenjet.Pt()<<"  "<<thisgenjet.Eta()<<"  "<<thisgenjet.Phi()<<"  "<<std::endl;
 				GenJetsBare.push_back(thisgenjet);
 				if (thisgenjet.Pt()<30.0) continue;
 					GenJet30Count+= 1.0;
-					HT_genjets_bare += thisgenjet.Pt();				
+					HT_genjets += thisgenjet.Pt();				
 			}
 			
 			GenJetCount = 1.0*(GenJetsBare.size());
@@ -1458,6 +1498,12 @@ void placeholder::Loop()
 			if (MuonCount>=2)	Eta_genmuon2 =	SortedGenMuons[1].Eta();
 			if (MuonCount>=2)	Phi_genmuon2 =	SortedGenMuons[1].Phi();
 
+			if (GenMuonCount>=1)	Pt_genmuon1_bare  =	GenMuons[0].Pt();
+			if (GenMuonCount>=1)	Eta_genmuon1_bare =	GenMuons[0].Eta();
+			if (GenMuonCount>=1)	Phi_genmuon1_bare =	GenMuons[0].Phi();
+			
+
+
 			// Assign Jet Variables		
 			if (PFJetCount>=1)	Pt_genjet1  =	SortedGenJets[0].Pt();
 			if (PFJetCount>=1)	Eta_genjet1 =	SortedGenJets[0].Eta();
@@ -1489,33 +1535,35 @@ void placeholder::Loop()
 			if (GenJetCount>=1)	Pt_genjet1_bare  =	GenJetsBare[0].Pt();
 			if (GenJetCount>=1)	Eta_genjet1_bare =	GenJetsBare[0].Eta();
 			if (GenJetCount>=1)	Phi_genjet1_bare =	GenJetsBare[0].Phi();
-			if (GenJetCount>=1)	DeltaPhi_genjet1genmuon1_bare =	fabs(GenJetsBare[0].DeltaPhi(SortedGenMuons[0]));
 
 			if (GenJetCount>=2)	Pt_genjet2_bare  =	GenJetsBare[1].Pt();
 			if (GenJetCount>=2)	Eta_genjet2_bare =	GenJetsBare[1].Eta();
 			if (GenJetCount>=2)	Phi_genjet2_bare =	GenJetsBare[1].Phi();
-			if (GenJetCount>=2)	DeltaPhi_genjet2genmuon1_bare =	fabs(GenJetsBare[1].DeltaPhi(SortedGenMuons[0]));
 
 			if (GenJetCount>=3)	Pt_genjet3_bare  =	GenJetsBare[2].Pt();
 			if (GenJetCount>=3)	Eta_genjet3_bare =	GenJetsBare[2].Eta();
 			if (GenJetCount>=3)	Phi_genjet3_bare =	GenJetsBare[2].Phi();
-			if (GenJetCount>=3)	DeltaPhi_genjet3genmuon1_bare =	fabs(GenJetsBare[2].DeltaPhi(SortedGenMuons[0]));
 
 			if (GenJetCount>=4)	Pt_genjet4_bare  =	GenJetsBare[3].Pt();
 			if (GenJetCount>=4)	Eta_genjet4_bare =	GenJetsBare[3].Eta();
 			if (GenJetCount>=4)	Phi_genjet4_bare =	GenJetsBare[3].Phi();
-			if (GenJetCount>=4)	DeltaPhi_genjet4genmuon1_bare =	fabs(GenJetsBare[3].DeltaPhi(SortedGenMuons[0]));
 
 			if (GenJetCount>=5)	Pt_genjet5_bare  =	GenJetsBare[4].Pt();
 			if (GenJetCount>=5)	Eta_genjet5_bare =	GenJetsBare[4].Eta();
 			if (GenJetCount>=5)	Phi_genjet5_bare =	GenJetsBare[4].Phi();
-			if (GenJetCount>=5)	DeltaPhi_genjet5genmuon1_bare =	fabs(GenJetsBare[4].DeltaPhi(SortedGenMuons[0]));
 
+			if (GenMuonCount>=1){
+				if (GenJetCount>=1)	DeltaPhi_genjet1genmuon1_bare =	fabs(GenJetsBare[0].DeltaPhi(GenMuons[0]));
+				if (GenJetCount>=2)	DeltaPhi_genjet2genmuon1_bare =	fabs(GenJetsBare[1].DeltaPhi(GenMuons[0]));
+				if (GenJetCount>=3)	DeltaPhi_genjet3genmuon1_bare =	fabs(GenJetsBare[2].DeltaPhi(GenMuons[0]));
+				if (GenJetCount>=4)	DeltaPhi_genjet4genmuon1_bare =	fabs(GenJetsBare[3].DeltaPhi(GenMuons[0]));
+				if (GenJetCount>=5)	DeltaPhi_genjet5genmuon1_bare =	fabs(GenJetsBare[4].DeltaPhi(GenMuons[0]));
+			}
 
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
-			
 			MT_genmuon1genMET =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
+			MT_genmuon1genMET_bare =  TMass(Pt_genmuon1_bare,Pt_genMET, fabs(Phi_genmuon1_bare - Phi_genMET) );
 			
 			if (GenMuNeutrinos.size()>0)	
 			{	

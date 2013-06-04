@@ -315,27 +315,26 @@ def main():
 	htbinning = [30,60,90,120,150,195,240,285,330,390,450,510,570,660,750,840,990,1170,1500]
 	htbinning = [30,60,90,120,150,180,210,240,270,300,360,420,480,540,600,720,840,960,1200,1700]
 	htunfbinning = [65,0,1950]
-	htunfbinning = [117,-30,1725]
+	htunfbinning = [114,15,1725]
 
 	htbinning = [30,60,90,120,150,180,210,240,270,300,360,420,480,540,600,660,720,780,840,900,1020,1140,1260,1500]
 	htbinning = [30,60,90,120,150,195,240,285,330,390,450,510,570,660,750,840,990,1590]
+	#mtbinning = [50,55,60,65,70,75,80,85,90,95,100,110,120,130,145,160,180,200,250]
 
 
-
-	# FullAnalysisWithUncertainty(['Pt_genjet1','Pt_genjet1_bare'],'Pt_pfjet1',0,["p_{T}(jet_{1}) [GeV]",""],[40,10,810],[30,50,70,90,110,150,190,250,310,400,750],Sels_Pt_pfjet1_reco, Sels_Pt_pfjet1_gen,weight,'c')
-	# FullAnalysisWithUncertainty(['Pt_genjet2','Pt_genjet2_bare'],'Pt_pfjet2',0,["p_{T}(jet_{2}) [GeV]",""],[30,10,610],[30,50,70,90,110,150,190,250,550],Sels_Pt_pfjet2_reco, Sels_Pt_pfjet2_gen,weight,'c')
-	# FullAnalysisWithUncertainty(['Pt_genjet3','Pt_genjet3_bare'],'Pt_pfjet3',0,["p_{T}(jet_{3}) [GeV]",""],[25,10,510],[30,50,70,90,110,150,210,450],Sels_Pt_pfjet3_reco, Sels_Pt_pfjet3_gen,weight,'c')
+	FullAnalysisWithUncertainty(['Pt_genjet1','Pt_genjet1_bare'],'Pt_pfjet1',0,["p_{T}(jet_{1}) [GeV]",""],[40,10,810],[30,50,70,90,110,150,190,250,310,400,750],Sels_Pt_pfjet1_reco, Sels_Pt_pfjet1_gen,weight,'c')
+	FullAnalysisWithUncertainty(['Pt_genjet2','Pt_genjet2_bare'],'Pt_pfjet2',0,["p_{T}(jet_{2}) [GeV]",""],[30,10,610],[30,50,70,90,110,150,190,250,550],Sels_Pt_pfjet2_reco, Sels_Pt_pfjet2_gen,weight,'c')
+	FullAnalysisWithUncertainty(['Pt_genjet3','Pt_genjet3_bare'],'Pt_pfjet3',0,["p_{T}(jet_{3}) [GeV]",""],[25,10,510],[30,50,70,90,110,150,210,450],Sels_Pt_pfjet3_reco, Sels_Pt_pfjet3_gen,weight,'c')
 	FullAnalysisWithUncertainty(['Pt_genjet4','Pt_genjet4_bare'],'Pt_pfjet4',0,["p_{T}(jet_{4}) [GeV]",""],[20,10,410],[30,50,70,90,350],Sels_Pt_pfjet4_reco, Sels_Pt_pfjet4_gen,weight,'c')
 
-	sys.exit()
 	FullAnalysisWithUncertainty(['GenJet30Count','GenJet30Count'],'PFJet30Count',-1,["N_{Jet}",""],[8,-.5,7.5],[4 ,0.5,4.5],Sels_PFJet30Count_reco,Sels_PFJet30Count_gen,weight,'c')	
 	FullAnalysisWithUncertainty(['GenJet30Count','GenJet30Count'],'PFJet30Count',-1,["N_{Jet}","_preexc"],[11,-.5,10.5],[8 ,0.5,8.5],Sels_PFJet30Count_reco,Sels_PFJet30Count_gen,weight,'c')	
 
 
-	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',0,["H_{T}(jets) [GeV]","_inc1"],htunfbinning,htbinning,Sels_HT_pfjets_1_reco, Sels_HT_pfjets_1_gen,weight,'c')
-	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',0,["H_{T}(jets) [GeV]","_inc2"],htunfbinning,htbinning,Sels_HT_pfjets_2_reco, Sels_HT_pfjets_2_gen,weight,'c')
-	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',0,["H_{T}(jets) [GeV]","_inc3"],htunfbinning,htbinning,Sels_HT_pfjets_3_reco, Sels_HT_pfjets_3_gen,weight,'c')
-	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',0,["H_{T}(jets) [GeV]","_inc4"],htunfbinning,htbinning,Sels_HT_pfjets_4_reco, Sels_HT_pfjets_4_gen,weight,'c')
+	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',25.,["H_{T}(jets) [GeV]","_inc1"],htunfbinning,htbinning[0:],Sels_HT_pfjets_1_reco, Sels_HT_pfjets_1_gen,weight,'c')
+	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',55.,["H_{T}(jets) [GeV]","_inc2"],htunfbinning[2:],htbinning[1:],Sels_HT_pfjets_2_reco, Sels_HT_pfjets_2_gen,weight,'c')
+	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',85.,["H_{T}(jets) [GeV]","_inc3"],htunfbinning[4:],htbinning[2:],Sels_HT_pfjets_3_reco, Sels_HT_pfjets_3_gen,weight,'c')
+	FullAnalysisWithUncertainty(['HT_genjets','HT_genjets'],'HT_pfjets',115.,["H_{T}(jets) [GeV]","_inc4"],htunfbinning[6:],htbinning[3:],Sels_HT_pfjets_4_reco, Sels_HT_pfjets_4_gen,weight,'c')
 
 
 	FullAnalysisWithUncertainty(['Eta_genjet1','Eta_genjet1_bare'],'Eta_pfjet1',-2.5,["#eta(jet_{1}) ",""],[28,-2.8,2.8],[24,-2.4,2.4],Sels_Eta_pfjet1_reco, Sels_Eta_pfjet1_gen,weight,'c')
@@ -349,11 +348,14 @@ def main():
 	FullAnalysisWithUncertainty(['DeltaPhi_genjet4genmuon1','DeltaPhi_genjet4genmuon1_bare'],'DeltaPhi_pfjet4muon1',-0.05,["#Delta#phi(jet_{4},#mu) [GeV]",""],[8,-0.523598766,3.1415927+0.523598766],[6,0,3.1415927],Sels_DeltaPhi_pfjet4muon1_reco,Sels_DeltaPhi_pfjet4muon1_gen,weight,'c')
 
 	FullAnalysisWithUncertainty(['Pt_genMET','Pt_genMET'],'Pt_MET',-1,["E_{T}^{miss} [GeV]",""],[100,0,500],[0,10,20,30,40,50,60,70,80,90,100,115,130,150,170,200,250,400],Sels_Pt_MET_reco,Sels_Pt_MET_gen,weight,'c')
-	FullAnalysisWithUncertainty(['MT_genmuon1genMET','MT_genmuon1genMET_bare'],'MT_muon1MET',25,["M_{T}(#mu,E_{T}^{miss}) [GeV]",""],[90,20,320],[50,55,60,65,70,75,80,85,90,95,100,110,120,130,145,160,180,200,250],Sels_MT_genmuon1genMET_reco,Sels_MT_genmuon1genMET_gen,weight,'c')
+	FullAnalysisWithUncertainty(['MT_genmuon1genMET','MT_genmuon1genMET_bare'],'MT_muon1MET',25,["M_{T}(#mu,E_{T}^{miss}) [GeV]",""],[90,20,320],[30,50,200],Sels_MT_genmuon1genMET_reco,Sels_MT_genmuon1genMET_gen,weight,'c')
 
 
 	FullAnalysisWithUncertainty(['Pt_genmuon1','Pt_genmuon1_bare'],'Pt_muon1',0,["p_{T}(#mu_{1}) [GeV]",""],[80,15,415],[25,30,35,40,45,50,55,60,70,80,90,100,115,130,145,160,180,200,230,260,300],Sels_Pt_muon1_reco,Sels_Pt_muon1_gen,weight,'c')
 	FullAnalysisWithUncertainty(['Eta_genmuon1','Eta_genmuon1_bare'],'Eta_muon1',0,["#eta (#mu_{1}) [GeV]",""],[92,-2.3,2.3],[42,-2.1,2.1],Sels_Eta_muon1_reco,Sels_Eta_muon1_gen,weight,'c')
+
+	FullAnalysisWithUncertainty(['N_GoodVertices','N_GoodVertices'],'N_GoodVertices',0,["N_GoodVertices",""],[-1,51,50],[40,0,40],Sels_Eta_muon1_reco,Sels_Eta_muon1_gen,weight,'c')
+
 
 
 	# selection = basic_selection
@@ -1765,6 +1767,24 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	[genvariable,baregenvariable] = genvariables
 	[xlabel,namelabel] = labelmods
 
+
+	recomodvariable = recovariable	
+	genmodvariable = genvariable
+
+	if 'HT' in recovariable:
+		# recomodvariable = '( ('+selection+')*('+recovariable+ ') + (1-'+selection+')*('+str(default_value)+') )'
+		genmodvariable = '( ('+gen_selection+')*('+genvariable+ ') + (1-'+gen_selection+')*('+str(default_value)+') )'		
+		baregenvariable = genmodvariable
+
+	rivetselection = str(gen_selection).replace('_bare','')
+	rivetmodvariable = str(genmodvariable.replace('_bare',''))
+
+	# Get optimal variable binning binning
+	varbinning=GetConstBinStructure(binning)
+	if (optvar=="v" or optvar=="V"):
+		varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recomodvariable,[100000*len(presentationbinning),presentationbinning[0],presentationbinning[-1]],selection+weight,MCGenStyle,Label),binning)
+
+
 	##############################################################################
 	#######   Preparation and stylistic modifications below                #######
 	##############################################################################
@@ -1804,6 +1824,63 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 
 	##############################################################################
+	#######   Get Data-Driven Scale Factors                                #######
+	##############################################################################
+
+
+	ttbar_selection = selection.replace('(PFJet30TCHPTCountMod<0.5)','(PFJet30TCHPTCountMod>1.5)')
+	z_selection = selection.replace('(Pt_muon2<25)','(Pt_muon2>25)')
+
+	__Z_h_rec_Data=CreateHisto('__Z_h_rec_Data','Data, 5/fb [Reco]',t_SingleMuData,recomodvariable,varbinning,z_selection+IsoMuCond,DataRecoStyle,Label)
+	__Z_h_rec_WJetsMG=CreateHisto('__Z_h_rec_WJetsMG','W+Jets MadGraph [Reco]',t_MG,recomodvariable,varbinning,z_selection+weight,MCRecoStyle,Label)
+	__Z_h_rec_DiBoson=CreateHisto('__Z_h_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recomodvariable,varbinning,z_selection+weight,DiBosonStackStyle,Label)
+	__Z_h_rec_ZJets=CreateHisto('__Z_h_rec_ZJets','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,varbinning,z_selection+weight,ZStackStyle,Label)
+	__Z_h_rec_TTBar=CreateHisto('__Z_h_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,varbinning,z_selection+weight,TTStackStyle,Label)
+	__Z_h_rec_SingleTop=CreateHisto('__Z_h_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recomodvariable,varbinning,z_selection+weight,StopStackStyle,Label)
+
+	__T_h_rec_Data=CreateHisto('__T_h_rec_Data','Data, 5/fb [Reco]',t_SingleMuData,recomodvariable,varbinning,ttbar_selection+IsoMuCond,DataRecoStyle,Label)
+	__T_h_rec_WJetsMG=CreateHisto('__T_h_rec_WJetsMG','W+Jets MadGraph [Reco]',t_MG,recomodvariable,varbinning,ttbar_selection+weight,MCRecoStyle,Label)
+	__T_h_rec_DiBoson=CreateHisto('__T_h_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recomodvariable,varbinning,ttbar_selection+weight,DiBosonStackStyle,Label)
+	__T_h_rec_ZJets=CreateHisto('__T_h_rec_ZJets','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,varbinning,ttbar_selection+weight,ZStackStyle,Label)
+	__T_h_rec_TTBar=CreateHisto('__T_h_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,varbinning,ttbar_selection+weight,TTStackStyle,Label)
+	__T_h_rec_SingleTop=CreateHisto('__T_h_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recomodvariable,varbinning,ttbar_selection+weight,StopStackStyle,Label)
+
+
+	__Z_histos = [__Z_h_rec_Data,	__Z_h_rec_WJetsMG,	__Z_h_rec_DiBoson,	__Z_h_rec_ZJets,	__Z_h_rec_TTBar,	__Z_h_rec_SingleTop]
+	__T_histos = [__T_h_rec_Data,	__T_h_rec_WJetsMG,	__T_h_rec_DiBoson,	__T_h_rec_ZJets,	__T_h_rec_TTBar,	__T_h_rec_SingleTop]
+
+	__Z_ints = [__h.Integral() for __h in __Z_histos]
+	__T_ints = [__h.Integral() for __h in __T_histos]
+
+	[__Z_z, __Z_o, __Z_d] = [__Z_ints[3], __Z_ints[1]+__Z_ints[2]+__Z_ints[4]+__Z_ints[5],__Z_ints[0]]
+	[__T_z, __T_o, __T_d] = [__T_ints[4], __T_ints[1]+__T_ints[2]+__T_ints[3]+__T_ints[5],__T_ints[0]]
+
+	__Z_sf = (__Z_d - __Z_o)/__Z_d
+	__T_sf = (__T_d - __T_o)/__T_d
+
+
+	print ' ----------- DATA DRIVEN INFORMATION ------------- '
+	print ' '
+	print 'Z:    ',__Z_z
+	print 'Data: ',__Z_d
+	print 'Other:',__Z_o
+	print 'SF_Z: ',__Z_sf
+	print ' '
+	print 'T:    ',__T_z
+	print 'Data: ',__T_d
+	print 'Other:',__T_o
+	print 'SF_T: ',__T_sf
+	print ' '
+	print ' ----------- END DRIVEN INFORMATION ------------- '
+
+	fZ = '*(1.0)'
+	fT = '*(1.0)'
+
+	fZ = '*('+str(round(__Z_sf,4))+')'
+	fT = '*('+str(round(__T_sf,4))+')'
+
+
+	##############################################################################
 	#######     Top Right - Background Subtracted Distributions            #######
 	##############################################################################
 	c1.cd(2)
@@ -1812,10 +1889,6 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	# selection+='*('+recovariable+'<'+str(presentationbinning[-1])+')*('+recovariable+'>'+str(presentationbinning[0])+')'
 	# The selection for the gen variable. Larger range for the underflow/overflow. '(Pt_genmuon1>1.0)' also demands that a gen-muon is present. 
 	# The trees should otherwise be skimmed for a reco muon to be present.
-	recomodvariable = recovariable	
-	genmodvariable = genvariable
-	rivetselection = str(gen_selection).replace('_bare','')
-	rivetmodvariable = str(genmodvariable.replace('_bare',''))
 
 	# print rivetselection
 	for x in RivetGenBranchMap:
@@ -1829,10 +1902,6 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	rivetselection = 'evweight*(31314*4955.0/'+nrivet+')*'+rivetselection
 	t_rivet = TFile.Open(RIVETMadGraph,'READ').Get('RivetTree')
 
-	# Get optimal variable binning binning
-	varbinning=GetConstBinStructure(binning)
-	if (optvar=="v" or optvar=="V"):
-		varbinning=GetIdealBinStructure(CreateHisto('h_forrebin_WJets','temptest',t_WJets_MG,recomodvariable,[100000*len(presentationbinning),presentationbinning[0],presentationbinning[-1]],selection+weight,MCGenStyle,Label),binning)
 
 	nvbin = len(varbinning)
 	vbinmin = 1
@@ -1860,8 +1929,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	h_rec_Data=CreateHisto('h_rec_Data','Data, 5/fb [Reco]',t_SingleMuData,recomodvariable,varbinning,selection+IsoMuCond,DataRecoStyle,Label)
 	# Other Backgrounds
 	h_rec_DiBoson=CreateHisto('h_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recomodvariable,varbinning,selection+weight,DiBosonStackStyle,Label)
-	h_rec_ZJets=CreateHisto('h_rec_ZJets','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,varbinning,selection+weight,ZStackStyle,Label)
-	h_rec_TTBar=CreateHisto('h_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,varbinning,selection+weight,TTStackStyle,Label)
+	h_rec_ZJets=CreateHisto('h_rec_ZJets','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,varbinning,selection+weight+fZ,ZStackStyle,Label)
+	h_rec_TTBar=CreateHisto('h_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,varbinning,selection+weight+fT,TTStackStyle,Label)
 	h_rec_SingleTop=CreateHisto('h_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recomodvariable,varbinning,selection+weight,StopStackStyle,Label)
 
 
@@ -1931,8 +2000,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	hs_rec_WJets=CreateHisto('hs_rec_WJets','W+Jets',t_WJets_MG,recovariable,presentationbinning,selection+weight,WStackStyle,Label)
 	hs_rec_Data=CreateHisto('hs_rec_Data','Data, 5/fb',t_SingleMuData,recovariable,presentationbinning,selection+IsoMuCond,DataRecoStyle,Label)
 	hs_rec_DiBoson=CreateHisto('hs_rec_DiBoson','DiBoson',t_DiBoson,recovariable,presentationbinning,selection+weight,DiBosonStackStyle,Label)
-	hs_rec_ZJets=CreateHisto('hs_rec_ZJets','Z+Jets',t_ZJets_MG,recovariable,presentationbinning,selection+weight,ZStackStyle,Label)
-	hs_rec_TTBar=CreateHisto('hs_rec_TTBar','t#bar{t}',t_TTBar,recovariable,presentationbinning,selection+weight,TTStackStyle,Label)
+	hs_rec_ZJets=CreateHisto('hs_rec_ZJets','Z+Jets',t_ZJets_MG,recovariable,presentationbinning,selection+weight+fZ,ZStackStyle,Label)
+	hs_rec_TTBar=CreateHisto('hs_rec_TTBar','t#bar{t}',t_TTBar,recovariable,presentationbinning,selection+weight+fT,TTStackStyle,Label)
 	hs_rec_SingleTop=CreateHisto('hs_rec_SingleTop','SingleTop',t_SingleTop,recovariable,presentationbinning,selection+weight,StopStackStyle,Label)
 
 	hs_rec_QCDMu=CreateHisto('hs_rec_QCDMu','QCD',t_SingleMuData,recomodvariable,presentationbinning,qcdselection+'*(MT_muon1MET>50.0)*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*('+str(QCDSF)+')',QCDStackStyle,Label)
@@ -2191,7 +2260,7 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	# genscaleMG = h_rec_WJets_flatMG_nogen.Integral()/h_rec_WJets_flatMG.Integral()
 
 	# Response Matrix 
-	h_response_WJets=Create2DHisto('h_response_WJets','ResponseMatrix',t_WJets_MG,genvariable,recomodvariable,varbinning,selection+'*'+gen_selection_minimal+'*(weight_gen*4955)',[xlabel+" Reco",xlabel+" Truth"])
+	h_response_WJets=Create2DHisto('h_response_WJets','ResponseMatrix',t_WJets_MG,genmodvariable,recomodvariable,varbinning,selection+'*'+gen_selection_minimal+'*(weight_gen*4955)',[xlabel+" Reco",xlabel+" Truth"])
 
 	# Rescaling of Adet and bini for gen cuts:
 	# h_rec_WJets_flat.Scale(genscale)
@@ -2362,8 +2431,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 	# Other Backgrounds Rescaled
 	h_pres_rec_DiBoson_res=CreateHisto('h_pres_rec_DiBoson_res','DiBoson [MadGraph]',t_DiBoson,recomodvariable,presentationbinning,selection+weight+'*'+DataRescalingString,DiBosonStackStyle,Label)
-	h_pres_rec_ZJets_res=CreateHisto('h_pres_rec_ZJets_res','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,presentationbinning,selection+weight+'*'+DataRescalingString,ZStackStyle,Label)
-	h_pres_rec_TTBar_res=CreateHisto('h_pres_rec_TTBar_res','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,presentationbinning,selection+weight+'*'+DataRescalingString,TTStackStyle,Label)
+	h_pres_rec_ZJets_res=CreateHisto('h_pres_rec_ZJets_res','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,presentationbinning,selection+weight+'*'+DataRescalingString+fZ,ZStackStyle,Label)
+	h_pres_rec_TTBar_res=CreateHisto('h_pres_rec_TTBar_res','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,presentationbinning,selection+weight+'*'+DataRescalingString+fT,TTStackStyle,Label)
 	h_pres_rec_SingleTop_res=CreateHisto('h_pres_rec_SingleTop_res','SingleTop [MadGraph]',t_SingleTop,recomodvariable,presentationbinning,selection+weight+'*'+DataRescalingString,StopStackStyle,Label)	
 
 	h_pres_rec_QCDMu_res=CreateHisto('h_pres_rec_QCDMu_res','QCD',t_SingleMuData,recomodvariable,presentationbinning,qcdselection+'*(MT_muon1MET>50)*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*('+str(QCDSF)+')*'+DataRescalingString,QCDStackStyle,Label)
@@ -2373,8 +2442,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 	# Other Backgrounds Unrescaled
 	h_pres_rec_DiBoson=CreateHisto('h_pres_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recomodvariable,presentationbinning,selection+weight,DiBosonStackStyle,Label)
-	h_pres_rec_ZJets=CreateHisto('h_pres_rec_ZJets','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,presentationbinning,selection+weight,ZStackStyle,Label)
-	h_pres_rec_TTBar=CreateHisto('h_pres_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,presentationbinning,selection+weight,TTStackStyle,Label)
+	h_pres_rec_ZJets=CreateHisto('h_pres_rec_ZJets','Z+Jets [MadGraph]',t_ZJets_MG,recomodvariable,presentationbinning,selection+weight+fZ,ZStackStyle,Label)
+	h_pres_rec_TTBar=CreateHisto('h_pres_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recomodvariable,presentationbinning,selection+weight+fT,TTStackStyle,Label)
 	h_pres_rec_SingleTop=CreateHisto('h_pres_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recomodvariable,presentationbinning,selection+weight,StopStackStyle,Label)	
 
 	h_pres_rec_QCDMu=CreateHisto('h_pres_rec_QCDMu','QCD',t_SingleMuData,recomodvariable,presentationbinning,qcdselection+'*(MT_muon1MET>50)*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*('+str(QCDSF)+')',QCDStackStyle,Label)
@@ -2392,6 +2461,13 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	MCBinInfo=[]
 
 	# Loop to get the data and MC bin info as lists - need for tables and so forth.
+
+	lumifactor = 1.0
+	if 'lumi_plus' in tagname:
+		lumifactor = lumifactor * 1.022
+	if 'lumi_minus' in tagname:
+		lumifactor = lumifactor / 1.022
+
 	for x in range(h_pres_rec_Data.GetNbinsX()+1):
 		if x==0:
 			continue
@@ -2402,8 +2478,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 		lhs=h_pres_unf_Data.GetBinCenter(x)-0.5*(h_pres_unf_Data.GetBinWidth(x))
 		rhs=h_pres_unf_Data.GetBinCenter(x)+0.5*(h_pres_unf_Data.GetBinWidth(x))
-		content=h_pres_unf_Data.GetBinContent(x)
-		error=h_pres_unf_Data_err.GetBinContent(x)
+		content=lumifactor*h_pres_unf_Data.GetBinContent(x)
+		error=lumifactor*h_pres_unf_Data_err.GetBinContent(x)
 		lhs=str(lhs)
 		rhs=str(rhs)
 		content=str(round(content,2))
@@ -2412,8 +2488,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 		lhs=h_pres_gen_WJets.GetBinCenter(x)-0.5*(h_pres_gen_WJets.GetBinWidth(x))
 		rhs=h_pres_gen_WJets.GetBinCenter(x)+0.5*(h_pres_gen_WJets.GetBinWidth(x))
-		content=h_pres_gen_WJets.GetBinContent(x)
-		error=h_pres_gen_WJets.GetBinError(x)
+		content=lumifactor*h_pres_gen_WJets.GetBinContent(x)
+		error=lumifactor*h_pres_gen_WJets.GetBinError(x)
 		lhs=str(lhs)
 		rhs=str(rhs)
 		content=str(round(content,2))
@@ -2553,8 +2629,12 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,default_value,xlabel, b
 		[null,data_pileup_minus,mc_pileup_minus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight.replace('central','sysminus'),optvar,NormalDirectory,'',tau,'pileup_minus')
 
 		# Integrated luminosity up/down
-		[null,data_lumi_plus,mc_lumi_plus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight.replace('4955','5064'),optvar,NormalDirectory,'',tau,'lumi_plus')
-		[null,data_lumi_minus,mc_lumi_minus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight.replace('4955','4848'),optvar,NormalDirectory,'',tau,'lumi_minus')
+		# [null,data_lumi_plus,mc_lumi_plus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight.replace('4955','5064'),optvar,NormalDirectory,'',tau,'lumi_plus')
+		# [null,data_lumi_minus,mc_lumi_minus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight.replace('4955','4848'),optvar,NormalDirectory,'',tau,'lumi_minus')
+
+		[null,data_lumi_plus,mc_lumi_plus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,NormalDirectory,'',tau,'lumi_plus')
+		[null,data_lumi_minus,mc_lumi_minus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,NormalDirectory,'',tau,'lumi_minus')
+
 
 		# Jet energy scale up/down, and smeared
 		[null,data_jetscale_plus,mc_jetscale_plus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,JetScaleUpDirectory,'',tau,'jetscale_plus')
@@ -2567,9 +2647,9 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,default_value,xlabel, b
 		[null,data_musmear,mc_musmear]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,MuSmearDirectory,'',tau,'musmear')	
 
 		# BTag Efficiency Up/Down
-		if 'TCHP' in selection:
-			[null,data_btag_plus,mc_btag_plus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection.replace('PFJet30TCHPTCountMod','PFJet30TCHPTCountEffUp'),gen_selection,weight,optvar,NormalDirectory,'',tau,'btag_plus')
-			[null,data_btag_minus,mc_btag_minus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection.replace('PFJet30TCHPTCountMod','PFJet30TCHPTCountEffDown'),gen_selection,weight,optvar,NormalDirectory,'',tau,'btag_minus')
+		if 'TCHP' in selection[0]:
+			[null,data_btag_plus,mc_btag_plus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,[selection[0].replace('PFJet30TCHPTCountMod','PFJet30TCHPTCountEffUp'),selection[1]],gen_selection,weight,optvar,NormalDirectory,'',tau,'btag_plus')
+			[null,data_btag_minus,mc_btag_minus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,[selection[0].replace('PFJet30TCHPTCountMod','PFJet30TCHPTCountEffDown'),selection[1]],gen_selection,weight,optvar,NormalDirectory,'',tau,'btag_minus')
 
 		else:
 			[null,data_btag_plus,mc_btag_plus]=[tau,data_standard,mc_standard]
