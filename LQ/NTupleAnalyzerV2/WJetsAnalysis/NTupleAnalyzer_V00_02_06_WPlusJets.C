@@ -923,8 +923,8 @@ void placeholder::Loop()
 			}
 		}
 		// std::cout<<(*PFMET)[0] - JetAdjustedMET.Pt()<<std::endl;
-		(*PFMET)[0] = JetAdjustedMET.Pt();
-		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
+		// (*PFMET)[0] = JetAdjustedMET.Pt();
+		// (*PFMETPhi)[0] = JetAdjustedMET.Phi();
 		
 		//========================     Muon Rescaling / Smearing Sequence   ================================//
 
@@ -1431,7 +1431,11 @@ void placeholder::Loop()
 					if ((GenMuons[igmu]).DeltaR(thisgenjet) < 0.3)		KeepGenJet=false;
 					break; // lead muon only
 				}
-			
+				
+				// FIX TO REMOVE MUONS/NEUTRINOS
+				float _invisenergyfrac = 1.0-1.0*(GenJetEMF->at(ijet) + GenJetHADF->at(ijet)); 
+				if (_invisenergyfrac > 0.5) KeepGenJet=false;
+
 				if (!KeepGenJet) continue;
 
 				GenJets.push_back(thisgenjet);
