@@ -82,6 +82,53 @@ TLorentzVector Recoil_Corr(TLorentzVector MET, TLorentzVector LEPTON, TLorentzVe
 
 }
 
+TLorentzVector PhiMod_Corr(TLorentzVector MET, float Nvtx, bool _isdata)
+{
+	// std::cout<<" ---------------------- "<<std::endl;
+	float _met = MET.Pt();
+	float _phi = MET.Phi();
+	// std::cout<<_met<<std::endl;
+	float _ex = _met*cos(_phi);
+	float _ey = _met*sin(_phi);
+	// std::cout<<"comp: "<<_ex<<"  "<<_ey<<std::endl;
+	// std::cout<<MET.Px()<<"  "<<MET.Py()<<std::endl;
+	std::cout<<_met<<"  "<<_phi<<std::endl;
+	float px = 0.0;
+	float py = 0.0;
+
+	if (_isdata)
+	{
+	    px = (3.64118e-01) + (2.93853e-01)*Nvtx;
+	    py = (-7.17757e-01) - (3.57309e-01)*Nvtx;
+	}
+	
+
+	else
+	{
+	    px = (-4.79178e-02) + (8.62653e-04)*Nvtx;
+	    py = (-4.54408e-01) - (1.89684e-01)*Nvtx;
+	}
+	// std::cout<<"Mods: "<<px<<"  "<<py<<std::endl;
+	float _exp = _ex - px;
+	float _eyp = _ey - py;
+	// std::cout<<"NewComp: "<<_exp<<"  "<<_eyp<<std::endl;
+	float _metprime = sqrt(_exp*_exp + _eyp*_eyp);
+
+
+	TLorentzVector METprime;
+	TLorentzVector METAngle;
+	METAngle.SetPx(_exp);
+	METAngle.SetPy(_eyp);
+	// std::cout<<" ------>"<<METAngle.Phi()<<std::endl;
+	float _metphiprime = 1.0*METAngle.Phi();
+	// std::cout<<"prime: "<<_metprime<<"  "<<_metphiprime<<std::endl;
+	METprime.SetPtEtaPhiM(_metprime,0.0,_metphiprime,0.0);
+	// std::cout<<"vec: "<<METprime.Pt()<<"   "<<METprime.Phi()<<std::endl;
+	return METprime;
+
+}
+
+
 Double_t TMass(Double_t Pt1, Double_t Pt2, Double_t DPhi12)
 {
 	return sqrt( 2*Pt2*Pt1*(1-cos(DPhi12)) );
@@ -226,7 +273,8 @@ vector<bool> BTagTCHPT(float pt, bool isdata,float discrim, float eta, int evt)
 	float mistag_central = (1.20711+(0.000681067*pt)) + (-1.57062e-06*(pt*pt)) + (2.83138e-10*(pt*(pt*pt)));
 	float mistag_down    = (1.03418+(0.000428273*pt)) + (-5.43024e-07*(pt*pt)) + (-6.18061e-10*(pt*(pt*pt)));
 	float mistag_up      = (1.38002+(0.000933875*pt)) + (-2.59821e-06*(pt*pt)) + (1.18434e-09*(pt*(pt*pt)));
-	float mistag_nominal = 0.00284;
+	// float mistag_nominal = 0.00284;
+	float mistag_nominal = (-0.00101+(4.70405e-05*pt))+(8.3338e-09*(pt*pt));
 
 	float efferr = 0.0;
 
@@ -244,6 +292,8 @@ vector<bool> BTagTCHPT(float pt, bool isdata,float discrim, float eta, int evt)
 	if (pt >= 320. && pt < 400.) efferr =  0.0556052;
 	if (pt >= 400. && pt < 500.) efferr =  0.0598105;
 	if (pt >= 500. && pt < 670.) efferr =  0.0861122 ;
+	if (pt >= 670.) efferr =  0.0861122*2.0 ;
+
 
 	float eff_up = eff_central + efferr;
 	float eff_down = eff_central - efferr;
@@ -300,41 +350,503 @@ vector<bool> BTagTCHPT(float pt, bool isdata,float discrim, float eta, int evt)
 	return tags;
 }
 
-vector<bool> BTags(float pt, bool isdata,float tchpt, float ssvhpt,float jpt,float jpbt)
+
+
+vector<bool> BTagSSVHPT(float pt, bool isdata,float discrim, float eta, int evt)
 {
 
-	float sf_tchpt  = 0.895596*((1.+(9.43219e-05*pt))/(1.+(-4.63927e-05*pt)));
-	float sf_ssvhpt = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
-	float sf_jpt    = 0.835882*((1.+(0.00167826*pt))/(1.+(0.00120221*pt)));
-	float sf_jpbt   = 0.827249*((1.+(0.00261855*pt))/(1.+(0.00194604*pt)));
-
-	bool toss_tchpt  = rr->Rndm() > sf_tchpt;
-	bool toss_ssvhpt = rr->Rndm() > sf_ssvhpt;
-	bool toss_jpt    = rr->Rndm() > sf_jpt;
-	bool toss_jpbt   = rr->Rndm() > sf_jpbt;
-
-	if (isdata)
-	{
-		toss_tchpt = false;
-		toss_ssvhpt = false;
-		toss_jpt = false;
-		toss_jpbt = false;
-	}
-
-	bool tag_tchpt   = (tchpt > 3.41)*(!toss_tchpt);
-	bool tag_ssvhpt  = (ssvhpt > 2.00)*(!toss_ssvhpt);
-	bool tag_jpt     = (jpt > 0.79)*(!toss_jpt);
-	bool tag_jpbt    = (jpbt > 3.74)*(!toss_jpbt);
+	double dseedmod = fabs(eta*eta*1000000+42);
+	int dseed = int(floor(abs(dseedmod)));
+	int evtseed = abs( int(floor((1.0*evt)+10000)) -42 );
+	
+	rr->SetSeed(evtseed + dseed );
 
 	vector<bool> tags;
+	float discrim_cut = 2.00;
 
-	tags.push_back(tag_tchpt);
-	tags.push_back(tag_ssvhpt);
-	tags.push_back(tag_jpt);
-	tags.push_back(tag_jpbt);
+	float eff_central  = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
+	float mistag_central = ((0.97409+(0.000646241*pt))+(-2.86294e-06*(pt*pt)))+(2.79484e-09*(pt*(pt*pt)));
+	float mistag_down    = ((0.807222+(0.00103676*pt))+(-3.6243e-06*(pt*pt)))+(3.17368e-09*(pt*(pt*pt)));
+	float mistag_up      = ((1.14091+(0.00025586*pt))+(-2.10157e-06*(pt*pt)))+(2.41599e-09*(pt*(pt*pt)));
+	float mistag_nominal = (-2.9605e-05+(2.35624e-05*pt))+(-1.77552e-08*(pt*pt));
 
+	float efferr = 0.0;
+
+	if (pt >=  30. && pt <  40.) efferr	=	0.0403485;	
+	if (pt >=  40. && pt <  50.) efferr	=	0.0396907;	
+	if (pt >=  50. && pt <  60.) efferr	=	0.0291837;	
+	if (pt >=  60. && pt <  70.) efferr	=	0.0325778;	
+	if (pt >=  70. && pt <  80.) efferr	=	0.0335716;	
+	if (pt >=  80. && pt < 100.) efferr	=	0.0255023;	
+	if (pt >= 100. && pt < 120.) efferr	=	0.0300639;	
+	if (pt >= 120. && pt < 160.) efferr	=	0.0253228;	
+	if (pt >= 160. && pt < 210.) efferr	=	0.0409739;	
+	if (pt >= 210. && pt < 260.) efferr	=	0.043561;	
+	if (pt >= 260. && pt < 320.) efferr	=	0.0458427;	
+	if (pt >= 320. && pt < 400.) efferr	=	0.0763302;	
+	if (pt >= 400. && pt < 500.) efferr	=	0.0781752;	
+	if (pt >= 500. && pt < 670.) efferr	=	0.108927 ;
+	if (pt >= 670.) efferr =  0.108927*2.0 ;
+
+
+	float eff_up = eff_central + efferr;
+	float eff_down = eff_central - efferr;
+
+	float rand_efftag = rr->Rndm();
+	float rand_mistag = rr->Rndm();
+
+	bool untag_central  = rand_efftag > eff_central;
+	bool untag_up       = rand_efftag > eff_up;
+	bool untag_down     = rand_efftag > eff_down;
+
+	bool forcemistag_central = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_central); 
+	bool forcemistag_up      = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_up); 
+	bool forcemistag_down    = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_down); 
+
+	bool basic_tag = discrim > discrim_cut;
+
+	bool tag_central  = basic_tag;
+	bool tag_eff_up   = basic_tag;
+	bool tag_eff_down = basic_tag;
+	bool tag_mis_up   = basic_tag;
+	bool tag_mis_down = basic_tag;
+	
+	if (isdata)
+	{
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		return tags;
+	}
+
+	if ( (tag_central == true ) && (untag_central == true) )         tag_central = false;
+	if ( (tag_central == false) && (forcemistag_central == true) )   tag_central = true;
+
+	if ( (tag_eff_up == true ) && (untag_up == true) )               tag_eff_up = false;
+	if ( (tag_eff_up == false) && (forcemistag_central == true) )    tag_eff_up = true;
+
+	if ( (tag_eff_down == true ) && (untag_down == true) )           tag_eff_down = false;
+	if ( (tag_eff_down == false) && (forcemistag_central == true) )  tag_eff_down = true;
+
+	if ( (tag_mis_up == true ) && (untag_central == true) )          tag_mis_up = false;
+	if ( (tag_mis_up == false) && (forcemistag_up == true) )     tag_mis_up = true;
+
+	if ( (tag_mis_down == true ) && (untag_central == true) )        tag_mis_down = false;
+	if ( (tag_mis_down == false) && (forcemistag_down == true) ) tag_mis_down = true;
+
+	tags.push_back(tag_central);
+	tags.push_back(tag_eff_up);
+	tags.push_back(tag_eff_down);
+	tags.push_back(tag_mis_up);
+	tags.push_back(tag_mis_down);
 	return tags;
 }
+
+
+vector<bool> BTagJPT(float pt, bool isdata,float discrim, float eta, int evt)
+{
+
+	double dseedmod = fabs(eta*eta*1000000+42);
+	int dseed = int(floor(abs(dseedmod)));
+	int evtseed = abs( int(floor((1.0*evt)+10000)) -42 );
+	
+	rr->SetSeed(evtseed + dseed );
+
+	vector<bool> tags;
+	float discrim_cut = 0.79;
+
+	float eff_central  = 0.835882*((1.+(0.00167826*pt))/(1.+(0.00120221*pt)));
+
+	float mistag_central = ((0.831392+(0.00269525*pt))+(-7.33391e-06*(pt*pt)))+(5.73942e-09*(pt*(pt*pt)));
+	float mistag_down    = ((0.671888+(0.0020106*pt))+(-5.03177e-06*(pt*pt)))+(3.74225e-09*(pt*(pt*pt)));
+	float mistag_up      = ((0.990774+(0.00338018*pt))+(-9.63606e-06*(pt*pt)))+(7.73659e-09*(pt*(pt*pt)));
+
+	float mistag_nominal = 	(0.000379966+(8.30969e-06*pt))+(1.10364e-08*(pt*pt));
+
+	float efferr = 0.0;
+
+	if (pt >=  30. && pt <  40.) efferr	=	0.0475813;	
+	if (pt >=  40. && pt <  50.) efferr	=	0.0472359;	
+	if (pt >=  50. && pt <  60.) efferr	=	0.0378328;	
+	if (pt >=  60. && pt <  70.) efferr	=	0.0334787;	
+	if (pt >=  70. && pt <  80.) efferr	=	0.034681;	
+	if (pt >=  80. && pt < 100.) efferr	=	0.0398312;	
+	if (pt >= 100. && pt < 120.) efferr	=	0.0481646;	
+	if (pt >= 120. && pt < 160.) efferr	=	0.0392262;	
+	if (pt >= 160. && pt < 210.) efferr	=	0.0463086;	
+	if (pt >= 210. && pt < 260.) efferr	=	0.0534565;	
+	if (pt >= 260. && pt < 320.) efferr	=	0.0545823;	
+	if (pt >= 320. && pt < 400.) efferr	=	0.102505;	
+	if (pt >= 400. && pt < 500.) efferr	=	0.113198;	
+	if (pt >= 500. && pt < 670.) efferr	=	0.138116;
+	if (pt >= 670.) efferr =  0.138116*2.0 ;
+
+	float eff_up = eff_central + efferr;
+	float eff_down = eff_central - efferr;
+
+	float rand_efftag = rr->Rndm();
+	float rand_mistag = rr->Rndm();
+
+	bool untag_central  = rand_efftag > eff_central;
+	bool untag_up       = rand_efftag > eff_up;
+	bool untag_down     = rand_efftag > eff_down;
+
+	bool forcemistag_central = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_central); 
+	bool forcemistag_up      = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_up); 
+	bool forcemistag_down    = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_down); 
+
+	bool basic_tag = discrim > discrim_cut;
+
+	bool tag_central  = basic_tag;
+	bool tag_eff_up   = basic_tag;
+	bool tag_eff_down = basic_tag;
+	bool tag_mis_up   = basic_tag;
+	bool tag_mis_down = basic_tag;
+	
+	if (isdata)
+	{
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		return tags;
+	}
+
+	if ( (tag_central == true ) && (untag_central == true) )         tag_central = false;
+	if ( (tag_central == false) && (forcemistag_central == true) )   tag_central = true;
+
+	if ( (tag_eff_up == true ) && (untag_up == true) )               tag_eff_up = false;
+	if ( (tag_eff_up == false) && (forcemistag_central == true) )    tag_eff_up = true;
+
+	if ( (tag_eff_down == true ) && (untag_down == true) )           tag_eff_down = false;
+	if ( (tag_eff_down == false) && (forcemistag_central == true) )  tag_eff_down = true;
+
+	if ( (tag_mis_up == true ) && (untag_central == true) )          tag_mis_up = false;
+	if ( (tag_mis_up == false) && (forcemistag_up == true) )     tag_mis_up = true;
+
+	if ( (tag_mis_down == true ) && (untag_central == true) )        tag_mis_down = false;
+	if ( (tag_mis_down == false) && (forcemistag_down == true) ) tag_mis_down = true;
+
+	tags.push_back(tag_central);
+	tags.push_back(tag_eff_up);
+	tags.push_back(tag_eff_down);
+	tags.push_back(tag_mis_up);
+	tags.push_back(tag_mis_down);
+	return tags;
+}
+
+
+
+
+
+vector<bool> BTagTCHPTUnCorr(float pt, bool isdata,float discrim, float eta, int evt)
+{
+	double dseedmod = fabs(eta*eta*1000000+42);
+	int dseed = int(floor(abs(dseedmod)));
+	int evtseed = abs( int(floor((1.0*evt)+10000)) -42 );
+	
+	rr->SetSeed(evtseed + dseed );
+
+	vector<bool> tags;
+	float discrim_cut = 3.41;
+	bool basic_tag = discrim > discrim_cut;
+
+	bool tag_central  = basic_tag;
+	
+	tags.push_back(tag_central);
+	tags.push_back(tag_central);
+	tags.push_back(tag_central);
+	tags.push_back(tag_central);
+	tags.push_back(tag_central);
+	return tags;
+
+}
+
+
+vector<bool> BTagTCHEM(float pt, bool isdata,float discrim, float eta, int evt)
+{
+
+	double dseedmod = fabs(eta*eta*1000000+42);
+	int dseed = int(floor(abs(dseedmod)));
+	int evtseed = abs( int(floor((1.0*evt)+10000)) -42 );
+	
+	rr->SetSeed(evtseed + dseed );
+
+	vector<bool> tags;
+	float discrim_cut = 3.3;
+
+	float eff_central  = 0.932251*((1.+(0.00335634*pt))/(1.+(0.00305994*pt)));
+
+	float mistag_central = 0.0;
+	float mistag_down    = 0.0;
+	float mistag_up      = 0.0;
+	float mistag_nominal = 0.0;
+
+	if ((fabs(eta)>=0.0) &&  (fabs(eta)<=0.8))
+	{
+	mistag_central = (1.2875*((1+(-0.000356371*pt))+(1.08081e-07*(pt*pt))))+(-6.89998e-11*(pt*(pt*(pt/(1+(-0.0012139*pt))))));
+	mistag_down = (1.11418*((1+(-0.000442274*pt))+(1.53463e-06*(pt*pt))))+(-4.93683e-09*(pt*(pt*(pt/(1+(0.00152436*pt))))));
+	mistag_up = (1.47515*((1+(-0.000484868*pt))+(2.36817e-07*(pt*pt))))+(-2.05073e-11*(pt*(pt*(pt/(1+(-0.00142819*pt))))));
+	mistag_nominal = (0.000919586+(0.00026266*pt))+(-1.75723e-07*(pt*pt));
+	}
+
+	if ((fabs(eta)>=0.8) &&  (fabs(eta)<=1.6))
+	{
+	mistag_central = (1.24986*((1+(-0.00039734*pt))+(5.37486e-07*(pt*pt))))+(-1.74023e-10*(pt*(pt*(pt/(1+(-0.00112954*pt))))));
+	mistag_down = (1.08828*((1+(-0.000208737*pt))+(1.50487e-07*(pt*pt))))+(-2.54249e-11*(pt*(pt*(pt/(1+(-0.00141477*pt))))));
+	mistag_up = (1.41211*((1+(-0.000559603*pt))+(9.50754e-07*(pt*pt))))+(-5.81148e-10*(pt*(pt*(pt/(1+(-0.000787359*pt))))));
+	mistag_nominal = (-0.00364137+(0.000350371*pt))+(-1.89967e-07*(pt*pt));
+	}
+
+	if ((fabs(eta)>=1.6) &&  (fabs(eta)<=2.4))
+	{
+	mistag_central = (1.10763*((1+(-0.000105805*pt))+(7.11718e-07*(pt*pt))))+(-5.3001e-10*(pt*(pt*(pt/(1+(-0.000821215*pt))))));
+	mistag_down = (0.958079*((1+(0.000327804*pt))+(-4.09511e-07*(pt*pt))))+(-1.95933e-11*(pt*(pt*(pt/(1+(-0.00143323*pt))))));
+	mistag_up = (1.26236*((1+(-0.000524055*pt))+(2.08863e-06*(pt*pt))))+(-2.29473e-09*(pt*(pt*(pt/(1+(-0.000276268*pt))))));
+	mistag_nominal = (-0.00483904+(0.000367751*pt))+(-1.36152e-07*(pt*pt));
+	}
+
+	float efferr = 0.0;
+	if (pt >=  30. && pt <  40.) efferr	=	0.0311456;
+	if (pt >=  40. && pt <  50.) efferr	=	0.0303825;
+	if (pt >=  50. && pt <  60.) efferr	=	0.0209488;
+	if (pt >=  60. && pt <  70.) efferr	=	0.0216987;
+	if (pt >=  70. && pt <  80.) efferr	=	0.0227149;
+	if (pt >=  80. && pt < 100.) efferr	=	0.0260294;
+	if (pt >= 100. && pt < 120.) efferr	=	0.0205766;
+	if (pt >= 120. && pt < 160.) efferr	=	0.0227065;
+	if (pt >= 160. && pt < 210.) efferr	=	0.0260481;
+	if (pt >= 210. && pt < 260.) efferr	=	0.0278001;
+	if (pt >= 260. && pt < 320.) efferr	=	0.0295361;
+	if (pt >= 320. && pt < 400.) efferr	=	0.0306555;
+	if (pt >= 400. && pt < 500.) efferr	=	0.0367805;
+	if (pt >= 500. && pt < 670.) efferr	=	0.0527368;
+	if (pt >= 670.) efferr	=	0.0527368*2.0;
+
+
+	float eff_up = eff_central + efferr;
+	float eff_down = eff_central - efferr;
+
+	float rand_efftag = rr->Rndm();
+	float rand_mistag = rr->Rndm();
+
+	bool untag_central  = rand_efftag > eff_central;
+	bool untag_up       = rand_efftag > eff_up;
+	bool untag_down     = rand_efftag > eff_down;
+
+	bool forcemistag_central = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_central); 
+	bool forcemistag_up      = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_up); 
+	bool forcemistag_down    = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_down); 
+
+	bool basic_tag = discrim > discrim_cut;
+
+	bool tag_central  = basic_tag;
+	bool tag_eff_up   = basic_tag;
+	bool tag_eff_down = basic_tag;
+	bool tag_mis_up   = basic_tag;
+	bool tag_mis_down = basic_tag;
+	
+	if (isdata)
+	{
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		return tags;
+	}
+
+	if ( (tag_central == true ) && (untag_central == true) )         tag_central = false;
+	if ( (tag_central == false) && (forcemistag_central == true) )   tag_central = true;
+
+	if ( (tag_eff_up == true ) && (untag_up == true) )               tag_eff_up = false;
+	if ( (tag_eff_up == false) && (forcemistag_central == true) )    tag_eff_up = true;
+
+	if ( (tag_eff_down == true ) && (untag_down == true) )           tag_eff_down = false;
+	if ( (tag_eff_down == false) && (forcemistag_central == true) )  tag_eff_down = true;
+
+	if ( (tag_mis_up == true ) && (untag_central == true) )          tag_mis_up = false;
+	if ( (tag_mis_up == false) && (forcemistag_up == true) )     tag_mis_up = true;
+
+	if ( (tag_mis_down == true ) && (untag_central == true) )        tag_mis_down = false;
+	if ( (tag_mis_down == false) && (forcemistag_down == true) ) tag_mis_down = true;
+
+	tags.push_back(tag_central);
+	tags.push_back(tag_eff_up);
+	tags.push_back(tag_eff_down);
+	tags.push_back(tag_mis_up);
+	tags.push_back(tag_mis_down);
+	return tags;
+}
+
+
+vector<bool> BTagTCHEL(float pt, bool isdata,float discrim, float eta, int evt)
+{
+
+	double dseedmod = fabs(eta*eta*1000000+42);
+	int dseed = int(floor(abs(dseedmod)));
+	int evtseed = abs( int(floor((1.0*evt)+10000)) -42 );
+	
+	rr->SetSeed(evtseed + dseed );
+
+	vector<bool> tags;
+	float discrim_cut = 1.7;
+
+	float eff_central  = 0.603913*((1.+(0.286361*pt))/(1.+(0.170474*pt)));
+
+	float mistag_central = 0.0;
+	float mistag_down    = 0.0;
+	float mistag_up      = 0.0;
+	float mistag_nominal = 0.0;
+
+	if ((fabs(eta)>=0.0) &&  (fabs(eta)<=0.5))
+	{
+	mistag_central =(1.13615*((1+(-0.00119852*pt))+(1.17888e-05*(pt*pt))))+(-9.8581e-08*(pt*(pt*(pt/(1+(0.00689317*pt))))));
+	mistag_down = (1.0369*((1+(-0.000945578*pt))+(7.73273e-06*(pt*pt))))+(-4.47791e-08*(pt*(pt*(pt/(1+(0.00499343*pt))))));
+	mistag_up = (1.22179*((1+(-0.000946228*pt))+(7.37821e-06*(pt*pt))))+(-4.8451e-08*(pt*(pt*(pt/(1+(0.0047976*pt))))));
+	mistag_nominal = (((-0.0235318+(0.00268868*pt))+(-6.47688e-06*(pt*pt)))+(7.92087e-09*(pt*(pt*pt))))+(-4.06519e-12*(pt*(pt*(pt*pt))));
+	}
+
+	if ((fabs(eta)>=0.5) &&  (fabs(eta)<=1.0))
+	{
+	mistag_central =(1.13277*((1+(-0.00084146*pt))+(3.80313e-06*(pt*pt))))+(-8.75061e-09*(pt*(pt*(pt/(1+(0.00118695*pt))))));
+	mistag_down = (0.983748*((1+(7.13613e-05*pt))+(-1.08648e-05*(pt*pt))))+(2.96162e-06*(pt*(pt*(pt/(1+(0.282104*pt))))));
+	mistag_up = (1.22714*((1+(-0.00085562*pt))+(3.74425e-06*(pt*pt))))+(-8.91028e-09*(pt*(pt*(pt/(1+(0.00109346*pt))))));
+	mistag_nominal = (((-0.0257274+(0.00289337*pt))+(-7.48879e-06*(pt*pt)))+(9.84928e-09*(pt*(pt*pt))))+(-5.40844e-12*(pt*(pt*(pt*pt))));
+	}
+
+	if ((fabs(eta)>=1.0) &&  (fabs(eta)<=1.5))
+	{
+	mistag_central =(1.17163*((1+(-0.000828475*pt))+(3.0769e-06*(pt*pt))))+(-4.692e-09*(pt*(pt*(pt/(1+(0.000337759*pt))))));
+	mistag_down = (1.0698*((1+(-0.000731877*pt))+(2.56922e-06*(pt*pt))))+(-3.0318e-09*(pt*(pt*(pt/(1+(5.04118e-05*pt))))));
+	mistag_up = (1.27351*((1+(-0.000911891*pt))+(3.5465e-06*(pt*pt))))+(-6.69625e-09*(pt*(pt*(pt/(1+(0.000590847*pt))))));
+	mistag_nominal = (((-0.0310046+(0.00307803*pt))+(-7.94145e-06*(pt*pt)))+(1.06889e-08*(pt*(pt*pt))))+(-6.08971e-12*(pt*(pt*(pt*pt))));
+	}
+
+	if ((fabs(eta)>=1.5) &&  (fabs(eta)<=2.4))
+	{
+	mistag_central =(1.14554*((1+(-0.000128043*pt))+(4.10899e-07*(pt*pt))))+(-2.07565e-10*(pt*(pt*(pt/(1+(-0.00118618*pt))))));
+	mistag_down = (1.04766*((1+(-6.87499e-05*pt))+(2.2454e-07*(pt*pt))))+(-1.18395e-10*(pt*(pt*(pt/(1+(-0.00128734*pt))))));
+	mistag_up = (1.24367*((1+(-0.000182494*pt))+(5.92637e-07*(pt*pt))))+(-3.3745e-10*(pt*(pt*(pt/(1+(-0.00107694*pt))))));
+	mistag_nominal = (((-0.0274561+(0.00301096*pt))+(-8.89588e-06*(pt*pt)))+(1.40142e-08*(pt*(pt*pt))))+(-8.95723e-12*(pt*(pt*(pt*pt))));
+	}
+
+
+
+
+	float efferr = 0.0;
+
+	if (pt >=  30. && pt <  40.) efferr	=	0.0244956;
+	if (pt >=  40. && pt <  50.) efferr	=	0.0237293;
+	if (pt >=  50. && pt <  60.) efferr	=	0.0180131;
+	if (pt >=  60. && pt <  70.) efferr	=	0.0182411;
+	if (pt >=  70. && pt <  80.) efferr	=	0.0184592;
+	if (pt >=  80. && pt < 100.) efferr	=	0.0106444;
+	if (pt >= 100. && pt < 120.) efferr	=	0.011073;
+	if (pt >= 120. && pt < 160.) efferr	=	0.0106296;
+	if (pt >= 160. && pt < 210.) efferr	=	0.0175259;
+	if (pt >= 210. && pt < 260.) efferr	=	0.0161566;
+	if (pt >= 260. && pt < 320.) efferr	=	0.0158973;
+	if (pt >= 320. && pt < 400.) efferr	=	0.0186782;
+	if (pt >= 400. && pt < 500.) efferr	=	0.0371113;
+	if (pt >= 500. && pt < 670.) efferr	=	0.0289788;
+	if (pt >= 670.) efferr	=	0.0289788*2.0;
+
+
+	float eff_up = eff_central + efferr;
+	float eff_down = eff_central - efferr;
+
+	float rand_efftag = rr->Rndm();
+	float rand_mistag = rr->Rndm();
+
+	bool untag_central  = rand_efftag > eff_central;
+	bool untag_up       = rand_efftag > eff_up;
+	bool untag_down     = rand_efftag > eff_down;
+
+	bool forcemistag_central = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_central); 
+	bool forcemistag_up      = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_up); 
+	bool forcemistag_down    = (rand_mistag > mistag_nominal) && (rand_mistag < mistag_nominal*mistag_down); 
+
+	bool basic_tag = discrim > discrim_cut;
+
+	bool tag_central  = basic_tag;
+	bool tag_eff_up   = basic_tag;
+	bool tag_eff_down = basic_tag;
+	bool tag_mis_up   = basic_tag;
+	bool tag_mis_down = basic_tag;
+	
+	if (isdata)
+	{
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		tags.push_back(tag_central);
+		return tags;
+	}
+
+	if ( (tag_central == true ) && (untag_central == true) )         tag_central = false;
+	if ( (tag_central == false) && (forcemistag_central == true) )   tag_central = true;
+
+	if ( (tag_eff_up == true ) && (untag_up == true) )               tag_eff_up = false;
+	if ( (tag_eff_up == false) && (forcemistag_central == true) )    tag_eff_up = true;
+
+	if ( (tag_eff_down == true ) && (untag_down == true) )           tag_eff_down = false;
+	if ( (tag_eff_down == false) && (forcemistag_central == true) )  tag_eff_down = true;
+
+	if ( (tag_mis_up == true ) && (untag_central == true) )          tag_mis_up = false;
+	if ( (tag_mis_up == false) && (forcemistag_up == true) )     tag_mis_up = true;
+
+	if ( (tag_mis_down == true ) && (untag_central == true) )        tag_mis_down = false;
+	if ( (tag_mis_down == false) && (forcemistag_down == true) ) tag_mis_down = true;
+
+	tags.push_back(tag_central);
+	tags.push_back(tag_eff_up);
+	tags.push_back(tag_eff_down);
+	tags.push_back(tag_mis_up);
+	tags.push_back(tag_mis_down);
+	return tags;
+}
+
+
+// vector<bool> BTags(float pt, bool isdata,float tchpt, float ssvhpt,float jpt,float jpbt)
+// {
+
+// 	float sf_tchpt  = 0.895596*((1.+(9.43219e-05*pt))/(1.+(-4.63927e-05*pt)));
+// 	float sf_ssvhpt = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
+// 	float sf_jpt    = 0.835882*((1.+(0.00167826*pt))/(1.+(0.00120221*pt)));
+// 	float sf_jpbt   = 0.827249*((1.+(0.00261855*pt))/(1.+(0.00194604*pt)));
+
+// 	bool toss_tchpt  = rr->Rndm() > sf_tchpt;
+// 	bool toss_ssvhpt = rr->Rndm() > sf_ssvhpt;
+// 	bool toss_jpt    = rr->Rndm() > sf_jpt;
+// 	bool toss_jpbt   = rr->Rndm() > sf_jpbt;
+
+// 	if (isdata)
+// 	{
+// 		toss_tchpt = false;
+// 		toss_ssvhpt = false;
+// 		toss_jpt = false;
+// 		toss_jpbt = false;
+// 	}
+
+// 	bool tag_tchpt   = (tchpt > 3.41)*(!toss_tchpt);
+// 	bool tag_ssvhpt  = (ssvhpt > 2.00)*(!toss_ssvhpt);
+// 	bool tag_jpt     = (jpt > 0.79)*(!toss_jpt);
+// 	bool tag_jpbt    = (jpbt > 3.74)*(!toss_jpbt);
+
+// 	vector<bool> tags;
+
+// 	tags.push_back(tag_tchpt);
+// 	tags.push_back(tag_ssvhpt);
+// 	tags.push_back(tag_jpt);
+// 	tags.push_back(tag_jpbt);
+
+// 	return tags;
+// }
 
 void placeholder::Loop()
 {
@@ -392,18 +904,38 @@ void placeholder::Loop()
 	BRANCH(GlobalMuonCount10GeV);
 	BRANCH(GenJetCount); BRANCH(GenJet30Count); 
 	BRANCH(PFJet30Count); 
-	BRANCH(PFJet30SSVHEMCount); BRANCH(PFJet30TCHPTCount);
-
-	BRANCH(PFJet30TCHPTCountMod);
-	BRANCH(PFJet30SSVHPTCountMod);
-	BRANCH(PFJet30JPTCountMod);
-	BRANCH(PFJet30JPBTCountMod);
 
 	BRANCH(PFJet30TCHPTCountCentral);
 	BRANCH(PFJet30TCHPTCountEffUp);
 	BRANCH(PFJet30TCHPTCountEffDown);
 	BRANCH(PFJet30TCHPTCountMisUp);
 	BRANCH(PFJet30TCHPTCountMisDown);
+
+	BRANCH(PFJet30SSVHPTCountCentral);
+	BRANCH(PFJet30SSVHPTCountEffUp);
+	BRANCH(PFJet30SSVHPTCountEffDown);
+	BRANCH(PFJet30SSVHPTCountMisUp);
+	BRANCH(PFJet30SSVHPTCountMisDown);
+
+	BRANCH(PFJet30JPTCountCentral);
+	BRANCH(PFJet30JPTCountEffUp);
+	BRANCH(PFJet30JPTCountEffDown);
+	BRANCH(PFJet30JPTCountMisUp);
+	BRANCH(PFJet30JPTCountMisDown);
+
+	BRANCH(PFJet30TCHEMCountCentral);
+	BRANCH(PFJet30TCHEMCountEffUp);
+	BRANCH(PFJet30TCHEMCountEffDown);
+	BRANCH(PFJet30TCHEMCountMisUp);
+	BRANCH(PFJet30TCHEMCountMisDown);
+
+	BRANCH(PFJet30TCHELCountCentral);
+	BRANCH(PFJet30TCHELCountEffUp);
+	BRANCH(PFJet30TCHELCountEffDown);
+	BRANCH(PFJet30TCHELCountMisUp);
+	BRANCH(PFJet30TCHELCountMisDown);
+
+	BRANCH(PFJet30TCHPTUnCorrCountCentral);
 
 	// Event Information
 	UInt_t run_number,event_number,ls_number;
@@ -446,6 +978,8 @@ void placeholder::Loop()
 	BRANCH(Pt_genjet5_bare);  BRANCH(Phi_genjet5_bare);  BRANCH(Eta_genjet5_bare);  
 
 	
+
+	BRANCH(DeltaPhi_genmuon1genMET_bare);
 
 	BRANCH(DeltaPhi_genjet1genmuon1);
 	BRANCH(DeltaPhi_genjet2genmuon1);
@@ -496,12 +1030,13 @@ void placeholder::Loop()
 	BRANCH(Phi_Wtrue); BRANCH(Phi_Ztrue);
 
 	// Reco Level Variables	
-	BRANCH(Pt_pfjet1);  BRANCH(Phi_pfjet1);  BRANCH(Eta_pfjet1);  BRANCH(SSVHEM_pfjet1);  BRANCH(TCHPT_pfjet1);
-	BRANCH(Pt_pfjet2);  BRANCH(Phi_pfjet2);  BRANCH(Eta_pfjet2);  BRANCH(SSVHEM_pfjet2);  BRANCH(TCHPT_pfjet2);  
-	BRANCH(Pt_pfjet3);  BRANCH(Phi_pfjet3);  BRANCH(Eta_pfjet3);  BRANCH(SSVHEM_pfjet3);  BRANCH(TCHPT_pfjet3);  
-	BRANCH(Pt_pfjet4);  BRANCH(Phi_pfjet4);  BRANCH(Eta_pfjet4);  BRANCH(SSVHEM_pfjet4);  BRANCH(TCHPT_pfjet4);  
-	BRANCH(Pt_pfjet5);  BRANCH(Phi_pfjet5);  BRANCH(Eta_pfjet5);  BRANCH(SSVHEM_pfjet5);  BRANCH(TCHPT_pfjet5);  
+	BRANCH(Pt_pfjet1);  BRANCH(Phi_pfjet1);  BRANCH(Eta_pfjet1);  
+	BRANCH(Pt_pfjet2);  BRANCH(Phi_pfjet2);  BRANCH(Eta_pfjet2);   
+	BRANCH(Pt_pfjet3);  BRANCH(Phi_pfjet3);  BRANCH(Eta_pfjet3);  
+	BRANCH(Pt_pfjet4);  BRANCH(Phi_pfjet4);  BRANCH(Eta_pfjet4);  
+	BRANCH(Pt_pfjet5);  BRANCH(Phi_pfjet5);  BRANCH(Eta_pfjet5);  
 
+	BRANCH(DeltaPhi_muon1MET);
 
 	BRANCH(DeltaPhi_pfjet1muon1);
 	BRANCH(DeltaPhi_pfjet2muon1);
@@ -622,8 +1157,33 @@ void placeholder::Loop()
 		pass_passBeamHaloFilterTight = 1.0*passBeamHaloFilterTight ;
 		pass_isTrackingFailure = 1.00*(1.0-1.0*isTrackingFailure);		
 		
+
+
+		//========================= MET CORRECTIONS ===============================================//		
+
+			if (false)
+			{
+				PFMET->at(0) = PFMETType1Cor->at(0);
+				PFMETPhi->at(0) = PFMETPhiType1Cor->at(0);	
+				// std::cout<<PFMET->at(0)<<"  "<<PFMETPhi->at(0)<<std::endl;
+
+				TLorentzVector __MET;
+				__MET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0.0);
+				TLorentzVector CorrectedMET;
+				CorrectedMET = PhiMod_Corr(__MET, N_Vertices, isData);
+				PFMET->at(0) = 1.0*CorrectedMET.Pt();
+				PFMETPhi->at(0) = CorrectedMET.Phi();
+				// std::cout<<PFMET->at(0)<<"  "<<PFMETPhi->at(0)<<std::endl;
+				// std::cout<<" --------------------------------------------"<<std::endl;
+			}
+
+
+
+
 		//========================     PileUp Technology  ================================//
-		
+
+
+
 		
 		N_PileUpInteractions = 0.0;
 
@@ -819,7 +1379,18 @@ void placeholder::Loop()
 			}
 		}
 
-		if (!isData)
+
+		// if (true)
+		// {
+		// 	std::cout<<" --------------------------------- "<<std::endl;
+		// 	for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
+		// 	{
+		// 	std::cout<<(*PFJetPt)[ijet]<<"   "<<(PFJetJECUnc->at(ijet))<<std::endl;
+		// 	}
+		// }
+
+		// if (!isData)
+		if (true)
 		{
 			int filterjetcount = 0;
 			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
@@ -923,8 +1494,8 @@ void placeholder::Loop()
 			}
 		}
 		// std::cout<<(*PFMET)[0] - JetAdjustedMET.Pt()<<std::endl;
-		// (*PFMET)[0] = JetAdjustedMET.Pt();
-		// (*PFMETPhi)[0] = JetAdjustedMET.Phi();
+		(*PFMET)[0] = JetAdjustedMET.Pt();
+		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
 		
 		//========================     Muon Rescaling / Smearing Sequence   ================================//
 
@@ -943,7 +1514,7 @@ void placeholder::Loop()
 	
 				bool PassGlobalTightPrompt =
 					MuonIsGlobal ->at(imuon) == 1 &&
-					MuonIsTracker ->at(imuon) == 1 &&
+					// MuonIsTracker ->at(imuon) == 1 &&
 					MuonRelIso->at(imuon) < 0.15 &&
 					MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 	
@@ -951,7 +1522,7 @@ void placeholder::Loop()
 					MuonStationMatches->at(imuon) > 1 && 
 					fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
 					MuonGlobalChi2 ->at(imuon) < 10.0 &&                         /// Disable for EWK
-					MuonPixelHitCount ->at(imuon) >=1 &&
+					MuonTrkPixelHitCount ->at(imuon) >=1 &&
 					MuonGlobalTrkValidHits->at(imuon)>=1 ;
 	
 				if ( ! (PassGlobalTightPrompt && PassPOGTight) ) continue;
@@ -1059,7 +1630,6 @@ void placeholder::Loop()
 		//========================      Muon Conditions   ================================//
 
 		vector<TLorentzVector> RecoMuons, RecoJets; 
-		vector<int> RecoJetSSVHEMtags, RecoJetTCHPTtags;
 		vector<int> v_idx_muon_final;
 		vector<double> RecoMuonIso;
 		bool checkPT = true;	 // Pt requirement only on first muon at this stage
@@ -1070,7 +1640,7 @@ void placeholder::Loop()
 		GlobalMuonCount10GeV = 0.0;
 		Muon25Count = 0.0;
 		TrackerMuonCount=0.0;
-		
+		// std::cout<<" -------------------------- "<<std::endl;
 		Double_t muoniso = 1.0;
 		for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 		{
@@ -1081,12 +1651,17 @@ void placeholder::Loop()
 			Double_t muonPt = MuonPt->at(imuon);
 			Double_t muonEta = MuonEta->at(imuon);
 
+
+
 			if (checkPT && (muonPt < 22.0) ) continue;
 			if  ( fabs(muonEta) > 2.1 )      continue;
 
+			// std::cout<<MuonPixelHitCount ->at(imuon) <<"  "<<MuonTrkPixelHitCount->at(imuon)<<std::endl;
+			// if ((MuonIsGlobal ->at(imuon) == 1) && (MuonIsGlobal ->at(imuon) != 1)) std::cout<<" FLAG FLAG FLAG FLAG "<<std::endl;
+
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
-				MuonIsTracker ->at(imuon) == 1 &&
+				// MuonIsTracker ->at(imuon) == 1 &&
 				// ((MuonRelIso->at(imuon) < 0.15)||(!checkIso)) &&
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;                         
 
@@ -1094,7 +1669,7 @@ void placeholder::Loop()
 				MuonStationMatches->at(imuon) > 1 && 
 				fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
 				MuonGlobalChi2 ->at(imuon) < 10.0 &&                         // Disable for EWK
-				MuonPixelHitCount ->at(imuon) >=1 &&
+				MuonTrkPixelHitCount ->at(imuon) >=1 &&
 				MuonGlobalTrkValidHits->at(imuon)>=1 ;
 
 			if ( ! (PassGlobalTightPrompt && PassPOGTight) ) continue;
@@ -1174,20 +1749,39 @@ void placeholder::Loop()
 		// Filter out jets that are actually muons or electrons
 
 
-		PFJet30Count = 0.0;
-		PFJet30TCHPTCount = 0.0;
-		PFJet30SSVHEMCount = 0.0;
-
-		PFJet30JPTCountMod = 0.0;
-		PFJet30JPBTCountMod = 0.0;
-		PFJet30TCHPTCountMod = 0.0;
-		PFJet30SSVHPTCountMod = 0.0;
-
 		PFJet30TCHPTCountCentral = 0.0;
 		PFJet30TCHPTCountEffUp = 0.0;
 		PFJet30TCHPTCountEffDown = 0.0;
 		PFJet30TCHPTCountMisUp = 0.0;
 		PFJet30TCHPTCountMisDown = 0.0;
+		PFJet30TCHPTUnCorrCountCentral = 0.0;
+
+		PFJet30SSVHPTCountCentral = 0.0;
+		PFJet30SSVHPTCountEffUp = 0.0;
+		PFJet30SSVHPTCountEffDown = 0.0;
+		PFJet30SSVHPTCountMisUp = 0.0;
+		PFJet30SSVHPTCountMisDown = 0.0;
+
+		PFJet30JPTCountCentral = 0.0;
+		PFJet30JPTCountEffUp = 0.0;
+		PFJet30JPTCountEffDown = 0.0;
+		PFJet30JPTCountMisUp = 0.0;
+		PFJet30JPTCountMisDown = 0.0;
+
+
+		PFJet30TCHEMCountCentral = 0.0;
+		PFJet30TCHEMCountEffUp = 0.0;
+		PFJet30TCHEMCountEffDown = 0.0;
+		PFJet30TCHEMCountMisUp = 0.0;
+		PFJet30TCHEMCountMisDown = 0.0;
+
+		PFJet30TCHELCountCentral = 0.0;
+		PFJet30TCHELCountEffUp = 0.0;
+		PFJet30TCHELCountEffDown = 0.0;
+		PFJet30TCHELCountMisUp = 0.0;
+		PFJet30TCHELCountMisDown = 0.0;		
+
+
 		HT_pfjets = 0.0;
 
 		for(unsigned int ijet=0; ijet<v_idx_pfjet_prefinal.size(); ijet++)
@@ -1225,8 +1819,7 @@ void placeholder::Loop()
 			if (!KeepJet) continue;
 			if ( PFJetTrackCountingHighEffBTag->at(jetindex) > 2.0 ) BpfJetCount = BpfJetCount + 1.0;
 			RecoJets.push_back(thisjet);
-			RecoJetTCHPTtags.push_back( PFJetTrackCountingHighPurBTag->at(jetindex) );
-			RecoJetSSVHEMtags.push_back( PFJetSimpleSecondaryVertexHighEffBTag->at(jetindex) );
+
 
 			v_idx_pfjet_final.push_back(jetindex);
 			if (thisjet.Pt() > 30.0) 
@@ -1235,18 +1828,23 @@ void placeholder::Loop()
 				HT_pfjets +=thisjet.Pt();
 
 				float tchpt   = PFJetTrackCountingHighPurBTag->at(jetindex);
+				float tchem   = PFJetTrackCountingHighEffBTag->at(jetindex);
+				float tchel   = PFJetTrackCountingHighEffBTag->at(jetindex);
+
 				float ssvhpt  = PFJetSimpleSecondaryVertexHighPurBTag->at(jetindex);
 				float jpt     = PFJetJetProbabilityBTag->at(jetindex);
-				float jpbt    = PFJetJetBProbabilityBTag->at(jetindex);
 
-				vector<bool> btags = BTags(thisjet.Pt(),isData,tchpt,ssvhpt,jpt,jpbt);
+				// vector<bool> btags = BTags(thisjet.Pt(),isData,tchpt,ssvhpt,jpt,jpbt);
 				vector<bool> btags_tchpt = BTagTCHPT(thisjet.Pt(),isData,tchpt,thisjet.Eta(), event);
+				vector<bool> btags_tchpt_uncorr = BTagTCHPTUnCorr(thisjet.Pt(),isData,tchpt,thisjet.Eta(), event);
+
+				vector<bool> btags_ssvhpt = BTagSSVHPT(thisjet.Pt(),isData,ssvhpt,thisjet.Eta(), event);
+				vector<bool> btags_jpt = BTagJPT(thisjet.Pt(),isData,jpt,thisjet.Eta(), event);
+
+				vector<bool> btags_tchem = BTagTCHEM(thisjet.Pt(),isData,tchem,thisjet.Eta(), event);
+				vector<bool> btags_tchel = BTagTCHEL(thisjet.Pt(),isData,tchel,thisjet.Eta(), event);
 
 
-				PFJet30TCHPTCountMod  += 1.0*btags[0];
-				PFJet30SSVHPTCountMod += 1.0*btags[1];
-				PFJet30JPTCountMod    += 1.0*btags[2];
-				PFJet30JPBTCountMod   += 1.0*btags[3];
 
 				PFJet30TCHPTCountCentral += 1.0*(btags_tchpt[0]);
 				PFJet30TCHPTCountEffUp   += 1.0*(btags_tchpt[1]);
@@ -1254,10 +1852,30 @@ void placeholder::Loop()
 				PFJet30TCHPTCountMisUp   += 1.0*(btags_tchpt[3]);
 				PFJet30TCHPTCountMisDown += 1.0*(btags_tchpt[4]);
 
+				PFJet30SSVHPTCountCentral += 1.0*(btags_ssvhpt[0]);
+				PFJet30SSVHPTCountEffUp   += 1.0*(btags_ssvhpt[1]);
+				PFJet30SSVHPTCountEffDown += 1.0*(btags_ssvhpt[2]);
+				PFJet30SSVHPTCountMisUp   += 1.0*(btags_ssvhpt[3]);
+				PFJet30SSVHPTCountMisDown += 1.0*(btags_ssvhpt[4]);
 
-				PFJet30Count += 1.0;
-				PFJet30TCHPTCount += 1.0*(PFJetTrackCountingHighPurBTag->at(jetindex) > 3.41);
-				PFJet30SSVHEMCount += 1.0*(PFJetSimpleSecondaryVertexHighEffBTag->at(jetindex) > 1.74);
+				PFJet30JPTCountCentral += 1.0*(btags_jpt[0]);
+				PFJet30JPTCountEffUp   += 1.0*(btags_jpt[1]);
+				PFJet30JPTCountEffDown += 1.0*(btags_jpt[2]);
+				PFJet30JPTCountMisUp   += 1.0*(btags_jpt[3]);
+				PFJet30JPTCountMisDown += 1.0*(btags_jpt[4]);
+
+				PFJet30TCHEMCountCentral += 1.0*(btags_tchem[0]);
+				PFJet30TCHEMCountEffUp   += 1.0*(btags_tchem[1]);
+				PFJet30TCHEMCountEffDown += 1.0*(btags_tchem[2]);
+				PFJet30TCHEMCountMisUp   += 1.0*(btags_tchem[3]);
+				PFJet30TCHEMCountMisDown += 1.0*(btags_tchem[4]);
+
+				PFJet30TCHEMCountCentral += 1.0*(btags_tchel[0]);
+				PFJet30TCHEMCountEffUp   += 1.0*(btags_tchel[1]);
+				PFJet30TCHEMCountEffDown += 1.0*(btags_tchel[2]);
+				PFJet30TCHEMCountMisUp   += 1.0*(btags_tchel[3]);
+				PFJet30TCHEMCountMisDown += 1.0*(btags_tchel[4]);				
+
 
 			}
 			// std::cout<<PFJet30TCHPTCountMod<<" "<<PFJet30SSVHPTCountMod<<std::endl;
@@ -1320,7 +1938,7 @@ void placeholder::Loop()
 			ST_genmuongenMETgenjet1234_bare = 0 ;
 			ST_genmuongenMETgenjet12345_bare = 0 ;
 
-
+			DeltaPhi_genmuon1genMET_bare = -1.0;
 			MT_genmuon1genMET = 0 ;  MT_genmuon1genneutrino = 0;
 			MT_genmuon1genMET_bare = 0; 
 			// std::cout<<" ---------------------------------------------- "<<std::endl;
@@ -1568,7 +2186,6 @@ void placeholder::Loop()
 			Phi_genMET = GenMETPhiTrue->at(0);
 			MT_genmuon1genMET =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
 			MT_genmuon1genMET_bare =  TMass(Pt_genmuon1_bare,Pt_genMET, fabs(Phi_genmuon1_bare - Phi_genMET) );
-			
 			if (GenMuNeutrinos.size()>0)	
 			{	
 				MT_genmuon1genneutrino = TMass(Pt_genmuon1, GenMuNeutrinos[0].Pt() , fabs(Phi_genmuon1 - GenMuNeutrinos[0].Phi()) );
@@ -1581,6 +2198,9 @@ void placeholder::Loop()
 			v_GenMet.SetPtEtaPhiM ( Pt_genMET, 0, Phi_genMET,0 );
 			Pt_W_gen = (SortedGenMuons[0]+v_GenMet).Pt();
 			Phi_W_gen = (SortedGenMuons[0]+v_GenMet).Phi();
+
+			DeltaPhi_genmuon1genMET_bare = GenMuons[0].DeltaPhi(v_GenMet);
+
 
 			ST_genmuongenMET = Pt_genMET+Pt_genmuon1 ;
 			ST_genmuongenMETgenjet1 = ST_genmuongenMET + Pt_genjet1 ;
@@ -1605,13 +2225,14 @@ void placeholder::Loop()
 		//========================     Calculate Reco Variables  ================================//
 
 	
-			Pt_pfjet1 = 0;       Phi_pfjet1 = 0;       Eta_pfjet1 = 0;    DeltaPhi_pfjet1muon1 = -1.0;     SSVHEM_pfjet1 = -100.0;    TCHPT_pfjet1 = -100.0;
-			Pt_pfjet2 = 0;       Phi_pfjet2 = 0;       Eta_pfjet2 = 0;    DeltaPhi_pfjet2muon1 = -1.0;     SSVHEM_pfjet2 = -100.0;    TCHPT_pfjet2 = -100.0;
-			Pt_pfjet3 = 0;       Phi_pfjet3 = 0;       Eta_pfjet3 = 0;    DeltaPhi_pfjet3muon1 = -1.0;     SSVHEM_pfjet3 = -100.0;    TCHPT_pfjet3 = -100.0;
-			Pt_pfjet4 = 0;       Phi_pfjet4 = 0;       Eta_pfjet4 = 0;    DeltaPhi_pfjet4muon1 = -1.0;     SSVHEM_pfjet4 = -100.0;    TCHPT_pfjet4 = -100.0;
-			Pt_pfjet5 = 0;       Phi_pfjet5 = 0;       Eta_pfjet5 = 0;    DeltaPhi_pfjet5muon1 = -1.0;     SSVHEM_pfjet5 = -100.0;    TCHPT_pfjet5 = -100.0;
+			Pt_pfjet1 = 0;       Phi_pfjet1 = 0;       Eta_pfjet1 = 0;    DeltaPhi_pfjet1muon1 = -1.0;     
+			Pt_pfjet2 = 0;       Phi_pfjet2 = 0;       Eta_pfjet2 = 0;    DeltaPhi_pfjet2muon1 = -1.0;     
+			Pt_pfjet3 = 0;       Phi_pfjet3 = 0;       Eta_pfjet3 = 0;    DeltaPhi_pfjet3muon1 = -1.0;    
+			Pt_pfjet4 = 0;       Phi_pfjet4 = 0;       Eta_pfjet4 = 0;    DeltaPhi_pfjet4muon1 = -1.0;     
+			Pt_pfjet5 = 0;       Phi_pfjet5 = 0;       Eta_pfjet5 = 0;    DeltaPhi_pfjet5muon1 = -1.0;   
 
-			
+			DeltaPhi_muon1MET = -1.0;
+
 			Pt_muon1 = 0;      Phi_muon1 = 0;      Eta_muon1 = 0;
 			Pt_muon2 = 0;      Phi_muon2 = 0;      Eta_muon2 = 0;
 	
@@ -1638,6 +2259,8 @@ void placeholder::Loop()
 				PFMET->at(0) = _v_Met.Pt();
 				PFMETPhi->at(0) = _v_Met.Phi();
 			}
+
+
 	
 			// Assign Muon Variables	
 			if (MuonCount>=1)	Pt_muon1  =	RecoMuons[0].Pt();
@@ -1651,37 +2274,27 @@ void placeholder::Loop()
 			if (PFJetCount>=1)	Pt_pfjet1  =	RecoJets[0].Pt();
 			if (PFJetCount>=1)	Eta_pfjet1 =	RecoJets[0].Eta();
 			if (PFJetCount>=1)	Phi_pfjet1 =	RecoJets[0].Phi();
-			if (PFJetCount>=1)	SSVHEM_pfjet1 =	RecoJetSSVHEMtags[0];
-			if (PFJetCount>=1)	TCHPT_pfjet1  =	RecoJetTCHPTtags[0];
 			if (PFJetCount>=1)	DeltaPhi_pfjet1muon1 =	fabs(RecoJets[0].DeltaPhi(RecoMuons[0]));
 			//std::cout<<DeltaPhi_pfjet1muon1<<std::endl;
 
 			if (PFJetCount>=2)	Pt_pfjet2  =	RecoJets[1].Pt();
 			if (PFJetCount>=2)	Eta_pfjet2 =	RecoJets[1].Eta();
 			if (PFJetCount>=2)	Phi_pfjet2 =	RecoJets[1].Phi();
-			if (PFJetCount>=2)	SSVHEM_pfjet2 =	RecoJetSSVHEMtags[1];
-			if (PFJetCount>=2)	TCHPT_pfjet2  =	RecoJetTCHPTtags[1];
 			if (PFJetCount>=2)	DeltaPhi_pfjet2muon1 =	fabs(RecoJets[1].DeltaPhi(RecoMuons[0]));			
 
 			if (PFJetCount>=3)	Pt_pfjet3  =	RecoJets[2].Pt();
 			if (PFJetCount>=3)	Eta_pfjet3 =	RecoJets[2].Eta();
 			if (PFJetCount>=3)	Phi_pfjet3 =	RecoJets[2].Phi();
-			if (PFJetCount>=3)	SSVHEM_pfjet3 =	RecoJetSSVHEMtags[2];
-			if (PFJetCount>=3)	TCHPT_pfjet3  =	RecoJetTCHPTtags[2];
 			if (PFJetCount>=3)	DeltaPhi_pfjet3muon1 =	fabs(RecoJets[2].DeltaPhi(RecoMuons[0]));			
 
 			if (PFJetCount>=4)	Pt_pfjet4  =	RecoJets[3].Pt();
 			if (PFJetCount>=4)	Eta_pfjet4 =	RecoJets[3].Eta();
 			if (PFJetCount>=4)	Phi_pfjet4 =	RecoJets[3].Phi();
-			if (PFJetCount>=4)	SSVHEM_pfjet4 =	RecoJetSSVHEMtags[3];
-			if (PFJetCount>=4)	TCHPT_pfjet4  =	RecoJetTCHPTtags[3];
 			if (PFJetCount>=4)	DeltaPhi_pfjet4muon1 =	fabs(RecoJets[3].DeltaPhi(RecoMuons[0]));			
 
 			if (PFJetCount>=5)	Pt_pfjet5  =	RecoJets[4].Pt();
 			if (PFJetCount>=5)	Eta_pfjet5 =	RecoJets[4].Eta();
 			if (PFJetCount>=5)	Phi_pfjet5 =	RecoJets[4].Phi();
-			if (PFJetCount>=5)	SSVHEM_pfjet5 =	RecoJetSSVHEMtags[4];
-			if (PFJetCount>=5)	TCHPT_pfjet5  =	RecoJetTCHPTtags[4];
 			if (PFJetCount>=5)	DeltaPhi_pfjet5muon1 =	fabs(RecoJets[4].DeltaPhi(RecoMuons[0]));			
 
 
@@ -1692,10 +2305,14 @@ void placeholder::Loop()
 			RelIso_muon1 = RecoMuonIso[0];
 			RelIso_muon2 = RecoMuonIso[1];
 			
+
+
 			TLorentzVector  v_Met;
 			v_Met.SetPtEtaPhiM ( Pt_MET, 0, Phi_MET,0 );
 			Pt_W = (RecoMuons[0]+v_Met).Pt();
 			Phi_W = (RecoMuons[0]+v_Met).Phi();
+			DeltaPhi_muon1MET = RecoMuons[0].DeltaPhi(v_Met);
+
 	
 			MET_pfsig = PFMETSig->at(0);
 			MET_pf_charged = PFMETCharged->at(0);
