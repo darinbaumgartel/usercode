@@ -2067,7 +2067,6 @@ void placeholder::Loop()
 			
 			GenJetCount = 1.0*(GenJetsBare.size());
 
-
 			for(unsigned int irecjet = 0; irecjet != RecoJets.size(); ++irecjet)
 			{
 				TLorentzVector matchedgenjet;
@@ -2186,6 +2185,7 @@ void placeholder::Loop()
 			Phi_genMET = GenMETPhiTrue->at(0);
 			MT_genmuon1genMET =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
 			MT_genmuon1genMET_bare =  TMass(Pt_genmuon1_bare,Pt_genMET, fabs(Phi_genmuon1_bare - Phi_genMET) );
+
 			if (GenMuNeutrinos.size()>0)	
 			{	
 				MT_genmuon1genneutrino = TMass(Pt_genmuon1, GenMuNeutrinos[0].Pt() , fabs(Phi_genmuon1 - GenMuNeutrinos[0].Phi()) );
@@ -2193,14 +2193,13 @@ void placeholder::Loop()
 				Phi_genmuonneutrino1 = GenMuNeutrinos[0].Phi();      
 				Eta_genmuonneutrino1 = GenMuNeutrinos[0].Eta();
 			}
-			
+
 			TLorentzVector  v_GenMet;
 			v_GenMet.SetPtEtaPhiM ( Pt_genMET, 0, Phi_genMET,0 );
 			Pt_W_gen = (SortedGenMuons[0]+v_GenMet).Pt();
 			Phi_W_gen = (SortedGenMuons[0]+v_GenMet).Phi();
 
-			DeltaPhi_genmuon1genMET_bare = GenMuons[0].DeltaPhi(v_GenMet);
-
+			if (GenMuonCount>=1) DeltaPhi_genmuon1genMET_bare = GenMuons[0].DeltaPhi(v_GenMet);
 
 			ST_genmuongenMET = Pt_genMET+Pt_genmuon1 ;
 			ST_genmuongenMETgenjet1 = ST_genmuongenMET + Pt_genjet1 ;
@@ -2209,7 +2208,7 @@ void placeholder::Loop()
 			ST_genmuongenMETgenjet1234 = ST_genmuongenMETgenjet123 + Pt_genjet4 ;
 			ST_genmuongenMETgenjet12345 = ST_genmuongenMETgenjet1234 + Pt_genjet5 ;
 
-		
+
 			ST_genmuongenMET_bare = Pt_genMET+Pt_genmuon1 ;
 			ST_genmuongenMETgenjet1_bare = ST_genmuongenMET + Pt_genjet1_bare ;
 			ST_genmuongenMETgenjet12_bare = ST_genmuongenMETgenjet1 + Pt_genjet2_bare ;
@@ -2306,7 +2305,6 @@ void placeholder::Loop()
 			RelIso_muon2 = RecoMuonIso[1];
 			
 
-
 			TLorentzVector  v_Met;
 			v_Met.SetPtEtaPhiM ( Pt_MET, 0, Phi_MET,0 );
 			Pt_W = (RecoMuons[0]+v_Met).Pt();
@@ -2339,6 +2337,7 @@ void placeholder::Loop()
 		if (skipevent) continue;
 
 		tree->Fill();
+
 	}
 
 	tree->Write();
