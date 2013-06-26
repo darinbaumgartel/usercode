@@ -233,15 +233,15 @@ _pdfLHS = '['
 # Below all the branches are created, everything is a double except for flags
 for b in _kinematicvariables:
 	for v in _variations:
-		exec(b+v+' = array.array("d",[0])')
-		exec('tout.Branch("'+b+v+'",'+b+v+',"'+b+v+'/D")' )
+		exec(b+v+' = array.array("f",[0])')
+		exec('tout.Branch("'+b+v+'",'+b+v+',"'+b+v+'/F")' )
 for b in _weights:
-	exec(b+' = array.array("d",[0])')
-	exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
+	exec(b+' = array.array("f",[0])')
+	exec('tout.Branch("'+b+'",'+b+',"'+b+'/F")' )
 if dopdf:
 	for b in _pdfweights:
-		exec(b+' = array.array("d",[0])')
-		exec('tout.Branch("'+b+'",'+b+',"'+b+'/D")' )
+		exec(b+' = array.array("f",[0])')
+		exec('tout.Branch("'+b+'",'+b+',"'+b+'/F")' )
 		_pdfLHS += (b+'[0],')
 for b in _flags:
 	exec(b+' = array.array("L",[0])')
@@ -566,11 +566,11 @@ def TightIDMuons(T,met,variation):
 	muons = []
 	muoninds = []
 	if variation=='MESup':	
-		_MuonPt = [pt*1.002 for pt in T.MuonPt]
+		_MuonPt = [pt*(1.0+0.05*0.001*pt) for pt in T.MuonPt]
 	elif variation=='MESdown':	
-		_MuonPt = [pt*0.998 for pt in T.MuonPt]
+		_MuonPt = [pt*(1.0-0.05*0.001*pt) for pt in T.MuonPt]
 	elif variation=='MER':	
-		_MuonPt = [pt+pt*tRand.Gaus(0.0,  0.01*(pt<=200) + (0.05*pt/(1000.0))*(pt>200.0) ) for pt in T.MuonPt]
+		_MuonPt = [pt+pt*tRand.Gaus(0.0,  0.01*(pt<=200) + 0.04*(pt>200) ) for pt in T.MuonPt]
 	else:	
 		_MuonPt = [pt for pt in T.MuonPt]	
 	trk_isos = []
