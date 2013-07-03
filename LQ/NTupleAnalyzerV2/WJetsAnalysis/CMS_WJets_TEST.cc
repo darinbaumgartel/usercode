@@ -17,7 +17,6 @@
 #include <iostream>
 #include <ostream>
 #include <iomanip>
-
 namespace Rivet
 {
 
@@ -57,8 +56,11 @@ namespace Rivet
 				vidsW.push_back(make_pair(ANTIMUON, NU_MU));
 
 				FinalState fsW(-MAXRAPIDITY,MAXRAPIDITY);
-				InvMassFinalState invfsW(fsW, vidsW, 50*GeV, 99990*GeV);
+				InvMassFinalState invfsW(fsW, vidsW, 0.01*GeV, 99990*GeV);
 				addProjection(invfsW, "INVFSW");
+
+		       // WFinder wfinder_dressed_mu(fs, std::vector<std::pair<-5.0,5.0>, 0.0, PdgId(13), 0.0*GeV, 11000.0*GeV, 0.0*GeV, 0.1,true,false);
+		       // addProjection(wfinder_dressed_mu, "WFinder_dressed_mu");
 
 				VetoedFinalState vfs(fs);
 				vfs.addVetoOnThisFinalState(invfsZ);
@@ -118,7 +120,9 @@ namespace Rivet
     			_rivetTree->Branch("mt_munu", &_mt_munu, "mt_munu/D");			
     			_rivetTree->Branch("mt_mumet", &_mt_mumet, "mt_mumet/D");			
 
-    			
+    			_rivetTree->Branch("htjets", &_htjets, "htjets/D");			
+
+
     			_rivetTree->Branch("ptmuon", &_ptmuon, "ptmuon/D");			
     			_rivetTree->Branch("etamuon", &_etamuon, "etamuon/D");			
     			_rivetTree->Branch("phimuon", &_phimuon, "phimuon/D");			
@@ -316,6 +320,7 @@ namespace Rivet
 	    		_ptmet = -5.0;
 	    		_phimet = -5.0;
 	    		_mt_mumet = -5.0;
+	    		_htjets = 0.0;
 
 	    		_ptneutrino = -1.0;
 	    		_etaneutrino = -5.0;
@@ -364,6 +369,10 @@ namespace Rivet
 
 				const InvMassFinalState& invMassFinalStateZ = applyProjection<InvMassFinalState>(event, "INVFSZ");
 				const InvMassFinalState& invMassFinalStateW = applyProjection<InvMassFinalState>(event, "INVFSW");
+				// const WFinder& wfinder_dressed_mu = applyProjection<WFinder>(event, "WFinder_dressed_mu");
+				// const WFinder& wfinder_bare_mu    = applyProjection<WFinder>(event, "WFinder_bare_mu");
+				const FinalState& totalfinalstate = applyProjection<FinalState>(event, "FS");
+
 
 				bool isW(false); bool isZ(false);
 
@@ -372,6 +381,7 @@ namespace Rivet
 
 				const ParticleVector&  ZDecayProducts =  invMassFinalStateZ.particles();
 				const ParticleVector&  WDecayProducts =  invMassFinalStateW.particles();
+				const ParticleVector& AllParticles = totalfinalstate.particles();
 
 				if (ZDecayProducts.size() < 2 && WDecayProducts.size() <2) vetoEvent;
 
@@ -469,82 +479,10 @@ namespace Rivet
 
 				if(!passBosonConditions)vetoEvent;
 
-				//Obtain the jets.
-				vector<FourMomentum> finaljet_list;
-				vector<int> finaljet_list_btags;
-				vector<FourMomentum> finalBjet_list;
 
-
-				// std::cout<<" ------------------- "<<std::endl;
-				//foreach (const Jet& j, applyProjection<JetAlg>(event, "ANTIKT").jetsByPt(40.0*GeV))
-				foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV))
-				{
-					double jeta = j.momentum().eta();
-					double jphi = j.momentum().phi();
-					double jpt = j.momentum().pT();
-
-					// std::cout<<jpt<<std::endl;
-					
-					
-					if ((fabs(jeta) < 2.4) && (jpt>30))
-					{
-						if(isWen||isWmn)
-						{
-							
-							int lindex = 0;
-							
-							if (fabs(WDecayProducts[1].pdgId()) == 13) lindex = 1;
-							
-							double leta = (WDecayProducts[lindex]).momentum().eta();
-							double lphi = (WDecayProducts[lindex]).momentum().phi();
-							// std::cout<<" * "<<lindex<<"  "<<(WDecayProducts[0]).momentum().pT()<<"  "<<(WDecayProducts[1]).momentum().pT()<<std::endl;
-
-							double delta_phi = DeltaPhi(lphi,jphi);
-
-							if( ((leta-jeta)*(leta-jeta) + (delta_phi*delta_phi)) > 0.3*0.3  )
-							{
-								finaljet_list.push_back(j.momentum());
-								if (j.containsBottom())
-								{	
-									finalBjet_list.push_back(j.momentum());
-									finaljet_list_btags.push_back(1);
-								}
-								else
-								{
-									finaljet_list_btags.push_back(0);
-								}	
-								// std::cout<<"   "<<jpt<<std::endl;
-							}
-						}
-					}
-				}
-
-				//Multiplicity plots.
-				if(isWen)Fill(_histJetMultWelec, weight, finaljet_list);
-				if(isWmn)Fill(_histJetMultWmu, weight, finaljet_list);
-				if(isWmnPlus)Fill(_histJetMultWmuPlus, weight, finaljet_list);
-				if(isWmnMinus)Fill(_histJetMultWmuMinus, weight, finaljet_list);
-				if(isWenPlus)Fill(_histJetMultWelPlus, weight, finaljet_list);
-				if(isWenMinus)Fill(_histJetMultWelMinus, weight, finaljet_list);
-				if(isZee)Fill(_histJetMultZelec, weight, finaljet_list);
-				if(isZmm)Fill(_histJetMultZmu, weight, finaljet_list);
-
-				//if((isWmn)&&(finaljet_list.size()>=1)) std::cout<<finaljet_list[0].pT()<<std::endl;
-				if((isWmn)&&(finaljet_list.size()>=1)) FillWithValue(_histJetPT1Wmu,weight,finaljet_list[0].pT());
-				if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetPT2Wmu,weight,finaljet_list[1].pT());
-				if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetPT3Wmu,weight,finaljet_list[2].pT());
-				if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetPT4Wmu,weight,finaljet_list[3].pT());
-
-				if((isWmn)&&(finaljet_list.size()>=1)) FillWithValue(_histJetETA1Wmu,weight,finaljet_list[0].eta());
-				if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetETA2Wmu,weight,finaljet_list[1].eta());
-				if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetETA3Wmu,weight,finaljet_list[2].eta());
-				if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetETA4Wmu,weight,finaljet_list[3].eta());
 
 				if (isWmn) {
 
-					_njet_WMuNu = finaljet_list.size();
-					_nBjet_WMuNu = finalBjet_list.size();
-					//std::cout<<_njet_WMuNu<<" "<<_nBjet_WMuNu<<std::endl;
 					int muind = -1;
 					int nuind=-1;
 					if (fabs(WDecayProducts[0].pdgId()) == 13) muind = 0;
@@ -557,6 +495,107 @@ namespace Rivet
 					_ptneutrino  = WDecayProducts[nuind].momentum().pT();
 					_etaneutrino = WDecayProducts[nuind].momentum().eta();
 					_phineutrino = WDecayProducts[nuind].momentum().phi();		
+
+
+					// std::cout<<" ------------------------- "<<std::endl;
+					FourMomentum finalmuon(WDecayProducts[muind].momentum());
+					// std::cout<<AllParticles.size()<<std::endl;
+					// std::cout<<_ptmuon<<std::endl;
+
+					for (unsigned int nn = 0; nn<AllParticles.size(); nn++)
+					{
+						unsigned int _nn_pid = 1*(AllParticles[nn].pdgId());
+						if (_nn_pid != 22) continue;
+
+						float _nn_pt  = AllParticles[nn].momentum().pT();
+						float _nn_eta = AllParticles[nn].momentum().eta();
+						float _nn_phi = AllParticles[nn].momentum().phi();		
+						double dr = deltaR(AllParticles[nn].momentum(),WDecayProducts[muind].momentum());				
+						// std::cout<<" --- "<<_nn_pid<<"  "<<_nn_pt<<"  "<<_nn_eta<<"  "<<dr<<std::endl;
+						// std::cout<<" --- "<<_nn_pid<<"  |  "<<WDecayProducts[muind].momentum().eta()<<"  "<<_nn_eta<<"  |  "<<WDecayProducts[muind].momentum().phi()<<"  "<<_nn_phi<<"  |  "<<dr<<std::endl;
+
+						if (dr<0.1) finalmuon = add(finalmuon,AllParticles[nn].momentum());
+						// if (dr<0.1) std::cout<<"  !!!!!"<<std::endl;
+
+					}
+
+
+					_ptmuon  = finalmuon.pT();
+					_etamuon = finalmuon.eta();
+					_phimuon = finalmuon.phi();
+
+					// std::cout<<_ptmuon<<std::endl;
+
+
+					//Obtain the jets.
+					vector<FourMomentum> finaljet_list;
+					vector<int> finaljet_list_btags;
+					vector<FourMomentum> finalBjet_list;
+
+
+					// std::cout<<" ------------------- "<<std::endl;
+					//foreach (const Jet& j, applyProjection<JetAlg>(event, "ANTIKT").jetsByPt(40.0*GeV))
+					foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV))
+					{
+						double jeta = j.momentum().eta();
+						double jphi = j.momentum().phi();
+						double jpt = j.momentum().pT();
+						
+						if ((fabs(jeta) < 2.4) && (jpt>30))
+						{
+							
+							double leta = finalmuon.eta();
+							double lphi = finalmuon.phi();
+							double delta_phi = DeltaPhi(lphi,jphi);
+
+							if( ((leta-jeta)*(leta-jeta) + (delta_phi*delta_phi)) > 0.5*0.5  )
+							{
+								finaljet_list.push_back(j.momentum());
+								_htjets += fabs(1.0*(j.momentum()).pT());
+
+								if (j.containsBottom())
+								{	
+									finalBjet_list.push_back(j.momentum());
+									finaljet_list_btags.push_back(1);
+								}
+								else
+								{
+									finaljet_list_btags.push_back(0);
+								}	
+								// std::cout<<"   "<<jpt<<std::endl;
+							}
+							
+						}
+					}
+
+					//Multiplicity plots.
+					if(isWen)Fill(_histJetMultWelec, weight, finaljet_list);
+					if(isWmn)Fill(_histJetMultWmu, weight, finaljet_list);
+					if(isWmnPlus)Fill(_histJetMultWmuPlus, weight, finaljet_list);
+					if(isWmnMinus)Fill(_histJetMultWmuMinus, weight, finaljet_list);
+					if(isWenPlus)Fill(_histJetMultWelPlus, weight, finaljet_list);
+					if(isWenMinus)Fill(_histJetMultWelMinus, weight, finaljet_list);
+					if(isZee)Fill(_histJetMultZelec, weight, finaljet_list);
+					if(isZmm)Fill(_histJetMultZmu, weight, finaljet_list);
+
+					//if((isWmn)&&(finaljet_list.size()>=1)) std::cout<<finaljet_list[0].pT()<<std::endl;
+					if((isWmn)&&(finaljet_list.size()>=1)) FillWithValue(_histJetPT1Wmu,weight,finaljet_list[0].pT());
+					if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetPT2Wmu,weight,finaljet_list[1].pT());
+					if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetPT3Wmu,weight,finaljet_list[2].pT());
+					if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetPT4Wmu,weight,finaljet_list[3].pT());
+
+					if((isWmn)&&(finaljet_list.size()>=1)) FillWithValue(_histJetETA1Wmu,weight,finaljet_list[0].eta());
+					if((isWmn)&&(finaljet_list.size()>=2)) FillWithValue(_histJetETA2Wmu,weight,finaljet_list[1].eta());
+					if((isWmn)&&(finaljet_list.size()>=3)) FillWithValue(_histJetETA3Wmu,weight,finaljet_list[2].eta());
+					if((isWmn)&&(finaljet_list.size()>=4)) FillWithValue(_histJetETA4Wmu,weight,finaljet_list[3].eta());
+
+
+					_njet_WMuNu = finaljet_list.size();
+					_nBjet_WMuNu = finalBjet_list.size();
+					//std::cout<<_njet_WMuNu<<" "<<_nBjet_WMuNu<<std::endl;
+
+
+
 
     			  	const MissingMomentum& met = applyProjection<MissingMomentum>(event, "MET");
    				   	_ptmet = met.visibleMomentum().pT();
@@ -693,6 +732,7 @@ namespace Rivet
 
 			double _mt_munu;
 			double _mt_mumet;
+			double _htjets;
 			double _ptmet;
 			double _phimet;
 
