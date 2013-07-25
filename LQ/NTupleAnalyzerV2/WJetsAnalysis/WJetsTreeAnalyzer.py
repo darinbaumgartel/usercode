@@ -356,13 +356,13 @@ def main():
 
 	WRenorm = "(1.0)"
 	# ParseTablesToFinalResults(WRenorm,basic_selection)	
-	ParseTablesToRecoHistograms()	
+	# ParseTablesToRecoHistograms()	
 	# os.system("convert pyplots/*.png pyplots/AllPlots.pdf")
 	# os.system("convert pyplots/*FINAL*Count.png pyplots/AllFinalCountPlots.pdf")
 	# os.system("convert pyplots/*FINAL*XSec.png pyplots/AllFinalXSecPlots.pdf")
 	# os.system("convert pyplots/*standard.png pyplots/StandardUnf.pdf")
 	# os.system("convert pyplots/*altunf.png pyplots/SherpaUnf.pdf")
-	sys.exit()
+	# sys.exit()
 # 
 	# selection = JetRescaleString+'*'+basic_selection
 
@@ -2474,7 +2474,7 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	selection_norm = selection+"*(MT_muon1METR>50.0)"
 	gen_selection_norm = gen_selection+"*(MT_muon1METR>50.0)"
 
-	h_normgen_WJets=CreateHisto('h_normgen_WJets_aod','W+Jets MG [Truth]',t_MG,baregenvariable,varbinning,gen_selection_norm+'*weight_gen*4955',MCGenStyle,Label)
+	h_normgen_WJets=CreateHisto('h_normgen_WJets','W+Jets MG [Truth]',t_WJets_MG,baregenvariable,varbinning,gen_selection_norm+'*weight_gen*4955',MCGenStyle,Label)
 	h_normrec_WJets=CreateHisto('h_normrec_WJets','W+Jets '+gtag+' [Reco]',t_WJets_MG,recomodvariable,varbinning,selection_norm+weight+fW,MCRecoStyle,Label)
 	h_normrec_WJetsMG=CreateHisto('h_normrec_WJetsMG','W+Jets MadGraph [Reco]',t_MG,recomodvariable,varbinning,selection_norm+weight+fW,MCRecoStyle,Label)
 
@@ -2494,7 +2494,9 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	print 'W:',h_normrec_WJets.Integral() 
 
 
-	_wsf = 	( h_normrec_Data.Integral()	- h_normrec_ZJets.Integral() -	h_normrec_TTBar.Integral() -	h_normrec_DiBoson.Integral() -	h_normrec_SingleTop.Integral() ) / (	h_normrec_WJets.Integral() )
+	_wsf   = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() ) / (	h_normrec_WJets.Integral() )
+	_wsfMG = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() ) / (	h_normrec_WJetsMG.Integral() )
+
 	# print "USING W SCALE FACTOR:", _wsf
 	# h_normrec_WJets.Scale(_wsf)
 	# h_normrec_WJetsMG.Scale(_wsf)
@@ -2502,13 +2504,15 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	wsfoff = 'WSFOFF' in 'pyplots'
 
 	if wsfoff == True:
-		_wsf = 1.0
+		_wsf   = 1.0
+		_wsfMG = 1.0
 
 
 	print "USING W SCALE FACTOR:", _wsf
 
 
 	fW = '*('+str(round(_wsf,4))+')'
+	fWMG = '*('+str(round(_wsfMG,4))+')'
 
 
 
@@ -2520,13 +2524,13 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 	# W + Jets Contributions (Normalized for display)
 	# h_gen_WJets=CreateHisto('h_gen_WJets_aod','W+Jets '+gtag+' [Truth]',t_WJets_MG,baregenvariable,varbinning,gen_selection+'*weight_gen*4955',MCGenStyle,Label)
-	h_gen_WJets=CreateHisto('h_gen_WJets_aod','W+Jets MG [Truth]',t_MG,baregenvariable,varbinning,gen_selection+'*weight_gen*4955'+fW,MCGenStyle,Label)
+	h_gen_WJets=CreateHisto('h_gen_WJets','W+Jets MG [Truth]',t_WJets_MG,baregenvariable,varbinning,gen_selection+'*weight_gen*4955'+fW,MCGenStyle,Label)
 
 	print '-'*50+'\n'+rivetmodvariable+'\n'+rivetselection+'\n'+'-'*50+'\n'	
 	# h_gen_WJets=CreateHisto('h_gen_WJets','W+Jets [Truth Rivet]',t_rivet,rivetmodvariable,varbinning,rivetselection,MCGenStyle,Label)
 	# print '-'*50+'\n'+recomodvariable+'\n'+selection+weight+'\n'+'-'*50+'\n'	
 	h_rec_WJets=CreateHisto('h_rec_WJets','W+Jets '+gtag+' [Reco]',t_WJets_MG,recomodvariable,varbinning,selection+weight+fW,MCRecoStyle,Label)
-	h_rec_WJetsMG=CreateHisto('h_rec_WJetsMG','W+Jets MadGraph [Reco]',t_MG,recomodvariable,varbinning,selection+weight+fW,MCRecoStyle,Label)
+	h_rec_WJetsMG=CreateHisto('h_rec_WJetsMG','W+Jets MadGraph [Reco]',t_MG,recomodvariable,varbinning,selection+weight+fWMG,MCRecoStyle,Label)
 
 	# Data
 	h_rec_Data=CreateHisto('h_rec_Data','Data, 5/fb [Reco]',t_SingleMuData,recomodvariable,varbinning,selection+IsoMuCond,DataRecoStyle,Label)
@@ -2958,7 +2962,7 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	# h_rec_WJets_flatMG=CreateHisto('h_rec_WJets_flatMG','W+Jets '+gtag+' MG [Reco]',t_MG,recomodvariable,varbinning,selection+'*'+gen_selection_minimal+'*(weight_gen*4955)', MCRecoStyle,Label)
 	h_rec_WJets_flat=CreateHisto('h_rec_WJets_flat','W+Jets '+gtag+' [Reco]',t_WJets_MG,recomodvariable,varbinning,selection+'*(weight_pu_central*4955)'+fW, MCRecoStyle,Label)
 	# h_rec_WJets_flatMG=CreateHisto('h_rec_WJets_flatMG','W+Jets '+gtag+' MG [Reco]',t_MG,recomodvariable,varbinning,selection+'*(weight_gen*4955)', MCRecoStyle,Label)
-	h_rec_WJets_flatMG=CreateHisto('h_rec_WJets_flatMG','W+Jets '+gtag+' MG [Reco]',t_MG,recomodvariable,varbinning,selection+'*(weight_pu_central*4955)'+fW, MCRecoStyle,Label)
+	h_rec_WJets_flatMG=CreateHisto('h_rec_WJets_flatMG','W+Jets '+gtag+' MG [Reco]',t_MG,recomodvariable,varbinning,selection+'*(weight_pu_central*4955)'+fWMG, MCRecoStyle,Label)
 
 
 	# Reco histogram without gen minimal selection for normalization
@@ -3000,6 +3004,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	print 'Xini:',h_gen_WJets_flat.Integral()
 	print 'Bini:',h_rec_WJets_flat.Integral()
 	print 'Adet:',h_response_WJets.Integral()
+	print 'Pseu:',h_rec_Data_pseudo.Integral()
+
 
 	##############################################################################
 	#######      Top Right Addition  - UnFolded Distribution               #######
@@ -3127,11 +3133,11 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 	# WJets Gen + Reco
 	# h_pres_rec_WJets=CreateHisto('h_pres_rec_WJets','W+Jets '+ gtag+' [Truth/Reco]',t_WJets_MG,recomodvariable,presentationbinning,selection+weight,MCRecoStyle,Label)
-	h_pres_rec_WJets=CreateHisto('h_pres_rec_WJets','W+Jets MADGRAPH [Truth/Reco]',t_MG,recomodvariable,presentationbinning,selection+weight+fW,MCRecoStyle,Label)
+	h_pres_rec_WJets=CreateHisto('h_pres_rec_WJets','W+Jets MADGRAPH [Truth/Reco]',t_MG,recomodvariable,presentationbinning,selection+weight+fWMG,MCRecoStyle,Label)
 
 	# h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets '+gtag+' [Truth/Reco]',t_WJets_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955',MCRecoStyle,Label)
-	h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets MADGRAPH [Truth/Reco]',t_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955'+fW,MCRecoStyle,Label)
-	h_pres_gen_WJetsMG=CreateHisto('h_pres_gen_WJetsMG','W+Jets MadGraph [Truth/Reco]',t_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955'+fW,MCRecoStyle,Label)
+	h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets MADGRAPH [Truth/Reco]',t_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955'+fWMG,MCRecoStyle,Label)
+	h_pres_gen_WJetsMG=CreateHisto('h_pres_gen_WJetsMG','W+Jets MadGraph [Truth/Reco]',t_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955'+fWMG,MCRecoStyle,Label)
 	# NOW FROM RIVET
 	# h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets [Truth Rivet]',t_rivet,rivetmodvariable,presentationbinning,rivetselection,MCRecoStyle,Label)
 	# h_pres_gen_WJetsMG=CreateHisto('h_pres_gen_WJets','W+Jets [Truth Rivet]',t_rivet,rivetmodvariable,presentationbinning,rivetselection,MCRecoStyle,Label)
@@ -3144,8 +3150,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	h_pres_unf_Data_err=CreateHisto('h_pres_unf_Data_err','Data, 5/fb [Unfolded/Reco]',t_SingleMuData,recomodvariable,presentationbinning,selection+'*'+DataErrorString+IsoMuCond,DataUnfoldedStyle,Label)
 
 	# Closure
-	h_pres_unf_Data_pseudo=CreateHisto('h_pres_unf_Data_pseudo','MC Closure [Unf. Reco/ Gen]',t_MG,recomodvariable,presentationbinning,selection+weight+fW+'*'+DataRescalingString_pseudo,DataUnfoldedStyle_pseudo,Label)
-	h_pres_unf_Data_err_pseudo=CreateHisto('h_pres_unf_Data_err_pseudo','MC Closure [Unf. Reco/ Gen]',t_MG,recomodvariable,presentationbinning,selection+weight+fW+'*'+DataErrorString_pseudo,DataUnfoldedStyle_pseudo,Label)
+	h_pres_unf_Data_pseudo=CreateHisto('h_pres_unf_Data_pseudo','MC Closure [Unf. Reco/ Gen]',t_MG,recomodvariable,presentationbinning,selection+weight+fWMG+'*'+DataRescalingString_pseudo,DataUnfoldedStyle_pseudo,Label)
+	h_pres_unf_Data_err_pseudo=CreateHisto('h_pres_unf_Data_err_pseudo','MC Closure [Unf. Reco/ Gen]',t_MG,recomodvariable,presentationbinning,selection+weight+fWMG+'*'+DataErrorString_pseudo,DataUnfoldedStyle_pseudo,Label)
 
 	# Other Backgrounds Rescaled
 	h_pres_rec_DiBoson_res=CreateHisto('h_pres_rec_DiBoson_res','DiBoson [MadGraph]',t_DiBoson,recomodvariable,presentationbinning,selection+weight+'*'+DataRescalingString+fV,DiBosonStackStyle,Label)
@@ -3357,8 +3363,8 @@ def GetJetMultFactors(genvariable,recovariable,xlabel, binning,presentationbinni
 # FullAnalysisWithUncertainty just runs MakeUnfoldedPlots several times for each systematic variation. The goal is to return final distributions.
 def FullAnalysisWithUncertainty(genvariable,recovariable,default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,prefab_tau):
 
-	prefab_tau = 123456
-	prefab_tau = -10
+	# prefab_tau = 123456
+	# prefab_tau = -10
 
 	# This is the standard plot. here we get the optimal tau value. 
 	_tau = -1
