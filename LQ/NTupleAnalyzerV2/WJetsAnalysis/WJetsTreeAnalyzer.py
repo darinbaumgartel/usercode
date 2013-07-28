@@ -363,7 +363,7 @@ def main():
 	# os.system("convert pyplots/*standard.png pyplots/StandardUnf.pdf")
 	# os.system("convert pyplots/*altunf.png pyplots/SherpaUnf.pdf")
 	# sys.exit()
-# 
+
 	# selection = JetRescaleString+'*'+basic_selection
 
 	htbinning = [30,60,90,120,150,195,240,285,330,390,450,510,570,660,750,840,990,1170,1500]
@@ -413,7 +413,6 @@ def main():
 
 
 	# sys.exit()
-
 
 	FullAnalysisWithUncertainty(['Pt_genjet1','Pt_genjet1_bare'],'Pt_pfjet1',0,["p_{T}(jet_{1}) [GeV]",""],[40,10,810],[30,50,70,90,110,150,190,250,310,400,750],Sels_Pt_pfjet1_reco, Sels_Pt_pfjet1_gen,weight,'c',12)
 	FullAnalysisWithUncertainty(['Pt_genjet2','Pt_genjet2_bare'],'Pt_pfjet2',0,["p_{T}(jet_{2}) [GeV]",""],[30,10,610],[30,50,70,90,110,150,190,250,550],Sels_Pt_pfjet2_reco, Sels_Pt_pfjet2_gen,weight,'c',7)
@@ -1774,7 +1773,6 @@ def GetSF(histolist,_d,_m,_o):
 
 	return [[sf,sf_err],_SF]
 
-
 def GetScaleFactors(recoselections,weight,FileDirectory):
 
 	##############################################################################
@@ -2599,7 +2597,7 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 	## Draw W+Jets Gen and Reco
 	h_gen_WJets.Draw("HIST")	
-	h_rec_WJetsMG.Draw("HISTSAME")
+	h_rec_WJets.Draw("HISTSAME")
 
 	# Create Legend
 	FixDrawLegend(c1.cd(2).BuildLegend( 0.5,  0.6,  0.9,  0.88,'' ))
@@ -3132,11 +3130,10 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 
 
 	# WJets Gen + Reco
-	# h_pres_rec_WJets=CreateHisto('h_pres_rec_WJets','W+Jets '+ gtag+' [Truth/Reco]',t_WJets_MG,recomodvariable,presentationbinning,selection+weight,MCRecoStyle,Label)
-	h_pres_rec_WJets=CreateHisto('h_pres_rec_WJets','W+Jets MADGRAPH [Truth/Reco]',t_MG,recomodvariable,presentationbinning,selection+weight+fWMG,MCRecoStyle,Label)
-
+	h_pres_rec_WJets=CreateHisto('h_pres_rec_WJets','W+Jets '+ gtag+' [Truth/Reco]',t_WJets_MG,recomodvariable,presentationbinning,selection+weight+fW,MCRecoStyle,Label)
+	h_pres_rec_WJetsMG=CreateHisto('h_pres_rec_WJets','W+Jets MADGRAPH [Truth/Reco]',t_MG,recomodvariable,presentationbinning,selection+weight+fWMG,MCRecoStyle,Label)
 	# h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets '+gtag+' [Truth/Reco]',t_WJets_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955',MCRecoStyle,Label)
-	h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets MADGRAPH [Truth/Reco]',t_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955'+fWMG,MCRecoStyle,Label)
+	h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets '+gtag+' [Truth/Reco]',t_WJets_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955'+fW,MCRecoStyle,Label)
 	h_pres_gen_WJetsMG=CreateHisto('h_pres_gen_WJetsMG','W+Jets MadGraph [Truth/Reco]',t_MG,baregenvariable,presentationbinning,gen_selection+'*weight_pu_central*4955'+fWMG,MCRecoStyle,Label)
 	# NOW FROM RIVET
 	# h_pres_gen_WJets=CreateHisto('h_pres_gen_WJets','W+Jets [Truth Rivet]',t_rivet,rivetmodvariable,presentationbinning,rivetselection,MCRecoStyle,Label)
@@ -3365,6 +3362,9 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,default_value,xlabel, b
 
 	# prefab_tau = 123456
 	# prefab_tau = -10
+
+	if 'BinByBin' in 'pyplots':
+		prefab_tau = 123456
 
 	# This is the standard plot. here we get the optimal tau value. 
 	_tau = -1
