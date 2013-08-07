@@ -26,8 +26,8 @@ for l in $list ; do
     job=`basename $l`
     echo ./submitBatch.perl $job $exe $l $pdf $ren $fac
     ./submitBatch.perl $job $exe $l $pdf $ren $fac
-    sleep 10
-    wait_bjobs 8 USERNAME 60
+    sleep 1
+    wait_bjobs 8 darinb 60
 
 done
 
