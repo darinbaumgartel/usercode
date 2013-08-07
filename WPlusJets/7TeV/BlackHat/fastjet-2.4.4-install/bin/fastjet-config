@@ -8,7 +8,7 @@
 
 # the list of plugins is dynamic so we need the following
 # line to deal with the static lib link
-installationdir=/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install
+installationdir=CURRENTDIR/fastjet-2.4.4-install
 
 # print a usage message and exit
 # exit code passed as argument:
@@ -291,10 +291,10 @@ case $found_query in
 	echo 2.4.4
 	;;
     prefix)
-	echo /afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install
+	echo CURRENTDIR/fastjet-2.4.4-install
 	;;
     cxxflags)
-	echo -I/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install/include 
+	echo -ICURRENTDIR/fastjet-2.4.4-install/include 
 	;;
     libs)
 	libs_string="  -lm "
@@ -302,18 +302,18 @@ case $found_query in
 #       otherwise), we only need to worry if shared available and static
 #       explicitely asked
 	if test "x$use_shared" = "xno" && test "xyes" = "xyes" ; then
-	    libs_string=$libs_string" /afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install/lib/libfastjet.a"
+	    libs_string=$libs_string" CURRENTDIR/fastjet-2.4.4-install/lib/libfastjet.a"
 	else
-	    libs_string=$libs_string" -L/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install/lib -lfastjet"
+	    libs_string=$libs_string" -LCURRENTDIR/fastjet-2.4.4-install/lib -lfastjet"
 	fi
 	if test "x$add_rpath" = "xyes" ; then
-	    libs_string="-Wl,-rpath,/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install/lib "$libs_string
+	    libs_string="-Wl,-rpath,CURRENTDIR/fastjet-2.4.4-install/lib "$libs_string
         else
             # GPS 2009-05-29: remove any left over -Wl, e.g. related to CGAL.
             libs_string=`echo $libs_string | sed 's/-Wl,-rpath[^ ]*//'`
 	fi
 	if test "x$add_runpath" = "xyes" ; then
-	    libs_string="-Wl,--enable-new-dtags -Wl,-rpath,/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install/lib "$libs_string
+	    libs_string="-Wl,--enable-new-dtags -Wl,-rpath,CURRENTDIR/fastjet-2.4.4-install/lib "$libs_string
 	fi
 	if test "x$plugins_included" = "xyes" ; then
 	    if test "x$use_shared" = "xno" && test "xyes" = "xyes" ; then
@@ -324,7 +324,7 @@ case $found_query in
 
 	fi
 	if [ "x$found_flags" = "xyes" ] ; then
-	    echo -I/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install/include  $libs_string
+	    echo -ICURRENTDIR/fastjet-2.4.4-install/include  $libs_string
 	else
 	    echo $libs_string
 	fi

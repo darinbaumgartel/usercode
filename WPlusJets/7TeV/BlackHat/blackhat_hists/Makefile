@@ -1,8 +1,8 @@
 
-INCS =  -ICURRENTDIR/ntuplesreader-1.0-install/include/ntuplesreader -pthread -m64 -I/afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_8/external/slc5_amd64_gcc462/bin/../../../../../../lcg/root/5.32.00-cms21/include\
-	-ICURRENTDIR/fastjet-2.4.4-install/include
-LIBS =  -LCURRENTDIR/ntuplesreader-1.0-install/lib/ -lNTR -L/afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_8/external/slc5_amd64_gcc462/bin/../../../../../../lcg/root/5.32.00-cms21/lib -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic\
-	-Wl,-rpath,CURRENTDIR/fastjet-2.4.4-install/lib -lm -LCURRENTDIR/fastjet-2.4.4-install/lib -lfastjet
+INCS =  -I/afs/cern.ch/work/d/darinb/BHTEST1/CMSSW_5_3_8_Blackhat/src/BlackHat/ntuplesreader-1.0-install/include/ntuplesreader -pthread -m64 -I/afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_8/external/slc5_amd64_gcc462/bin/../../../../../../lcg/root/5.32.00-cms21/include\
+	-I/afs/cern.ch/work/d/darinb/BHTEST1/CMSSW_5_3_8_Blackhat/src/BlackHat/fastjet-2.4.4-install/include
+LIBS =  -L/afs/cern.ch/work/d/darinb/BHTEST1/CMSSW_5_3_8_Blackhat/src/BlackHat/ntuplesreader-1.0-install/lib/ -lNTR -L/afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_8/external/slc5_amd64_gcc462/bin/../../../../../../lcg/root/5.32.00-cms21/lib -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic\
+	-Wl,-rpath,/afs/cern.ch/work/d/darinb/BHTEST1/CMSSW_5_3_8_Blackhat/src/BlackHat/fastjet-2.4.4-install/lib -lm -L/afs/cern.ch/work/d/darinb/BHTEST1/CMSSW_5_3_8_Blackhat/src/BlackHat/fastjet-2.4.4-install/lib -lfastjet
 
 
 HDRS =  BH_hist.h Particle.h

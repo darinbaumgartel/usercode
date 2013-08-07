@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/fastjet-2.4.4-install/lib'
+libdir='CURRENTDIR/fastjet-2.4.4-install/lib'

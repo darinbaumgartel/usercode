@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/ntuplesreader-1.0-install/lib'
+libdir='CURRENTDIR/ntuplesreader-1.0-install/lib'
