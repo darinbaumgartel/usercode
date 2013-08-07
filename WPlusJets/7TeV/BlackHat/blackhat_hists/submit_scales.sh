@@ -20,7 +20,7 @@ for l in $list ; do
     echo ./submitBatch.perl $job $exe $l $pdf $ren $fac
     ./submitBatch.perl $job $exe $l $pdf $ren $fac
     sleep 10
-    wait_bjobs 8 jhaley 60
+    wait_bjobs 8 USERNAME 60
     
 done
 #done
