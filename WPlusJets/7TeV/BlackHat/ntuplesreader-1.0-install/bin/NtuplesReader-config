@@ -1,0 +1,20 @@
+#!/bin/sh
+
+case $1 in
+  --version)
+    echo 1.0;;
+  --prefix)
+    echo /afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/ntuplesreader-1.0-install;;
+  --libs)
+    echo -L/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/ntuplesreader-1.0-install/lib/ -lNTR -L/afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_8/external/slc5_amd64_gcc462/bin/../../../../../../lcg/root/5.32.00-cms21/lib -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic ;;
+  --include)
+    echo -I/afs/cern.ch/user/j/jhaley/work/CMSSW_5_3_8_LQ/src/ntuplesreader-1.0-install/include/ntuplesreader -pthread -m64 -I/afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_3_8/external/slc5_amd64_gcc462/bin/../../../../../../lcg/root/5.32.00-cms21/include  ;;
+  *)
+    echo "NtuplesReader-config: configuration script";
+    echo "Options:";
+    echo "  NtuplesReader-config --version : returns the version";
+    echo "  NtuplesReader-config --prefix  : returns the installation path";
+    echo "  NtuplesReader-config --include  : returns the compiler flags to include the header";
+    echo "  NtuplesReader-config --libs    : returns the linker arguments to link blackhat";;
+esac
+
