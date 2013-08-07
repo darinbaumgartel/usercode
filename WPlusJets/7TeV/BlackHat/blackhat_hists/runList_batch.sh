@@ -25,7 +25,7 @@ if [ $# -gt 3 ] ; then
     fac=$4
 fi
 
-. ~/.bashrc
+source rc.bash
 . ./setup.sh
 
 #dir=BHSNtuples_mnt
