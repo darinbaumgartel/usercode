@@ -10,7 +10,7 @@ def GetBJobCount():
 	return _c
 
 
-n = 9999999
+n = GetBJobCount()
 
 while n > 100:
 	print 'Waiting for bjobs to be less than 100. Current bjobs count:',n
