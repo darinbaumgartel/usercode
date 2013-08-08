@@ -1,0 +1,24 @@
+#!/bin/sh
+
+joblimit=$1
+pat=$2
+wait=$3
+
+if [ ${joblimit} -le 0 ]
+then
+exit 0
+fi
+
+njobs=`bjobs | egrep $pat | wc -l`
+
+#echo "$njobs"
+
+while [ ${njobs} -ge ${joblimit} ]
+do
+
+  echo "${njobs} jobs with string \"$pat\".  Max set to ${joblimit}.  Check again in ${wait} seconds. (`date`)."
+  sleep ${wait}
+
+  njobs=`bjobs | egrep $pat | wc -l`
+
+done
