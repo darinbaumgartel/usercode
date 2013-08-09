@@ -1,0 +1,41 @@
+# 1 Jet Minus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm1j/7TeV/born
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm1j/7TeV/loop
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm1j/7TeV/real
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm1j/7TeV/vsub
+# 2 Jet Minus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm2j/7TeV/born
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm2j/7TeV/loop
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm2j/7TeV/real
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm2j/7TeV/vsub
+# 3 Jet Minus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/B001
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/I001
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/R001
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/V001
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/V002
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/born
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/loop-fmlc
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/loop-lc
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/real
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm3j/7TeV/vsub
+# 4 Jet Minnus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wm4j/7TeV/born
+# 1 Jet Plus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp1j/7TeV/born
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp1j/7TeV/loop
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp1j/7TeV/real
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp1j/7TeV/vsub
+# 2 Jet Plus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp2j/7TeV/born
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp2j/7TeV/loop
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp2j/7TeV/real
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp2j/7TeV/vsub
+# 3 Jet Plus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp3j/7TeV/born
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp3j/7TeV/loop-fmlc
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp3j/7TeV/loop-lc
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp3j/7TeV/real
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp3j/7TeV/vsub
+# 4 Jet Plus
+/castor/cern.ch/user/d/dmaitre/BHSNtuples/Wp4j/7TeV/born
