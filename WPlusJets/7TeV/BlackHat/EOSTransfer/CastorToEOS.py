@@ -120,11 +120,11 @@ for n in range(len(castorfiles)):
 		if e in x:
 			esize = x.split()[1]
 			einf = x
-	print ' ---------------------------- '
-	print 'c:',c
-	print 'c inf:',cinf
-	print 'e:',e
-	print 'e inf:',einf
+	# print ' ---------------------------- '
+	# print 'c:',c
+	# print 'c inf:',cinf
+	# print 'e:',e
+	# print 'e inf:',einf
 	print n, csize,esize,csize == esize
 	if csize != esize:
 		necessarycps.append(cpcommands[n])
@@ -164,7 +164,10 @@ for xx in range(len(cpgroups)):
 
 for s in subs:
 	os.system('chmod 755 '+s[0])
-	print 'bsub -q 1nh -J '+s[1] +' < '+s[0]
+	if '--submit' in sys.argv:
+		os.system('bsub -q 1nh  -e /dev/null -J '+s[1] +' < '+s[0])
+
+	print 'bsub -q 1nh -e /dev/null -J '+s[1] +' < '+s[0]
 
 
 print 'Total Files: ',len(castorfiles)
@@ -176,160 +179,3 @@ if len(necessarycastorfiles) == 0:
 
 
 
-
-
-
-
-sys.exit()
-cfiles = []
-
-eosinfo = str(os.popen('cmsLs '+ndir+ ' | grep store ').readlines())
-
-eosverboseinfo = []
-
-castorverboseinfo = []
-
-for c in cdirs:
-	n = ndir + '/'+c.split('/')[-1]
-	if n not in eosinfo:
-		print n
-		print 'xrd eoscms mkdir  '+n
-		#sys.exit()
-		# os.system ( 'xrd eoscms mkdir  '+n)
-		sleep(1)
-	print 'scanning... cmsLs '+n
-	sleep(.1)
-	
-	thisverbose = os.popen('cmsLs '+n).readlines()
-	eosverboseinfo.append(thisverbose)
-	castorverboseinfo.append(os.popen('nsls -l '+c).readlines())
-
-sys.exit()
-
-for c in cdirs:
-	files = os.popen('nsls '+c).readlines()
-	for f in files:
-		cfiles.append(c + '/'+f.replace('\n',''))
-
-castorfiles=[]
-eosfiles = []
-for x in eosverboseinfo:
-	for y in x:
-		if '.root' in y:
-			info = [y.split()[1],y.split()[4]]
-			eosfiles.append(info)
-
-for x in castorverboseinfo:
-	for y in x:
-		if '.root' in y:
-			info = [y.split()[1],y.split()[4]]
-			castorfiles.append(info)
-
-NCopy = 0
-
-BatchCopy = ((((sys.argv[1]).split('/'))[-1]).split('.'))[0]
-
-os.system('rm -r '+BatchCopy)
-
-os.system('mkdir '+BatchCopy)
-
-fstat = open(BatchCopy+'/CopyCommands.txt','w')
-fstat.write("echo Starting\n")
-
-NTotal = 0
-NSub = 0
-NStage = 0
-NFinished = 0
-for f in range(len(cfiles)):
-	NTotal += 1
-	print 'Checking file ', f+1,' of ',(len(cfiles)), 
-	c = cfiles[f]
-	lfile = c.split('/')
-	n = ndir + '/'+lfile[-2]+'/'+lfile[-1]
-
-	cp = 'xrdcp "root://castorcms/'+c+'" root://eoscms//eos/cms'+n + ' '
-
-	is_present_on_eos = False
-	has_correct_size_on_eos = False
-	bytesize = -1
-
-	for e in eosfiles:
-		if n==e[-1]:
-			is_present_on_eos = True
-			bytesize = int(e[0])
-
-
-	if is_present_on_eos:
-		castorbytesize=int( (((os.popen('nsls -l '+c).readlines())[0]).split())[4])
-		if castorbytesize == bytesize:
-			print '...  Correct file with byte size: ', castorbytesize, '==' ,bytesize, '. '
-			has_correct_size_on_eos = True
-		else:
-			print '... Incorrect file size. Removing. ', castorbytesize, '!=' ,bytesize, '. '
-			print('xrd eoscms rm  /eos/cms'+n)
-			os.system('xrd eoscms rm  /eos/cms'+n)
-
-
-	has_good_copy = has_correct_size_on_eos*is_present_on_eos
-
-	if has_good_copy:
-		NFinished += 1
-		continue
-
-	sleep(.17)
-	stageinfo = str(os.popen('stager_qry -M '+c).readlines())
-	if 'STAGED' not in stageinfo:
-		print 'Staging file and skipping for now... '
-		if 'STAGEIN' not in stageinfo:
-		#if True:
-			sleep (.17)
-			os.system('stager_get -M '+c)
-		NStage += 1
-		continue
-
-	print '... writing copy statement to file.'
-	fstat.write(cp+'\n')
-	NSub += 1
-	
-fstat.close()
-
-if (NTotal != NFinished and '--norun' not in sys.argv):
-	fsub= open (BatchCopy+'/MasterSubber.tcsh','w')
-	fsub.write('#!/bin/tcsh\n\n')
-	n=0
-	m=0
-	for line in open(BatchCopy+'/CopyCommands.txt','r'):
-		if n==0:
-			m+=1
-			print 'Making subber number ' , m
-			f1 = open(''+BatchCopy+'/Subber_'+str(m)+'.tcsh','w')
-			f1.write('#!/bin/tcsh\n\ncd /afs/cern.ch/user/d/darinb/scratch0/Analyzer_PostLP/CMSSW_4_2_8/src\neval `scramv1 runtime -csh`\ncd -\n\n')
-			fsub.write('bsub -q 8nh -o /dev/null -e /dev/null -J JobNTupleMigration_'+str(m)+' < Subber_'+str(m)+'.tcsh\nsleep .5\n\n')
-		f1.write(line)
-		n+=1 
-		if n==3:
-			f1.close()
-			n=0
-	f1.close()
-	fsub.close()
-	os.system('chmod 777 '+BatchCopy+'/*')
-	
-	frun = open('run.tcsh','w')
-	frun.write('#!/bin/tcsh\n\ncd '+BatchCopy+'\n./MasterSubber.tcsh\ncd - \n')
-	frun.close()
-	os.system('chmod 777 run.tcsh')
-	os.system('./run.tcsh')
-
-
-
-print '\n\n   FileCheck Summary: \n\n'
-print 'File Count: ',NTotal 
-print 'Files submitted for Copying: ',NSub 
-print 'Files on hold for staging: ',NStage 
-print 'Files already finished: ',NFinished 
-print '\n\n'
-
-if (NTotal == NFinished) and 'DONE' not in sys.argv[1]:
-	print "Data migration is complete. Moving the input file to Done Status. \n\n         "+sys.argv[1] + '\n     --> '+ (sys.argv[1]).replace('.txt','_DONE.txt')+'\n\n'
-	os.system('mv '+sys.argv[1]+' '+ (sys.argv[1]).replace('.txt','_DONE.txt') + ' ')
-	
