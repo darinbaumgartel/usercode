@@ -41,8 +41,8 @@ date
 echo "Copying blackhat files: "
 for f in `cat $listfile` ; do
     to=$dir/`basename $f`
-    echo scp neu.cern.ch:/mnt/3TB/jhaley/Blackhat_ntuples/$f $to
-    scp neu.cern.ch:/mnt/3TB/jhaley/Blackhat_ntuples/$f $to
+    echo xrdcp root://eoscms//eos/cms/store/group/phys_smp/WPlusJets/$f $to
+    xrdcp root://eoscms//eos/cms/store/group/phys_smp/WPlusJets/$f $to
     ls -l $to
     list="$list  $to"
 done
