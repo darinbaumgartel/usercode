@@ -161,7 +161,7 @@ TLorentzVector PhiMod_Corr(TLorentzVector MET, float Nvtx, bool _isdata)
 	float _ey = _met*sin(_phi);
 	// std::cout<<"comp: "<<_ex<<"  "<<_ey<<std::endl;
 	// std::cout<<MET.Px()<<"  "<<MET.Py()<<std::endl;
-	std::cout<<_met<<"  "<<_phi<<std::endl;
+	// std::cout<<_met<<"  "<<_phi<<std::endl;
 	float px = 0.0;
 	float py = 0.0;
 
@@ -1188,6 +1188,7 @@ void placeholder::Loop()
 	// Another placeHolder. Needed because recoil corrections only get applied to W MC.
 	bool IsW = IsItWMC;
 	bool IsSherpa = IsItSherpa;
+	bool IsPhiCorr = IsItPhiCorr;
 
 	//===================================================================================================
 	//===================================================================================================
@@ -1258,10 +1259,10 @@ void placeholder::Loop()
 
 		//========================= MET CORRECTIONS ===============================================//		
 
-			if (false)
+			if (IsPhiCorr)
 			{
-				PFMET->at(0) = PFMETType1Cor->at(0);
-				PFMETPhi->at(0) = PFMETPhiType1Cor->at(0);	
+				// PFMET->at(0) = PFMETType1Cor->at(0);
+				// PFMETPhi->at(0) = PFMETPhiType1Cor->at(0);	
 				// std::cout<<PFMET->at(0)<<"  "<<PFMETPhi->at(0)<<std::endl;
 
 				TLorentzVector __MET;

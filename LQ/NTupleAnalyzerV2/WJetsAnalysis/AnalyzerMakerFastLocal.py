@@ -21,6 +21,7 @@ newjetscale = '1.0'
 newmuscale = '1.0'
 newjetres = '0.0'
 newmures = '0.0'
+dophicorr = 0
 
 StagerCheck = 0
 a = sys.argv
@@ -46,7 +47,9 @@ for x in range(len(a)):
 		newjetres = a[x+1]
 	if a[x] == '--mures':
 		newmures = a[x+1]
-
+	if a[x] == '--phicorr':
+		print 'USING PHI MODULATION CORRECTION'
+		dophicorr = 1
 
 
 if cfile == '' or hfile == '' or ifile == '':
@@ -188,7 +191,7 @@ for x in range(len(SignalType)):
 	sublist = []
 	for y in dirList:
 		sublist.append(y)
-		if len(sublist)>4:
+		if len(sublist)>5:
 			newdirList.append(sublist)
 			sublist =[]
 		if y==dirList[-1]:
@@ -232,11 +235,24 @@ for x in range(len(SignalType)):
 		
 
 	
-		if SignalType[x][0] == 'W' and 'Jets' in SignalType[x][0]:
+		if 'WJets' in SignalType[x] or 'WTo' in SignalType[x]:
 			s1 = s1.replace('IsItWMC', 'true')
-		if SignalType[x][0] != 'W' or 'Jets' not in SignalType[x][0]:
+		else:
 			s1 = s1.replace('IsItWMC', 'false')
-			
+
+		if 'Sherpa' in CastorDirectory[x]:
+			# print '   --> Indicating Sherpa in Code'
+			s1 = s1.replace('IsItSherpa', 'true')
+		else:
+			s1 = s1.replace('IsItSherpa', 'false')
+
+		if dophicorr ==1:
+			s1 = s1.replace('IsItPhiCorr', 'true')
+		else:
+			s1 = s1.replace('IsItPhiCorr', 'false')
+
+
+
 		if SignalType[x][0] == 'Z' and 'Spring11' in CastorDirectory[x] and 'ALPGEN' in CastorDirectory[x]:
 			s1 = s1.replace('IsItSpring11ZAlpgen', 'true')
 		if SignalType[x][0] != 'Z' or 'Spring11' in CastorDirectory[x] or 'ALPGEN' in CastorDirectory[x]:
@@ -345,7 +361,7 @@ def WaitForJobs():
 	done=0
 	n = 0
 	while done!=1:
-		os.system('sleep 120')
+		os.system('sleep 60')
 		jobinfo = os.popen('bjobs -w | grep '+now).readlines()
 		if 'PEND' not in str(jobinfo):
 			n += 1
