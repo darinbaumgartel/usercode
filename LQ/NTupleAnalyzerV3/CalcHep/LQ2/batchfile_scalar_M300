@@ -1,0 +1,63 @@
+Model:         LQ_P&B_2nd_gen
+Model changed: False
+Gauge:         Feynman
+Process:   p,p->alep,aqrk,lep,qrk
+
+# What markes up a proton, leptons and quarks
+Composite: p=u,U,d,D,s,S,G
+Composite: lep=e2
+Composite: alep=E2
+Composite: qrk=c
+Composite: aqrk=C
+
+# List of objects to remove - For Scalar Production
+Remove: Z,A,W+,VP,vp,VM,vm,WP,wp,WM,wm,u1,U1,ut,UT,up,UP,u0,U0,um,UM,ST,st,SP,sp,SM,sm,rp,RP,rm,RM,tp,TP,tm,TM 
+
+# PDF Sets and COM energy
+pdf1:      cteq6l (proton)
+pdf2:      cteq6l (proton)
+p1:        4000
+p2:        4000
+
+# Set Parameters
+Parameter: g1r = 0
+
+# Specify Run Paramters
+# ---- Scalar ----
+Run parameter: MLQ
+Run begin:     300
+Run step size: 100
+Run n steps:   1
+
+# Other Paramters
+alpha Q :            MLQ
+Cut parameter:1:    T(qrk)
+Cut min:1:          1
+Cut parameter:2:    T(aqrk)
+Cut min:2:          1
+
+# Kinematics 
+# Initial state to LQ, LQbar
+Kinematics :      12 -> 34, 56
+# LQ to l,q
+Kinematics :      34 -> 3 , 4
+# LQbar to l,q
+Kinematics :      56 -> 5 , 6
+
+# Regularization stuff
+Regularization momentum: 45
+Regularization mass:     MLQ
+Regularization width:    GS1
+Regularization power:    2
+
+# Batching setup
+Number of events (per run step): 100 
+Filename:                        LQPair_scalar
+NTuple:                          False
+Cleanup:                         True
+Parallelization method:      local
+Max number of cpus:          24
+nSess_1:   5
+nCalls_1:  100000
+nSess_2:   5
+nCalls_2:  100000
