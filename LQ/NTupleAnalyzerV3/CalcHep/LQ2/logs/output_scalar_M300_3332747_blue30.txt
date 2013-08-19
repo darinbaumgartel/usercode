@@ -1,0 +1,83 @@
+
+
+Job #3332747.blue30==============Monday 19th of August 2013 04:42:23 PM======================
+
+	CalcHEP Numerical Details
+
+	Done!
+
+Scans               sigma (fb)     Running   Finished   Time (hr)   N events
+MLQ300              7.1017e+02       0/8       8/8      0.02        100
+                                                        0.02
+
+MLQ300.txt	CalcHEP Numerical Details
+
+	Done!
+
+Processes                sigma (fb)     unc (%)   PID       Time (hr)      N events
+u,U->c,C,e2,E2           1.2244e+01     2.89e+01  0         0.00           25/25
+U,u->c,C,e2,E2           2.8294e+01     4.92e+01  0         0.00           25/25
+d,D->c,C,e2,E2           6.4866e+00     2.60e+01  0         0.00           25/25
+D,d->c,C,e2,E2           6.7312e+00     1.81e+01  0         0.00           25/25
+s,S->c,C,e2,E2           1.6191e+00     5.26e+01  0         0.00           25/25
+S,s->c,C,e2,E2           4.4448e-01     1.51e+01  0         0.00           25/25
+G,G->c,C,e2,E2           6.5435e+02     6.66e+01  0         0.01           137/137
+Total                    7.1017e+02     
+
+Decays                   width (GeV)    unc (%)   PID       Time (hr)      N events
+
+Widths                                            PID       Time (hr)
+Widths                                            0         0.00           
+
+Total                    7.1017e+02                         0.02           100/100
+
+
+
+
+
+Gz file was created LQPair_scalar-MLQ300.lhe.gz Please use menu 'Calchep->Lhe and Nt files' to veiw and plot. 
+cp: cannot stat `gnuplot.png': No such file or directory
+cp: cannot stat `gnuplot_dat': No such file or directory
+cp: cannot stat `gnuplot.png': No such file or directory
+Running PBS prologue script on red0892
+
+End of prologue. Now executing user's job
+------------------------------------------------------------------------------
+
+
+calchep_batch version 1.11
+
+Processing batch:
+Progress information can be found in the html directory.
+Simply open the following link in your browser:
+file:///scratch/hepmdb/users/1543/calc_work/html/index.html
+You can also view textual progress reports in /scratch/hepmdb/users/1543/calc_work/html/index.txt
+	and the other .txt files in the html directory.
+Events will be stored in the Events directory.
+
+PROCESS: S0->2*x
+PROCESS: S1->2*x
+PROCESS: S0->2*x
+PROCESS: S1->2*x
+PROCESS: S0->2*x
+PROCESS: S1->2*x
+PROCESS: S0->2*x
+PROCESS: S1->2*x
+PROCESS: S0->2*x
+PROCESS: S1->2*x
+PROCESS: S0->2*x
+PROCESS: S1->2*x
+PROCESS: S0->2*x
+PROCESS: S1->2*x
+
+-----------------------------------------------------------------------------
+Running epilogue script on red0892.
+
+Requested resource limits are mem=23gb,neednodes=1:ppn=12,nodes=1:ppn=12,pmem=1840mb,walltime=02:10:00
+Used resource limits are cput=00:02:17,mem=32204kb,vmem=301056kb,walltime=00:05:45
+
+Finished Running epilogue script on red0892
+
+-----------------------------------------------------------------------------
+
+
