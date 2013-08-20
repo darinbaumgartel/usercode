@@ -2,13 +2,22 @@ Model:         LQ_P&B_2nd_gen
 Model changed: False
 Gauge:         Feynman
 Process:   p,p->alep,aqrk,lep,qrk
+Process:   p,p->anu,aqrkb,lep,qrk
+Process:   p,p->alep,aqrk,nu,qrkb
+Process:   p,p->anu,aqrkb,nu,qrkb
+#Process:   p,p->s0,S0
+
 
 # What markes up a proton, leptons and quarks
 Composite: p=u,U,d,D,s,S,G
 Composite: lep=e2
 Composite: alep=E2
+Composite: nu=n2
+Composite: anu=N2
 Composite: qrk=c
+Composite: qrkb=s
 Composite: aqrk=C
+Composite: aqrkb=S
 
 # List of objects to remove - For Scalar Production
 Remove: Z,A,W+,VP,vp,VM,vm,WP,wp,WM,wm,u1,U1,ut,UT,up,UP,u0,U0,um,UM,ST,st,SP,sp,SM,sm,rp,RP,rm,RM,tp,TP,tm,TM 
@@ -31,10 +40,10 @@ Run n steps:   1
 
 # Other Paramters
 alpha Q :            MLQ
-Cut parameter:1:    T(qrk)
-Cut min:1:          1
-Cut parameter:2:    T(aqrk)
-Cut min:2:          1
+#Cut parameter:1:    T(qrk)
+#Cut min:1:          1
+#Cut parameter:2:    T(aqrk)
+#Cut min:2:          1
 
 # Kinematics 
 # Initial state to LQ, LQbar
@@ -45,10 +54,10 @@ Kinematics :      34 -> 3 , 4
 Kinematics :      56 -> 5 , 6
 
 # Regularization stuff
-Regularization momentum: 45
-Regularization mass:     MLQ
-Regularization width:    GS1
-Regularization power:    2
+#Regularization momentum: 45
+#Regularization mass:     MLQ
+#Regularization width:    GS1
+#Regularization power:    2
 
 # Batching setup
 Number of events (per run step): 100 
