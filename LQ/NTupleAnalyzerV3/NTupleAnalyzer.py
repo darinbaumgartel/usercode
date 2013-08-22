@@ -134,7 +134,7 @@ if nonisoswitch==True or emuswitch==True or quicktestswitch==True:
 
 
 def GetPURescalingFactors(puversion):
-	# Pupose: To get the pileup reweight factors from the PU_Central.root, PU_Up.root, and PU_Down.root files.
+	# Purpose: To get the pileup reweight factors from the PU_Central.root, PU_Up.root, and PU_Down.root files.
 	#         The MC Truth distribution is taken from https://twiki.cern.ch/twiki/bin/view/CMS/PileupMCReweightingUtilities
 
 	MCDistSummer12 = [2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 1.999E-03, 6.097E-03, 1.046E-02, 1.383E-02, 
@@ -143,8 +143,6 @@ def GetPURescalingFactors(puversion):
                       1.437E-02, 1.215E-02, 1.016E-02, 8.400E-03, 6.873E-03, 5.564E-03, 4.457E-03, 3.533E-03, 2.772E-03, 2.154E-03, 1.656E-03, 1.261E-03, 
                       9.513E-04, 7.107E-04, 5.259E-04, 3.856E-04, 2.801E-04, 2.017E-04, 1.439E-04, 1.017E-04, 7.126E-05, 4.948E-05, 3.405E-05, 2.322E-05, 
                       1.570E-05, 5.005E-06]
-
-
 
 	if puversion =='Basic':
 		h_pu_up = TFile.Open("PU_Up.root",'read').Get('pileup')
@@ -203,10 +201,8 @@ fout = TFile.Open(tmpfout,"RECREATE")
 tout=TTree("PhysicalVariables","PhysicalVariables")
 
 
-
-
 def GetPDFWeightVars(T):
-	# Pupose: Determine all the branch names needed to store the PDFWeights 
+	# Purpose: Determine all the branch names needed to store the PDFWeights 
 	#         for CTEQ, MSTW, and NNPDF in flat (non vector) form. 
 	if T.isData:
 		return []
@@ -257,7 +253,7 @@ _pdfLHS = _pdfLHS.replace(',]',']')
 ##########################################################################################
 
 def PrintBranchesAndExit(T):
-	# Pupose: Just list the branches on the input file and bail out. 
+	# Purpose: Just list the branches on the input file and bail out. 
 	#         For coding and debugging
 	x = T.GetListOfBranches()
 	for n in x:
@@ -313,7 +309,7 @@ def CheckRunLumiCert(r,l):
 
 
 def GeomFilterCollection(collection_to_clean,good_collection,dRcut):
-	# Pupose: Take a collection of TLorentzVectors that you want to clean (arg 1)
+	# Purpose: Take a collection of TLorentzVectors that you want to clean (arg 1)
 	#         by removing all objects within dR of dRcut (arg 3) of any element in
 	#         the collection of other particles (arg 2)
 	#         e.g.  argumments (jets,muons,0.3) gets rid of jets within 0.3 of muons. 
@@ -328,24 +324,24 @@ def GeomFilterCollection(collection_to_clean,good_collection,dRcut):
 	return output_collection
 
 def TransMass(p1,p2):
-	# Pupose: Simple calculation of transverse mass between two TLorentzVectors
+	# Purpose: Simple calculation of transverse mass between two TLorentzVectors
 	return math.sqrt( 2*p1.Pt()*p2.Pt()*(1-math.cos(p1.DeltaPhi(p2))) )
 
 def InvMass(particles):
-	# Pupose: Simple calculation of invariant mass between two TLorentzVectors	
+	# Purpose: Simple calculation of invariant mass between two TLorentzVectors	
 	output=particles
 	return (p1+p2).M()
 
 def ST(particles):
-	# Pupose: Calculation of the scalar sum of PT of a set of TLorentzVectors	
+	# Purpose: Calculation of the scalar sum of PT of a set of TLorentzVectors	
 	st = 0.0
 	for p in particles:
 		st += p.Pt()
 	return st
 
 def PassTrigger(T,trigger_identifiers,prescale_threshold):
-	# Pupose: Return a flag (1 or 0) to indicate whether the event passes any trigger
-	#         which is syntatically matched to a set of strings trigger_identifiers,
+	# Purpose: Return a flag (1 or 0) to indicate whether the event passes any trigger
+	#         which is syntactically matched to a set of strings trigger_identifiers,
 	#         considering only triggers with a prescale <= the prescale threshold.	
 	for n in range(len(T.HLTInsideDatasetTriggerNames)):
 		name = T.HLTInsideDatasetTriggerNames[n]
@@ -377,19 +373,26 @@ def CountVertices(T):
 	return vertices	
 
 def GetPUWeight(T,version,puversion):
-	# Pupose: Get the pileup weight for an event. Version can indicate the central
+	# Purpose: Get the pileup weight for an event. Version can indicate the central
 	#         weight, or the Upper or Lower systematics. Needs to be updated for
 	#         input PU histograms given only the generated disribution........	
+
+	# Only necessary for MC
 	if T.isData:
 		return 1.0
+
+	# Getting number of PU interactions, start with zero.	
 	N_pu = 0
 
+	# Set N_pu to number of true PU interactions in the central bunch
 	for n in range(len(T.PileUpInteractionsTrue)):
 		if abs(T.PileUpOriginBX[n]==0):
 			N_pu = int(1.0*(T.PileUpInteractionsTrue[n]))
 
 	puweight = 0
 
+	# Assign the list of possible PU weights according to what is being done
+	# Central systematics Up, or systematic down
 	if puversion=='Basic':
 		puweights = CentralWeights
 		if version=='SysUp':
@@ -397,6 +400,7 @@ def GetPUWeight(T,version,puversion):
 		if version=='SysDown':
 			puweights=LowerWeights
 
+	# Also possible to do just for 2012D, for cross-checks. 
 	if puversion=='2012D':
 		puweights = CentralWeights_2012D
 		if version=='SysUp':
@@ -404,6 +408,9 @@ def GetPUWeight(T,version,puversion):
 		if version=='SysDown':
 			puweights=LowerWeights_2012D
 
+
+	# Make sure there exists a weight for the number of interactions given, 
+	# and set the puweight to the appropriate value.
 	NRange = range(len(puweights))
 	if N_pu in NRange:
 		puweight=puweights[N_pu]
@@ -412,7 +419,7 @@ def GetPUWeight(T,version,puversion):
 
 
 def FillPDFWeights(T):
-	# Pupose: Given the _pdfLHS stored at the begging when branches were created,
+	# Purpose: Given the _pdfLHS stored at the begging when branches were created,
 	#         this function will set all PDFweights in the event. 	
 	_allweights = []
 	_allweights += T.PDFCTEQWeights
@@ -422,7 +429,7 @@ def FillPDFWeights(T):
 
 
 def MuonsFromLQ(T):
-	# Pupose: Testing. Get the muons from LQ decays and find the matching reco muons. 
+	# Purpose: Testing. Get the muons from LQ decays and find the matching reco muons. 
 	#         Return TLorentzVectors of the gen and reco muons, and the indices for
 	#         the recomuons as well.
 	muons = []
@@ -470,7 +477,7 @@ def MuonsFromLQ(T):
 
 
 def PropagatePTChangeToMET(met,original_object,varied_object):
-	# Pupose: This takes an input TLorentzVector met representing the missing ET
+	# Purpose: This takes an input TLorentzVector met representing the missing ET
 	#         (no eta component), and an original object (arg 2), which has been
 	#         kinmatically modified for a systematic (arg 3), and modifies the 
 	#         met to compensate for the change in the object.
@@ -478,7 +485,7 @@ def PropagatePTChangeToMET(met,original_object,varied_object):
 
 
 def TightIDCocktailMuons(T,met,variation,isdata):
-	# Pupose: Gets the collection of muons passing tight muon ID. 
+	# Purpose: Gets the collection of muons passing tight muon ID. 
 	#         Returns muons as TLorentzVectors, and indices corrresponding
 	#         to the surviving muons of the muon collection. 
 	#         Also returns modified MET for systematic variations.
@@ -559,7 +566,7 @@ def TightIDCocktailMuons(T,met,variation,isdata):
 	return [muons,muoninds,met,trk_isos,charges,deltainvpts,chi2,pfid,layers]
 
 def TightIDMuons(T,met,variation):
-	# Pupose: Gets the collection of muons passing tight muon ID. 
+	# Purpose: Gets the collection of muons passing tight muon ID. 
 	#         Returns muons as TLorentzVectors, and indices corrresponding
 	#         to the surviving muons of the muon collection. 
 	#         Also returns modified MET for systematic variations.
@@ -611,7 +618,7 @@ def TightIDMuons(T,met,variation):
 	return [muons,muoninds,met,trk_isos,charges]
 
 def HEEPElectrons(T,met,variation):
-	# Pupose: Gets the collection of electrons passing HEEP ID. 
+	# Purpose: Gets the collection of electrons passing HEEP ID. 
 	#         Returns electrons as TLorentzVectors, and indices corrresponding
 	#         to the surviving electrons of the electron collection. 
 	#         Also returns modified MET for systematic variations.	
@@ -674,7 +681,7 @@ def HEEPElectrons(T,met,variation):
 	return [electrons,electroninds,met]
 
 def JERModifiedPt(pt,eta,phi,T,modtype):
-	# Pupose: Modify reco jets based on genjets. Input is pt/eta/phi of a jet. 
+	# Purpose: Modify reco jets based on genjets. Input is pt/eta/phi of a jet. 
 	#         The jet will be matched to a gen jet, and the difference
 	#         between reco and gen will be modified according to appropriate
 	#         pt/eta dependent scale factors. 
@@ -717,7 +724,7 @@ def JERModifiedPt(pt,eta,phi,T,modtype):
 	return pt
 
 def LooseIDJets(T,met,variation,isdata):
-	# Pupose: Gets the collection of jets passing loose PFJet ID. 
+	# Purpose: Gets the collection of jets passing loose PFJet ID. 
 	#         Returns jets as TLorentzVectors, and indices corrresponding
 	#         to the surviving jetss of the jet collection. 
 	#         Also returns modified MET for systematic variations.	
@@ -774,7 +781,7 @@ def MetVector(T):
 	return met
 
 def GetLLJJMasses(l1,l2,j1,j2):
-	# Pupose: For LLJJ channels, this function returns two L-J Masses, corresponding to the
+	# Purpose: For LLJJ channels, this function returns two L-J Masses, corresponding to the
 	#         pair of L-Js which minimizes the difference between LQ masses in the event
 	m11 = (l1+j1).M()
 	m12 = (l1+j2).M()
@@ -795,7 +802,7 @@ def GetLLJJMasses(l1,l2,j1,j2):
 	return pair
 
 def GetLVJJMasses(l1,met,j1,j2):
-	# Pupose: For LVJJ channels, this function returns two L-J Masses, and an LJ mass and mT, 
+	# Purpose: For LVJJ channels, this function returns two L-J Masses, and an LJ mass and mT, 
 	#         Quantities corresponding to the pair of L-Js which minimizes the difference 
 	#         between LQ masses in the event
 	m11 = (l1+j1).M()
@@ -826,7 +833,7 @@ def GetLVJJMasses(l1,met,j1,j2):
 ##########################################################################################
 
 def FullKinematicCalculation(T,variation):
-	# Pupose: This is the magic function which calculates all kinmatic quantities using
+	# Purpose: This is the magic function which calculates all kinmatic quantities using
 	#         the previous functions. It returns them as a simple list of doubles. 
 	#         It will be used in the loop over events. The 'variation' argument is passed
 	#         along when getting the sets of leptons and jets, so the kinematics will vary.
