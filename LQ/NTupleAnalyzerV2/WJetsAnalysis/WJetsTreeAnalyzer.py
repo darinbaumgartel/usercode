@@ -6,14 +6,15 @@ from datetime import datetime
 startTime = datetime.now()
 
 afsdir = '/afs/cern.ch/work/d/darinb/WAnalysis/CMSSW_4_2_8/src/WJetsAnalysis/'
-NormalDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_2013_09_02_16_51_14/SummaryFiles"
-JetScaleDownDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetScaleDown_2013_09_09_16_31_31/SummaryFiles"
-JetScaleUpDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetScaleUp_2013_09_09_16_02_36/SummaryFiles"
-JetSmearDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetSmear_2013_09_09_19_23_58/SummaryFiles"
-PhiCorrDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MetPhiMod_2013_09_09_20_12_28/SummaryFiles"
-MuScaleDownDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuScaleDown_2013_09_10_01_06_05/SummaryFiles"
-MuScaleUpDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuScaleUp_2013_09_09_22_34_22/SummaryFiles"
-MuSmearDirectory = afsdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuSmear_2013_09_10_04_52_20/SummaryFiles"
+eosdir = '/store/group/phys_smp/WPlusJets/AnalyzerOutput/'
+NormalDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_2013_09_02_16_51_14/SummaryFiles"
+JetScaleDownDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetScaleDown_2013_09_09_16_31_31/SummaryFiles"
+JetScaleUpDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetScaleUp_2013_09_09_16_02_36/SummaryFiles"
+JetSmearDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetSmear_2013_09_09_19_23_58/SummaryFiles"
+PhiCorrDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MetPhiMod_2013_09_09_20_12_28/SummaryFiles"
+MuScaleDownDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuScaleDown_2013_09_10_01_06_05/SummaryFiles"
+MuScaleUpDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuScaleUp_2013_09_09_22_34_22/SummaryFiles"
+MuSmearDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuSmear_2013_09_10_04_52_20/SummaryFiles"
 
 
 
@@ -1426,228 +1427,6 @@ def GetIntErr(histograms):
 	return [Int,Err]
 
 
-def QCDStudy(FileDirectory,selection,gen_selection,weight):
-
-
-	table = '\n\nJet Multiplicity | Muon PT | Global Scale Factor | Isolation Fake Rate (Data) | Isolation Fake Rate (QCD MC)| Total Rescaling \\\\ \\hline \n'
-
-	globalreweightingvals = MakeBasicPlotQCD('Pt_MET',"E_{T}^{miss} [GeV]",[50,0,10],selection+'*(RelIso_muon1<0.15)*(MT_muon1METR>50)',gen_selection,weight,FileDirectory,'globalreweightbackground','(1.0)')
-
-	globaldata = globalreweightingvals[6][0]
-	globalmc = globalreweightingvals[5][0]+ globalreweightingvals[0][0]+globalreweightingvals[1][0]+globalreweightingvals[2][0]+globalreweightingvals[3][0]+globalreweightingvals[4][0]
-
-	globalscale = str(round(globaldata/globalmc,3))
-
-	selection += ('*(Pt_MET<10.0)')
-
-	weight = weight+'*('+globalscale+')'
-
-	jetreq = -1
-	ptpoint = ''
-
-	scalestring_qcd_central = '('
-	scalestring_qcd_up = '('
-	scalestring_qcd_down = '('
-
-	for jetcut in ['*(PFJet30Count==0)','*(PFJet30Count==1)','*(PFJet30Count==2)','*(PFJet30Count==3)','*(PFJet30Count==4)','*(PFJet30Count==5)']:
-	# for jetcut in ['*(PFJet30Count==0)','*(PFJet30Count==1)']:
-		jetreq += 1
-
-		for ptrange in ['*(Pt_muon1>25)*(Pt_muon1<40)','*(Pt_muon1>40)']:
-			ptpoint = ((ptrange.split('>')[1]).split(')')[0]).replace(' ','')
-
-			nonisovals = MakeBasicPlotQCD('Pt_MET',"E_{T}^{miss} [GeV] (Non-Iso, Non-Rescaled, Njet="+str(jetreq)+')',[50,0,10],selection+jetcut+ptrange,gen_selection,weight,FileDirectory,'qcdunscaled_noniso_'+str(jetreq)+'jet_mupt_'+ptpoint,'(1.0)')
-			nonisodata = nonisovals[6][0]
-			nonisoqcd = nonisovals[5][0]
-			nonisobg = nonisovals[0][0]+nonisovals[1][0]+nonisovals[2][0]+nonisovals[3][0]+nonisovals[4][0]
-			nonisodata_err = nonisovals[6][1]
-			nonisoqcd_err = nonisovals[5][1] 
-			nonisobg_err = math.sqrt(nonisovals[0][1]**2+nonisovals[1][1]**2+nonisovals[2][1]**2+nonisovals[3][1]**2+nonisovals[4][1]**2)
-
-			isovals = MakeBasicPlotQCD('Pt_MET',"E_{T}^{miss} [GeV] (Isolated, Non-Rescaled, Njet="+str(jetreq)+')',[50,0,10],selection+jetcut+'*(RelIso_muon1<0.15)'+ptrange,gen_selection,weight,FileDirectory,'qcdunscaled_iso_'+str(jetreq)+'jet_mupt_'+ptpoint,'(1.0)')
-			# isovals = MakeBasicPlotQCD('Pt_MET',"E_{T}^{miss} [GeV]",[50,0,10],selection+jetcut,gen_selection,weight,FileDirectory,'qcdunscaled_iso_'+str(jetreq)+'jet','(1.0)')
-			isodata = isovals[6][0]
-			isoqcd = isovals[5][0]
-			isobg = isovals[0][0]+isovals[1][0]+isovals[2][0]+isovals[3][0]+isovals[4][0]
-			isodata_err = isovals[6][1]
-			isoqcd_err = isovals[5][1]
-			isobg_err = math.sqrt(isovals[0][1]**2+isovals[1][1]**2+isovals[2][1]**2+isovals[3][1]**2+isovals[4][1]**2)
-
-			# FakeRate = isodata/nonisodata
-			# FakeRate_err = (math.sqrt((isodata_err/isodata)**2 + (nonisodata_err/nonisodata)**2))*FakeRate
-
-			DataMinusBG = nonisodata - nonisobg
-			DataMinusBG_err = math.sqrt(nonisodata_err**2 + nonisobg_err**2)
-
-			IsoDataMinusBG = isodata - isobg
-			IsoDataMinusBG_err = math.sqrt(isodata_err**2 + isobg_err**2)
-
-
-			FakeRate = IsoDataMinusBG/DataMinusBG
-			FakeRate_err = (math.sqrt((IsoDataMinusBG_err/IsoDataMinusBG)**2 + (DataMinusBG_err/DataMinusBG)**2))*FakeRate
-
-
-			ScaleFactor = DataMinusBG/nonisoqcd
-			ScaleFactor_err = (math.sqrt((DataMinusBG_err/DataMinusBG)**2 + (nonisoqcd_err/nonisoqcd)**2))*ScaleFactor
-
-			TotalNorm = FakeRate*ScaleFactor
-			TotalNorm_err = (math.sqrt((FakeRate_err/FakeRate)**2 + (ScaleFactor_err/ScaleFactor)**2))*TotalNorm
-
-			MCFakeRate = isoqcd/nonisoqcd
-			MCFakeRate_err = (math.sqrt((isoqcd_err/isoqcd)**2 + (nonisoqcd_err/nonisoqcd)**2))*MCFakeRate		
-
-
-			print FakeRate, FakeRate_err
-			print MCFakeRate, MCFakeRate_err
-			print ScaleFactor, ScaleFactor_err
-			print TotalNorm, TotalNorm_err
-
-			scalestring_qcd_central += ' ('+str(round(TotalNorm,4))+')' +jetcut+ptrange +' +'*(jetreq!=5) + ' )'*(jetreq ==5)
-			scalestring_qcd_up += ' ('+str(round(TotalNorm + TotalNorm_err,4))+')' +jetcut+ptrange +' +'*(jetreq!=5)+ ' )'*(jetreq ==5)
-			scalestring_qcd_down += ' ('+str(round(TotalNorm - TotalNorm_err,4))+')' +jetcut+ptrange +' +'*(jetreq!=5)+ ' )'*(jetreq ==5)
-
-			table += '$N_{jet} =='+str(jetreq) + ' $  &  ' + 'Muon $p_T >$ ' +ptpoint+' & '
-			table += str(round(ScaleFactor,3)) + '\\pm' + str(round(ScaleFactor_err,3)) + ' & '
-			table += str(round(FakeRate,3)) + '\\pm' + str(round(FakeRate_err,3)) + ' & '
-			table += str(round(MCFakeRate,3)) + '\\pm' + str(round(MCFakeRate_err,3)) + ' & '
-			table += str(round(TotalNorm,3)) + '\\pm' + str(round(TotalNorm_err,3)) + ' \\\\ \\hline \n '
-
-
-			null = MakeBasicPlotQCD('Pt_MET',"E_{T}^{miss} [GeV](Non-Isolated, Global QCD MC Rescaling = "+str(round(ScaleFactor,2))+" , Njet="+str(jetreq)+')',[50,0,10],selection+jetcut+ptrange,gen_selection,weight,FileDirectory,'qcdscaled_noniso_'+str(jetreq)+'jet_mupt_'+ptpoint,'('+str(ScaleFactor)+')' ) 
-
-			ratednonisovals = MakeBasicPlotQCD('Pt_MET',"E_{T}^{miss} [GeV](Isolated, QCD FakeRate*Rescaling = "+str(round(TotalNorm,2))+", Njet="+str(jetreq)+')',[50,0,10],selection+jetcut+'*(RelIso_muon1<0.15)'+ptrange,gen_selection,weight,FileDirectory,'qcdrated_iso_'+str(jetreq)+'jet_mupt_'+ptpoint,'('+str(TotalNorm)+')' ) 
-			# ratednonisovals = MakeBasicPlotQCD('Pt_MET',"E_{T}^{miss} [GeV]",[50,0,10],selection,gen_selection+jetcut,weight,FileDirectory,'qcdrated_noniso_'+str(jetreq)+'jet','('+str(FakeRate)+')' ) 
-			ratednonisodata = ratednonisovals[6][0]
-			ratednonisoqcd = ratednonisovals[5][0]
-			ratednonisobg = ratednonisovals[0][0]+ratednonisovals[1][0]+ratednonisovals[2][0]+ratednonisovals[3][0]+ratednonisovals[4][0]
-			ratednonisodata_err = ratednonisovals[6][1]
-			ratednonisoqcd_err = ratednonisovals[5][1]
-			ratednonisobg_err = math.sqrt(ratednonisovals[0][1]**2+ratednonisovals[1][1]**2+ratednonisovals[2][1]**2+ratednonisovals[3][1]**2+ratednonisovals[4][1]**2)
-
-		# break
-
-	print table 
-	print '\n'
-	print scalestring_qcd_central
-	print scalestring_qcd_up
-	print scalestring_qcd_down
-	print '\n'
-
-	os.system('montage pyplots/*qcdrated_iso*png -geometry +2+2 pyplots/qcdratediso.png')
-	os.system('montage pyplots/*qcdunscaled_iso*png -geometry +2+2 pyplots/qcdunscalediso.png')
-	os.system('montage pyplots/*qcdunscaled_noniso*png -geometry +2+2 pyplots/qcdunscalednoniso.png')
-	os.system('montage pyplots/*qcdscaled_noniso*png -geometry +2+2 pyplots/qcdscalednoniso.png')
-	os.system('convert -density 800 pyplots/qcdunscalednoniso.png pyplots/qcdscalednoniso.png pyplots/qcdunscalediso.png pyplots/qcdratediso.png    pyplots/QCDStudy.pdf')
-
-
-	return [scalestring_qcd_central , scalestring_qcd_up , scalestring_qcd_down]
-
-
-# This is basic plot code for a data vs MC histogram. It is not used much on it's own, but was a precursor to parts of MakeUnfoldedPlots.
-def MakeBasicPlotQCD(recovariable,xlabel,presentationbinning,selection,gen_selection,weight,FileDirectory,tagname,qcdrescaling):
-
-	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
-	allfiles = [x.replace('\n','') for x in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines()]
-	if 'SingleMuData.root' not in allfiles:
-		allfiles.append('SingleMuData.root')
-	for f in allfiles:
-		fin = f.replace('\n','')
-		# file_override is just a means of replacing the normal file with files for shape-varied systematics which have different names.
-		exec('t_'+f.replace(".root","")+" = TFile.Open(\""+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
-
-	tmpfile = TFile("tmp.root","RECREATE")
-	
-	print "\n     Making basic histogram for "+recovariable+". \n"
-	# Create Canvas
-	c1 = TCanvas("c1","",700,500)
-	gStyle.SetOptStat(0)
-
-	# These are teh style parameters for certain plots - [FillStyle,MarkerStyle,MarkerSize,LineWidth,Color]
-	MCRecoStyle=[0,20,.00001,1,4]
-	DataRecoStyle=[0,20,.7,1,1]
-	# X and Y axis labels for plot
-	Label=[xlabel,"Events/Bin"]
-
-	WStackStyle=[3007,20,.00001,2,6]
-	TTStackStyle=[3005,20,.00001,2,4]
-	ZStackStyle=[3004,20,.00001,2,2]
-	DiBosonStackStyle=[3006,20,.00001,2,3]
-	StopStackStyle=[3008,20,.00001,2,9]
-	QCDStackStyle=[3013,20,.00001,2,15]
-
-
-	# print ' declared styles'
-	##############################################################################
-	#######      Top Left Plot - Normal Stacked Distributions              #######
-	##############################################################################
-	c1.cd(1)
-
-	qcdselection = selection
-	if 'rated' in tagname:
-		qcdselection = qcdselection.replace('*(RelIso_muon1<0.15)','')
-
-	### Make the plots without variable bins!
-	hs_rec_WJets=CreateHisto('hs_rec_WJets','W+Jets [Reco]',t_WJets_MG,recovariable,presentationbinning,selection+weight,WStackStyle,Label)
-	# print 'got wjets', hs_rec_WJets.Integral()
-	hs_rec_Data=CreateHisto('hs_rec_Data','Data, 5/fb [Reco]',t_SingleMuData,recovariable,presentationbinning,selection+'*Mu24PassPrescale*(Mu24Pass>0.5)',DataRecoStyle,Label)
-	print 'got data', hs_rec_Data.Integral()
-	hs_rec_DiBoson=CreateHisto('hs_rec_DiBoson','DiBoson [MadGraph]',t_DiBoson,recovariable,presentationbinning,selection+weight,DiBosonStackStyle,Label)
-	# print 'got DiBoson'
-	hs_rec_ZJets=CreateHisto('hs_rec_ZJets','Z+Jets [MadGraph]',t_ZJets_MG,recovariable,presentationbinning,selection+weight,ZStackStyle,Label)
-	# print 'got ZJets'
-	hs_rec_TTBar=CreateHisto('hs_rec_TTBar','t#bar{t} [MadGraph]',t_TTBar,recovariable,presentationbinning,selection+weight,TTStackStyle,Label)
-	# print 'got TTBar'
-	hs_rec_SingleTop=CreateHisto('hs_rec_SingleTop','SingleTop [MadGraph]',t_SingleTop,recovariable,presentationbinning,selection+weight,StopStackStyle,Label)
-	# print 'got stop'
-	hs_rec_QCDMu=CreateHisto('hs_rec_QCDMu','QCD #mu-enriched [Pythia]',t_QCDMu,recovariable,presentationbinning,qcdselection+weight+'*'+qcdrescaling,QCDStackStyle,Label)
-	# print 'got QCD'
-	
-	# All the standard model contribution histograms
-	SM=[hs_rec_SingleTop,hs_rec_DiBoson,hs_rec_ZJets,hs_rec_TTBar,hs_rec_WJets,hs_rec_QCDMu]
-
-	# You could scale the mc but the factor computed below to have Integral(MC) == Integral(data)
-	mcdatascalepres = (1.0*(hs_rec_Data.GetEntries()))/(sum(k.Integral() for k in SM))
-
-	# Stack for all the mc
-	MCStack = THStack ("MCStack","")
-	
-	# Integral of the MC
-	SMIntegral = sum(k.Integral() for k in SM)
-	
-	# Set better minima and maxima for a log plot
-	MCStack.SetMinimum(1.0)
-	MCStack.SetMaximum(SMIntegral*100)
-	
-	# Add MC to the stack
-	for x in SM:
-		#x.Scale(mcdatascalepres)
-		MCStack.Add(x)
-	
-	# Draw the stack
-	MCStack.Draw("HIST")
-	c1.cd(1).SetLogy()
-
-	# Fix up stack style
-	MCStack=BeautifyStack(MCStack,Label)
-	hs_rec_Data.Draw("EPSAME")
-
-	# Create Legend
-	FixDrawLegend(c1.cd(1).BuildLegend())
-	gPad.RedrawAxis()
-
-	# Print plot
-	c1.Print('pyplots/Basic_'+recovariable+'_'+tagname+'.pdf')
-	c1.Print('pyplots/Basic_'+recovariable+'_'+tagname+'.png')
-
-	w = GetIntErr([hs_rec_WJets])
-	tt = GetIntErr([hs_rec_TTBar])
-	z = GetIntErr([hs_rec_ZJets]) 
-	vv = GetIntErr([hs_rec_DiBoson])
-	st = GetIntErr([hs_rec_SingleTop]) 
-	q = GetIntErr([hs_rec_QCDMu])
-	dat = GetIntErr([hs_rec_Data])
-	return [w,tt,z,vv,st,q,dat]
-
 
 def DivWithErr(a,b):
 	av = a[0]
@@ -1682,17 +1461,18 @@ def DivWithErr(a,b):
 # This is basic plot code for a data vs MC histogram. It is not used much on it's own, but was a precursor to parts of MakeUnfoldedPlots.
 def MakeBasicPlot(recovariable,xlabel,presentationbinning,selection,gen_selection,weight,FileDirectory,tagname):
 
+	eosroot = 'root://eoscms//eos/cms'
 	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
-	allfiles = [x.replace('\n','') for x in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines()]
+	allfiles = [x.replace('\n','') for x in os.popen('cmsLs '+FileDirectory+"| grep \".root\" | awk '{print $5}'").readlines()]
 	if 'SingleMuData.root' not in allfiles:
 		allfiles.append('SingleMuData.root')
 	for f in allfiles:
 		fin = f.replace('\n','')
 		# file_override is just a means of replacing the normal file with files for shape-varied systematics which have different names.
 		if 'Data' not in fin:
-			exec('t_'+f.replace(".root","")+" = TFile.Open(\""+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+			exec('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
 		if 'Data' in fin:
-			exec('t_'+f.replace(".root","")+" = TFile.Open(\""+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+			exec('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
 
 	tmpfile = TFile("tmp.root","RECREATE")
 	
@@ -2037,11 +1817,12 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	##############################################################################
 	#######     Basic setup - Get the files and trees, designate styles    #######
 	##############################################################################
+	eosroot = 'root://eoscms//eos/cms'
 
 	JESTag = ('JetScale' in FileDirectory) and ('NoJESTag' not in 'pyplots')
 	PHITag = 'PhiCorr' in FileDirectory
 	# Load all root files as trees - e.g. file "DiBoson.root" will give you tree called "t_DiBoson"
-	allfiles = [x.replace('\n','') for x in os.popen('ls '+FileDirectory+"| grep \".root\"").readlines()]
+	allfiles = [(x.split('/')[-1]).replace('\n','') for x in os.popen('cmsLs '+FileDirectory+"| grep \".root\" | awk '{print $5}'").readlines()]
 	if 'SingleMuData.root' not in allfiles:
 		allfiles.append('SingleMuData.root')
 	for f in allfiles:
@@ -2054,34 +1835,36 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 			if 'WJets_MG' in fin:
 				fin = fin.replace('WJets_MG','WJets_Sherpa')
 
+		print ('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+
 		if JESTag==True:
 
 			if 'Data' not in fin :
-				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
 
 				if 'WJets_MG' in fin:
-					exec("t_MG = TFile.Open(\""+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")	
+					exec("t_MG = TFile.Open(\""+eosroot+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")	
 
 			else:
-				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
 
 		elif PHITag==True:
 
 			if True:
-				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
 
 				if 'WJets_MG' in fin:
-					exec("t_MG = TFile.Open(\""+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")	
+					exec("t_MG = TFile.Open(\""+eosroot+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")	
 
 		else:
 			if 'Data' not in fin:
-				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+FileDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
 
 				if 'WJets_MG' in fin_orig:
-					exec("t_MG = TFile.Open(\""+FileDirectory+"/"+fin_orig+"\")"+".Get(\""+TreeName+"\")")	
+					exec("t_MG = TFile.Open(\""+eosroot+FileDirectory+"/"+fin_orig+"\")"+".Get(\""+TreeName+"\")")	
 
 			else:
-				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
+				exec('t_'+f.replace(".root","")+" = TFile.Open(\""+eosroot+NormalDirectory+"/"+fin+"\")"+".Get(\""+TreeName+"\")")
 
 
 	print 'Is the new modified JES being used (Data not unf Matrix?):', JESTag
@@ -2589,30 +2372,24 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	print 'W:',h_normrec_WJets.Integral() 
 
 
+
 	###############################################################################################
 	############### MULTIPLE ITERATION QCD DETERMINATION METHOD  ##################################
 	###############################################################################################
 
 	###############################################################################################
 
-	## ITERATION 1 ##
-	print '---------- QCD ITERATION 1 ---------'
-
+	print ' -------- QCD ITERATIVE METHOD -----------'
+	# Get initial W scale factors with MT>50 using no QCD
 	_wsf   = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() ) / (	h_normrec_WJets.Integral() )
-	_wsfMG = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() ) / (	h_normrec_WJetsMG.Integral() )
+	_wsfMG   = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() ) / (	h_normrec_WJetsMG.Integral() )
 
 	wsfoff = 'WSFOFF' in 'pyplots'
-
 	if wsfoff == True:
 		_wsf   = 1.0
 		_wsfMG = 1.0
-
-
 	fW = '*('+str(round(_wsf,4))+')'
 	fWMG = '*('+str(round(_wsfMG,4))+')'
-
-	print "USING W SCALE FACTOR (run 1):", _wsf
-
 
 
 	# W + Jets Contributions (Normalized for display)
@@ -2641,19 +2418,21 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	print ' D: ',h_rec_Data.Integral()
 	# sys.exit()
 
-	# GETTING QCD 
+	# QCD Setup
 	selection_nomt = selection.replace('MT_muon1METR','99999')
-	nonisotrees = [t_TTBar,t_WJets_MG,t_SingleTop,t_DiBoson,t_ZJets_MG]
-	nonisotreenames = ['t_TTBarNonIso','t_WJets_MGNonIso','t_SingleTopNonIso','t_DiBosonNonIso','t_ZJets_MGNonIso']
-	treesf = [fT,fW,fsT,fV,fZ]
-	
+	nonisotrees = [t_TTBar,t_SingleTop,t_DiBoson,t_ZJets_MG]
+	nonisotreenames = ['t_TTBarNonIso','t_SingleTopNonIso','t_DiBosonNonIso','t_ZJets_MGNonIso']
+	treesf = [fT,fsT,fV,fZ]
 
-	regtrees = [t_TTBar,t_WJets_MG,t_SingleTop,t_DiBoson,t_ZJets_MG]
-	regtreenames = ['t_TTBar','t_WJets_MG','t_SingleTop','t_DiBoson','t_ZJets_MG']
+	regtrees = [t_TTBar,t_SingleTop,t_DiBoson,t_ZJets_MG]
+	regtreenames = ['t_TTBar','t_SingleTop','t_DiBoson','t_ZJets_MG']
+
+	# Initial MT<50 Iso and NonIso histos using the data
 	__h_noniso_qcd=CreateHisto('__h_noniso_qcd','QCD',t_SingleMuData,recomodvariable,varbinning,qcdselection+'*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*(MT_muon1METR<50)',QCDStackStyle,Label)
 	__h_iso_reg=CreateHisto('__h_iso_reg','__h_iso_reg',t_SingleMuData,recovariable,varbinning,selection_nomt+'*(MT_muon1METR<50)*(IsoMu24Pass>0.5)',WStackStyle,Label)
 
 
+	# Subtract non-W background from the MT<50 Iso and NonIso data histos
 	tn = 0
 	for tt in nonisotrees:
 		__sf = treesf[tn]
@@ -2664,199 +2443,43 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 		__h_iso_reg.Add(CreateHisto(tmpname,tmpname,regtrees[tn],recovariable,varbinning,qcdselection+'*(RelIso_muon1<0.15)'+weight+'*(-1)*(IsoMu24Pass>0.5)*(MT_muon1METR<50)'+__sf,WStackStyle,Label))
 		tn += 1
 
+	# Use scale-factor adjusted W to subtract from MT<50 Iso and NonIso histos
+	__h_noniso_w =CreateHisto('__h_noniso_w','__h_noniso_w',t_WJets_MG,recovariable,varbinning,qcdselection+weight+'*(RelIso_muon1>0.15)*(MT_muon1METR<50)*(-1)',WStackStyle,Label) 
+	__h_iso_w =CreateHisto('__h_iso_w','__h_iso_w',t_WJets_MG,recovariable,varbinning,qcdselection+'*(RelIso_muon1<0.15)'+weight+'*(-1)*(IsoMu24Pass>0.5)*(MT_muon1METR<50)',WStackStyle,Label) 
+
+	__h_noniso_w.Scale(_wsf)
+	__h_iso_w.Scale(_wsf)
+
+	__h_noniso_qcd.Add(__h_noniso_w)
+	__h_iso_reg.Add(__h_iso_w)
+
+
+	# In case of jet multiplicity, need binwise scale-factors
+	dovariableqcd = ('VariableQCD' in 'pyplots') or ('PFJet30Count' in recomodvariable)
+
+	# Get basic QCDSF fake rate
 	if __h_noniso_qcd.GetEntries()>0:
 		QCDSF = __h_iso_reg.Integral()/__h_noniso_qcd.Integral()
 
 	else:
 		QCDSF = 0.02
 
-	print 'FOUND QCD SF (run 1): ',QCDSF
-
-
-	h_rec_QCDMu1=CreateHisto('h_rec_QCDMu1','QCD',t_SingleMuData,recomodvariable,varbinning,qcdselection+'*(MT_muon1METR>50)*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*('+str(QCDSF)+')',QCDStackStyle,Label)
-	tn = 0
-	for tt in nonisotrees:
-		__sf = treesf[tn]
-
-		tmpname = 'h_noniso_mc'+str(random.randint(0,1000000))
-		h_rec_QCDMu1.Add(CreateHisto(tmpname,tmpname,tt,recomodvariable,varbinning,qcdselection+weight+'*(MT_muon1METR>50)*(RelIso_muon1>0.15)*(-1.0)*('+str(QCDSF)+')'+__sf,QCDStackStyle,Label))
-		tn += 1
-
-	###############################################################################################
-
-
-	## ITERATION 2 ##
-	print '---------- QCD ITERATION 2 ---------'
-	_wsf   = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() + h_rec_QCDMu1.Integral() ) / (	h_normrec_WJets.Integral() )
-	_wsfMG = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() + h_rec_QCDMu1.Integral() ) / (	h_normrec_WJetsMG.Integral() )
-
-	wsfoff = 'WSFOFF' in 'pyplots'
-
-	if wsfoff == True:
-		_wsf   = 1.0
-		_wsfMG = 1.0
-
-
-	fW = '*('+str(round(_wsf,4))+')'
-	fWMG = '*('+str(round(_wsfMG,4))+')'
-
-	print "USING W SCALE FACTOR (run 2):", _wsf
-
-
-
-	# GETTING QCD 
-	selection_nomt = selection.replace('MT_muon1METR','99999')
-	nonisotrees = [t_TTBar,t_WJets_MG,t_SingleTop,t_DiBoson,t_ZJets_MG]
-	nonisotreenames = ['t_TTBarNonIso','t_WJets_MGNonIso','t_SingleTopNonIso','t_DiBosonNonIso','t_ZJets_MGNonIso']
-	treesf = [fT,fW,fsT,fV,fZ]
-	
-
-	regtrees = [t_TTBar,t_WJets_MG,t_SingleTop,t_DiBoson,t_ZJets_MG]
-	regtreenames = ['t_TTBar','t_WJets_MG','t_SingleTop','t_DiBoson','t_ZJets_MG']
-	__h_noniso_qcd_2=CreateHisto('__h_noniso_qcd_2','QCD',t_SingleMuData,recomodvariable,varbinning,qcdselection+'*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*(MT_muon1METR<50)',QCDStackStyle,Label)
-	__h_iso_reg_2=CreateHisto('__h_iso_reg_2','__h_iso_reg',t_SingleMuData,recovariable,varbinning,selection_nomt+'*(MT_muon1METR<50)*(IsoMu24Pass>0.5)',WStackStyle,Label)
-
-
-	tn = 0
-	for tt in nonisotrees:
-		__sf = treesf[tn]
-		print nonisotreenames[tn], __sf
-		tmpname = '__h_noniso_mc'+str(random.randint(0,1000000))
-		__h_noniso_qcd_2.Add(CreateHisto(tmpname,tmpname,tt,recomodvariable,varbinning,qcdselection+weight+'*(RelIso_muon1>0.15)*(MT_muon1METR<50)*(-1)'+__sf,QCDStackStyle,Label))
-		tmpname = '__h_iso_mc'+str(random.randint(0,1000000))
-		__h_iso_reg_2.Add(CreateHisto(tmpname,tmpname,regtrees[tn],recovariable,varbinning,qcdselection+'*(RelIso_muon1<0.15)'+weight+'*(-1)*(IsoMu24Pass>0.5)*(MT_muon1METR<50)'+__sf,WStackStyle,Label))
-		tn += 1
-
-	if __h_noniso_qcd_2.GetEntries()>0:
-		QCDSF = __h_iso_reg_2.Integral()/__h_noniso_qcd_2.Integral()
-	else:
-		QCDSF = 0.02
-	print 'FOUND QCD SF (run 2): ',QCDSF
-
-
-
-	h_rec_QCDMu2=CreateHisto('h_rec_QCDMu2','QCD',t_SingleMuData,recomodvariable,varbinning,qcdselection+'*(MT_muon1METR>50)*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*('+str(QCDSF)+')',QCDStackStyle,Label)
-	tn = 0
-	for tt in nonisotrees:
-		__sf = treesf[tn]
-
-		tmpname = 'h_noniso_mc'+str(random.randint(0,1000000))
-		h_rec_QCDMu2.Add(CreateHisto(tmpname,tmpname,tt,recomodvariable,varbinning,qcdselection+weight+'*(MT_muon1METR>50)*(RelIso_muon1>0.15)*(-1.0)*('+str(QCDSF)+')'+__sf,QCDStackStyle,Label))
-		tn += 1
-
-
-	###############################################################################################
-
-	## ITERATION 3 ##
-	print '---------- QCD ITERATION 3 ---------'
-	_wsf   = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() + h_rec_QCDMu2.Integral() ) / (	h_normrec_WJets.Integral() )
-	_wsfMG = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() + h_rec_QCDMu2.Integral() ) / (	h_normrec_WJetsMG.Integral() )
-
-	wsfoff = 'WSFOFF' in 'pyplots'
-
-	if wsfoff == True:
-		_wsf   = 1.0
-		_wsfMG = 1.0
-
-
-	fW = '*('+str(round(_wsf,4))+')'
-	fWMG = '*('+str(round(_wsfMG,4))+')'
-
-	print "USING W SCALE FACTOR (run 3):", _wsf
-
-
-
-	# GETTING QCD 
-	selection_nomt = selection.replace('MT_muon1METR','99999')
-	nonisotrees = [t_TTBar,t_WJets_MG,t_SingleTop,t_DiBoson,t_ZJets_MG]
-	nonisotreenames = ['t_TTBarNonIso','t_WJets_MGNonIso','t_SingleTopNonIso','t_DiBosonNonIso','t_ZJets_MGNonIso']
-	treesf = [fT,fW,fsT,fV,fZ]
-	
-
-	regtrees = [t_TTBar,t_WJets_MG,t_SingleTop,t_DiBoson,t_ZJets_MG]
-	regtreenames = ['t_TTBar','t_WJets_MG','t_SingleTop','t_DiBoson','t_ZJets_MG']
-	__h_noniso_qcd_3=CreateHisto('__h_noniso_qcd_3','QCD',t_SingleMuData,recomodvariable,varbinning,qcdselection+'*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*(MT_muon1METR<50)',QCDStackStyle,Label)
-	__h_iso_reg_3=CreateHisto('__h_iso_reg_3','__h_iso_reg',t_SingleMuData,recovariable,varbinning,selection_nomt+'*(MT_muon1METR<50)*(IsoMu24Pass>0.5)',WStackStyle,Label)
-
-
-	tn = 0
-	for tt in nonisotrees:
-		__sf = treesf[tn]
-		print nonisotreenames[tn], __sf
-		tmpname = '__h_noniso_mc'+str(random.randint(0,1000000))
-		__h_noniso_qcd_3.Add(CreateHisto(tmpname,tmpname,tt,recomodvariable,varbinning,qcdselection+weight+'*(RelIso_muon1>0.15)*(MT_muon1METR<50)*(-1)'+__sf,QCDStackStyle,Label))
-		tmpname = '__h_iso_mc'+str(random.randint(0,1000000))
-		__h_iso_reg_3.Add(CreateHisto(tmpname,tmpname,regtrees[tn],recovariable,varbinning,qcdselection+'*(RelIso_muon1<0.15)'+weight+'*(-1)*(IsoMu24Pass>0.5)*(MT_muon1METR<50)'+__sf,WStackStyle,Label))
-		tn += 1
-
-	if __h_noniso_qcd_3.GetEntries()>0:
-		QCDSF = __h_iso_reg_3.Integral()/__h_noniso_qcd_3.Integral()
-
-		_i_int = 0.0
-		_n_int = 0.0
-		_i_err = 0.0
-		_n_err = 0.0		
-
-		for xx in range(__h_iso_reg_3.GetNbinsX()):
-			_n = xx+1
-			_icont = __h_iso_reg_3.GetBinContent(_n)
-			_ierr = __h_iso_reg_3.GetBinError(_n)
-			_ncont = __h_noniso_qcd_3.GetBinContent(_n)
-			_nerr = __h_noniso_qcd_3.GetBinError(_n)
-			_i_int += _icont
-			_n_int += _ncont
-			_i_err += _ierr**2
-			_n_err += _nerr**2
-		_i_err = math.sqrt(_ierr)
-		_n_err = math.sqrt(_n_err)
-		QCDSF_NEW = _i_int/_n_int
-		QCDSFErr = QCDSF*math.sqrt( (_i_err/_i_int)**2 + (_n_err/_n_int)**2 )
-
-
-	else:
-		QCDSF_NEW = 0.02
-		QCDSF = 0.02
-		QCDSFErr = 0.02
-
-
-	print 'FOUND QCD SF: (run 3)',QCDSF
-	print '  CrossCheck: QCDSF (NEW): ',QCDSF_NEW
-	print '  CrossCheck: QCDSFErr:', QCDSFErr
-	print '  CrossCheck: QCDSFErr Percent:', 100.0*(QCDSFErr/QCDSF)
-
-
-	if 'bgnorm_plus' in tagname:
-		QCDSF += QCDSFErr
-	if 'bgnorm_minus' in tagname:
-		QCDSF -= QCDSFErr
-	if 'bgnorm' in tagname:
-		print 'QCDSF Modified to:',QCDSF
-
-
-	dovariableqcd = ('VariableQCD' in 'pyplots') or ('PFJet30Count' in recomodvariable)
-
+	# Fix for bin-wise scale factors
 	if dovariableqcd == True:
 		QCDSF  = 1.0
-		qcdsfhisto = __h_iso_reg_3.Clone()
-		qcdsfhisto.Divide(__h_noniso_qcd_3)
+		qcdsfhisto = __h_iso_reg.Clone()
+		qcdsfhisto.Divide(__h_noniso_qcd)
 
 	else:
-		qcdsfhisto = __h_iso_reg_3.Clone()
-
+		qcdsfhisto = __h_iso_reg.Clone()
 		for xx in range(qcdsfhisto.GetNbinsX()):
 			_n = xx+1
 			qcdsfhisto.SetBinContent(_n,1.0)
 			qcdsfhisto.SetBinError(_n,0.0)
-			print 'QCD SF Variable: Bin',_n,qcdsfhisto.GetBinContent(_n)
 
-	for xx in range(qcdsfhisto.GetNbinsX()):
-			_n = xx+1
-			print 'QCD SF Variable: Bin',_n,qcdsfhisto.GetBinContent(_n)
 
+	# Now the actual QCD measurement with MT>50
 	h_rec_QCDMu=CreateHisto('h_rec_QCDMu','QCD',t_SingleMuData,recomodvariable,varbinning,qcdselection+'*(MT_muon1METR>50)*(RelIso_muon1>0.15)*(Mu24Pass>0)*Mu24PassPrescale*('+str(QCDSF)+')',QCDStackStyle,Label)
-	for xx in range(h_rec_QCDMu.GetNbinsX()):
-			_n = xx+1
-			print 'QCD Estimate: Bin',_n,h_rec_QCDMu.GetBinContent(_n)
 	tn = 0
 	for tt in nonisotrees:
 		__sf = treesf[tn]
@@ -2865,7 +2488,92 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 		h_rec_QCDMu.Add(CreateHisto(tmpname,tmpname,tt,recomodvariable,varbinning,qcdselection+weight+'*(MT_muon1METR>50)*(RelIso_muon1>0.15)*(-1.0)*('+str(QCDSF)+')'+__sf,QCDStackStyle,Label))
 		tn += 1
 
+	# Subtract SF-adjusted W from QCD Measurement
+	__h_reg_noniso_w =CreateHisto('__h_reg_iso_w','__h_iso_w',t_WJets_MG,recovariable,varbinning,qcdselection+weight+'*(MT_muon1METR>50)*(RelIso_muon1>0.15)*(-1.0)*('+str(QCDSF)+')',QCDStackStyle,Label) 
+	__h_reg_noniso_w.Scale(_wsf)
+	h_rec_QCDMu.Add(__h_reg_noniso_w)
 	h_rec_QCDMu.Multiply(qcdsfhisto)
+
+
+	# Finally, use the above histos and tools to iterate several times, correcting the WSF and QCD until they equilibriate
+	for x in range(15):
+
+		print ' ---   QCD ITERATION ',x,' ---'
+		print "Iterative QCD, W SF:", _wsf
+		print "Iterative QCD, QCD SF", QCDSF
+
+		# New W Scale Factor
+		_wsf_new   = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() + h_rec_QCDMu.Integral() ) / (	h_normrec_WJets.Integral() )
+		_wsfMG_new   = 	( h_normrec_Data.Integral() - h_normrec_ZJets.Integral() - h_normrec_TTBar.Integral() - h_normrec_DiBoson.Integral() - h_normrec_SingleTop.Integral() + h_rec_QCDMu.Integral() ) / (	h_normrec_WJetsMG.Integral() )
+
+		if wsfoff == True:
+			_wsf_new   = 1.0
+			_wsfMG_new = 1.0
+		fW = '*('+str(round(_wsf_new,4))+')'
+		fWMG = '*('+str(round(_wsf_new,4))+')'
+
+
+		# Remove W from Iso and NonIso MT <50 Histos
+		__h_noniso_w.Scale(-1)
+		__h_iso_w.Scale(-1)
+
+		__h_noniso_qcd.Add(__h_noniso_w)
+		__h_iso_reg.Add(__h_iso_w)
+
+
+		# Scale W Iso and Non Iso MT<50 Histos to new Scale Factor
+		__h_noniso_w.Scale(-1*_wsf_new/_wsf)
+		__h_iso_w.Scale(-1*_wsf_new/_wsf)	
+
+
+		# Modify QCD Iso and Non Iso MT<50 histos for new W contribution
+		__h_noniso_qcd.Add(__h_noniso_w)
+		__h_iso_reg.Add(__h_iso_w)
+
+		# Get new QCDSF 
+		if __h_noniso_qcd.GetEntries()>0:
+			QCDSF_new = __h_iso_reg.Integral()/__h_noniso_qcd.Integral()
+
+		else:
+			QCDSF_new = 0.02
+
+		if dovariableqcd == True:
+			QCDSF_new  = 1.0
+			qcdsfhisto_new = __h_iso_reg.Clone()
+			qcdsfhisto_new.Divide(__h_noniso_qcd)
+
+		else:
+			qcdsfhisto_new = __h_iso_reg.Clone()
+
+			for xx in range(qcdsfhisto_new.GetNbinsX()):
+				_n = xx+1
+				qcdsfhisto_new.SetBinContent(_n,1.0)
+				qcdsfhisto_new.SetBinError(_n,0.0)
+
+		# Remove W from noniso MT>50 QCD histo
+		__h_reg_noniso_w.Scale(-1)
+		h_rec_QCDMu.Add(__h_reg_noniso_w)
+
+		# Scale MT>50 QCD histo to new QCD SF
+		h_rec_QCDMu.Scale(QCDSF_new/QCDSF)
+		h_rec_QCDMu.Multiply(qcdsfhisto_new)
+		h_rec_QCDMu.Divide(qcdsfhisto)
+
+
+		# Modify new W MT>50 contribution for new WSF and QCD SF
+		__h_reg_noniso_w.Scale(-1*(QCDSF_new/QCDSF)*(_wsf_new/_wsf))
+		__h_reg_noniso_w.Multiply(qcdsfhisto_new)
+		__h_reg_noniso_w.Divide(qcdsfhisto)
+
+
+		# Add W MT>50 contribution back to QCD MT>50 histo
+		h_rec_QCDMu.Add(__h_reg_noniso_w)
+
+		# Reset Scale Factors for next iteration
+
+		QCDSF = QCDSF_new
+		_wsf = _wsf_new
+		qcdsfhisto = qcdsfhisto_new.Clone()
 
 
 	print ' ---- EVENT BREAKDOWN ----'
@@ -3087,14 +2795,13 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 		binrhs = bincent + 0.5*hs_rec_WJets_noscale.GetBinWidth(nn)
 		logline += str(binlhs)+','+str(binrhs)+';'
 		
-		for ss in SM_noscale:
-			fac = 1.0
-
 		if 'lumi_plus' in tagname:
 			fac = fac * 1.022
 		if 'lumi_minus' in tagname:
 			fac = fac * 1.022
 
+		for ss in SM_noscale:
+			fac = 1.0
 			totsm += fac*(ss.GetBinContent(nn))
 			totsmerr += (fac*(ss.GetBinError(nn)))**2
 			logline += str(fac*(ss.GetBinContent(nn)))+ ','+str(fac*(ss.GetBinError(nn)))+';'
@@ -7043,4 +6750,9 @@ main()
 
 
 print 'Time to completion:',(datetime.now()-startTime)
+
+
+
+
+
 
