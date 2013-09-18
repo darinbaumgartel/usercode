@@ -52,7 +52,7 @@ for f in runfiles:
 
 	b = open(batchfile,'w')
 	b.write('#!/bin/tcsh\n\ncd '+srcdir+'\ncmsenv\ncd -\n')
-	b.write('cp '+pwd+'/'+pyfile+' . \ncmsStage '+infile ' '+infile.split('/')[-1]+' \n')
+	b.write('cp '+pwd+'/'+pyfile+' . \ncmsStage '+infile+ ' '+infile.split('/')[-1]+' \n')
 	if 'lhe' in infile:
 		b.write('sed -i \'s/LQ_P&B_2nd_gen/LQ/g\' '+pyfile.split('/')[-1])
 	b.write('cmsRun '+pyfile.split('/')[-1]+'\nmv *root '+outfile+'\ncp '+outfile+' '+pwd+'/results/\n\n')
