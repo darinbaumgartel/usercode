@@ -41,7 +41,7 @@ namespace Rivet
       			MissingMomentum missing(fs);
       			addProjection(missing, "MET");
 
-				addProjection(FastJets(fs, FastJets::ANTIKT, 0.5), "Jets");
+				// addProjection(FastJets(fs, FastJets::ANTIKT, 0.5), "Jets");
 
 
 				_treeFileName = "rivetTree.root";
@@ -142,35 +142,29 @@ namespace Rivet
 	    		_ptjet1 = -5.0;
 	    		_etajet1 = -5.0;
 	    		_phijet1 = -5.0;
-	    		_isBjet1 = -1;
 	    		_dphijet1muon = -1.0;
 
 	    		_ptjet2 = -5.0;
 	    		_etajet2 = -5.0;
 	    		_phijet2 = -5.0;
-	    		_isBjet2 = -1;
 	    		_dphijet2muon = -1.0;
 
 	    		_ptjet3 = -5.0;
 	    		_etajet3 = -5.0;
 	    		_phijet3 = -5.0;
-	    		_isBjet3 = -1;
 	    		_dphijet3muon = -1.0;
 
 	    		_ptjet4 = -5.0;
 	    		_etajet4 = -5.0;
 	    		_phijet4 = -5.0;
-	    		_isBjet4 = -1;
 	    		_dphijet4muon = -1.0;
 
 	    		_ptjet5 = -5.0;
 	    		_etajet5 = -5.0;
 	    		_phijet5 = -5.0;
-	    		_isBjet5 = -1;
 	    		_dphijet5muon = -1.0;
 
 				_njet_WMuNu = -1;
-				_nBjet_WMuNu = -1;
 
 				_evweight = -1.0;
 				_nevt = -1;
@@ -227,34 +221,43 @@ namespace Rivet
 
 					//Obtain the jets.
 					vector<FourMomentum> finaljet_list;
-					vector<int> finaljet_list_btags;
-					vector<FourMomentum> finalBjet_list;
 
-					foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV))
+
+					for (unsigned int nn = 0; nn<AllParticles.size(); nn++)
 					{
+						unsigned int _nn_pid = 1*std::abs(AllParticles[nn].pdgId());
+						if ( (_nn_pid != 4)  && (_nn_pid != 3) ) continue
 
-						
-						if ((fabs( (j.momentum()).eta()  ) < 2.4) && ( (j.momentum()).pT()  >30))
-						{
-							finaljet_list.push_back(j.momentum());
-							_htjets += fabs(1.0*(j.momentum()).pT());
+						finaljet_list.push_back(AllParticles[nn].momentum());
 
-							if (j.containsBottom())
-							{	
-								finalBjet_list.push_back(j.momentum());
-								finaljet_list_btags.push_back(1);
-							}
-							else
-							{
-								finaljet_list_btags.push_back(0);
-							}	
-							
-						}
+
 					}
 
 
+					// foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV))
+					// {
+
+						
+					// 	if ((fabs( (j.momentum()).eta()  ) < 2.4) && ( (j.momentum()).pT()  >30))
+					// 	{
+					// 		finaljet_list.push_back(j.momentum());
+					// 		_htjets += fabs(1.0*(j.momentum()).pT());
+
+					// 		if (j.containsBottom())
+					// 		{	
+					// 			finalBjet_list.push_back(j.momentum());
+					// 			finaljet_list_btags.push_back(1);
+					// 		}
+					// 		else
+					// 		{
+					// 			finaljet_list_btags.push_back(0);
+					// 		}	
+							
+					// 	}
+					// }
+
+
 					_njet_WMuNu = finaljet_list.size();
-					_nBjet_WMuNu = finalBjet_list.size();
 
 
     			  	const MissingMomentum& met = applyProjection<MissingMomentum>(event, "MET");
@@ -270,7 +273,6 @@ namespace Rivet
 						_ptjet1=finaljet_list[0].pT();
 						_etajet1=finaljet_list[0].eta();
 						_phijet1=finaljet_list[0].phi();
-						_isBjet1=finaljet_list_btags[0];
 						_dphijet1muon = DeltaPhi(_phijet1,_phimuon1);
 					}
 
@@ -278,7 +280,6 @@ namespace Rivet
 						_ptjet2=finaljet_list[1].pT();
 						_etajet2=finaljet_list[1].eta();
 						_phijet2=finaljet_list[1].phi();
-						_isBjet2=finaljet_list_btags[1];
 						_dphijet2muon = DeltaPhi(_phijet2,_phimuon1);
 					}
 
@@ -286,7 +287,6 @@ namespace Rivet
 						_ptjet3=finaljet_list[2].pT();
 						_etajet3=finaljet_list[2].eta();
 						_phijet3=finaljet_list[2].phi();
-						_isBjet3=finaljet_list_btags[2];
 						_dphijet3muon = DeltaPhi(_phijet3,_phimuon1);
 					}
 
@@ -294,7 +294,6 @@ namespace Rivet
 						_ptjet4=finaljet_list[3].pT();
 						_etajet4=finaljet_list[3].eta();
 						_phijet4=finaljet_list[3].phi();
-						_isBjet4=finaljet_list_btags[3];
 						_dphijet4muon = DeltaPhi(_phijet4,_phimuon1);
 					}
 
@@ -302,7 +301,6 @@ namespace Rivet
 						_ptjet5=finaljet_list[4].pT();
 						_etajet5=finaljet_list[4].eta();
 						_phijet5=finaljet_list[4].phi();
-						_isBjet5=finaljet_list_btags[4];
 						_dphijet5muon = DeltaPhi(_phijet5,_phimuon1);
 					}
 
@@ -330,7 +328,6 @@ namespace Rivet
 
     		int _nevt; 
     		int _njet_WMuNu;
-    		int _nBjet_WMuNu;
 
     		double _evweight;
 
@@ -356,31 +353,26 @@ namespace Rivet
     		double _etajet1;
     		double _phijet1;
     		double _dphijet1muon;
-			double _isBjet1;
 
     		double _ptjet2;
     		double _etajet2;
     		double _phijet2;
     		double _dphijet2muon;
-			double _isBjet2;
 
     		double _ptjet3;
     		double _etajet3;
     		double _phijet3;
     		double _dphijet3muon;
-			double _isBjet3;
 
     		double _ptjet4;
     		double _etajet4;
     		double _phijet4;
     		double _dphijet4muon;
-			double _isBjet4;
 
     		double _ptjet5;
     		double _etajet5;
     		double _phijet5;
     		double _dphijet5muon;
-			double _isBjet5;
 
 	};
 
