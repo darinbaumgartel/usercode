@@ -28,6 +28,23 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:SourceFile')
 )
 
+
+
+process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
+    splitLevel = cms.untracked.int32(0),
+    eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
+    outputCommands = process.RAWSIMEventContent.outputCommands,
+    fileName = cms.untracked.string('gen.root'),
+    dataset = cms.untracked.PSet(
+        filterName = cms.untracked.string(''),
+        dataTier = cms.untracked.string('GEN')
+    ),
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('generation_step')
+    )
+)
+
+
 process.GlobalTag.globaltag = 'MC_60_V4::All'
 
 process.load("GeneratorInterface.RivetInterface.rivetAnalyzer_cfi")
@@ -35,4 +52,4 @@ process.load("GeneratorInterface.RivetInterface.rivetAnalyzer_cfi")
 process.rivetAnalyzer.AnalysisNames = cms.vstring('CMS_LQ_TEST')
 process.rivetAnalyzer.UseExternalWeight = cms.bool(True)
 
-process.p = cms.Path(process.rivetAnalyzer)
+process.p = cms.Path(process.generation_step+process.rivetAnalyzer)
