@@ -43,7 +43,7 @@ for f in runfiles:
 			if 'lhe' in infile:
 				line = line.replace('Pool','LHE')
 		if 'fileNames' in line:
-		 	line = line.replace('SourceFile',infile)
+		 	line = line.replace('SourceFile',infile.split('/')[-1])
 		sf.write(line)
 	sf.close()
 	rf.close()
@@ -52,7 +52,10 @@ for f in runfiles:
 
 	b = open(batchfile,'w')
 	b.write('#!/bin/tcsh\n\ncd '+srcdir+'\ncmsenv\ncd -\n')
-	b.write('cp '+pwd+'/'+pyfile+' . \n\ncmsRun '+pyfile.split('/')[-1]+'\nmv *root '+outfile+'\ncp '+outfile+' '+pwd+'/results/\n\n')
+	b.write('cp '+pwd+'/'+pyfile+' . \ncmsStage '+infile ' '+infile.split('/')[-1]+' \n')
+	if 'lhe' in infile:
+		b.write('sed -i \'s/LQ_P&B_2nd_gen/LQ/g\' '+pyfile.split('/')[-1])
+	b.write('cmsRun '+pyfile.split('/')[-1]+'\nmv *root '+outfile+'\ncp '+outfile+' '+pwd+'/results/\n\n')
 	b.close()
 
 	com = ('bsub -q 2nd -e /dev/null -J Job'+outfile+' < '+batchfile)
