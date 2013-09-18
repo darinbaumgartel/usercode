@@ -51,7 +51,6 @@ namespace Rivet
 
     			_rivetTree->Branch("nevt", &_nevt, "nevt/I");	
     			_rivetTree->Branch("njet_WMuNu", &_njet_WMuNu, "njet_WMuNu/I");
-    			_rivetTree->Branch("nBjet_WMuNu", &_nBjet_WMuNu, "nBjet_WMuNu/I");
 
     			_rivetTree->Branch("evweight", &_evweight, "evweight/D");			
 
@@ -79,31 +78,26 @@ namespace Rivet
     			_rivetTree->Branch("etajet1", &_etajet1, "etajet1/D");			
     			_rivetTree->Branch("phijet1", &_phijet1, "phijet1/D");
     			_rivetTree->Branch("dphijet1muon", &_dphijet1muon, "dphijet1muon/D");			
-    			_rivetTree->Branch("isBjet1", &_isBjet1, "isBjet1/D");			
 
     			_rivetTree->Branch("ptjet2", &_ptjet2, "ptjet2/D");			
     			_rivetTree->Branch("etajet2", &_etajet2, "etajet2/D");			
     			_rivetTree->Branch("phijet2", &_phijet2, "phijet2/D");
     			_rivetTree->Branch("dphijet2muon", &_dphijet2muon, "dphijet2muon/D");			
-    			_rivetTree->Branch("isBjet2", &_isBjet2, "isBjet2/D");			
 
     			_rivetTree->Branch("ptjet3", &_ptjet3, "ptjet3/D");			
     			_rivetTree->Branch("etajet3", &_etajet3, "etajet3/D");			
     			_rivetTree->Branch("phijet3", &_phijet3, "phijet3/D");
     			_rivetTree->Branch("dphijet3muon", &_dphijet3muon, "dphijet3muon/D");			
-    			_rivetTree->Branch("isBjet3", &_isBjet3, "isBjet3/D");			
 
     			_rivetTree->Branch("ptjet4", &_ptjet4, "ptjet4/D");			
     			_rivetTree->Branch("etajet4", &_etajet4, "etajet4/D");			
     			_rivetTree->Branch("phijet4", &_phijet4, "phijet4/D");
     			_rivetTree->Branch("dphijet4muon", &_dphijet4muon, "dphijet4muon/D");			
-    			_rivetTree->Branch("isBjet4", &_isBjet4, "isBjet4/D");			
 
     			_rivetTree->Branch("ptjet5", &_ptjet5, "ptjet5/D");			
     			_rivetTree->Branch("etajet5", &_etajet5, "etajet5/D");			
     			_rivetTree->Branch("phijet5", &_phijet5, "phijet5/D");
     			_rivetTree->Branch("dphijet5muon", &_dphijet5muon, "dphijet5muon/D");			
-    			_rivetTree->Branch("isBjet5", &_isBjet5, "isBjet5/D");		
 
     		}
 
@@ -226,7 +220,7 @@ namespace Rivet
 					for (unsigned int nn = 0; nn<AllParticles.size(); nn++)
 					{
 						unsigned int _nn_pid = 1*std::abs(AllParticles[nn].pdgId());
-						if ( (_nn_pid != 4)  && (_nn_pid != 3) ) continue
+						if ( (_nn_pid != 4)  && (_nn_pid != 3) ) continue;
 
 						finaljet_list.push_back(AllParticles[nn].momentum());
 
