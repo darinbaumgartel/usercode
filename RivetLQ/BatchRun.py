@@ -5,6 +5,9 @@ files = []
 
 dirs = ['/store/group/phys_exotica/leptonsPlusJets/leptoquarks/Pythia','/store/group/phys_exotica/leptonsPlusJets/leptoquarks/CalcHep']
 
+dirs = ['/store/group/phys_exotica/leptonsPlusJets/leptoquarks/Pythia']
+
+
 for d in dirs:
 	files += [x.replace('\n','') for x in os.popen('cmsLs '+d+'  | awk \'{print $5}\'')]
 
@@ -55,7 +58,7 @@ for f in runfiles:
 	b.write('cp '+pwd+'/'+pyfile+' . \ncmsStage '+infile+ ' '+infile.split('/')[-1]+' \n')
 	if 'lhe' in infile:
 		b.write('sed -i \'s/LQ_P&B_2nd_gen/LQ/g\' '+infile.split('/')[-1]+'\n\n')
-	b.write('cmsRun '+pyfile.split('/')[-1]+'\nmv *root '+outfile+'\ncp '+outfile+' '+pwd+'/results/\n\n')
+	b.write('cmsRun '+pyfile.split('/')[-1]+'\nmv *root '+outfile.split('/')[-1]+'\ncmsStage '+outfile.split('/')[-1]+' '+outfile+'\n\n')
 	b.close()
 
 	com = ('bsub -q 2nd -e /dev/null -J Job'+outfile+' < '+batchfile)
