@@ -61,7 +61,7 @@ for f in runfiles:
 	b.write('cmsRun '+pyfile.split('/')[-1]+'\nmv rivetTree.root '+outfile.split('/')[-1]+'\ncmsStageOut '+outfile.split('/')[-1]+' '+outfile+'\n\n')
 	b.close()
 
-	com = ('bsub -q 2nd -e /dev/null -J Job'+outfile+' < '+batchfile)
+	com = ('bsub -R "pool>40000" -q 2nd -e /dev/null -J Job'+outfile+' < '+batchfile)
 	print com
 	if '--do' in sys.argv:
 		os.system(com)
