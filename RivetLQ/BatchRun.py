@@ -58,7 +58,7 @@ for f in runfiles:
 	b.write('cp '+pwd+'/'+pyfile+' . \ncmsStage '+infile+ ' '+infile.split('/')[-1]+' \n')
 	if 'lhe' in infile:
 		b.write('sed -i \'s/LQ_P&B_2nd_gen/LQ/g\' '+infile.split('/')[-1]+'\n\n')
-	b.write('cmsRun '+pyfile.split('/')[-1]+'\nmv *root '+outfile.split('/')[-1]+'\ncmsStage '+outfile.split('/')[-1]+' '+outfile+'\n\n')
+	b.write('cmsRun '+pyfile.split('/')[-1]+'\nmv rivetTree.root '+outfile.split('/')[-1]+'\ncmsStageOut '+outfile.split('/')[-1]+' '+outfile+'\n\n')
 	b.close()
 
 	com = ('bsub -q 2nd -e /dev/null -J Job'+outfile+' < '+batchfile)
