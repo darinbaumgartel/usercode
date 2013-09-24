@@ -221,7 +221,7 @@ namespace Rivet
 					{
 						unsigned int _nn_pid = 1*std::abs(AllParticles[nn].pdgId());
 						unsigned int _nn_stat = 1*std::abs(AllParticles[nn].status());
-
+						std::cout<<" - "<<std::endl;
 						std::cout<<_nn_pid<<"  "<<_nn_stat<<std::endl;
 
 						if ( (_nn_pid != 4)  && (_nn_pid != 3) ) continue;
