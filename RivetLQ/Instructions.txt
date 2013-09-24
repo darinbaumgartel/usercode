@@ -13,5 +13,5 @@ cp RivetLQ/CMS_LQ_TEST.info GeneratorInterface/RivetInterface/data/CMS_LQ_TEST.i
 cp RivetLQ/CMS_LQ_TEST.aida GeneratorInterface/RivetInterface/data/CMS_LQ_TEST.aida
 scramv1 b -j 16
 cd RivetLQ
-python BatchRun.py
+python BatchRun.py --do
 
