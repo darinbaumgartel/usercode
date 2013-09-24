@@ -216,10 +216,12 @@ namespace Rivet
 					//Obtain the jets.
 					vector<FourMomentum> finaljet_list;
 
-
+					std::cout<<" --------- "<<std::endl;
 					for (unsigned int nn = 0; nn<AllParticles.size(); nn++)
 					{
 						unsigned int _nn_pid = 1*std::abs(AllParticles[nn].pdgId());
+						std::cout<<_nn_pid<<std::endl;
+
 						if ( (_nn_pid != 4)  && (_nn_pid != 3) ) continue;
 
 						finaljet_list.push_back(AllParticles[nn].momentum());
