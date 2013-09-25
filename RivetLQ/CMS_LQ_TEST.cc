@@ -6,6 +6,7 @@
 #include "Rivet/RivetAIDA.hh"
 #include "Rivet/Tools/Logging.hh"
 #include "Rivet/Projections/FinalState.hh"
+#include "Rivet/Projections/InitialQuarks.hh"
 #include "Rivet/Projections/FastJets.hh"
 #include "Rivet/Projections/VetoedFinalState.hh"
 #include "Rivet/Projections/InvMassFinalState.hh"
@@ -37,6 +38,9 @@ namespace Rivet
 
 				const FinalState fs(-MAXRAPIDITY,MAXRAPIDITY);
 				addProjection(fs, "FS");
+
+      			const FinalState fsb;
+				addProjection(fsb, "FSB");
 
       			MissingMomentum missing(fs);
       			addProjection(missing, "MET");
@@ -216,43 +220,20 @@ namespace Rivet
 					//Obtain the jets.
 					vector<FourMomentum> finaljet_list;
 
-					std::cout<<" --------- "<<std::endl;
-					for (unsigned int nn = 0; nn<AllParticles.size(); nn++)
-					{
-						unsigned int _nn_pid = 1*std::abs(AllParticles[nn].pdgId());
-						// unsigned int _nn_stat = 1*std::abs(AllParticles[nn].status());
-						// std::cout<<" - "<<std::endl;
-						std::cout<<_nn_pid<<std::endl;
 
+    				foreach (const GenParticle* p, Rivet::particles(event.genEvent())) {
+
+	     				PdgId pid = abs(p->pdg_id());
+	     				int _nn_pid = std::abs(1*pid);
+						int st = p->status();
+	     				
+	     				if (pid > 19) continue;
 						if ( (_nn_pid != 4)  && (_nn_pid != 3) ) continue;
+						if (st != 3) continue;
 
-						finaljet_list.push_back(AllParticles[nn].momentum());
+						finaljet_list.push_back(p->momentum());
 
-
-					}
-
-
-					// foreach (const Jet& j, applyProjection<FastJets>(event, "Jets").jetsByPt(30.0*GeV))
-					// {
-
-						
-					// 	if ((fabs( (j.momentum()).eta()  ) < 2.4) && ( (j.momentum()).pT()  >30))
-					// 	{
-					// 		finaljet_list.push_back(j.momentum());
-					// 		_htjets += fabs(1.0*(j.momentum()).pT());
-
-					// 		if (j.containsBottom())
-					// 		{	
-					// 			finalBjet_list.push_back(j.momentum());
-					// 			finaljet_list_btags.push_back(1);
-					// 		}
-					// 		else
-					// 		{
-					// 			finaljet_list_btags.push_back(0);
-					// 		}	
-							
-					// 	}
-					// }
+ 					}
 
 
 					_njet_WMuNu = finaljet_list.size();
