@@ -338,10 +338,9 @@ idisosysweight += ')'
 idisosysweight += ')'
 
 
-# This is the baseline selection - only one muon, fiducial region, MT in W window.
+# Define baic weight - including PU, trigger, int lumi, and id/iso SF
 
 weight = '*weight_pu_central*4955'
-
 weight += triggerweight + idisoweight
 
 ##########################################################################
