@@ -1,12 +1,15 @@
 import os
-
+from glob import glob
 # Directory where root files are kept and the tree you want to get root files from. Normal is for standard analysis, the jet rescaling, jet smearing, muon PT rescaling ,and muon PT smearing. 
 from datetime import datetime
 
 startTime = datetime.now()
 
+#Current AFS Working Directory and eos directory for ntuples
 afsdir = '/afs/cern.ch/work/d/darinb/WAnalysis/CMSSW_4_2_8/src/WJetsAnalysis/'
 eosdir = '/store/group/phys_smp/WPlusJets/AnalyzerOutput/'
+
+# Set of all ntuples
 NormalDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_2013_09_02_16_51_14/SummaryFiles"
 JetScaleDownDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetScaleDown_2013_09_09_16_31_31/SummaryFiles"
 JetScaleUpDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_JetScaleUp_2013_09_09_16_02_36/SummaryFiles"
@@ -15,7 +18,6 @@ PhiCorrDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_
 MuScaleDownDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuScaleDown_2013_09_10_01_06_05/SummaryFiles"
 MuScaleUpDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuScaleUp_2013_09_09_22_34_22/SummaryFiles"
 MuSmearDirectory = eosdir+"NTupleAnalyzer_V00_02_06_WPlusJets_WJetsAnalysis_5fb_Sept2_MuSmear_2013_09_10_04_52_20/SummaryFiles"
-
 
 
 # This is the Rivet NTuple for MadGraph
@@ -143,18 +145,6 @@ basic_selection = '(Pt_muon1>25)*(RelIso_muon1<0.15)*(Pt_muon2<0.000001)*(abs(Et
 basic_selection += '*(MT_muon1METR>50)*(PFJet30TCHEMCountCentral<0.5)'
 basic_selection += filters
 basic_selection += j1
-
-
-# _ttbar_selection = '(Pt_muon1>25)*(RelIso_muon1<0.15)*(Pt_muon2<0.000001)*(abs(Eta_muon1)<2.1)*(IsoMu24Pass>0)'
-# _ttbar_selection += '*(MT_muon1METR>50)*(PFJet30TCHEMCountCentral>1.5)'
-# _ttbar_selection += filters
-# _ttbar_selection += j1
-
-# _z_selection = '(Pt_muon1>25)*(RelIso_muon1<0.15)*(Pt_muon2>25.0)*(abs(Eta_muon1)<2.1)*(IsoMu24Pass>0)'
-# _z_selection += '*(PFJet30TCHEMCountCentral<0.5)'
-# _z_selection += filters
-# _z_selection += j1
-
 
 
 # Minimal reco level selection (not currently needed!)
@@ -362,8 +352,11 @@ weight += triggerweight + idisoweight
 def main():
 
 	WRenorm = "(1.0)"
+	# CleanUpAndMakeTables()
+	# sys.exit()
 	# ParseTablesToFinalResults(WRenorm,basic_selection)	
 	# ParseTablesToRecoHistograms()	
+	# BatchRecoHistograms('Results_2013_09_17_15_26_30_EOSQCDFixMemFix')
 	# os.system("convert pyplots/*.png pyplots/AllPlots.pdf")
 	# os.system("convert pyplots/*FINAL*Count.png pyplots/AllFinalCountPlots.pdf")
 	# os.system("convert pyplots/*FINAL*XSec.png pyplots/AllFinalXSecPlots.pdf")
@@ -457,7 +450,7 @@ def main():
 
 	ParseTablesToRecoHistograms()	
 	ParseTablesToFinalResults(WRenorm,basic_selection)	
-	
+	CleanUpAndMakeTables()
 
 ####################################################################################################################################################
 ####################################################################################################################################################
@@ -2306,8 +2299,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 	##############################################################################
 
 
-	tmpname = "pyplots/tmp"+str(random.randint(0,1000000))+".root"
-	tmpfile = TFile(tmpname,"RECREATE") # temporary root file. Named with random number so you can run several versions of this script at once if needed.
+	# tmpname = "pyplots/tmp"+str(random.randint(0,1000000))+".root"
+	# tmpfile = TFile(tmpname,"RECREATE") # temporary root file. Named with random number so you can run several versions of this script at once if needed.
 		
 	# Create Canvas
 	c1 = TCanvas("c1","",1200,900)
@@ -2794,6 +2787,8 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 		binlhs = bincent - 0.5*hs_rec_WJets_noscale.GetBinWidth(nn)
 		binrhs = bincent + 0.5*hs_rec_WJets_noscale.GetBinWidth(nn)
 		logline += str(binlhs)+','+str(binrhs)+';'
+
+		fac = 1.0
 		
 		if 'lumi_plus' in tagname:
 			fac = fac * 1.022
@@ -2801,7 +2796,6 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 			fac = fac * 1.022
 
 		for ss in SM_noscale:
-			fac = 1.0
 			totsm += fac*(ss.GetBinContent(nn))
 			totsmerr += (fac*(ss.GetBinError(nn)))**2
 			logline += str(fac*(ss.GetBinContent(nn)))+ ','+str(fac*(ss.GetBinError(nn)))+';'
@@ -3443,6 +3437,10 @@ def MakeUnfoldedPlots(genvariables,recovariable, default_value, labelmods, binni
 		DataBinInfo = MakeInclusiveBinInfo(DataBinInfo)
 		MCBinInfo = MakeInclusiveBinInfo(MCBinInfo)
 
+
+	# Clear the memory!
+	gDirectory.GetList().Delete()
+
 	#return the optimal dau, the bin-by-bin unfolded data and MC.
 	return [tau,DataBinInfo,MCBinInfo]
 
@@ -3514,7 +3512,7 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,default_value,xlabel, b
 	# [null,data_match_plus,mc_match_plus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,NormalDirectory,'MatchUp',tau,'matchup')
 	# [null,data_match_minus,mc_match_minus]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,NormalDirectory,'MatchDown',tau,'matchdown')
 	
-	if (True):
+	if ('NoSys' not in 'pyplots'):
 
 
 		[null,data_altunf,mc_altunf]=MakeUnfoldedPlots(genvariable,recovariable, default_value,xlabel, binning,presentationbinning,selection,gen_selection,weight,optvar,NormalDirectory,'',taush,'altunf')
@@ -3671,7 +3669,7 @@ def FullAnalysisWithUncertainty(genvariable,recovariable,default_value,xlabel, b
 
 
 	# QUICK FIX FOR NO SYSTEMATICS
-	if (False):
+	if ('NoSys' in 'pyplots'):
 		[null,data_pileup_plus,mc_pileup_plus]= [tau,data_standard,mc_standard]
 		[null,data_pileup_minus,mc_pileup_minus]= [tau,data_standard,mc_standard]
 
@@ -5339,6 +5337,10 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	print ' '
 	def verbose_to_string(_verbose):
 		_output = []
+		if normalization>0:
+			_normalization = normalization
+		else:
+			_normalization = 1.0
 		for v in range(len(_verbose[0])):
 			if '30Count' not in filename:
 				_bin = str(round(float(_verbose[-1][v]),2)) +' $-$ ' +str(round(float(_verbose[-1][v+1]),2) )
@@ -5347,9 +5349,9 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 					_bin = str( int(  round( 0.5*float(_verbose[-1][v]) + 0.5*float(_verbose[-1][v+1])  )) )			
 				else:
 					_bin = ' $\\geq$'+str( int(round( 0.5*float(_verbose[-1][v]) + 0.5*float(_verbose[-1][v+1])  )) )			
-			_mean = str(round(_verbose[0][v],2))
-			_errp = str(round(_verbose[1][v],2))
-			_errm = str(round(_verbose[2][v],2))
+			_mean = str(round(_verbose[0][v]/_normalization,2))
+			_errp = str(round(_verbose[1][v]/_normalization,2))
+			_errm = str(round(_verbose[2][v]/_normalization,2))
 			_output.append([_bin,_mean,_errp,_errm])
 		return _output
 	def check_compatibility(_verbose_sets):
@@ -5408,7 +5410,7 @@ def FinalHisto(binning, label, quantity, filename ,expectation_means, expectatio
 	_table.append('\\begin{center}')
 	_table.append('\\begin{tabular}{|l|l|lll|}\\hline')
 
-	_table.append(var +' & Measurement & Blackhat+Sherpa & Sherpa & MadGraph \\\\ \\hline')
+	_table.append(var +' & Measurement [pb] & Blackhat+Sherpa [pb] & Sherpa [pb] & MadGraph [pb] \\\\ \\hline')
 
 	for x in range(len(__D)):
 		__d = __D[x]
@@ -6103,7 +6105,11 @@ def ParseTablesToRecoHistograms():
 	relabels.append(['Eta_pfjet4','Fourth Leading Jet #eta','#eta'])
 	relabels.append(['Eta_pfjet5','Fifth Leading Jet #eta','#eta'])
 	relabels.append(['preexc','Jet Count (Inclusive)','N_{Jet}'])
-	relabels.append(['PFJet30Count','Jet Count (Exclusive)','N_{Jet}'])
+	relabels.append(['PFJet30Count','Exclusive Jet Multiplicity','N_{Jet}'])
+	if 'BTagOff' in 'pyplots':
+		relabels[-1][1]+=' (No b-tag veto)'
+	else:
+		relabels[-1][1]+=' (With b-tag veto)'		
 	relabels.append(['MT_muon1METR','M_{T}(#mu,E_{T}^{miss}) [GeV]','M_{T}'])
 	relabels.append(['Pt_MET','E_{T}^{miss} [GeV]','E_{T}^{miss}'])
 	relabels.append(['DeltaPhi_pfjet1muon1','#Delta #phi(jet_{1},#mu)'	,'#Delta #phi(jet_{1},#mu)'])
@@ -6285,6 +6291,24 @@ def ParseTablesToRecoHistograms():
 			# print syslog, _wvals[0:3]
 			_variations.append(_sysvals)
 
+		for syslog in [centlog]:
+			_sysvals = []
+			_wvals = []
+			for entry in HArrayFromHlog(syslog):
+				[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry
+				_sysvals.append(T+w*0.047)
+				_wvals.append(w)
+			_variations.append(_sysvals)
+
+		for syslog in [centlog]:
+			_sysvals = []
+			_wvals = []
+			for entry in HArrayFromHlog(syslog):
+				[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry
+				_sysvals.append(T-w*0.047)
+				_wvals.append(w)
+			_variations.append(_sysvals)
+
 		# print f
 		for _c in range(len(_centralvals)):
 			c = _centralvals[_c]
@@ -6409,15 +6433,15 @@ def ParseTablesToRecoHistograms():
 		ratunity=TLine(presentationbinning[0], 1.0 , presentationbinning[-1],1.0)
 
 
-		ErrorWindow_rat.SetMaximum(1.5)
-		ErrorWindow_rat.SetMinimum(0.5)
+		ErrorWindow_rat.SetMaximum(2.0)
+		ErrorWindow_rat.SetMinimum(0.0)
 
 		ErrorWindow_rat.GetXaxis().SetRangeUser(presentationbinning[0], presentationbinning[-1])
 
 		ErrorWindow_rat.Draw("a2")
 		ratunity.Draw("SAME")
-		hs_rec_Data_ratio.SetMinimum(0.5)
-		hs_rec_Data_ratio.SetMaximum(1.5)
+		hs_rec_Data_ratio.SetMinimum(0.0)
+		hs_rec_Data_ratio.SetMaximum(2.0)
 
 		hs_rec_Data_ratio.Draw("EPSAME")
 
@@ -6429,6 +6453,422 @@ def ParseTablesToRecoHistograms():
 		c1.Print(fname+'pdf')
 
 
+
+
+def ParseTablesToRecoBatchHistograms(indir):
+
+	WStackStyle=[3007,20,.00001,2,6]
+	TTStackStyle=[3005,20,.00001,2,4]
+	ZStackStyle=[3004,20,.00001,2,2]
+	DiBosonStackStyle=[3006,20,.00001,2,3]
+	StopStackStyle=[3008,20,.00001,2,9]
+	QCDStackStyle=[3013,20,.00001,2,15]
+	MCGenStyle=[0,20,.00001,1,2]
+	MCGenSmearStyle=[0,20,.00001,1,9]
+	MCRecoStyle=[0,21,.00001,1,4]
+	DataRecoStyle=[0,20,1.0,1,1]
+	DataCompStyle=[0,21,1.0,1,6]
+	BlankRecoStyle=[0,21,.00001,1,0]
+	DataUnfoldedStyle=[0,21,0.5,1,1]
+	DataUnfoldedStyle_pseudo=[0,20,0.5,1,9]
+	DataUnfoldedStyle_pseudo2=[0,20,0.5,1,2]
+
+	# nstart = 8
+	# nint = -1
+	# print nstart
+	# WStackStyle=[1001,20,.00001,1,nstart+nint*5]
+	# TTStackStyle=[1001,20,.00001,1,nstart+nint*4]
+	# ZStackStyle=[1001,20,.00001,1,nstart+nint*3]
+	# DiBosonStackStyle=[1001,20,.00001,1,nstart+nint*2]
+	# StopStackStyle=[1001,20,.00001,1,nstart+nint*1]
+	# QCDStackStyle=[1001,20,.00001,1,nstart+nint*0]
+	# MCGenStyle=[0,20,.00001,1,2]
+	# MCGenSmearStyle=[0,20,.00001,1,9]
+	# MCRecoStyle=[0,21,.00001,1,4]
+	# DataRecoStyle=[0,20,1.0,1,1]
+	# DataCompStyle=[0,21,1.0,1,6]
+	# BlankRecoStyle=[0,21,.00001,1,0]
+	# DataUnfoldedStyle=[0,21,0.5,1,1]
+	# DataUnfoldedStyle_pseudo=[0,20,0.5,1,9]
+	# DataUnfoldedStyle_pseudo2=[0,20,0.5,1,2]
+
+
+
+
+	bgbandstyle=[3253,20,.00001,0,14]
+	bgbandstyle=[3002,20,.00001,0,14]
+
+	relabels = []
+	relabels.append(['Pt_pfjet1','Leading Jet p_{T} [GeV]','p_{T}'])
+	relabels.append(['Pt_muon1','Muon p_{T} [GeV]','p_{T}'])
+	relabels.append(['N_GoodVertices','N_{Vertices}','N_{Vertices}'])
+	relabels.append(['Pt_pfjet2','Second Leading Jet p_{T} [GeV]','p_{T}'])
+	relabels.append(['Pt_pfjet3','Third Leading Jet p_{T} [GeV]','p_{T}'])
+	relabels.append(['Pt_pfjet4','Fourth Leading Jet p_{T} [GeV]','p_{T}'])
+	relabels.append(['Pt_pfjet5','Fifth Leading Jet p_{T} [GeV]','p_{T}'])
+	relabels.append(['Eta_pfjet1','Leading Jet #eta','#eta'])
+	relabels.append(['Eta_pfjet2','Second Leading Jet #eta','#eta'])
+	relabels.append(['Eta_pfjet3','Third Leading Jet #eta','#eta'])
+	relabels.append(['Eta_pfjet4','Fourth Leading Jet #eta','#eta'])
+	relabels.append(['Eta_pfjet5','Fifth Leading Jet #eta','#eta'])
+	relabels.append(['preexc','Jet Count (Inclusive)','N_{Jet}'])
+	relabels.append(['PFJet30Count','Exclusive Jet Multiplicity','N_{Jet}'])
+	if 'BTagOff' in indir:
+		relabels[-1][1]+=' (No b-tag veto)'
+	else:
+		relabels[-1][1]+=' (With b-tag veto)'		
+	relabels.append(['MT_muon1METR','M_{T}(#mu,E_{T}^{miss}) [GeV]','M_{T}'])
+	relabels.append(['Pt_MET','E_{T}^{miss} [GeV]','E_{T}^{miss}'])
+	relabels.append(['DeltaPhi_pfjet1muon1','#Delta #phi(jet_{1},#mu)'	,'#Delta #phi(jet_{1},#mu)'])
+	relabels.append(['DeltaPhi_pfjet2muon1','#Delta #phi(jet_{2},#mu)'	,'#Delta #phi(jet_{2},#mu)'])
+	relabels.append(['DeltaPhi_pfjet3muon1','#Delta #phi(jet_{3},#mu)'	,'#Delta #phi(jet_{3},#mu)'])
+	relabels.append(['DeltaPhi_pfjet4muon1','#Delta #phi(jet_{4},#mu)'	,'#Delta #phi(jet_{4},#mu)'])
+	relabels.append(['DeltaPhi_pfjet5muon1','#Delta #phi(jet_{5},#mu)'	,'#Delta #phi(jet_{5},#mu)'])
+
+	filesets = []
+
+	allfiles = glob(indir+'/*hlog')
+	usedfiles = []
+	# print allfiles
+	for rl in relabels:
+		fset = []
+		for a in allfiles:
+			if rl[0] in a and 'standard' in a and a not in usedfiles:
+				fset.append(a)
+		for a in allfiles:
+			if rl[0] in a and 'standard' not in a and a not in usedfiles:
+				fset.append(a)
+		if len(fset)>0:
+			fset.append([rl[1],"Events/Bin"])
+			filesets.append(fset)
+		usedfiles = []
+		for x in filesets:
+			for y in x:
+				usedfiles.append(y)
+
+	for f in filesets:
+		# if 'MT' not in str(f):
+		# 	continue
+		# for a in f:
+		# 	print a
+		c1 = TCanvas("c1","",1000,1000)
+		cpad1 = TPad( 'cpad1', 'cpad1', 0.0, 0.30, 1.0, 1.0 )#divide canvas into pads
+		cpad1.SetRightMargin(0.1)
+		cpad1.SetTopMargin(0.15)
+		# cpad1.SetBottomMargin(0.0)
+
+
+		cpad2 = TPad( 'cpad2', 'cpad2', 0.0, 0.05, 1.0, 0.30 )#divide canvas into pads
+		cpad2.SetRightMargin(0.1)
+		cpad2.SetTopMargin(0.0)
+		# cpad2.SetBottomMargin(0.15)
+
+
+		dolinear = False
+		if 'MT' in str(f):
+			dolinear=True
+		dolinear = False
+		if (dolinear == False):
+			cpad1.SetLogy()
+
+		cpad1.Draw()
+		cpad2.Draw()
+
+		cpad1.cd()
+
+		harray = HArrayFromHlog(f[0])
+		# print harray
+		_binning = []
+
+		entries = []
+		plotmin = 99999.9
+		plotmax = 0.1
+		for entry in harray:
+			# print entry
+			[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry
+			# print lhs, rhs
+			_plotpoints = [q,s,v,z,t,w,T,D]
+			plotpoints = []
+			for p in _plotpoints:
+				if p>0.0001:
+					plotpoints.append(p)
+			entries.append(entry)
+			_binning.append(lhs)
+			if len(plotpoints)==0:
+				continue
+			_plotmin = 10.9*min(plotpoints)
+			_plotmax = 4.0*max(plotpoints)
+			if _plotmin < plotmin: plotmin = _plotmin
+			if _plotmax > plotmax: plotmax = _plotmax
+
+
+		if plotmin <0.1: plotmin = 0.1
+		if dolinear:
+			plotmin = 0
+			plotmax = 0.25*plotmax*1.2
+		_binning.append(rhs)
+		# print _binning
+		presentationbinning= _binning
+		Label = f[-1]
+		hs_rec_WJets=NullHisto('hs_rec_WJets','W+Jets',presentationbinning,WStackStyle,Label)
+		hs_rec_Data=NullHisto('hs_rec_Data','Data, 5/fb',presentationbinning,DataRecoStyle,Label)
+		hs_rec_DiBoson=NullHisto('hs_rec_DiBoson','DiBoson',presentationbinning,DiBosonStackStyle,Label)
+		hs_rec_ZJets=NullHisto('hs_rec_ZJets','Z+Jets',presentationbinning,ZStackStyle,Label)
+		hs_rec_TTBar=NullHisto('hs_rec_TTBar','t#bar{t}',presentationbinning,TTStackStyle,Label)
+		hs_rec_SingleTop=NullHisto('hs_rec_SingleTop','SingleTop',presentationbinning,StopStackStyle,Label)
+		hs_rec_QCDMu=NullHisto('hs_rec_QCDMu','QCD',presentationbinning,QCDStackStyle,Label)
+
+
+		# Declare the MC Stack
+		MCStack = THStack ("MCStack","")
+
+		MCStack.SetMinimum(plotmin)
+		MCStack.SetMaximum(plotmax)
+
+		# List of MC Histos
+		SM=[hs_rec_QCDMu,hs_rec_SingleTop,hs_rec_DiBoson,hs_rec_ZJets,hs_rec_TTBar,hs_rec_WJets]
+
+		# for x in SM:
+		# 	x.SetLineColor(1)
+		xoffset = 1.1
+		_nbin = 0
+		for entry in entries:
+			_nbin += 1
+			[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry			
+			# print hs_rec_WJets.GetBinCenter(_nbin) - 0.5*hs_rec_WJets.GetBinWidth(_nbin)
+
+			hs_rec_WJets.SetBinContent(_nbin,w)
+			hs_rec_Data.SetBinContent(_nbin,D)
+			hs_rec_DiBoson.SetBinContent(_nbin,v)
+			hs_rec_ZJets.SetBinContent(_nbin,z)
+			hs_rec_TTBar.SetBinContent(_nbin,t)
+			hs_rec_SingleTop.SetBinContent(_nbin,s)
+			hs_rec_QCDMu.SetBinContent(_nbin,q)
+
+		# Build stack
+		for x in SM:
+			# print x.Integral()
+			# x.GetXaxis().SetRangeUser(_binning[0],_binning[-1])
+			# x.GetXaxis().SetLimits(_binning[0],_binning[-1])
+			x.SetMaximum(plotmax)
+			x.SetMaximum(plotmin)
+			x.GetXaxis().SetTitleOffset(xoffset)
+
+			MCStack.Add(x)
+		# MCStack.GetHistogram().GetXaxis().SetRangeUser(_binning[0],_binning[-1])		
+		# hs_rec_Data.GetXaxis().SetRangeUser(_binning[0],_binning[-1])
+		# hs_rec_Data.GetXaxis().SetLimits(_binning[0],_binning[-1])
+
+
+
+		hs_rec_Data_ratio = hs_rec_Data.Clone()
+
+		hs_rec_MC_ratio = hs_rec_WJets.Clone()
+		hs_rec_MC_ratio.Add(hs_rec_DiBoson)
+		hs_rec_MC_ratio.Add(hs_rec_ZJets)
+		hs_rec_MC_ratio.Add(hs_rec_TTBar)
+		hs_rec_MC_ratio.Add(hs_rec_SingleTop)
+		hs_rec_MC_ratio.Add(hs_rec_QCDMu)
+
+		hs_rec_Data_ratio.Divide(hs_rec_MC_ratio)
+		hs_rec_Data_ratio.GetYaxis().SetTitle("Data/MC")
+
+		centlog = f[0]
+		syslogs = (f[1:-1])
+
+		_centralvals = []
+		_staterrs = []
+		_syserrsup = []
+		_syserrsdown = []
+
+		_variations = []
+
+		for entry in HArrayFromHlog(centlog):
+			[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry
+			_centralvals.append(T)
+			_staterrs.append(eT)
+
+		for syslog in syslogs:
+			_sysvals = []
+			_wvals = []
+			for entry in HArrayFromHlog(syslog):
+				[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry
+				_sysvals.append(T)
+				_wvals.append(w)
+			# print syslog, _wvals[0:3]
+			_variations.append(_sysvals)
+
+		for syslog in [centlog]:
+			_sysvals = []
+			_wvals = []
+			for entry in HArrayFromHlog(syslog):
+				[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry
+				_sysvals.append(T+w*0.047)
+				_wvals.append(w)
+			_variations.append(_sysvals)
+
+		for syslog in [centlog]:
+			_sysvals = []
+			_wvals = []
+			for entry in HArrayFromHlog(syslog):
+				[lhs,rhs,q,eq,s,es,v,ev,z,ez,t,et,w,ew,T,eT,D] = entry
+				_sysvals.append(T-w*0.047)
+				_wvals.append(w)
+			_variations.append(_sysvals)
+
+		# print f
+		for _c in range(len(_centralvals)):
+			c = _centralvals[_c]
+			_staterr = _staterrs[_c]
+			_upvars = []
+			_downvars = []
+			for _v in _variations:
+				_val = _v[_c]
+				if _val > c:
+					_upvars.append(_val - c)
+				if _val < c:
+					_downvars.append(c-_val)
+			_upvars.append(_staterr)
+			_downvars.append(_staterr)
+			# print c, _upvars,_downvars				
+			__sup = quadsum(_upvars)
+			__sdown = quadsum(_downvars)
+			_syserrsup.append(__sup)
+			_syserrsdown.append(__sdown)
+
+		# print _centralvals
+		# print _staterrs
+		# print _syserrsup
+		# print _syserrsdown
+
+		_centralvals_rat = []
+		_syserrsdown_rat = []
+		_syserrsup_rat = []
+
+		for n in range(len(_centralvals)):
+			_c = _centralvals[n]
+			_d = _syserrsdown[n]
+			_u = _syserrsup[n]
+			_centralvals_rat.append(1.0)
+			if _c > 0.0:
+				_u = _u/_c
+				_d = _d/_c
+			else:
+				_u = 0.0
+				_d = 0.0
+			_syserrsup_rat.append(_u)
+			_syserrsdown_rat.append(_d)
+
+
+		# print 'WINDOW', presentationbinning, plotmin
+		[ErrorWindow,null] = CreateBandHistoFromLists(presentationbinning, "",Label, _centralvals, _syserrsup, _syserrsdown, bgbandstyle,1.0,"TopPlot")
+
+		[ErrorWindow_rat,null_rat] = CreateBandHistoFromLists(presentationbinning, "",Label, _centralvals_rat, _syserrsup_rat, _syserrsdown_rat, bgbandstyle,1.0,"SubPlot")
+
+		# print presentationbinning
+		# print _centralvals
+		# [ErrorWindow,null] = CreateHistoFromLists([100.0,110.0,120.0,130.0], "",Label, [10000.0,10000.0,10000.0], [1000.0,1000.0,1000.0], [10000.0,10000.0,10000.0] , bgbandstyle,1.0,"TopPlot")
+		# print null
+
+		ErrorWindow.SetMaximum(plotmax)
+		ErrorWindow.SetMinimum(plotmin)
+
+		ErrorWindow.GetXaxis().SetRangeUser(presentationbinning[0], presentationbinning[-1])
+
+		ErrorWindow_rat.GetYaxis().SetTitle("Data/MC")
+		ErrorWindow_rat.GetXaxis().SetTitle("")
+
+		ErrorWindow.Draw("a2")
+		# ErrorWindow.GetXaxis().SetMinimum(presentationbinning[0])
+		# ErrorWindow.GetXaxis().SetMaximum(presentationbinning[-1])
+		# ErrorWindow.GetXaxis().SetRangeUser(_binning[0],_binning[-1])
+		# ErrorWindow.GetXaxis().SetLimits(_binning[0],_binning[-1])
+		ErrorWindow.SetMaximum(plotmax)
+		ErrorWindow.SetMinimum(plotmin)
+		ErrorWindow.GetXaxis().SetTitleOffset(xoffset)
+
+		# ErrorWindow.Draw("a2")
+		# cpad1.Update()
+
+
+		MCStack.Draw("SAME")
+		MCStack.SetMinimum(plotmin)
+		MCStack.SetMaximum(plotmax)
+		MCStack.GetXaxis().SetTitleOffset(xoffset)
+		MCStack.GetYaxis().SetTitleOffset(0.9)
+		MCStack.Draw("HISTSAME")
+
+		MCStack.SetMinimum(plotmin)
+		MCStack.SetMaximum(plotmax)
+		cpad1.Update()
+		MCStack=BeautifyStack(MCStack,Label)
+
+		# Draw the data.
+		hs_rec_Data.Draw("EPSAME")		
+		# ErrorWindow.Draw("2")
+
+		leg = TLegend(0.69,0.58,0.9,0.82,"","brNDC");
+		leg.SetTextFont(42);
+		leg.SetFillColor(0);
+		leg.SetBorderSize(0);
+		leg.SetTextSize(.03)
+		leg.AddEntry(hs_rec_Data)
+		ind = -1
+		for s in SM:
+			ind += 1
+			leg.AddEntry(SM[ind])
+
+		leg.Draw()
+
+		# Stamp on top
+		sqrts = "#sqrt{s} = 7 TeV";
+		l1=TLatex()
+		l1.SetTextAlign(12)
+		l1.SetTextFont(42)
+		l1.SetNDC()
+		l1.SetTextSize(0.05)
+		l1.DrawLatex(0.18,0.92,"CMS Preliminary     "+sqrts+"      #int L = 5.0 fb^{-1}")
+
+
+
+
+		gPad.RedrawAxis()
+		
+
+		cpad2.cd()
+
+		ratunity=TLine(presentationbinning[0], 1.0 , presentationbinning[-1],1.0)
+
+
+		ErrorWindow_rat.SetMaximum(2.0)
+		ErrorWindow_rat.SetMinimum(0.0)
+
+		ErrorWindow_rat.GetXaxis().SetRangeUser(presentationbinning[0], presentationbinning[-1])
+
+		ErrorWindow_rat.Draw("a2")
+		ratunity.Draw("SAME")
+		hs_rec_Data_ratio.SetMinimum(0.0)
+		hs_rec_Data_ratio.SetMaximum(2.0)
+
+		hs_rec_Data_ratio.Draw("EPSAME")
+
+		fname = f[0].replace('.hlog','_reco.')
+		
+
+		print fname
+		c1.Print(fname+'png')
+		c1.Print(fname+'pdf')
+
+
+def BatchRecoHistograms(resdir):
+	if resdir[-1] != '/':
+		resdir+= '/'
+	pydirs = [resdir+x.replace('\n','') for x in os.popen('ls -1 '+resdir+'| grep pyplots').readlines()]
+	print pydirs
+
+	for p in pydirs:
+		print p
+		ParseTablesToRecoBatchHistograms(p)
 
 
 def ParseTablesToFinalResults(WRenorm,sel):
@@ -6742,6 +7182,559 @@ def setTDRStyle():
 	# gStyle.SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
 	# gStyle.SetTimeOffset(Double_t toffset);
 	# gStyle.SetHistMinimumZero(kTRUE);
+
+def CleanUpAndMakeTables():
+	allfiles = glob('pyplots/*.*')
+	for f in allfiles:
+		if 'btag' in f:
+			continue
+		# print f
+		newfile=''
+		count=0
+		if f.count('.')>=2:
+			for x in f:
+				if x=='.':
+					count += 1
+					if count!=f.count('.'):
+						x='_'
+				newfile += (x)
+			print ( f + ' -> ' + newfile)
+
+			os.system(' mv ' + f + ' ' + newfile)
+			
+
+	cont = ['pyplots'+'/' + x.replace('\n','') for x in os.listdir('pyplots')]
+
+	tables = []
+	systables = []
+
+	for c in cont:
+		if "FINAL" in c and 'Tex' in c and 'Verbose' not in c:
+			tables.append(c)
+
+	for c in cont:
+		if "FINAL" in c and 'Tex' in c and 'Verbose'  in c:
+			systables.append(c)
+
+	for t in tables:
+		print t
+	for s in systables:
+		print s
+
+	pairs = []
+	for t in tables:
+		if "TexCount" not in t:
+			continue
+		p = []
+		p.append(t)
+		for tt in tables:
+			if tt == t.replace('TexCount','TexXSec'):
+				p.append(tt)
+		if len(p)==2:
+			pairs.append(p)
+
+
+	def TexTableFromPair(pair):
+		
+		for p in pair:
+			if 'TexCount' in p:
+				outfile = open(pair[0].replace('TexCount.txt','All.tex'),'w')
+
+		alllines=[]
+		for p in pair:	
+			for line in open(p):
+				line=line.replace('--','-')
+				line=line.replace('&','')
+				line=line.replace('\\','')
+				line=line.replace('pm','\\pm')
+				newline = ''
+				dcount = 0
+				for c in line:
+					newline +=(c)
+					if c == "$":
+						dcount +=1
+					if dcount ==2:
+						dcount=0
+						newline += '&' 
+				newline = newline.split("&")
+				alllines.append(newline)
+
+		newtable = []
+		for a in range(len(alllines)/2):
+			c = alllines[a]
+			x = alllines[a+len(alllines)/2]
+			div = ' & '
+			bin = c[0]
+			bin = bin.replace('-','')
+			bin = bin.replace('$','')
+			bin = bin.split()
+			outbin = '$'
+			outbin += str(round(float(bin[0]),2))
+			outbin += '-'
+			outbin += str(round(float(bin[1]),2))
+			outbin += "$"
+			outbin = outbin.replace("$ 0.5 - 1.5 $","1")
+			outbin = outbin.replace("$ 1.5 - 2.5 $","2")
+			outbin = outbin.replace("$ 2.5 - 3.5 $","3")
+			outbin = outbin.replace("$ 3.5 - 4.5 $","4")
+			outbin = outbin.replace("$ 4.5 - 5.5 $","5")
+			outbin = outbin.replace("$ 5.5 - 6.5 $","6")
+			outbin = outbin.replace("$ 6.5 - 7.5 $","7")
+			outbin = outbin.replace("$ 7.5 - 8.5 $","8")
+			outbin=outbin.replace("$0.5-1.5$","1")
+			outbin=outbin.replace("$1.5-2.5$","2")
+			outbin=outbin.replace("$2.5-3.5$","3")
+			outbin=outbin.replace("$3.5-4.5$","4")
+			outbin=outbin.replace("$4.5-5.5$","5")
+			outbin=outbin.replace("$5.5-6.5$","6")
+			outbin=outbin.replace("$6.5-7.5$","7")
+			outbin=outbin.replace("$7.5-8.5$","8")
+
+			newtable.append(outbin+div+c[1]+div+c[2]+div+x[1]+div+x[2]+' \\\\')
+		# for n in newtable:
+		# 	print n
+
+
+		vmap = []
+		vmap.append(["DeltaPhi_pfjet1muon1","$\\Delta \\phi (jet_1, \mu)$"])
+		vmap.append(["DeltaPhi_pfjet2muon1","$\\Delta \\phi (jet_2, \mu)$"])
+		vmap.append(["DeltaPhi_pfjet3muon1","$\\Delta \\phi (jet_3, \mu)$"])
+		vmap.append(["DeltaPhi_pfjet4muon1","$\\Delta \\phi (jet_4, \mu)$"])
+		vmap.append(["Eta_pfjet1","$\\eta(jet_1)$"])
+		vmap.append(["Eta_pfjet2","$\\eta(jet_2)$"])
+		vmap.append(["Eta_pfjet3","$\\eta(jet_3)$"])
+		vmap.append(["Eta_pfjet4","$\\eta(jet_4)$"])
+		vmap.append(["MT_muon1MET","$M_T(\\mu,E_T^{miss})$"])
+		vmap.append(["PFJet30Count_preexc","Inc Jet Mult"])
+		vmap.append(["PFJet30Count","Exc Jet Mult"])
+		vmap.append(["Pt_MET","$E_T^{miss}$"])
+		vmap.append(["Pt_pfjet1","$p_T(jet_1)$"])
+		vmap.append(["Pt_pfjet2","$p_T(jet_2)$"])
+		vmap.append(["Pt_pfjet3","$p_T(jet_3)$"])
+		vmap.append(["Pt_pfjet4","$p_T(jet_4)$"])
+		vmap.append(["HT_pfjets_inc1","$H_T(\\geq 1 jet)$"])
+		vmap.append(["HT_pfjets_inc2","$H_T(\\geq 2 jet)$"])
+		vmap.append(["HT_pfjets_inc3","$H_T(\\geq 3 jet)$"])
+		vmap.append(["HT_pfjets_inc4","$H_T(\\geq 4 jet)$"])
+
+		vmap.append(["Pt_muon1","$p_T(\\mu)$"])
+		vmap.append(["Eta_muon1","$\eta(\\mu)$"])
+
+		var = 'Bin'
+		for v in vmap:
+			if v[0] in str(pair):
+				var = v[1]
+		outfile.write('\\begin{table}[htb]\n\caption{Bin-by-bin data and uncertainties for the final '+var+' distribution.}\n')
+		outfile.write("\\begin{center}\n\\begin{tabular}{|l|ll|ll|}\\hline\n "+var+"     & Predicted Events  & Measured Events & Predicted $\\sigma$ & Measured $\\sigma$ \\\\ \\hline \\hline\n")
+		for n in newtable:
+			outfile.write(n+'\n')
+		outfile.write('\\hline\n\\end{tabular}\n\\end{center}\\end{table}\n')
+
+		outfile.close()
+
+	def systablefromfile(sysfile):
+
+
+		vmap = []
+		vmap.append(["DeltaPhi_pfjet1muon1","$\\Delta \\phi (jet_1, \mu)$"])
+		vmap.append(["DeltaPhi_pfjet2muon1","$\\Delta \\phi (jet_2, \mu)$"])
+		vmap.append(["DeltaPhi_pfjet3muon1","$\\Delta \\phi (jet_3, \mu)$"])
+		vmap.append(["DeltaPhi_pfjet4muon1","$\\Delta \\phi (jet_4, \mu)$"])
+		vmap.append(["Eta_pfjet1","$\\eta(jet_1)$"])
+		vmap.append(["Eta_pfjet2","$\\eta(jet_2)$"])
+		vmap.append(["Eta_pfjet3","$\\eta(jet_3)$"])
+		vmap.append(["Eta_pfjet4","$\\eta(jet_4)$"])
+		vmap.append(["MT_muon1MET","$M_T(\\mu,E_T^{miss})$"])
+		vmap.append(["PFJet30Count_preexc","Inc Jet Mult"])
+		vmap.append(["PFJet30Count","Exc Jet Mult"])
+		vmap.append(["Pt_MET","$E_T^{miss}$"])
+		vmap.append(["Pt_pfjet1","$p_T(jet_1)$"])
+		vmap.append(["Pt_pfjet2","$p_T(jet_2)$"])
+		vmap.append(["Pt_pfjet3","$p_T(jet_3)$"])
+		vmap.append(["Pt_pfjet4","$p_T(jet_4)$"])
+		vmap.append(["Pt_muon1","$p_T(\\mu)$"])
+		vmap.append(["Eta_muon1","$\eta(\\mu)$"])
+		vmap.append(["HT_pfjets_inc1","$H_T(\\geq 1 jet)$"])
+		vmap.append(["HT_pfjets_inc2","$H_T(\\geq 2 jet)$"])
+		vmap.append(["HT_pfjets_inc3","$H_T(\\geq 3 jet)$"])
+		vmap.append(["HT_pfjets_inc4","$H_T(\\geq 4 jet)$"])
+
+		print sysfile
+		var = 'Bin'
+		for v in vmap:
+			if v[0] in str(sysfile):
+				var = v[1]
+
+		outfile = open(sysfile.replace('TexVerboseError.txt','AllSys.tex'),'w')
+		outfile.write('\\begin{table}[htb]\n\caption{Bin-by-bin percent systematic uncertainties on the measured result for the final '+var+' distribution.}\n')
+		outfile.write("\\begin{center}\n\\begin{tabular}{|l|cccccccccccc|}\\hline\n "+var+"     &PU    & BG & Lumi   & bTag   & JES    & JER     & MES    & MER   & Stat  & Gen & Evt & MET   \\\\ \\hline \\hline\n")
+		for line in open(sysfile,'r'):
+			outfile.write(line.replace('--','-'))
+		outfile.write('\\hline\n\\end{tabular}\n\\end{center}\n\\end{table}\n')
+		outfile.close()
+
+
+	for pair in pairs:
+		TexTableFromPair(pair)
+
+	for s in systables:
+		systablefromfile(s)
+
+
+	print ' -------------- '
+
+	cont = ['pyplots/' + x.replace('\n','') for x in os.popen('ls -1 pyplots | grep -v Tables | grep tex ')]
+	cont.sort()
+	latdoc = 'pyplots/Tables.tex'
+	os.system('rm pyplots/Tables.*')
+
+
+	doccont = '\\documentclass[8pt,a4paper]{article}\n\\usepackage[margin=0.25in]{geometry} \n\\begin{document}\n'
+
+	for c in cont:
+		name = c.split('/')[-1]
+		name = name.split('.')[0]
+		print name
+		# doccont += name.replace('_','\\_') +'\\\\\n'
+		doccont += '\\include{'+name+'}\n'
+		if 'Sys' in name:
+			doccont += '\\clearpage\n\n'
+
+	doccont += '\n\\end{document}\n\n'
+
+	print doccont
+
+	x = open(latdoc,'w')
+	x.write(doccont)
+	x.close()
+
+	exe = open('mtex.sh','w')
+	exe.write("#!/bin/sh\n\ncd pyplots\n"+"\npdflatex Tables.tex"*2)
+	exe.close()
+	os.system('chmod 777 mtex.sh')
+	os.system('./mtex.sh')
+	os.system('rm mtex.sh')
+
+	tdir = 'pyplots'
+
+	files = glob(tdir+'/*AllSys.tex')
+	print files
+
+	def FixDrawLegend(legend):
+		legend.SetTextFont(42)
+		legend.SetTextSize(.04)
+
+		legend.SetFillColor(0)
+		legend.SetBorderSize(0)
+		legend.Draw()
+		return legend
+
+	print ' '
+
+	def quadsum(vals):
+		_s = .0
+		for v in vals:
+			_s += v*v
+		_s = math.sqrt(_s)
+		return _s 
+
+
+	def setTDRStyle2():
+
+		# For the canvas:
+		gStyle.SetCanvasBorderMode(0)
+		gStyle.SetCanvasColor(0) # must be kWhite but I dunno how to do that in PyROOT
+		gStyle.SetCanvasDefH(600) #Height of canvas
+		gStyle.SetCanvasDefW(600) #Width of canvas
+		gStyle.SetCanvasDefX(0)   #POsition on screen
+		gStyle.SetCanvasDefY(0)
+
+
+		# For the Pad:
+		gStyle.SetPadBorderMode(0);
+		# gStyle.SetPadBorderSize(Width_t size = 1);
+		gStyle.SetPadColor(0); # kWhite
+		gStyle.SetPadGridX(0); #false
+		gStyle.SetPadGridY(0); #false
+		gStyle.SetGridColor(0);
+		gStyle.SetGridStyle(3);
+		gStyle.SetGridWidth(1);
+
+		# For the frame:
+		gStyle.SetFrameBorderMode(0);
+		gStyle.SetFrameBorderSize(1);
+		gStyle.SetFrameFillColor(0);
+		gStyle.SetFrameFillStyle(0);
+		gStyle.SetFrameLineColor(1);
+		gStyle.SetFrameLineStyle(1);
+		gStyle.SetFrameLineWidth(1);
+
+		# For the histo:
+		# gStyle.SetHistFillColor(1);
+		# gStyle.SetHistFillStyle(0);
+		gStyle.SetHistLineColor(1);
+		gStyle.SetHistLineStyle(0);
+		gStyle.SetHistLineWidth(1);
+		# gStyle.SetLegoInnerR(Float_t rad = 0.5);
+		# gStyle.SetNumberContours(Int_t number = 20);
+
+		gStyle.SetEndErrorSize(2);
+		#gStyle.SetErrorMarker(20);   #/ I COMMENTED THIS OUT
+		gStyle.SetErrorX(0.);
+
+		gStyle.SetMarkerStyle(20);
+
+		#For the fit/function:
+		gStyle.SetOptFit(0);
+		gStyle.SetFitFormat("5.4g");
+		gStyle.SetFuncColor(2);
+		gStyle.SetFuncStyle(1);
+		gStyle.SetFuncWidth(1);
+
+		#For the date:
+		gStyle.SetOptDate(0);
+		# gStyle.SetDateX(Float_t x = 0.01);
+		# gStyle.SetDateY(Float_t y = 0.01);
+
+		# For the statistics box:
+		gStyle.SetOptFile(0);
+		gStyle.SetOptStat(0); # To display the mean and RMS:   SetOptStat("mr");
+		gStyle.SetStatColor(0); # kWhite
+		gStyle.SetStatFont(42);
+		gStyle.SetStatFontSize(0.025);
+		gStyle.SetStatTextColor(1);
+		gStyle.SetStatFormat("6.4g");
+		gStyle.SetStatBorderSize(1);
+		gStyle.SetStatH(0.1);
+		gStyle.SetStatW(0.15);
+		# gStyle.SetStatStyle(Style_t style = 1001);
+		# gStyle.SetStatX(Float_t x = 0);
+		# gStyle.SetStatY(Float_t y = 0);
+
+		# Margins:
+		gStyle.SetPadTopMargin(0.05);
+		gStyle.SetPadBottomMargin(0.13);
+		gStyle.SetPadLeftMargin(0.16);
+		#gStyle.SetPadRightMargin(0.12);
+		gStyle.SetPadRightMargin(0.02);
+
+		# For the Global title:
+
+		gStyle.SetOptTitle(0);
+		gStyle.SetTitleFont(42);
+		gStyle.SetTitleColor(1);
+		gStyle.SetTitleTextColor(1);
+		gStyle.SetTitleFillColor(10);
+		gStyle.SetTitleFontSize(0.05);
+		# gStyle.SetTitleH(0); # Set the height of the title box
+		# gStyle.SetTitleW(0); # Set the width of the title box
+		# gStyle.SetTitleX(0); # Set the position of the title box
+		# gStyle.SetTitleY(0.985); # Set the position of the title box
+		# gStyle.SetTitleStyle(Style_t style = 1001);
+		# gStyle.SetTitleBorderSize(2);
+
+		# For the axis titles:
+
+		gStyle.SetTitleColor(1, "XYZ");
+		gStyle.SetTitleFont(42, "XYZ");
+		gStyle.SetTitleSize(0.06, "XYZ");
+		# gStyle.SetTitleXSize(Float_t size = 0.02); # Another way to set the size?
+		# gStyle.SetTitleYSize(Float_t size = 0.02);
+		gStyle.SetTitleXOffset(0.9);
+		gStyle.SetTitleYOffset(1.25);
+		# gStyle.SetTitleOffset(1.1, "Y"); # Another way to set the Offset
+
+		# For the axis labels:
+
+		gStyle.SetLabelColor(1, "XYZ");
+		gStyle.SetLabelFont(42, "XYZ");
+		gStyle.SetLabelOffset(0.007, "XYZ");
+		gStyle.SetLabelSize(0.05, "XYZ");
+
+		# For the axis:
+
+		gStyle.SetAxisColor(1, "XYZ");
+		gStyle.SetStripDecimals(1); # kTRUE
+		gStyle.SetTickLength(0.03, "XYZ");
+		gStyle.SetNdivisions(510, "XYZ");
+		gStyle.SetPadTickX(1);  # To get tick marks on the opposite side of the frame
+		gStyle.SetPadTickY(1);
+
+		# Change for log plots:
+		gStyle.SetOptLogx(0);
+		gStyle.SetOptLogy(0);
+		gStyle.SetOptLogz(0);
+
+		# Postscript options:
+		gStyle.SetPaperSize(20.,20.);
+		# gStyle.SetLineScalePS(Float_t scale = 3);
+		# gStyle.SetLineStyleString(Int_t i, const char* text);
+		# gStyle.SetHeaderPS(const char* header);
+		# gStyle.SetTitlePS(const char* pstitle);
+
+		# gStyle.SetBarOffset(Float_t baroff = 0.5);
+		# gStyle.SetBarWidth(Float_t barwidth = 0.5);
+		# gStyle.SetPaintTextFormat(const char* format = "g");
+		# gStyle.SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
+		# gStyle.SetTimeOffset(Double_t toffset);
+		# gStyle.SetHistMinimumZero(kTRUE);
+
+	setTDRStyle2()
+
+
+
+	def AnalyzeFile(afile):
+		relabels = []
+		relabels.append(['Pt_pfjet1','Leading Jet p_{T} [GeV]','p_{T}'])
+		relabels.append(['Pt_muon1','Muon p_{T} [GeV]','p_{T}'])
+		relabels.append(['N_GoodVertices','N_{Vertices}','N_{Vertices}'])
+		relabels.append(['Pt_pfjet2','Second Leading Jet p_{T} [GeV]','p_{T}'])
+		relabels.append(['Pt_pfjet3','Third Leading Jet p_{T} [GeV]','p_{T}'])
+		relabels.append(['Pt_pfjet4','Fourth Leading Jet p_{T} [GeV]','p_{T}'])
+		relabels.append(['Pt_pfjet5','Fifth Leading Jet p_{T} [GeV]','p_{T}'])
+		relabels.append(['Eta_pfjet1','Leading Jet #eta','#eta'])
+		relabels.append(['Eta_pfjet2','Second Leading Jet #eta','#eta'])
+		relabels.append(['Eta_pfjet3','Third Leading Jet #eta','#eta'])
+		relabels.append(['Eta_pfjet4','Fourth Leading Jet #eta','#eta'])
+		relabels.append(['Eta_pfjet5','Fifth Leading Jet #eta','#eta'])
+		relabels.append(['preexc','Jet Multiplicity (Inclusive)','N_{Jet}'])
+		relabels.append(['PFJet30Count','Jet Multiplicity (Exclusive)','N_{Jet}'])
+		relabels.append(['MT_muon1METR','M_{T}(#mu,E_{T}^{miss}) [GeV]','M_{T}'])
+		relabels.append(['Pt_MET','E_{T}^{miss} [GeV]','E_{T}^{miss}'])
+		relabels.append(['DeltaPhi_pfjet1muon1','#Delta #phi(jet_{1},#mu)'	,'#Delta #phi(jet_{1},#mu)'])
+		relabels.append(['DeltaPhi_pfjet2muon1','#Delta #phi(jet_{2},#mu)'	,'#Delta #phi(jet_{2},#mu)'])
+		relabels.append(['DeltaPhi_pfjet3muon1','#Delta #phi(jet_{3},#mu)'	,'#Delta #phi(jet_{3},#mu)'])
+		relabels.append(['DeltaPhi_pfjet4muon1','#Delta #phi(jet_{4},#mu)'	,'#Delta #phi(jet_{4},#mu)'])
+		relabels.append(['DeltaPhi_pfjet5muon1','#Delta #phi(jet_{5},#mu)'	,'#Delta #phi(jet_{5},#mu)'])
+
+		label = ''
+		for x in relabels:
+			if x[0] in afile:
+				label = x[1]
+		f = open(afile,'r')
+		
+		headers = ''
+		contents = []
+		for line in f:
+			line = line.replace('hline','')
+			line = line.replace('\\','')
+
+			# print line
+			if 'Lumi' in line:
+				headers = line
+			else:
+				if '&' in line:
+					contents.append(line)
+
+		print ' '
+		# print headers
+		# for c in contents:
+		# 	print c
+		nbins = []
+
+		vcont  = []
+		for c in contents:
+			dolastbin = False
+			if c == contents[-1]:
+				dolastbin = True
+			v = [float(x) for x in c.replace('\n','').split('&')[1:]]
+			c = c.split('&')[0]
+			c = c.replace('$','')
+			c = c.split(' - ')
+			nbins.append(float(c[0]))
+			vcont.append(v)
+			if  dolastbin == True:
+				nbins.append(float(c[1]))
+		# print nbins
+
+		binset = nbins
+		n = len(binset)-1
+		T = TH1D('T','Total',n,array('d',binset))
+		JJ = TH1D('JJ','JES, JER',n,array('d',binset))
+		MM = TH1D('MM','MES, MER, Muon Sel',n,array('d',binset))
+		BG = TH1D('BG','Background',n,array('d',binset))
+		UN = TH1D('UN','Statistical',n,array('d',binset))
+		Gen = TH1D('Gen','Generator',n,array('d',binset))
+		BT = TH1D('BT','BTagging',n,array('d',binset))
+		OT = TH1D('OT','All Other',n,array('d',binset))
+
+		allvals = []
+		for x in range(len(binset)-1):
+			[pu,bg,lu,bt,js,jr,ms,mr,st,gn,hl,mt] = vcont[x]
+			nbin = x+1
+			_T = math.sqrt(sum([aa*aa for aa in [pu,bg,lu,bt,js,jr,ms,mr,st,gn,hl,mt]]))
+			T.SetBinContent(nbin,_T)
+			
+			_JJ = math.sqrt(js*js+jr*jr)
+			_MM = math.sqrt(ms*ms+mr*mr+hl*hl)
+			_BG = bg
+			_UN = st
+			_Gen = gn
+			_BT = bt
+			# _OT = math.sqrt(lu*lu+pu*pu+hl*hl+mt*mt)
+
+			_OT = quadsum([pu,bg,lu,bt,ms,mr,hl,mt])
+
+
+			JJ.SetBinContent(nbin,_JJ)
+			MM.SetBinContent(nbin,_MM)
+			BG.SetBinContent(nbin,_BG)
+			UN.SetBinContent(nbin,_UN)
+			Gen.SetBinContent(nbin,_Gen)
+			BT.SetBinContent(nbin,_BT)
+			OT.SetBinContent(nbin,_OT)
+			# allvals+= [_JJ,_MM,_BG,_UN,_Gen,_BT,_OT]
+
+			allvals += [_JJ,_Gen,_UN,_OT,_T]
+		colors = [1,2,4,6,28,7,8,9]
+		styles = [1,2,4,5,3,6,7,8]
+
+		# histos = [T,JJ,MM,BG,UN,Gen,BT,OT]
+		histos = [T,JJ,Gen,UN,OT]
+
+		# gROOT.SetStyle('Plain')  # Plain white default for plots
+		gStyle.SetOptTitle(0) # No titles
+		gStyle.SetOptStat(0) # No titles
+
+		c1 = TCanvas("c1","",700,800)
+		plotmin = min(allvals)*0.8
+		print plotmin
+		if plotmin < 0.1:
+			plotmin = 0.1
+		plotmax = max(allvals)
+		plotmax *= 50
+		c1.cd(1).SetLogy()
+
+
+		for x in range(len(histos)):
+			histos[x].SetLineColor(colors[x])
+			histos[x].SetMarkerColor(colors[x])
+			histos[x].SetLineStyle(styles[x])
+			histos[x].GetXaxis().SetTitle(label)
+			histos[x].SetMarkerSize(0.0)
+			histos[x].GetYaxis().SetTitle("Uncertainty (%)")
+			histos[x].SetMinimum(plotmin)
+			histos[x].SetMaximum(plotmax)
+			histos[x].SetLineWidth(2)
+			
+			histos[x].Draw("HIST"+"SAME"*(x!=0))
+
+
+		FixDrawLegend(c1.cd(1).BuildLegend())
+
+		pdf = afile.replace('.tex','.pdf')
+		png = afile.replace('.tex','.png')
+		c1.Print(pdf)
+		c1.Print(png)
+
+	for f in files:
+		AnalyzeFile(f)
+
+	for f in files:
+		AnalyzeFile(f)	
+
+	print ' '
+
 
 setTDRStyle()
 

@@ -75,9 +75,9 @@ for r in range(1,len(table)):
 table2= map(list,zip(*table[1:]))
 for x in range(0,len(table2)):
 	exec (table[0][x]+'='+`table2[x]`)	
-for x in range(0,len(SigOrBG)):
+# for x in range(0,len(SigOrBG)):
 	#HLTBit[x]=int(HLTBit[x])
-	SigOrBG[x]=int(SigOrBG[x])
+	# SigOrBG[x]=int(SigOrBG[x])
 ###----------------------------------------------------------------------###
 
 ### This portion creates the branch status commands to speed up the code ###
@@ -95,7 +95,7 @@ for x in variables:
 	for line in f2:
 		if x in line:	
 			use = 1
-	if use ==1:
+	if use ==1 or 'GenJetEMF' in x:
 		statuscommands += '   fChain->SetBranchStatus("'+x+'",1);\n'
 	else:
 		statuscommands += '   fChain->SetBranchStatus("'+x+'",0);\n'
@@ -166,15 +166,17 @@ for x in range(len(SignalType)):
 	#cfile=Analyzer[x]+'.C'
 	#hfile=Analyzer[x]+'.h'
 	
-	print 'Preparing '+ SignalType[x]
+	print 'Preparing '+ SignalType[x],
 	path = CastorDirectory[x]	
 	#fcont = os.popen('xrd eoscms dirlist '+path+ ' | awk \'{print $5}\' ').readlines()
 	fcont = []
 
+	# print '   ',path.replace('\n','')
+
 	for subfile in allfiles:
 		if path.replace('\n','') in subfile:
 			fcont.append(subfile)
-
+	print '  --> ', len(fcont),'files.'
 
 	FullList = []
 	for y in fcont:
@@ -223,9 +225,9 @@ for x in range(len(SignalType)):
 		s1 = s1.replace('crosssection', str(float(Xsections[x])))
 		s1 = s1.replace('desired_luminosity', str(float(1.0)))
 		s1 = s1.replace('FILEINPUT', path + '/' + dirList[0] )
-		s1 = s1.replace('DRESSEDREPLACEMENTFILE', str(DressedFile[x]) )
-		s1 = s1.replace('MassOfLQ', str(float(MassOfLQ[x])))
-		s1 = s1.replace('MyCustomHTCut', str(float(HTRemoveIfGreater[x])))
+		# s1 = s1.replace('DRESSEDREPLACEMENTFILE', str(DressedFile[x]) )
+		# s1 = s1.replace('MassOfLQ', str(float(MassOfLQ[x])))
+		# s1 = s1.replace('MyCustomHTCut', str(float(HTRemoveIfGreater[x])))
 
 		
 		s1 = s1.replace('Double_t JetRescaleFactor = 1.00;','Double_t JetRescaleFactor = '+newjetscale+';\n')
@@ -250,6 +252,14 @@ for x in range(len(SignalType)):
 			s1 = s1.replace('IsItPhiCorr', 'true')
 		else:
 			s1 = s1.replace('IsItPhiCorr', 'false')
+
+		if ( 'WJets' not in SignalType[x] and 'WTo' not in SignalType[x] ):
+			s1 = s1.replace('GenJetNUF->at(ijet)','0.0')
+		else:
+			s1 = s1.replace('GenJetPt->','GenJetPtNoMuNoNu->')
+			s1 = s1.replace('GenJetEta->','GenJetEtaNoMuNoNu->')
+			s1 = s1.replace('GenJetPhi->','GenJetPhiNoMuNoNu->')
+
 
 
 
@@ -286,7 +296,20 @@ for x in range(len(SignalType)):
 		f2 = open(c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part+".h", 'w')
 		for line in s2.readlines():
 			line = line.replace('placeholder', c2file.replace('.C','')+'_'+SignalType[x].replace('-','_')+part)
+
+			if 'GenJetEMF' in line and 'SetBranchStatus' in line:
+				line = line.replace('0','1')
+
 			f2.write(line)
+			if 'GenJetEMF' in line and ( 'WJets' in SignalType[x] or 'WTo' in SignalType[x] ):
+				f2.write(line.replace('EMF','NUF'))
+				f2.write(line.replace('EMF','LEPF'))
+				f2.write(line.replace('EMF','PtNoMuNoNu'))
+				f2.write(line.replace('EMF','EtaNoMuNoNu'))
+				f2.write(line.replace('EMF','PhiNoMuNoNu'))
+
+
+
 			if 'filetracermark000' in line:	
 				f2.write('\nTChain * chain = new TChain(\"rootTupleTree/tree\",\"\");\n')
 				for z in range(len(newdirList[y])):

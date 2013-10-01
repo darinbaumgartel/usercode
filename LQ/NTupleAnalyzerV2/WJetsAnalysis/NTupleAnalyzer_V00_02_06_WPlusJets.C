@@ -2099,9 +2099,12 @@ void placeholder::Loop()
 			{
 				// std::cout<<"size check "<<GenParticlePdgId->size()<<"  "<<GenParticlePt->size()<<std::endl;	
 				int pdgId = GenParticlePdgId->at(ip);
+				int status = GenParticleStatus->at(ip);
 				// std::cout<<pdgId<<"  "<<GenParticlePt->at(ip)<<std::endl;
 				// if ( TMath::Abs(pdgId) == 13 || TMath::Abs(pdgId) == 713 )
-				if (  TMath::Abs(pdgId) == 713 )
+				if ( (!IsSherpa) &&  TMath::Abs(pdgId) == 713 )
+				// if (  TMath::Abs(pdgId) == 713 )
+
 				{
 					// std::cout<<"  kept mu size: "<<GenMuons.size()<<std::endl;
 					// if (TMath::Abs(pdgId) == 713) 
@@ -2126,6 +2129,30 @@ void placeholder::Loop()
 					if (KeepMuon==true) GenMuons.push_back(thisgenmuon);
 					// break;
 				}
+
+				// std::cout<<"   MUONS: "<<GenMuons.size()<<std::endl;
+				if ( (IsSherpa) &&  TMath::Abs(pdgId) == 13 && abs(status) == 3)
+				// if ( (false) &&  TMath::Abs(pdgId) == 13 && abs(status) == 3)
+
+				{
+
+					TLorentzVector thisgenmuon;
+					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
+					// std::cout<<"   -> any: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
+
+					bool KeepMuon=true;
+					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
+					{
+						if ( (GenMuons[igenmuon].Pt() == thisgenmuon.Pt())&&(GenMuons[igenmuon].Eta() == thisgenmuon.Eta())&&(GenMuons[igenmuon].Phi() == thisgenmuon.Phi()) ) 
+						{	
+							KeepMuon=false;
+						}
+					}
+
+					if (KeepMuon==true) GenMuons.push_back(thisgenmuon);
+					// break;
+				}
+
 				// std::cout<<"  Final  mu size: "<<GenMuons.size()<<std::endl;
 
 
@@ -2161,9 +2188,41 @@ void placeholder::Loop()
 			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
 			{
 
-				if (fabs(GenJetEta->at(ijet))>3.0) continue;
 				TLorentzVector(thisgenjet);
 				thisgenjet.SetPtEtaPhiM(GenJetPt->at(ijet),GenJetEta->at(ijet),GenJetPhi->at(ijet),0.0);
+
+
+
+				// for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
+				// {
+		
+				// 	TLorentzVector _part;
+				// 	_part.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
+
+				// 	int absid = abs(GenParticlePdgId->at(ip));
+				// 	bool _isnu = ( (absid == 12)||(absid == 14)||(absid == 16) );
+
+				// 	_isnu *= (GenParticleStatus->at(ip)==1);
+
+				// 	if (!_isnu) continue;
+
+				// 	if (_part.DeltaR(thisgenjet) < 0.5) 
+				// 	{
+				// 			std::cout<<GenParticlePdgId->at(ip)<<"  "<<_part.DeltaR(thisgenjet)<<"   "<<GenParticlePt->at(ip)<<"  "<<thisgenjet.Pt()<<std::endl;
+				// 			TLorentzVector _antipart;
+				// 			// _antipart.SetPtEtaPhiM(-1.0*GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
+				// 			thisgenjet -= _part;
+				// 			std::cout<<"ReAssigning pT: "<<GenJetPt->at(ijet)<<"  -->  "<<thisgenjet.Pt()<<std::endl;
+				// 			GenJetPt->at(ijet) = thisgenjet.Pt();
+				// 			GenJetEta->at(ijet) = thisgenjet.Eta();
+				// 			GenJetPhi->at(ijet) = thisgenjet.Phi();
+				// 	}
+				// }
+
+
+
+
+				if (fabs(GenJetEta->at(ijet))>3.0) continue;
 
 				bool KeepGenJet=true;
 				for(unsigned int igmu = 0; igmu != GenMuons.size(); ++igmu)
@@ -2173,9 +2232,13 @@ void placeholder::Loop()
 				}
 				
 				// FIX TO REMOVE MUONS/NEUTRINOS
-				float _invisenergyfrac = 1.0-1.0*(GenJetEMF->at(ijet) + GenJetHADF->at(ijet)); 
+				// float _invisenergyfrac = 1.0-1.0*(GenJetEMF->at(ijet) + GenJetHADF->at(ijet)); 
+
+				// float _nuf = 1.0*(GenJetNUF->at(ijet));
+				// std::cout<<" nufrac:"<<_nuf<<std::endl;
 				// std::cout<<_invisenergyfrac<<"  "<<GenJetPt->at(ijet)<<"    "<<std::endl;
-				if ((_invisenergyfrac > 0.5) && (IsSherpa)) KeepGenJet=false;
+				// if ((_invisenergyfrac > 0.5) && (IsSherpa)) KeepGenJet=false;
+				// if (_nuf > 0.8) KeepGenJet = false;
 
 				if (!KeepGenJet) continue;
 
@@ -2589,7 +2652,7 @@ void placeholder::Loop()
 
 		bool skipevent = true;
 
-		if ( ( Pt_muon1>24 || Pt_genmuon1 > 24 ) && (Pt_pfjet1>28 || Pt_genjet1_bare > 28) ) skipevent = false;
+		if ( ( Pt_muon1>24 || Pt_genmuon1 > 24 ) && (Pt_pfjet1>29 || Pt_genjet1_bare > 29) ) skipevent = false;
 
 		// if ((Muon25Count>0)&&(HEEPEle25Count>0)) skipevent = false;
 		// if (Pt_muon2>25) skipevent = true;				
