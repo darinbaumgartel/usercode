@@ -23,15 +23,15 @@
 //        Initial Setup and Special Functions
 //===================================================================================================
 
-// int ND = dtree->GetEntries();
-
 TRandom3* rr = new TRandom3();
 
+// Systematic factors, interchanged via python script. Do not modify here.
 Double_t JetRescaleFactor = 1.00;
 Double_t MuonRescaleFactor = 1.00;
 Double_t JetSmearFactor = 0.0;
 Double_t MuonSmearFactor = 0.0;
 
+// Recoil Correction Function. 
 TLorentzVector Recoil_Corr(TLorentzVector L, TLorentzVector U, TLorentzVector P)
 {
 
@@ -98,68 +98,14 @@ TLorentzVector Recoil_Corr(TLorentzVector L, TLorentzVector U, TLorentzVector P)
 
 }
 
-
-TLorentzVector Recoil_Corr_old(TLorentzVector MET, TLorentzVector LEPTON, TLorentzVector W)
-{
-	TLorentzVector U = -( MET + LEPTON);
-	Double_t U1 = (U.Pt())*(cos(U.DeltaPhi(W)));
-	Double_t U2 = (U.Pt())*(sin(U.DeltaPhi(W)));
-
-	Double_t x = (MET+LEPTON).Pt();
-
-	Double_t responseU1 = 1.33223-0.917782*x;
-	Double_t responseU2 = -0.013;
-
-	Double_t responseMCU1 = 1.26247-0.950094*x;
-	Double_t responseMCU2 = -0.00544907;
-
-	Double_t resolutionU1 = 11.1566+0.0654529*x+0.000124436*x*x;
-	Double_t resolutionU2 = 11.1235+0.0449872*x-6.39822e-5*x*x;
-
-	Double_t resolutionMCU1 = 10.6449+0.0436475*x+3.07554e-5*x*x;
-	Double_t resolutionMCU2 = 10.5649+0.0225853*x-5.81371e-5*x*x;
-
-	Double_t ScaleU1Response = responseU1/responseMCU1;
-	Double_t ScaleU2Response = responseU2/responseMCU2;
-	Double_t ScaleU1Resolution = resolutionU1/resolutionMCU1;
-	Double_t ScaleU2Resolution = resolutionU2/resolutionMCU2;
-
-	Double_t U1prime = U1*ScaleU1Response*(rr->Gaus(1.0,fabs(ScaleU1Resolution - 1.0))) ;
-	Double_t U2prime = U2*ScaleU2Response*(rr->Gaus(1.0,fabs(ScaleU2Resolution - 1.0)));
-
-	Double_t U1x,U1y,U2x,U2y;
-	Double_t piover2 = 0.5*3.1415926;
-	Double_t wphi = W.Phi();
-	U1x = U1prime*cos(wphi);
-	U1y = U1prime*sin(wphi);
-	U2x = -U2prime*cos(piover2-wphi);
-	U2y = U2prime*sin(piover2-wphi);
-
-	Double_t Upt = sqrt( (U1x+U2x)*(U1x+U2x) + (U1y+U2y)*(U1y+U2y) );
-	Double_t Uphi = atan((U1y +U2y)/(U1x+U2x));
-
-	TLorentzVector Uprime;
-	Uprime.SetPtEtaPhiM(Upt,0.,Uphi,0.);
-
-	TLorentzVector METprime;
-	METprime = (-LEPTON - Uprime);
-
-	return METprime;
-
-}
-
-
+// Phi Modulation Correction
 TLorentzVector PhiMod_Corr(TLorentzVector MET, float Nvtx, bool _isdata)
 {
-	// std::cout<<" ---------------------- "<<std::endl;
 	float _met = MET.Pt();
 	float _phi = MET.Phi();
-	// std::cout<<_met<<std::endl;
 	float _ex = _met*cos(_phi);
 	float _ey = _met*sin(_phi);
-	// std::cout<<"comp: "<<_ex<<"  "<<_ey<<std::endl;
-	// std::cout<<MET.Px()<<"  "<<MET.Py()<<std::endl;
-	// std::cout<<_met<<"  "<<_phi<<std::endl;
+
 	float px = 0.0;
 	float py = 0.0;
 
@@ -174,86 +120,38 @@ TLorentzVector PhiMod_Corr(TLorentzVector MET, float Nvtx, bool _isdata)
 		px = (-4.79178e-02) + (8.62653e-04)*Nvtx;
 		py = (-4.54408e-01) - (1.89684e-01)*Nvtx;
 	}
-	// std::cout<<"Mods: "<<px<<"  "<<py<<std::endl;
 	float _exp = _ex - px;
 	float _eyp = _ey - py;
-	// std::cout<<"NewComp: "<<_exp<<"  "<<_eyp<<std::endl;
 	float _metprime = sqrt(_exp*_exp + _eyp*_eyp);
 
 	TLorentzVector METprime;
 	TLorentzVector METAngle;
 	METAngle.SetPx(_exp);
 	METAngle.SetPy(_eyp);
-	// std::cout<<" ------>"<<METAngle.Phi()<<std::endl;
 	float _metphiprime = 1.0*METAngle.Phi();
-	// std::cout<<"prime: "<<_metprime<<"  "<<_metphiprime<<std::endl;
 	METprime.SetPtEtaPhiM(_metprime,0.0,_metphiprime,0.0);
-	// std::cout<<"vec: "<<METprime.Pt()<<"   "<<METprime.Phi()<<std::endl;
 	return METprime;
-
 }
 
-
+// Transverse Mass
 Double_t TMass(Double_t Pt1, Double_t Pt2, Double_t DPhi12)
 {
 	return sqrt( 2*Pt2*Pt1*(1-cos(DPhi12)) );
 }
 
-
+// PT Rescaling
 Double_t ScaleObject(Double_t PT, Double_t fraction)
 {
 	return (PT*(fraction));
 }
 
-
-Double_t ScaleJet(Double_t PT, Double_t fraction)
-{
-	int sign = 1.0;
-	if (fraction<1.0) sign =-1.0;
-	if (PT >  10.045837015009878  ) fraction =  1.0816  ;
-	if (PT >  10.914793145910853  ) fraction =  1.07331  ;
-	if (PT >  11.189851524004983  ) fraction =  1.07075  ;
-	if (PT >  11.809823908691957  ) fraction =  1.06727  ;
-	if (PT >  12.259045129630636  ) fraction =  1.0642  ;
-	if (PT >  12.831363365781058  ) fraction =  1.0613  ;
-	if (PT >  13.655098586775988  ) fraction =  1.05633  ;
-	if (PT >  14.352001430814637  ) fraction =  1.05359  ;
-	if (PT >  15.21013385976414  ) fraction =  1.05044  ;
-	if (PT >  15.723339390468372  ) fraction =  1.04895  ;
-	if (PT >  16.73273083846727  ) fraction =  1.04522  ;
-	if (PT >  19.347205427601036  ) fraction =  1.03909  ;
-	if (PT >  22.838995888501916  ) fraction =  1.03412  ;
-	if (PT >  26.51733610692726  ) fraction =  1.03006  ;
-	if (PT >  30.916067683613512  ) fraction =  1.02649  ;
-	if (PT >  37.26064411541987  ) fraction =  1.02293  ;
-	if (PT >  44.721359549995796  ) fraction =  1.02003  ;
-	if (PT >  54.57396572955423  ) fraction =  1.01746  ;
-	if (PT >  68.84426735408334  ) fraction =  1.01547  ;
-	if (PT >  85.41697259944324  ) fraction =  1.01431  ;
-	if (PT >  108.20016239260036  ) fraction =  1.01373  ;
-	if (PT >  134.246912074893  ) fraction =  1.01331  ;
-	if (PT >  172.18386410651112  ) fraction =  1.01323  ;
-	if (PT >  221.75941333248414  ) fraction =  1.01315  ;
-	if (PT >  285.6088615315718  ) fraction =  1.01331  ;
-	if (PT >  377.1117867826719  ) fraction =  1.01348  ;
-	if (PT >  491.77237401567504  ) fraction =  1.01373  ;
-	if (PT >  643.9610775470397  ) fraction =  1.01423  ;
-	if (PT >  779.3404110640498  ) fraction =  1.01456  ;
-	if (PT >  1127.3478597509404  ) fraction =  1.0153  ;
-	if (PT >  1513.4296900580316  ) fraction =  1.01605  ;
-	if (PT >  1846.8548557201623  ) fraction =  1.01646  ;
-
-	if (sign < 0.0 ) fraction = 2.0 - fraction;
-	return (PT*(fraction));
-}
-
-
+// PT Smearing
 Double_t SmearObject(Double_t PT, Double_t fraction)
 {
 	return (rr->Gaus(PT,fraction*PT));
 }
 
-
+// Jet energy resolution smearing
 Double_t JERFactor(Double_t J_ETA)
 {
 	// if ((abs(J_ETA)<0.5))                     return rr->Gaus(1.052,0.063);
@@ -269,14 +167,14 @@ Double_t JERFactor(Double_t J_ETA)
 	return 1.0;
 }
 
-
+//Smearing function for jet resolution - increasing gen/reco pT difference
 Double_t GetRecoGenJetScaleFactor(Double_t RecoPT,Double_t GenPT, Double_t SmearFactor)
 {
 	Double_t deltaPT = ((RecoPT-GenPT)*SmearFactor);
 	return (GenPT+deltaPT)/RecoPT;
 }
 
-
+// Function to modify MET when another object pT is changed
 TLorentzVector PropagatePTChangeToMET(Double_t MET, Double_t METPhi, Double_t PTCorr, Double_t PTOrig, Double_t Phi)
 {
 	Double_t yMET = MET*sin(METPhi) - ( (PTCorr - PTOrig)*sin(Phi)  );
@@ -289,54 +187,38 @@ TLorentzVector PropagatePTChangeToMET(Double_t MET, Double_t METPhi, Double_t PT
 	return vmetcorr;
 }
 
-
+// HEEP electron ID, not used in practice .
 int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven , double e_dphi_sc, double e_deta_sc, double e_hoe, double e_sigmann, double e_e1x5_over_5x5, double e_e2x5_over_5x5, double e_em_had1iso , double e_had2iso, double e_trkiso, double e_losthits )
 {
 	int isgood = 1;
 
-								 // OK
 	if (e_pt_real<20.0) isgood = 0;
-								 //OK
 	if (!e_ecaldriven) isgood = 0;
-								 //OK
 	if (fabs(e_dphi_sc) > 0.09) isgood = 0;
 	if (e_hoe > 0.05) isgood = 0;//OK
 	if (e_losthits != 0) isgood = 0;
-								 //OK
 	bool barrel = (fabs(e_eta) < 1.442);
-								 //OK
 	bool endcap = (fabs(e_eta) > 1.560 && fabs(e_eta) < 2.5);
 
 	if ((!barrel)&&(!endcap)) isgood = 0;
 
 	if (barrel)
 	{
-								 // OK
 		if (e_pt<35.0) isgood = 0;
-								 // OK
 		if (fabs(e_deta_sc) > 0.005) isgood = 0;
-								 // OK
 		if (( e_e1x5_over_5x5 < 0.83)&&( e_e2x5_over_5x5 < 0.94 )) isgood = 0;
-								 //OK
 		if ( e_em_had1iso > ( 2.0 + 0.03*e_pt )) isgood = 0;
-								 //OK
 		if (e_trkiso > 7.5) isgood = 0;
 	}
 
 	if (endcap)
 	{
-								 // OK
 		if (e_pt<40.0) isgood = 0;
-								 //OK
 		if (fabs(e_deta_sc)> 0.007) isgood = 0;
-								 //OK
 		if (fabs(e_sigmann) > 0.03) isgood = 0;
-								 //OK
 		if ((e_pt < 50.0) && ( e_em_had1iso >  2.5 )) isgood = 0;
-								 // OK
 		if ((e_pt >= 50.0) && ( e_em_had1iso > ( 2.5 + 0.03*(e_pt-50.0) ))) isgood = 0;
 		if ( e_had2iso > 0.5 ) isgood = 0;
-								 // OK
 		if (e_trkiso > 15.0)    isgood = 0;
 	}
 
@@ -344,6 +226,7 @@ int CustomHeepID(double e_pt, double e_pt_real, double e_eta, bool e_ecaldriven 
 }
 
 
+// BTagging with data/MC rescaling for TCHPT
 vector<bool> BTagTCHPT(float pt, bool isdata,float discrim, float eta, int evt)
 {
 
@@ -437,7 +320,7 @@ vector<bool> BTagTCHPT(float pt, bool isdata,float discrim, float eta, int evt)
 	return tags;
 }
 
-
+// BTagging with data/MC rescaling for SSVHPT
 vector<bool> BTagSSVHPT(float pt, bool isdata,float discrim, float eta, int evt)
 {
 
@@ -529,7 +412,7 @@ vector<bool> BTagSSVHPT(float pt, bool isdata,float discrim, float eta, int evt)
 	return tags;
 }
 
-
+// BTagging with data/MC rescaling for JPT
 vector<bool> BTagJPT(float pt, bool isdata,float discrim, float eta, int evt)
 {
 
@@ -623,7 +506,7 @@ vector<bool> BTagJPT(float pt, bool isdata,float discrim, float eta, int evt)
 	return tags;
 }
 
-
+// BTagging without data/MC rescaling for TCHPT. 
 vector<bool> BTagTCHPTUnCorr(float pt, bool isdata,float discrim, float eta, int evt)
 {
 	double dseedmod = fabs(eta*eta*1000000+42);
@@ -648,6 +531,7 @@ vector<bool> BTagTCHPTUnCorr(float pt, bool isdata,float discrim, float eta, int
 }
 
 
+// BTagging with data/MC rescaling for TCHEM
 vector<bool> BTagTCHEM(float pt, bool isdata,float discrim, float eta, int evt)
 {
 
@@ -764,6 +648,7 @@ vector<bool> BTagTCHEM(float pt, bool isdata,float discrim, float eta, int evt)
 }
 
 
+// BTagging with data/MC rescaling for TCHEL
 vector<bool> BTagTCHEL(float pt, bool isdata,float discrim, float eta, int evt)
 {
 
@@ -889,66 +774,9 @@ vector<bool> BTagTCHEL(float pt, bool isdata,float discrim, float eta, int evt)
 }
 
 
-// vector<bool> BTags(float pt, bool isdata,float tchpt, float ssvhpt,float jpt,float jpbt)
-// {
-
-// 	float sf_tchpt  = 0.895596*((1.+(9.43219e-05*pt))/(1.+(-4.63927e-05*pt)));
-// 	float sf_ssvhpt = 0.422556*((1.+(0.437396*pt))/(1.+(0.193806*pt)));
-// 	float sf_jpt    = 0.835882*((1.+(0.00167826*pt))/(1.+(0.00120221*pt)));
-// 	float sf_jpbt   = 0.827249*((1.+(0.00261855*pt))/(1.+(0.00194604*pt)));
-
-// 	bool toss_tchpt  = rr->Rndm() > sf_tchpt;
-// 	bool toss_ssvhpt = rr->Rndm() > sf_ssvhpt;
-// 	bool toss_jpt    = rr->Rndm() > sf_jpt;
-// 	bool toss_jpbt   = rr->Rndm() > sf_jpbt;
-
-// 	if (isdata)
-// 	{
-// 		toss_tchpt = false;
-// 		toss_ssvhpt = false;
-// 		toss_jpt = false;
-// 		toss_jpbt = false;
-// 	}
-
-// 	bool tag_tchpt   = (tchpt > 3.41)*(!toss_tchpt);
-// 	bool tag_ssvhpt  = (ssvhpt > 2.00)*(!toss_ssvhpt);
-// 	bool tag_jpt     = (jpt > 0.79)*(!toss_jpt);
-// 	bool tag_jpbt    = (jpbt > 3.74)*(!toss_jpbt);
-
-// 	vector<bool> tags;
-
-// 	tags.push_back(tag_tchpt);
-// 	tags.push_back(tag_ssvhpt);
-// 	tags.push_back(tag_jpt);
-// 	tags.push_back(tag_jpbt);
-
-// 	return tags;
-// }
-
+// The Main analysis loop. 
 void placeholder::Loop()
 {
-
-	// TFile *dfile= new TFile("DRESSEDREPLACEMENTFILE","READ");
-	// TTree *dtree= (TTree*)dfile->Get("ModVariables");
-
-	// dtree->BuildIndex("devent");
-
-	// UInt_t          devent;
-	// float dRegMuonPt;
-	// float dRegMuonEta;
-	// float dRegMuonPhi;
-	// float dDressedMuonPt;
-	// float dDressedMuonEta;
-	// float dDressedMuonPhi;
-
-	// dtree->SetBranchAddress("devent",&devent);
-	// dtree->SetBranchAddress("dRegMuonPt",&dRegMuonPt);
-	// dtree->SetBranchAddress("dRegMuonEta",&dRegMuonEta);
-	// dtree->SetBranchAddress("dRegMuonPhi",&dRegMuonPhi);
-	// dtree->SetBranchAddress("dDressedMuonPt",&dDressedMuonPt);
-	// dtree->SetBranchAddress("dDressedMuonEta",&dDressedMuonEta);
-	// dtree->SetBranchAddress("dDressedMuonPhi",&dDressedMuonPhi);
-
 	//===================================================================================================
 	//      MAKE TREE FOR PLACEHOLDER SIGNAL/BG TYPE AND DECLARE VARIABLES
 	//===================================================================================================
@@ -959,7 +787,7 @@ void placeholder::Loop()
 	TTree *tree=new TTree("PhysicalVariables","PhysicalVariables");
 
 	//*****************************************************************
-	//         MUON AND CALOJET/CALOMET VARIABLES BELOW
+	//         DECLARATION OF BRANCHES IN TREE
 	//*****************************************************************
 
 	int ngood = 0;
@@ -967,18 +795,13 @@ void placeholder::Loop()
 
 	Double_t weight=0.0;
 	Double_t xsection=0.0;
-	//Double_t Events_AfterLJ=0.0;
 	Double_t Events_Orig=0.0;
 	Double_t N_PileUpInteractions=0.0;
 	Double_t Pt_HEEPele1=0.0;
 
 	// Particle Counts
-	BRANCH(MuonCount); BRANCH(EleCount); BRANCH(HEEPEle25Count);
-	// BRANCH(Muon25Count);
 	BRANCH(PFJetCount); BRANCH(BpfJetCount);
-	// BRANCH(GlobalMuonCount); BRANCH(TrackerMuonCount);
-	// BRANCH(GlobalMuonCount10GeV);
-	BRANCH(GenJetCount); BRANCH(GenJet30Count);
+	BRANCH(GenJet30Count);
 	BRANCH(PFJet30Count);
 
 	BRANCH(PFJet30TCHPTCountCentral);
@@ -1021,38 +844,18 @@ void placeholder::Loop()
 	BRANCH(bx);
 	BRANCH(N_Vertices);
 	BRANCH(N_GoodVertices);
-	// BRANCH(weight);
 	BRANCH(weight_pu_central); BRANCH(weight_pu_sysplus); BRANCH(weight_pu_sysminus); BRANCH(weight_gen);
 	BRANCH(pass_HBHENoiseFilter); BRANCH(pass_isBPTX0); BRANCH(pass_passBeamHaloFilterLoose);
 	BRANCH(pass_passBeamHaloFilterTight);
 	BRANCH(pass_isTrackingFailure);
 
-	// ID Efficiency Informations
-
-	// vector<int> RecoJetsWithMatchesIDPass;
-	// tree->Branch("RecoJetsWithMatchesIDPass",&RecoJetsWithMatchesIDPass);
-
-	// PFMET
-	// BRANCH(MET_pfsig);	BRANCH(MET_pf_charged);
-
-	// Event Flags
-	BRANCH(FailIDPFThreshold);
 
 	// Generator Level Variables
-
 	BRANCH(Pt_genjet1);  BRANCH(Phi_genjet1);  BRANCH(Eta_genjet1);
 	BRANCH(Pt_genjet2);  BRANCH(Phi_genjet2);  BRANCH(Eta_genjet2);
 	BRANCH(Pt_genjet3);  BRANCH(Phi_genjet3);  BRANCH(Eta_genjet3);
 	BRANCH(Pt_genjet4);  BRANCH(Phi_genjet4);  BRANCH(Eta_genjet4);
 	BRANCH(Pt_genjet5);  BRANCH(Phi_genjet5);  BRANCH(Eta_genjet5);
-
-	BRANCH(Pt_genjet1_bare);  BRANCH(Phi_genjet1_bare);  BRANCH(Eta_genjet1_bare);
-	BRANCH(Pt_genjet2_bare);  BRANCH(Phi_genjet2_bare);  BRANCH(Eta_genjet2_bare);
-	BRANCH(Pt_genjet3_bare);  BRANCH(Phi_genjet3_bare);  BRANCH(Eta_genjet3_bare);
-	BRANCH(Pt_genjet4_bare);  BRANCH(Phi_genjet4_bare);  BRANCH(Eta_genjet4_bare);
-	BRANCH(Pt_genjet5_bare);  BRANCH(Phi_genjet5_bare);  BRANCH(Eta_genjet5_bare);
-
-	BRANCH(DeltaPhi_genmuon1genMET_bare);
 
 	BRANCH(DeltaPhi_genjet1genmuon1);
 	BRANCH(DeltaPhi_genjet2genmuon1);
@@ -1060,41 +863,19 @@ void placeholder::Loop()
 	BRANCH(DeltaPhi_genjet4genmuon1);
 	BRANCH(DeltaPhi_genjet5genmuon1);
 
-	BRANCH(DeltaPhi_genjet1genmuon1_bare);
-	BRANCH(DeltaPhi_genjet2genmuon1_bare);
-	BRANCH(DeltaPhi_genjet3genmuon1_bare);
-	BRANCH(DeltaPhi_genjet4genmuon1_bare);
-	BRANCH(DeltaPhi_genjet5genmuon1_bare);
-
-	// BRANCH(ST_genmuongenMET);
-	// BRANCH(ST_genmuongenMETgenjet1);
-	// BRANCH(ST_genmuongenMETgenjet12);
-	// BRANCH(ST_genmuongenMETgenjet123);
-	// BRANCH(ST_genmuongenMETgenjet1234);
-	// BRANCH(ST_genmuongenMETgenjet12345);
 	BRANCH(HT_genjets);
 
-	// BRANCH(ST_genmuongenMET_bare);
-	// BRANCH(ST_genmuongenMETgenjet1_bare);
-	// BRANCH(ST_genmuongenMETgenjet12_bare);
-	// BRANCH(ST_genmuongenMETgenjet123_bare);
-	// BRANCH(ST_genmuongenMETgenjet1234_bare);
-	// BRANCH(ST_genmuongenMETgenjet12345_bare);
 
 	BRANCH(Pt_genmuon1);  BRANCH(Phi_genmuon1);  BRANCH(Eta_genmuon1);
 	BRANCH(Pt_genmuon2);  BRANCH(Phi_genmuon2);  BRANCH(Eta_genmuon2);
-	BRANCH(Pt_genmuon1_bare);  BRANCH(Phi_genmuon1_bare);  BRANCH(Eta_genmuon1_bare);
 
 	BRANCH(Pt_genmuonneutrino1);  BRANCH(Phi_genmuonneutrino1);  BRANCH(Eta_genmuonneutrino1);
 	BRANCH(Pt_genMET);  BRANCH(Phi_genMET);
 
 	BRANCH(MT_genmuon1genMET);
-
-	BRANCH(MT_genmuon1genMET_bare);
 	BRANCH(MT_genmuon1genneutrino);
-	// BRANCH(Pt_W_gen);  BRANCH(Phi_W_gen);
 
-	// BRANCH(Phi_Wtrue); BRANCH(Phi_Ztrue);
+
 
 	// Reco Level Variables
 	BRANCH(Pt_pfjet1);  BRANCH(Phi_pfjet1);  BRANCH(Eta_pfjet1);
@@ -1103,20 +884,18 @@ void placeholder::Loop()
 	BRANCH(Pt_pfjet4);  BRANCH(Phi_pfjet4);  BRANCH(Eta_pfjet4);
 	BRANCH(Pt_pfjet5);  BRANCH(Phi_pfjet5);  BRANCH(Eta_pfjet5);
 
-	BRANCH(DeltaPhi_muon1MET);
-
 	BRANCH(DeltaPhi_pfjet1muon1);
 	BRANCH(DeltaPhi_pfjet2muon1);
 	BRANCH(DeltaPhi_pfjet3muon1);
 	BRANCH(DeltaPhi_pfjet4muon1);
 	BRANCH(DeltaPhi_pfjet5muon1);
 
-	// BRANCH(ST_muonMET);
-	// BRANCH(ST_muonMETpfjet1);
-	// BRANCH(ST_muonMETpfjet12);
-	// BRANCH(ST_muonMETpfjet123);
-	// BRANCH(ST_muonMETpfjet1234);
-	// BRANCH(ST_muonMETpfjet12345);
+	BRANCH(Pt_pfjet1_pt20);   BRANCH(Eta_pfjet1_eta2p5);
+	BRANCH(Pt_pfjet2_pt20);   BRANCH(Eta_pfjet2_eta2p5);
+	BRANCH(Pt_pfjet3_pt20);   BRANCH(Eta_pfjet3_eta2p5);
+	BRANCH(Pt_pfjet4_pt20);   BRANCH(Eta_pfjet4_eta2p5);
+	BRANCH(Pt_pfjet5_pt20);   BRANCH(Eta_pfjet5_eta2p5);
+
 	BRANCH(HT_pfjets);
 
 	BRANCH(Pt_muon1);  BRANCH(Phi_muon1);  BRANCH(Eta_muon1);
@@ -1153,12 +932,9 @@ void placeholder::Loop()
 
 	BRANCH(IsoMu24Pass);
 
-	Double_t HLTIsoMu24Pass=0.0; //RANCH(HLTIsoMu24Pass);
-	Double_t HLTMu24Pass=0.0;	 //RANCH(HLTIsoMu24Pass);
-								 //RANCH(HLTIsoMu24Pass);
+	Double_t HLTIsoMu24Pass=0.0; 
+	Double_t HLTMu24Pass=0.0;	 				 
 	Double_t HLTMu24PassPrescale=0.0;
-
-								 //BRANCH(HLTMu24TriggerPass);
 	Double_t HLTMu24TriggerPass=0.0;
 
 	//===================================================================================================
@@ -1193,7 +969,6 @@ void placeholder::Loop()
 	Long64_t nentries = fChain->GetEntriesFast();
 	Long64_t nbytes = 0, nb = 0;
 
-	//nentries=10000;  /// TEST>>>>>> COMMENT THIS ALWAYS
 	for (Long64_t jentry=0; jentry<nentries;jentry++)
 	{
 		Long64_t ientry = LoadTree(jentry);
@@ -1213,7 +988,6 @@ void placeholder::Loop()
 		weight = extraweight*lumi*xsection/Events_Orig;
 
 		//========================     JSON   Conditions   ================================//
-
 		if (isData)
 		{
 			bool KeepEvent = PassFilter(run, ls);
@@ -1240,8 +1014,6 @@ void placeholder::Loop()
 
 		pass_HBHENoiseFilter =1.0*passHBHENoiseFilter;
 		pass_isBPTX0 = 1.0*isBPTX0 ;
-		//pass_EcalMaskedCellDRFilter = 1.0*passEcalMaskedCellDRFilter ;
-		//pass_CaloBoundaryDRFilter = 1.0*passCaloBoundaryDRFilter ;
 		pass_passBeamHaloFilterLoose = 1.0*passBeamHaloFilterLoose ;
 		pass_passBeamHaloFilterTight = 1.0*passBeamHaloFilterTight ;
 		pass_isTrackingFailure = 1.00*(1.0-1.0*isTrackingFailure);
@@ -1250,18 +1022,12 @@ void placeholder::Loop()
 
 		if (IsPhiCorr)
 		{
-			// PFMET->at(0) = PFMETType1Cor->at(0);
-			// PFMETPhi->at(0) = PFMETPhiType1Cor->at(0);
-			// std::cout<<PFMET->at(0)<<"  "<<PFMETPhi->at(0)<<std::endl;
-
 			TLorentzVector __MET;
 			__MET.SetPtEtaPhiM(PFMET->at(0),0.0,PFMETPhi->at(0),0.0);
 			TLorentzVector CorrectedMET;
 			CorrectedMET = PhiMod_Corr(__MET, N_Vertices, isData);
 			PFMET->at(0) = 1.0*CorrectedMET.Pt();
 			PFMETPhi->at(0) = CorrectedMET.Phi();
-			// std::cout<<PFMET->at(0)<<"  "<<PFMETPhi->at(0)<<std::endl;
-			// std::cout<<" --------------------------------------------"<<std::endl;
 		}
 
 		//========================     PileUp Technology  ================================//
@@ -1451,132 +1217,91 @@ void placeholder::Loop()
 		TLorentzVector JetAdjustedMET1UnProp;
 		JetAdjustedMET1UnProp.SetPtEtaPhiM(PFMETType1Cor->at(0),0.0,PFMETPhiType1Cor->at(0),0);
 
-		//std::cout<<PFMET->at(0)<<"  "<<(*PFMET)[0]<<"      "<<PFMETPhi->at(0)<<"  "<<(*PFMETPhi)[0]<<std::endl;
-		//std::cout<<(*PFJetPt)[0]<<"  "<<(*PFJetPtRaw)[0]<<std::endl;
-		if (!isData)
+
+		// Loop over jets and modify pT for systematics
+		int filterjetcount = 0;
+		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 		{
-			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
+			if (filterjetcount >=20) continue;
+			if (PFJetPt->at(ijet) < 20.0) continue;
+			if (PFJetPassLooseID->at(ijet) != 1) continue;
+			if ( fabs(PFJetEta->at(ijet)) > 2.4 ) continue;
+			filterjetcount += 1;
+
+			bool consider = true;
+			TLorentzVector ThisPFJet;
+			Double_t JetLepDR;
+			ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
+
+			for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 			{
-								 // * PFJetL1OffsetJEC->at(ijet)/PFJetL1FastJetJEC->at(ijet);
-				(*PFJetPt)[ijet]  = (*PFJetPt)[ijet];
+				TLorentzVector ThisLepton;
+				ThisLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
+				if (ThisLepton.Pt() < 20) continue;
+				JetLepDR = ThisLepton.DeltaR(ThisPFJet);
+				if (JetLepDR < .3) consider = false;
+				break;		 // lead muon only
 			}
-		}
 
-		// if (true)
-		// {
-		// 	std::cout<<" --------------------------------- "<<std::endl;
-		// 	for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
-		// 	{
-		// 	if ((*PFJetPt)[ijet] < 30.0) continue;
-		// 	if ( fabs(PFJetEta->at(ijet)) > 2.4 ) continue;
-		// 	if (PFJetPassLooseID->at(ijet) != 1) continue;
+			if (!consider) continue;
 
-		// 	std::cout<<(*PFJetPt)[ijet]<<"   "<<(*PFJetEta)[ijet]<<"   "<<(PFJetJECUnc->at(ijet))<<std::endl;
-		// 	}
-		// }
+			double NewJetRescalingFactor = JetRescaleFactor;
 
-		// if (!isData)
-		if (true)
-		{
-			int filterjetcount = 0;
-			for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
+			if (false)
 			{
-				if (filterjetcount >=20) continue;
-				if (PFJetPt->at(ijet) < 20.0) continue;
-				if (PFJetPassLooseID->at(ijet) != 1) continue;
-				if ( fabs(PFJetEta->at(ijet)) > 2.4 ) continue;
-				filterjetcount += 1;
-
-				bool consider = true;
-				TLorentzVector ThisPFJet;
-				Double_t JetLepDR;
-				ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
-
-				for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
-				{
-					TLorentzVector ThisLepton;
-					ThisLepton.SetPtEtaPhiM(MuonPt->at(imuon),MuonEta->at(imuon), MuonPhi->at(imuon),0.0);
-					if (ThisLepton.Pt() < 20) continue;
-					JetLepDR = ThisLepton.DeltaR(ThisPFJet);
-					if (JetLepDR < .3) consider = false;
-					break;		 // lead muon only
-				}
-				// for(unsigned int iele = 0; iele < ElectronPt->size(); ++iele)
-				// {
-				// 	TLorentzVector ThisLepton;
-				// 	ThisLepton.SetPtEtaPhiM(ElectronPt->at(iele),ElectronEta->at(iele),ElectronPhi->at(iele),0.0);
-				// 	JetLepDR = ThisLepton.DeltaR(ThisPFJet);
-				// 	if (JetLepDR < .3) consider = false;
-				// }
-
-				if (!consider) continue;
-
-				double NewJetRescalingFactor = JetRescaleFactor;
-
-				if (false)
-				{
-					NewJetRescalingFactor = 1.0+NewJesUncertainty((JetRescaleFactor - 1.0), (*PFJetPtRaw)[ijet], (*PFJetEta)[ijet]);
-					if (JetRescaleFactor < 1.0) NewJetRescalingFactor = 2.0 - NewJetRescalingFactor;
-				}
-
-				double NewJetPT = (*PFJetPt)[ijet];
-				// double NewJetPT2 = (*PFJetPt)[ijet];
-
-				//double NewJetETA = (*PFJetEta)[ijet];
-
-				// if (JetRescaleFactor != 1.00) NewJetPT = NewJetPT + ((ScaleObject((*PFJetPtRaw)[ijet],NewJetRescalingFactor)) - ((*PFJetPtRaw)[ijet])) ;
-				// if (JetRescaleFactor != 1.00) NewJetPT = NewJetPT + ((ScaleJet((*PFJetPtRaw)[ijet],NewJetRescalingFactor)) - ((*PFJetPtRaw)[ijet])) ;
-
-				if (JetRescaleFactor > 1.00) NewJetPT *= (1+PFJetJECUnc->at(ijet))  ;
-				if (JetRescaleFactor < 1.00) NewJetPT *= (1-PFJetJECUnc->at(ijet))  ;
-
-				// std::cout<<(NewJetPT - PFJetPt->at(ijet))/(PFJetPt->at(ijet))<<std::endl;
-
-				int closestgenjet = -1;
-				Double_t SmallestDeltaR = 9999.9999;
-				Double_t ClosestGenJetPT = 99999.9999;
-				for(unsigned int igenjet = 0; igenjet != GenJetPt->size(); ++igenjet)
-				{
-					TLorentzVector thisGenJet;
-					thisGenJet.SetPtEtaPhiM(GenJetPt->at(igenjet),GenJetEta->at(igenjet),GenJetPhi->at(igenjet),0);
-					Double_t ThisGenJetDR = fabs((thisGenJet).DeltaR(ThisPFJet));
-					if (ThisGenJetDR<SmallestDeltaR)
-					{
-						SmallestDeltaR = ThisGenJetDR;
-						closestgenjet = igenjet;
-						ClosestGenJetPT = GenJetPt->at(igenjet);
-					}
-				}
-				Double_t Standard_rescale = 1.0;
-				if (false)
-				{
-					if (SmallestDeltaR<0.5) Standard_rescale = 1.1;
-				}
-				Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
-				NewJetPT *=JetAdjustmentFactor;
-				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
-				JetAdjustedMET1 = PropagatePTChangeToMET(JetAdjustedMET1.Pt(),  JetAdjustedMET1.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
-
-				if (JetSmearFactor > 0.0)
-				{
-
-					Double_t JetEta = fabs(PFJetEta->at(ijet));
-					Double_t Systematic_rescale =   JERFactor(JetEta);
-					Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Systematic_rescale);
-					if (SmallestDeltaR<0.5) NewJetPT *=JetAdjustmentFactorSys;
-					// NewJetPT *=JetAdjustmentFactorSys;
-
-				}
-				// if (fabs((*PFJetPt)[ijet]-NewJetPT)>1000.0)
-				// std::cout<<(*PFJetPt)[ijet]-NewJetPT<<"  "<<(*PFJetPt)[ijet]<<"  "<<NewJetPT<<"   "<<SmallestDeltaR<<std::endl;
-
-				JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
-				JetAdjustedMET1 = PropagatePTChangeToMET(JetAdjustedMET1.Pt(),  JetAdjustedMET1.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
-
-				(*PFJetPt)[ijet] = NewJetPT ;
+				NewJetRescalingFactor = 1.0+NewJesUncertainty((JetRescaleFactor - 1.0), (*PFJetPtRaw)[ijet], (*PFJetEta)[ijet]);
+				if (JetRescaleFactor < 1.0) NewJetRescalingFactor = 2.0 - NewJetRescalingFactor;
 			}
+
+			double NewJetPT = (*PFJetPt)[ijet];
+
+			if (JetRescaleFactor > 1.00) NewJetPT *= (1+PFJetJECUnc->at(ijet))  ;
+			if (JetRescaleFactor < 1.00) NewJetPT *= (1-PFJetJECUnc->at(ijet))  ;
+
+
+			int closestgenjet = -1;
+			Double_t SmallestDeltaR = 9999.9999;
+			Double_t ClosestGenJetPT = 99999.9999;
+			for(unsigned int igenjet = 0; igenjet != GenJetPt->size(); ++igenjet)
+			{
+				TLorentzVector thisGenJet;
+				thisGenJet.SetPtEtaPhiM(GenJetPt->at(igenjet),GenJetEta->at(igenjet),GenJetPhi->at(igenjet),0);
+				Double_t ThisGenJetDR = fabs((thisGenJet).DeltaR(ThisPFJet));
+				if (ThisGenJetDR<SmallestDeltaR)
+				{
+					SmallestDeltaR = ThisGenJetDR;
+					closestgenjet = igenjet;
+					ClosestGenJetPT = GenJetPt->at(igenjet);
+				}
+			}
+			Double_t Standard_rescale = 1.0;
+			if (false)
+			{
+				if (SmallestDeltaR<0.5) Standard_rescale = 1.1;
+			}
+			Double_t JetAdjustmentFactor = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Standard_rescale);
+			NewJetPT *=JetAdjustmentFactor;
+			JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+			JetAdjustedMET1 = PropagatePTChangeToMET(JetAdjustedMET1.Pt(),  JetAdjustedMET1.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+
+			if (JetSmearFactor > 0.0)
+			{
+
+				Double_t JetEta = fabs(PFJetEta->at(ijet));
+				Double_t Systematic_rescale =   JERFactor(JetEta);
+				Double_t JetAdjustmentFactorSys = GetRecoGenJetScaleFactor(PFJetPt->at(ijet),ClosestGenJetPT,Systematic_rescale);
+				if (SmallestDeltaR<0.5) NewJetPT *=JetAdjustmentFactorSys;
+				// NewJetPT *=JetAdjustmentFactorSys;
+
+			}
+
+
+			JetAdjustedMET = PropagatePTChangeToMET(JetAdjustedMET.Pt(),  JetAdjustedMET.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+			JetAdjustedMET1 = PropagatePTChangeToMET(JetAdjustedMET1.Pt(),  JetAdjustedMET1.Phi(), NewJetPT, (*PFJetPt)[ijet], PFJetPhi->at(ijet));
+
+			(*PFJetPt)[ijet] = NewJetPT ;
 		}
-		// std::cout<<(*PFMET)[0] - JetAdjustedMET.Pt()<<std::endl;
+		// Reset MET values
 		(*PFMET)[0] = JetAdjustedMET.Pt();
 		(*PFMETPhi)[0] = JetAdjustedMET.Phi();
 
@@ -1625,31 +1350,6 @@ void placeholder::Loop()
 		(*PFMETType1Cor)[0] = JetAdjustedMET1.Pt();
 		(*PFMETPhiType1Cor)[0] = JetAdjustedMET1.Phi();
 
-		//========================    CaloJet Matching to PFJET   ================================//
-
-		vector<int> PFJetCaloMatches;
-
-		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
-		{
-			TLorentzVector ThisPFJet;
-			ThisPFJet.SetPtEtaPhiM((*PFJetPt)[ijet],(*PFJetEta)[ijet],(*PFJetPhi)[ijet],0);
-
-			int closestcalojet = -1;
-			Double_t SmallestDeltaR = 9999.9999;
-			for(unsigned int icalojet = 0; icalojet < CaloJetPt->size(); ++icalojet)
-			{
-				if (CaloJetPassLooseID->at(icalojet)!=1) continue;
-				TLorentzVector thisCaloJet;
-				thisCaloJet.SetPtEtaPhiM(CaloJetPt->at(icalojet),CaloJetEta->at(icalojet),CaloJetPhi->at(icalojet),0);
-				Double_t ThisCaloJetDR = fabs((thisCaloJet).DeltaR(ThisPFJet));
-				if (ThisCaloJetDR<SmallestDeltaR)
-				{
-					SmallestDeltaR = ThisCaloJetDR;
-					closestcalojet = icalojet;
-				}
-			}
-			PFJetCaloMatches.push_back(closestcalojet);
-		}
 
 		//========================     Electron Conditions   ================================//
 
@@ -1678,7 +1378,6 @@ void placeholder::Loop()
 			}
 		}
 
-		EleCount = 1.0*v_idx_ele_final.size();
 
 		//========================     Stricter Electron Conditions   =============================//
 
@@ -1709,48 +1408,34 @@ void placeholder::Loop()
 				v_idx_ele_good_final.push_back(iele);
 			}
 		}
-		HEEPEle25Count = 1.0*v_idx_ele_good_final.size();
+		int HEEPEle25Count = 1.0*v_idx_ele_good_final.size();
 
 		//========================      Muon Conditions   ================================//
 
-		vector<TLorentzVector> RecoMuons, RecoJets;
+		vector<TLorentzVector> RecoMuons, RecoJets, RecoJetsLooseEta, RecoJetsLoosePt;
 		vector<int> v_idx_muon_final;
 		vector<double> RecoMuonIso;
 		bool checkPT = true;	 // Pt requirement only on first muon at this stage
 		bool checkIso = true;	 // Pt requirement only on first muon at this stage
 
-		// SubRoutine for Muon Counts
-		// GlobalMuonCount = 0.0;
-		// GlobalMuonCount10GeV = 0.0;
-		// Muon25Count = 0.0;
-		// TrackerMuonCount=0.0;
-		// std::cout<<" -------------------------- "<<std::endl;
+
 		Double_t muoniso = 1.0;
 		for(unsigned int imuon = 0; imuon < MuonPt->size(); ++imuon)
 		{
-			// if (MuonIsGlobal  ->at(imuon) == 1) GlobalMuonCount += 1.0;
-			// if (MuonIsTracker ->at(imuon) == 1) TrackerMuonCount += 1.0;
-			// if ((MuonIsGlobal->at(imuon) == 1) && (MuonPt->at(imuon) > 10.0)) GlobalMuonCount10GeV += 1.0;
 
 			Double_t muonPt = MuonPt->at(imuon);
 			Double_t muonEta = MuonEta->at(imuon);
 
-			if (checkPT && (muonPt < 22.0) ) continue;
+			if (checkPT && (muonPt < 23.0) ) continue;
 			if  ( fabs(muonEta) > 2.1 )      continue;
-
-			// std::cout<<MuonPixelHitCount ->at(imuon) <<"  "<<MuonTrkPixelHitCount->at(imuon)<<std::endl;
-			// if ((MuonIsGlobal ->at(imuon) == 1) && (MuonIsGlobal ->at(imuon) != 1)) std::cout<<" FLAG FLAG FLAG FLAG "<<std::endl;
 
 			bool PassGlobalTightPrompt =
 				MuonIsGlobal ->at(imuon) == 1 &&
-			// MuonIsTracker ->at(imuon) == 1 &&
-			// ((MuonRelIso->at(imuon) < 0.15)||(!checkIso)) &&
 				MuonTrkHitsTrackerOnly ->at(imuon) >= 11   ;
 
 			bool PassPOGTight =
 				MuonStationMatches->at(imuon) > 1 &&
 				fabs(MuonPrimaryVertexDXY ->at(imuon)) < 0.2  &&
-								 // Disable for EWK
 				MuonGlobalChi2 ->at(imuon) < 10.0 &&
 				MuonTrkPixelHitCount ->at(imuon) >=1 &&
 				MuonGlobalTrkValidHits->at(imuon)>=1 ;
@@ -1763,7 +1448,6 @@ void placeholder::Loop()
 			checkIso = false;
 			if (muoniso > 0.999) muoniso = MuonRelIso->at(imuon);
 			v_idx_muon_final.push_back(imuon);
-			// Muon25Count += 1.0;
 			if (v_idx_muon_final.size()>=1) checkPT=false;
 		}						 // loop over muons
 
@@ -1789,9 +1473,8 @@ void placeholder::Loop()
 			RecoMuons.push_back(elorentz);
 		}
 
-		MuonCount = RecoMuons.size();
+		int MuonCount = RecoMuons.size();
 
-		// if ( Muon25Count < 1 ) continue;
 
 		//========================     PFJet Conditions   ================================//
 		// Get Good Jets in general
@@ -1800,7 +1483,6 @@ void placeholder::Loop()
 		vector<int> v_idx_pfjet_prefinal;
 		vector<int> v_idx_pfjet_final;
 		BpfJetCount = 0.0;
-		FailIDPFThreshold = -1.0;
 		TLorentzVector CurrentLepton,CurrentPFJet;
 
 		TLorentzVector thisjet, thismu, thise;
@@ -1809,7 +1491,7 @@ void placeholder::Loop()
 		int eindex = 99;
 		int jetindex = 99;
 
-		// Initial Jet Quality Selection
+		// Initial Jet Quality Selection, loose 20GeV jets
 		for(unsigned int ijet = 0; ijet < PFJetPt->size(); ++ijet)
 		{
 			double jetPt = PFJetPt -> at(ijet);
@@ -1820,9 +1502,9 @@ void placeholder::Loop()
 
 			bool IsLepton = false;
 
-			if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)&&(!IsLepton)) FailIDPFThreshold = PFJetPt->at(ijet);
-			if ( jetPt < 25.0 ) continue;
-			if ( fabs(jetEta) > 2.4 ) continue;
+			// if ((PFJetPassLooseID->at(ijet) != 1)&&(PFJetPt->at(ijet) > FailIDPFThreshold)&&(!IsLepton)) FailIDPFThreshold = PFJetPt->at(ijet);
+			if ( jetPt < 20.0 ) continue;
+			if ( fabs(jetEta) > 2.5 ) continue;
 			if (PFJetPassLooseID->at(ijet) != 1) continue;
 			v_idx_pfjet_prefinal.push_back(ijet);
 		}
@@ -1879,28 +1561,30 @@ void placeholder::Loop()
 				break;			 // lead muon only
 			}
 
-			// for(unsigned int imu=0; imu<v_idx_muon_final.size(); imu++)
-			// {
-			// 	muindex = v_idx_muon_final[imu];
-			// 	thismu.SetPtEtaPhiM(MuonPt->at(muindex),MuonEta->at(muindex),MuonPhi->at(muindex),0);
-			// 	if (thismu.Pt()<20.0) continue;
-			// 	if (thismu.DeltaR(thisjet) < 0.3)		KeepJet=false;
-			// }
-
-			// for(unsigned int ie=0; ie<v_idx_ele_good_final.size(); ie++)
-			// {
-			// 	eindex = v_idx_ele_good_final[ie];
-			// 	thise.SetPtEtaPhiM(ElectronPt->at(eindex),ElectronEta->at(eindex),ElectronPhi->at(eindex),0);
-			// 	if (thise.DeltaR(thisjet) < 0.3)		KeepJet=false;
-			// }
-
 			if (!KeepJet) continue;
 			if ( PFJetTrackCountingHighEffBTag->at(jetindex) > 2.0 ) BpfJetCount = BpfJetCount + 1.0;
-			RecoJets.push_back(thisjet);
 
 			v_idx_pfjet_final.push_back(jetindex);
-			if (thisjet.Pt() > 30.0)
+
+			if (thisjet.Pt() > 30.0 && fabs(thisjet.Eta()) < 2.4)
 			{
+				RecoJets.push_back(thisjet);
+			}
+
+			if (thisjet.Pt() > 20.0 && fabs(thisjet.Eta()) < 2.4)
+			{
+				RecoJetsLoosePt.push_back(thisjet);
+			}
+
+			if (thisjet.Pt() > 30.0 && fabs(thisjet.Eta()) < 2.5)
+			{
+				RecoJetsLooseEta.push_back(thisjet);
+			}
+
+
+			if (thisjet.Pt() > 30.0 && fabs(thisjet.Eta()) < 2.4)
+			{
+
 
 				HT_pfjets +=thisjet.Pt();
 
@@ -1953,17 +1637,10 @@ void placeholder::Loop()
 				PFJet30TCHELCountMisDown += 1.0*(btags_tchel[4]);
 
 			}
-			// std::cout<<PFJet30TCHPTCountMod<<" "<<PFJet30SSVHPTCountMod<<std::endl;
-			// std::cout<<"  "<<PFJet30TCHPTCountCentral<<"  "<<PFJet30TCHPTCountEffUp<<"  "<<PFJet30TCHPTCountEffDown<<"  "<<PFJet30TCHPTCountMisUp<<"  "<<PFJet30TCHPTCountMisDown<<std::endl;
 		}
 
-		PFJetCount = 1.0*v_idx_pfjet_final.size();
-		//std::cout<<PFJet40Count<<"  "<<PFJet40SSVHEMCount<<"  "<<PFJet40TCHPTCount<<std::endl;
 
-		// std::cout<<" --------------- "<<std::endl;
-
-		//========================     Generator Level Module  ================================//
-
+		//========================     Generator Level Calculations  ================================//
 		TLorentzVector GenW,GenZ;
 		GenW.SetPtEtaPhiM(0.,0.,0.,0.);
 		GenZ.SetPtEtaPhiM(0.,0.,0.,0.);
@@ -1971,8 +1648,16 @@ void placeholder::Loop()
 		TLorentzVector  v_GenMet;
 		vector<TLorentzVector> GenMuons, GenJets, GenJetsBare, SortedGenMuons, SortedGenJets, GenMuNeutrinos;
 
+		int GenMuonCount = 0;
 		if (!isData)
 		{
+
+			// Reset Gen Variables
+			Pt_genjet1 = 0;       Phi_genjet1 = 0;       Eta_genjet1 = 0; DeltaPhi_genjet1genmuon1 = -1.0;
+			Pt_genjet2 = 0;       Phi_genjet2 = 0;       Eta_genjet2 = 0; DeltaPhi_genjet2genmuon1 = -1.0;
+			Pt_genjet3 = 0;       Phi_genjet3 = 0;       Eta_genjet3 = 0; DeltaPhi_genjet3genmuon1 = -1.0;
+			Pt_genjet4 = 0;       Phi_genjet4 = 0;       Eta_genjet4 = 0; DeltaPhi_genjet4genmuon1 = -1.0;
+			Pt_genjet5 = 0;       Phi_genjet5 = 0;       Eta_genjet5 = 0; DeltaPhi_genjet5genmuon1 = -1.0;
 
 			Pt_genjet1 = 0;       Phi_genjet1 = 0;       Eta_genjet1 = 0; DeltaPhi_genjet1genmuon1 = -1.0;
 			Pt_genjet2 = 0;       Phi_genjet2 = 0;       Eta_genjet2 = 0; DeltaPhi_genjet2genmuon1 = -1.0;
@@ -1980,56 +1665,27 @@ void placeholder::Loop()
 			Pt_genjet4 = 0;       Phi_genjet4 = 0;       Eta_genjet4 = 0; DeltaPhi_genjet4genmuon1 = -1.0;
 			Pt_genjet5 = 0;       Phi_genjet5 = 0;       Eta_genjet5 = 0; DeltaPhi_genjet5genmuon1 = -1.0;
 
-			Pt_genjet1_bare = 0;       Phi_genjet1_bare = 0;       Eta_genjet1_bare = 0; DeltaPhi_genjet1genmuon1_bare = -1.0;
-			Pt_genjet2_bare = 0;       Phi_genjet2_bare = 0;       Eta_genjet2_bare = 0; DeltaPhi_genjet2genmuon1_bare = -1.0;
-			Pt_genjet3_bare = 0;       Phi_genjet3_bare = 0;       Eta_genjet3_bare = 0; DeltaPhi_genjet3genmuon1_bare = -1.0;
-			Pt_genjet4_bare = 0;       Phi_genjet4_bare = 0;       Eta_genjet4_bare = 0; DeltaPhi_genjet4genmuon1_bare = -1.0;
-			Pt_genjet5_bare = 0;       Phi_genjet5_bare = 0;       Eta_genjet5_bare = 0; DeltaPhi_genjet5genmuon1_bare = -1.0;
-
 			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
-			Pt_genmuon1_bare = 0;      Phi_genmuon1_bare = 0;      Eta_genmuon1_bare = 0;
+			Pt_genmuon1 = 0;      Phi_genmuon1 = 0;      Eta_genmuon1 = 0;
 
-			Pt_genmuon2 = 0;      Phi_genmuon2 = 0;      Eta_genmuon2 = 0;
-			GenJetCount=0;        GenJet30Count = 0.0;
+			GenJet30Count = 0.0;
 			Pt_genmuonneutrino1 = 0;      Phi_genmuonneutrino1 = 0;      Eta_genmuonneutrino1 = 0;
 
 			HT_genjets = 0.0;
 
-			// ST_genmuongenMET = 0 ;
-			// ST_genmuongenMETgenjet1 = 0 ;
-			// ST_genmuongenMETgenjet12 = 0 ;
-			// ST_genmuongenMETgenjet123 = 0 ;
-			// ST_genmuongenMETgenjet1234 = 0 ;
-			// ST_genmuongenMETgenjet12345 = 0 ;
-
-			// ST_genmuongenMET_bare = 0 ;
-			// ST_genmuongenMETgenjet1_bare = 0 ;
-			// ST_genmuongenMETgenjet12_bare = 0 ;
-			// ST_genmuongenMETgenjet123_bare = 0 ;
-			// ST_genmuongenMETgenjet1234_bare = 0 ;
-			// ST_genmuongenMETgenjet12345_bare = 0 ;
-
-			DeltaPhi_genmuon1genMET_bare = -1.0;
 			MT_genmuon1genMET = 0 ;  MT_genmuon1genneutrino = 0;
-			MT_genmuon1genMET_bare = 0;
-			// std::cout<<" ---------------------------------------------- "<<std::endl;
+			MT_genmuon1genMET = 0;
 
-			// Phi_Wtrue = 99.9; Phi_Ztrue=99.9;
-
+			// Gen W/Z info, for recoil stuff
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
 				int pdgId = GenParticlePdgId->at(ip);
 				if ( TMath::Abs(pdgId) == 23 )
 				{
 					GenZ.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					// Phi_Ztrue  = GenZ.Phi();
 					break;
 				}
 			}
-
-			// double Phi_Zreco = 99.9;
-			// if (MuonCount>=2)	Phi_Zreco = (RecoMuons[0]+RecoMuons[1]).Phi();
-			// std::cout<<Phi_Ztrue<<"  "<<Phi_Zreco<<std::endl;
 
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
@@ -2037,72 +1693,53 @@ void placeholder::Loop()
 				if ( TMath::Abs(pdgId) == 24 )
 				{
 					GenW.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					// Phi_Wtrue  = GenW.Phi();
 					break;
 				}
 			}
 
-			// std::cout<<" --------------------------------- "<<std::endl;
+
+
 			for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
 			{
-				// std::cout<<"size check "<<GenParticlePdgId->size()<<"  "<<GenParticlePt->size()<<std::endl;
 				int pdgId = GenParticlePdgId->at(ip);
 				int status = GenParticleStatus->at(ip);
-				// std::cout<<pdgId<<"  "<<GenParticlePt->at(ip)<<std::endl;
-				// if ( TMath::Abs(pdgId) == 13 || TMath::Abs(pdgId) == 713 )
-				if ( (!IsSherpa) &&  TMath::Abs(pdgId) == 713 )
-					// if (  TMath::Abs(pdgId) == 713 )
 
+				// Store dressed muons for MadGraph
+				if ( (!IsSherpa) &&  TMath::Abs(pdgId) == 713 ) // PDGID 713 is made up - for dressed muon
 				{
-					// std::cout<<"  kept mu size: "<<GenMuons.size()<<std::endl;
-					// if (TMath::Abs(pdgId) == 713)
-					// 	{
-					// 		GenMuons.erase (GenMuons.begin(),GenMuons.end());
-					// 		// std::cout<<"  kept mu size after erasure: "<<GenMuons.size()<<std::endl;
-					// 		// std::cout<<"   -> dressed: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
-					// 	}
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					// std::cout<<"   -> any: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
 
 					bool KeepMuon=true;
 					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
 					{
 						if ( (GenMuons[igenmuon].Pt() == thisgenmuon.Pt())&&(GenMuons[igenmuon].Eta() == thisgenmuon.Eta())&&(GenMuons[igenmuon].Phi() == thisgenmuon.Phi()) )
 						{
-							KeepMuon=false;
+							KeepMuon=false; // Check for duplicate muons
 						}
 					}
-
 					if (KeepMuon==true) GenMuons.push_back(thisgenmuon);
-					// break;
 				}
 
-				// std::cout<<"   MUONS: "<<GenMuons.size()<<std::endl;
+				// Store status 3 regular munos for Sherpa
 				if ( (IsSherpa) &&  TMath::Abs(pdgId) == 13 && abs(status) == 3)
-					// if ( (false) &&  TMath::Abs(pdgId) == 13 && abs(status) == 3)
-
 				{
 
 					TLorentzVector thisgenmuon;
 					thisgenmuon.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-					// std::cout<<"   -> any: "<<GenParticlePt->at(ip)<<"  "<<pdgId<<std::endl;
 
 					bool KeepMuon=true;
 					for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
 					{
 						if ( (GenMuons[igenmuon].Pt() == thisgenmuon.Pt())&&(GenMuons[igenmuon].Eta() == thisgenmuon.Eta())&&(GenMuons[igenmuon].Phi() == thisgenmuon.Phi()) )
 						{
-							KeepMuon=false;
+							KeepMuon=false;// Check for duplicate muons
 						}
 					}
-
 					if (KeepMuon==true) GenMuons.push_back(thisgenmuon);
-					// break;
 				}
 
-				// std::cout<<"  Final  mu size: "<<GenMuons.size()<<std::endl;
-
+				// Store Gen Neutrino
 				if ( TMath::Abs(pdgId) == 14 )
 				{
 					TLorentzVector thisgenneutrino;
@@ -2121,49 +1758,16 @@ void placeholder::Loop()
 				}
 			}
 
-			// int dentry = dtree->GetEntryWithIndex(nevent);
 
-			// if (dDressedMuonPt > 0.0)
-			// {
-			// 	TLorentzVector thisdressedmuon;
-			// 	thisdressedmuon.SetPtEtaPhiM(dDressedMuonPt,dDressedMuonEta,dDressedMuonPhi,0.0);
-			// 	GenMuons.push_back(thisdressedmuon);
-			// }
+			GenMuonCount= GenMuons.size();
 
-			int GenMuonCount = GenMuons.size();
-			// std::cout<<" ------------------------- "<<std::endl;
+
+			// Store Gen Jets passing PT30/Eta2p4
 			for(unsigned int ijet = 0; ijet != GenJetPt->size(); ++ijet)
 			{
 
 				TLorentzVector(thisgenjet);
 				thisgenjet.SetPtEtaPhiM(GenJetPt->at(ijet),GenJetEta->at(ijet),GenJetPhi->at(ijet),0.0);
-
-				// for(unsigned int ip = 0; ip != GenParticlePdgId->size(); ++ip)
-				// {
-
-				// 	TLorentzVector _part;
-				// 	_part.SetPtEtaPhiM(GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-
-				// 	int absid = abs(GenParticlePdgId->at(ip));
-				// 	bool _isnu = ( (absid == 12)||(absid == 14)||(absid == 16) );
-
-				// 	_isnu *= (GenParticleStatus->at(ip)==1);
-
-				// 	if (!_isnu) continue;
-
-				// 	if (_part.DeltaR(thisgenjet) < 0.5)
-				// 	{
-				// 			std::cout<<GenParticlePdgId->at(ip)<<"  "<<_part.DeltaR(thisgenjet)<<"   "<<GenParticlePt->at(ip)<<"  "<<thisgenjet.Pt()<<std::endl;
-				// 			TLorentzVector _antipart;
-				// 			// _antipart.SetPtEtaPhiM(-1.0*GenParticlePt->at(ip),GenParticleEta->at(ip),GenParticlePhi->at(ip),0.0);
-				// 			thisgenjet -= _part;
-				// 			std::cout<<"ReAssigning pT: "<<GenJetPt->at(ijet)<<"  -->  "<<thisgenjet.Pt()<<std::endl;
-				// 			GenJetPt->at(ijet) = thisgenjet.Pt();
-				// 			GenJetEta->at(ijet) = thisgenjet.Eta();
-				// 			GenJetPhi->at(ijet) = thisgenjet.Phi();
-				// 	}
-				// }
-
 				if (fabs(GenJetEta->at(ijet))>3.0) continue;
 
 				bool KeepGenJet=true;
@@ -2173,145 +1777,59 @@ void placeholder::Loop()
 					break;		 // lead muon only
 				}
 
-				// FIX TO REMOVE MUONS/NEUTRINOS
-				// float _invisenergyfrac = 1.0-1.0*(GenJetEMF->at(ijet) + GenJetHADF->at(ijet));
-
-				// float _nuf = 1.0*(GenJetNUF->at(ijet));
-				// std::cout<<" nufrac:"<<_nuf<<std::endl;
-				// std::cout<<_invisenergyfrac<<"  "<<GenJetPt->at(ijet)<<"    "<<std::endl;
-				// if ((_invisenergyfrac > 0.5) && (IsSherpa)) KeepGenJet=false;
-				// if (_nuf > 0.8) KeepGenJet = false;
-
 				if (!KeepGenJet) continue;
 
 				GenJets.push_back(thisgenjet);
 				if (fabs(GenJetEta->at(ijet))>2.4) continue;
-				// std::cout<<thisgenjet.Pt()<<"  "<<thisgenjet.Eta()<<"  "<<thisgenjet.Phi()<<"  "<<std::endl;
-				GenJetsBare.push_back(thisgenjet);
 				if (thisgenjet.Pt()<30.0) continue;
+				GenJetsBare.push_back(thisgenjet);
 				GenJet30Count+= 1.0;
 				HT_genjets += thisgenjet.Pt();
 			}
 
-			GenJetCount = 1.0*(GenJetsBare.size());
-
-			for(unsigned int irecjet = 0; irecjet != RecoJets.size(); ++irecjet)
-			{
-				TLorentzVector matchedgenjet;
-				matchedgenjet.SetPtEtaPhiM(0,0,0,0);
-				float closestDR=9999.9;
-				unsigned int closestindex=9999;
-
-				for(unsigned int igenjet = 0; igenjet != GenJets.size(); ++igenjet)
-				{
-					float thisDR=(GenJets[igenjet].DeltaR(RecoJets[irecjet]));
-					if (thisDR<closestDR)
-					{
-						closestDR=thisDR;
-						closestindex=igenjet;
-					}
-				}
-
-				if (closestDR<0.5) matchedgenjet=GenJets[closestindex];
-				SortedGenJets.push_back(matchedgenjet);
-			}
-
-			for(unsigned int irecmuon = 0; irecmuon != RecoMuons.size(); ++irecmuon)
-			{
-				TLorentzVector matchedgenmuon;
-				matchedgenmuon.SetPtEtaPhiM(0,0,0,0);
-				float closestDR=9999.9;
-				unsigned int closestindex=9999;
-
-				for(unsigned int igenmuon = 0; igenmuon != GenMuons.size(); ++igenmuon)
-				{
-					float thisDR=(GenMuons[igenmuon].DeltaR(RecoMuons[irecmuon]));
-					if (thisDR<closestDR)
-					{
-						closestDR=thisDR;
-						closestindex=igenmuon;
-					}
-				}
-
-				if (closestDR<0.5) matchedgenmuon=GenMuons[closestindex];
-				SortedGenMuons.push_back(matchedgenmuon);
-				//std::cout<<matchedgenmuon.DeltaR(RecoMuons[0])<<std::endl;
-			}
 
 			// Assign Muon Variables
-			if (MuonCount>=1)   Pt_genmuon1  =  SortedGenMuons[0].Pt();
-			if (MuonCount>=1)   Eta_genmuon1 =  SortedGenMuons[0].Eta();
-			if (MuonCount>=1)   Phi_genmuon1 =  SortedGenMuons[0].Phi();
-
-			if (MuonCount>=2)   Pt_genmuon2  =  SortedGenMuons[1].Pt();
-			if (MuonCount>=2)   Eta_genmuon2 =  SortedGenMuons[1].Eta();
-			if (MuonCount>=2)   Phi_genmuon2 =  SortedGenMuons[1].Phi();
-
-			if (GenMuonCount>=1)    Pt_genmuon1_bare  = GenMuons[0].Pt();
-			if (GenMuonCount>=1)    Eta_genmuon1_bare = GenMuons[0].Eta();
-			if (GenMuonCount>=1)    Phi_genmuon1_bare = GenMuons[0].Phi();
+			if (GenMuonCount>=1)    Pt_genmuon1  = GenMuons[0].Pt();
+			if (GenMuonCount>=1)    Eta_genmuon1 = GenMuons[0].Eta();
+			if (GenMuonCount>=1)    Phi_genmuon1 = GenMuons[0].Phi();
 
 			// Assign Jet Variables
-			if (PFJetCount>=1)  Pt_genjet1  =   SortedGenJets[0].Pt();
-			if (PFJetCount>=1)  Eta_genjet1 =   SortedGenJets[0].Eta();
-			if (PFJetCount>=1)  Phi_genjet1 =   SortedGenJets[0].Phi();
-			if (PFJetCount>=1)  DeltaPhi_genjet1genmuon1 =  fabs(SortedGenJets[0].DeltaPhi(SortedGenMuons[0]));
+			if (GenJet30Count>=1) Pt_genjet1  =  GenJetsBare[0].Pt();
+			if (GenJet30Count>=1) Eta_genjet1 =  GenJetsBare[0].Eta();
+			if (GenJet30Count>=1) Phi_genjet1 =  GenJetsBare[0].Phi();
 
-			if (PFJetCount>=2)  Pt_genjet2  =   SortedGenJets[1].Pt();
-			if (PFJetCount>=2)  Eta_genjet2 =   SortedGenJets[1].Eta();
-			if (PFJetCount>=2)  Phi_genjet2 =   SortedGenJets[1].Phi();
-			if (PFJetCount>=2)  DeltaPhi_genjet2genmuon1 =  fabs(SortedGenJets[1].DeltaPhi(SortedGenMuons[0]));
+			if (GenJet30Count>=2) Pt_genjet2  =  GenJetsBare[1].Pt();
+			if (GenJet30Count>=2) Eta_genjet2 =  GenJetsBare[1].Eta();
+			if (GenJet30Count>=2) Phi_genjet2 =  GenJetsBare[1].Phi();
 
-			if (PFJetCount>=3)  Pt_genjet3  =   SortedGenJets[2].Pt();
-			if (PFJetCount>=3)  Eta_genjet3 =   SortedGenJets[2].Eta();
-			if (PFJetCount>=3)  Phi_genjet3 =   SortedGenJets[2].Phi();
-			if (PFJetCount>=3)  DeltaPhi_genjet3genmuon1 =  fabs(SortedGenJets[2].DeltaPhi(SortedGenMuons[0]));
+			if (GenJet30Count>=3) Pt_genjet3  =  GenJetsBare[2].Pt();
+			if (GenJet30Count>=3) Eta_genjet3 =  GenJetsBare[2].Eta();
+			if (GenJet30Count>=3) Phi_genjet3 =  GenJetsBare[2].Phi();
 
-			if (PFJetCount>=4)  Pt_genjet4  =   SortedGenJets[3].Pt();
-			if (PFJetCount>=4)  Eta_genjet4 =   SortedGenJets[3].Eta();
-			if (PFJetCount>=4)  Phi_genjet4 =   SortedGenJets[3].Phi();
-			if (PFJetCount>=4)  DeltaPhi_genjet4genmuon1 =  fabs(SortedGenJets[3].DeltaPhi(SortedGenMuons[0]));
+			if (GenJet30Count>=4) Pt_genjet4  =  GenJetsBare[3].Pt();
+			if (GenJet30Count>=4) Eta_genjet4 =  GenJetsBare[3].Eta();
+			if (GenJet30Count>=4) Phi_genjet4 =  GenJetsBare[3].Phi();
 
-			if (PFJetCount>=5)  Pt_genjet5  =   SortedGenJets[4].Pt();
-			if (PFJetCount>=5)  Eta_genjet5 =   SortedGenJets[4].Eta();
-			if (PFJetCount>=5)  Phi_genjet5 =   SortedGenJets[4].Phi();
-			if (PFJetCount>=5)  DeltaPhi_genjet5genmuon1 =  fabs(SortedGenJets[4].DeltaPhi(SortedGenMuons[0]));
-
-			// Assign Bare Jet Variables
-			if (GenJetCount>=1) Pt_genjet1_bare  =  GenJetsBare[0].Pt();
-			if (GenJetCount>=1) Eta_genjet1_bare =  GenJetsBare[0].Eta();
-			if (GenJetCount>=1) Phi_genjet1_bare =  GenJetsBare[0].Phi();
-
-			if (GenJetCount>=2) Pt_genjet2_bare  =  GenJetsBare[1].Pt();
-			if (GenJetCount>=2) Eta_genjet2_bare =  GenJetsBare[1].Eta();
-			if (GenJetCount>=2) Phi_genjet2_bare =  GenJetsBare[1].Phi();
-
-			if (GenJetCount>=3) Pt_genjet3_bare  =  GenJetsBare[2].Pt();
-			if (GenJetCount>=3) Eta_genjet3_bare =  GenJetsBare[2].Eta();
-			if (GenJetCount>=3) Phi_genjet3_bare =  GenJetsBare[2].Phi();
-
-			if (GenJetCount>=4) Pt_genjet4_bare  =  GenJetsBare[3].Pt();
-			if (GenJetCount>=4) Eta_genjet4_bare =  GenJetsBare[3].Eta();
-			if (GenJetCount>=4) Phi_genjet4_bare =  GenJetsBare[3].Phi();
-
-			if (GenJetCount>=5) Pt_genjet5_bare  =  GenJetsBare[4].Pt();
-			if (GenJetCount>=5) Eta_genjet5_bare =  GenJetsBare[4].Eta();
-			if (GenJetCount>=5) Phi_genjet5_bare =  GenJetsBare[4].Phi();
+			if (GenJet30Count>=5) Pt_genjet5  =  GenJetsBare[4].Pt();
+			if (GenJet30Count>=5) Eta_genjet5 =  GenJetsBare[4].Eta();
+			if (GenJet30Count>=5) Phi_genjet5 =  GenJetsBare[4].Phi();
 
 			if (GenMuonCount>=1)
 			{
-				if (GenJetCount>=1) DeltaPhi_genjet1genmuon1_bare = fabs(GenJetsBare[0].DeltaPhi(GenMuons[0]));
-				if (GenJetCount>=2) DeltaPhi_genjet2genmuon1_bare = fabs(GenJetsBare[1].DeltaPhi(GenMuons[0]));
-				if (GenJetCount>=3) DeltaPhi_genjet3genmuon1_bare = fabs(GenJetsBare[2].DeltaPhi(GenMuons[0]));
-				if (GenJetCount>=4) DeltaPhi_genjet4genmuon1_bare = fabs(GenJetsBare[3].DeltaPhi(GenMuons[0]));
-				if (GenJetCount>=5) DeltaPhi_genjet5genmuon1_bare = fabs(GenJetsBare[4].DeltaPhi(GenMuons[0]));
+				if (GenJet30Count>=1) DeltaPhi_genjet1genmuon1 = fabs(GenJetsBare[0].DeltaPhi(GenMuons[0]));
+				if (GenJet30Count>=2) DeltaPhi_genjet2genmuon1 = fabs(GenJetsBare[1].DeltaPhi(GenMuons[0]));
+				if (GenJet30Count>=3) DeltaPhi_genjet3genmuon1 = fabs(GenJetsBare[2].DeltaPhi(GenMuons[0]));
+				if (GenJet30Count>=4) DeltaPhi_genjet4genmuon1 = fabs(GenJetsBare[3].DeltaPhi(GenMuons[0]));
+				if (GenJet30Count>=5) DeltaPhi_genjet5genmuon1 = fabs(GenJetsBare[4].DeltaPhi(GenMuons[0]));
 			}
 
+			// GenMet variables
 			Pt_genMET = GenMETTrue->at(0);
 			Phi_genMET = GenMETPhiTrue->at(0);
 			MT_genmuon1genMET =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
-			MT_genmuon1genMET_bare =  TMass(Pt_genmuon1_bare,Pt_genMET, fabs(Phi_genmuon1_bare - Phi_genMET) );
+			MT_genmuon1genMET =  TMass(Pt_genmuon1,Pt_genMET, fabs(Phi_genmuon1 - Phi_genMET) );
 
+			// Neutrinos, not used in practice
 			if (GenMuNeutrinos.size()>0)
 			{
 				MT_genmuon1genneutrino = TMass(Pt_genmuon1, GenMuNeutrinos[0].Pt() , fabs(Phi_genmuon1 - GenMuNeutrinos[0].Phi()) );
@@ -2320,37 +1838,25 @@ void placeholder::Loop()
 				Eta_genmuonneutrino1 = GenMuNeutrinos[0].Eta();
 			}
 
+			// Gen Met - Used in practice
 			v_GenMet.SetPtEtaPhiM ( Pt_genMET, 0, Phi_genMET,0 );
-			// Pt_W_gen = (SortedGenMuons[0]+v_GenMet).Pt();
-			// Phi_W_gen = (SortedGenMuons[0]+v_GenMet).Phi();
-
-			if (GenMuonCount>=1) DeltaPhi_genmuon1genMET_bare = GenMuons[0].DeltaPhi(v_GenMet);
-
-			// ST_genmuongenMET = Pt_genMET+Pt_genmuon1 ;
-			// ST_genmuongenMETgenjet1 = ST_genmuongenMET + Pt_genjet1 ;
-			// ST_genmuongenMETgenjet12 = ST_genmuongenMETgenjet1 + Pt_genjet2 ;
-			// ST_genmuongenMETgenjet123 = ST_genmuongenMETgenjet12 + Pt_genjet3 ;
-			// ST_genmuongenMETgenjet1234 = ST_genmuongenMETgenjet123 + Pt_genjet4 ;
-			// ST_genmuongenMETgenjet12345 = ST_genmuongenMETgenjet1234 + Pt_genjet5 ;
-
-			// ST_genmuongenMET_bare = Pt_genMET+Pt_genmuon1 ;
-			// ST_genmuongenMETgenjet1_bare = ST_genmuongenMET + Pt_genjet1_bare ;
-			// ST_genmuongenMETgenjet12_bare = ST_genmuongenMETgenjet1 + Pt_genjet2_bare ;
-			// ST_genmuongenMETgenjet123_bare = ST_genmuongenMETgenjet12 + Pt_genjet3_bare ;
-			// ST_genmuongenMETgenjet1234_bare = ST_genmuongenMETgenjet123 + Pt_genjet4_bare ;
-			// ST_genmuongenMETgenjet12345_bare = ST_genmuongenMETgenjet1234 + Pt_genjet5_bare ;
 
 		}
 
-		//========================     Calculate Reco Variables  ================================//
+		//========================     Reco Level Calculations  ================================//
 
+		// Reset Variables
 		Pt_pfjet1 = 0;       Phi_pfjet1 = 0;       Eta_pfjet1 = 0;    DeltaPhi_pfjet1muon1 = -1.0;
 		Pt_pfjet2 = 0;       Phi_pfjet2 = 0;       Eta_pfjet2 = 0;    DeltaPhi_pfjet2muon1 = -1.0;
 		Pt_pfjet3 = 0;       Phi_pfjet3 = 0;       Eta_pfjet3 = 0;    DeltaPhi_pfjet3muon1 = -1.0;
 		Pt_pfjet4 = 0;       Phi_pfjet4 = 0;       Eta_pfjet4 = 0;    DeltaPhi_pfjet4muon1 = -1.0;
 		Pt_pfjet5 = 0;       Phi_pfjet5 = 0;       Eta_pfjet5 = 0;    DeltaPhi_pfjet5muon1 = -1.0;
 
-		DeltaPhi_muon1MET = -1.0;
+		Pt_pfjet1_pt20 = 0;   Eta_pfjet1_eta2p5 = 99;
+		Pt_pfjet2_pt20 = 0;   Eta_pfjet2_eta2p5 = 99;
+		Pt_pfjet3_pt20 = 0;   Eta_pfjet3_eta2p5 = 99;
+		Pt_pfjet4_pt20 = 0;   Eta_pfjet4_eta2p5 = 99;
+		Pt_pfjet5_pt20 = 0;   Eta_pfjet5_eta2p5 = 99;
 
 		Pt_muon1 = 0;      Phi_muon1 = 0;      Eta_muon1 = 0;
 		Pt_muon2 = 0;      Phi_muon2 = 0;      Eta_muon2 = 0;
@@ -2369,16 +1875,13 @@ void placeholder::Loop()
 		MT_muon1MET1UnProp = 0;
 		M_muon1muon2 = 0.0;
 
-		// ST_muonMET = 0 ;
-		// ST_muonMETpfjet1 = 0 ;
-		// ST_muonMETpfjet12 = 0 ;
-		// ST_muonMETpfjet123 = 0 ;
-		// ST_muonMETpfjet1234 = 0 ;
-		// ST_muonMETpfjet12345 = 0 ;
-
 		TLorentzVector  _v_Met;
+
+
+		// Get MET
 		_v_Met.SetPtEtaPhiM ( PFMET->at(0), 0, PFMETPhi->at(0),0 );
 
+		// Some recoil fixes
 		if ( true && IsW)
 		{
 			PFMET->at(0) = PFMET->at(0);
@@ -2396,27 +1899,10 @@ void placeholder::Loop()
 			UW = -_v_Met - RecoMuons[0];
 			PW = v_GenMet + RecoMuons[0];
 
-			// float UWx = UW.Px();
-			// float UWy = UW.Py();
-			// float PWx = PW.Px();
-			// float PWy = PW.Py();
-
-			// float PWr = sqrt(PWx*PWx + PWy*PWy);
-			// float UWr = sqrt(UWx*UWx + UWy*UWy);
-			// float UPWdphi = UW.Phi() - PW.Phi();
-			// U1_W = UWr*cos(UPWdphi);
-			// U2_W = UWr*sin(UPWdphi);
-			// Pt_W = PWr;
-			// std::cout<<" -------------- "<<std::endl;
-			// std::cout<<Pt_W<<"  "<<PW.Pt()<<std::endl;
-
-			// std::cout<<U1_W<<"  "<<U2_W<<std::endl;
-			// std::cout<<_v_Met.Pt()<<"  "<<_v_Met.Phi()<<std::endl;
 			_v_Met =  Recoil_Corr(RecoMuons[0], UW,PW);
-			// std::cout<<_v_Met.Pt()<<"  "<<_v_Met.Phi()<<std::endl;
-			// PFMET->at(0) = _v_Met.Pt();
-			// PFMETPhi->at(0) = _v_Met.Phi();
+
 		}
+
 
 		// Assign Muon Variables
 		if (MuonCount>=1)   Pt_muon1  = RecoMuons[0].Pt();
@@ -2426,35 +1912,87 @@ void placeholder::Loop()
 		if (MuonCount>=2)   Eta_muon2 = RecoMuons[1].Eta();
 		if (MuonCount>=2)   Phi_muon2 = RecoMuons[1].Phi();
 		if (MuonCount>=2)   M_muon1muon2 =  (RecoMuons[0]+RecoMuons[1]).M();
-		// std::cout<<RecoMuons[0].Pt()<<"  "<<RecoMuons[1].Pt()<<std::endl;
-		// std::cout<<M_muon1muon2<<std::endl;
+
 
 		// Assign Jet Variables
-		if (PFJetCount>=1)  Pt_pfjet1  =    RecoJets[0].Pt();
-		if (PFJetCount>=1)  Eta_pfjet1 =    RecoJets[0].Eta();
-		if (PFJetCount>=1)  Phi_pfjet1 =    RecoJets[0].Phi();
-		if (PFJetCount>=1)  DeltaPhi_pfjet1muon1 =  fabs(RecoJets[0].DeltaPhi(RecoMuons[0]));
-		//std::cout<<DeltaPhi_pfjet1muon1<<std::endl;
+		if (PFJet30Count>=1)  Pt_pfjet1  =    RecoJets[0].Pt();
+		if (PFJet30Count>=1)  Eta_pfjet1 =    RecoJets[0].Eta();
+		if (PFJet30Count>=1)  Phi_pfjet1 =    RecoJets[0].Phi();
+		if (PFJet30Count>=1)  DeltaPhi_pfjet1muon1 =  fabs(RecoJets[0].DeltaPhi(RecoMuons[0]));
 
-		if (PFJetCount>=2)  Pt_pfjet2  =    RecoJets[1].Pt();
-		if (PFJetCount>=2)  Eta_pfjet2 =    RecoJets[1].Eta();
-		if (PFJetCount>=2)  Phi_pfjet2 =    RecoJets[1].Phi();
-		if (PFJetCount>=2)  DeltaPhi_pfjet2muon1 =  fabs(RecoJets[1].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=2)  Pt_pfjet2  =    RecoJets[1].Pt();
+		if (PFJet30Count>=2)  Eta_pfjet2 =    RecoJets[1].Eta();
+		if (PFJet30Count>=2)  Phi_pfjet2 =    RecoJets[1].Phi();
+		if (PFJet30Count>=2)  DeltaPhi_pfjet2muon1 =  fabs(RecoJets[1].DeltaPhi(RecoMuons[0]));
 
-		if (PFJetCount>=3)  Pt_pfjet3  =    RecoJets[2].Pt();
-		if (PFJetCount>=3)  Eta_pfjet3 =    RecoJets[2].Eta();
-		if (PFJetCount>=3)  Phi_pfjet3 =    RecoJets[2].Phi();
-		if (PFJetCount>=3)  DeltaPhi_pfjet3muon1 =  fabs(RecoJets[2].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=3)  Pt_pfjet3  =    RecoJets[2].Pt();
+		if (PFJet30Count>=3)  Eta_pfjet3 =    RecoJets[2].Eta();
+		if (PFJet30Count>=3)  Phi_pfjet3 =    RecoJets[2].Phi();
+		if (PFJet30Count>=3)  DeltaPhi_pfjet3muon1 =  fabs(RecoJets[2].DeltaPhi(RecoMuons[0]));
 
-		if (PFJetCount>=4)  Pt_pfjet4  =    RecoJets[3].Pt();
-		if (PFJetCount>=4)  Eta_pfjet4 =    RecoJets[3].Eta();
-		if (PFJetCount>=4)  Phi_pfjet4 =    RecoJets[3].Phi();
-		if (PFJetCount>=4)  DeltaPhi_pfjet4muon1 =  fabs(RecoJets[3].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=4)  Pt_pfjet4  =    RecoJets[3].Pt();
+		if (PFJet30Count>=4)  Eta_pfjet4 =    RecoJets[3].Eta();
+		if (PFJet30Count>=4)  Phi_pfjet4 =    RecoJets[3].Phi();
+		if (PFJet30Count>=4)  DeltaPhi_pfjet4muon1 =  fabs(RecoJets[3].DeltaPhi(RecoMuons[0]));
 
-		if (PFJetCount>=5)  Pt_pfjet5  =    RecoJets[4].Pt();
-		if (PFJetCount>=5)  Eta_pfjet5 =    RecoJets[4].Eta();
-		if (PFJetCount>=5)  Phi_pfjet5 =    RecoJets[4].Phi();
-		if (PFJetCount>=5)  DeltaPhi_pfjet5muon1 =  fabs(RecoJets[4].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=5)  Pt_pfjet5  =    RecoJets[4].Pt();
+		if (PFJet30Count>=5)  Eta_pfjet5 =    RecoJets[4].Eta();
+		if (PFJet30Count>=5)  Phi_pfjet5 =    RecoJets[4].Phi();
+		if (PFJet30Count>=5)  DeltaPhi_pfjet5muon1 =  fabs(RecoJets[4].DeltaPhi(RecoMuons[0]));
+
+
+		// Assign jet variables with underflows for unfolding
+
+
+
+		// Add empty vectors to recojet vectors so code doesn't crash
+		for(unsigned int ii=0; ii<6; ii++)
+		{
+			RecoJetsLoosePt.push_back(elorentz);
+			RecoJetsLooseEta.push_back(elorentz);
+		}
+
+
+
+		// Set the Pt_pfjetX_pt20 to a value if all jets < X meet good pT>30 conditions (i.e. give underflow to only the Xth jet)
+		Pt_pfjet1_pt20 = RecoJetsLoosePt[0].Pt(); 
+		if (RecoJetsLoosePt[0].Pt()>30)
+		{
+			Pt_pfjet2_pt20 = RecoJetsLoosePt[1].Pt();
+			if (RecoJetsLoosePt[1].Pt()>30)
+			{
+				Pt_pfjet3_pt20 = RecoJetsLoosePt[2].Pt();
+				if (RecoJetsLoosePt[2].Pt()>30)
+				{
+					Pt_pfjet4_pt20 = RecoJetsLoosePt[3].Pt();
+					if (RecoJetsLoosePt[3].Pt()>30)
+					{
+						Pt_pfjet5_pt20 = RecoJetsLoosePt[4].Pt();
+					}
+				}
+			}	
+		}
+
+		// Set the Eta_pfjetX_eta2p5 to a value if all jets < X meet good eta<2.4 conditions (i.e. give under/overflow to only the Xth jet)
+		Eta_pfjet1_eta2p5 = RecoJetsLooseEta[0].Eta(); 
+		if ( fabs(RecoJetsLooseEta[0].Pt())>30.0)
+		{
+			Eta_pfjet2_eta2p5 = RecoJetsLooseEta[1].Eta();
+			if (fabs(RecoJetsLooseEta[1].Pt())>30.0)
+			{
+				Eta_pfjet3_eta2p5 = RecoJetsLooseEta[2].Eta();
+				if (fabs(RecoJetsLooseEta[2].Pt())>30.0)
+				{
+					Eta_pfjet4_eta2p5 = RecoJetsLooseEta[3].Eta();
+					if (fabs(RecoJetsLooseEta[3].Pt())>30.0)
+					{
+						Eta_pfjet5_eta2p5 = RecoJetsLooseEta[4].Eta();
+					}
+				}
+			}	
+		}
+
+
 
 		Pt_MET = PFMET->at(0);
 		Phi_MET = PFMETPhi->at(0);
@@ -2479,29 +2017,13 @@ void placeholder::Loop()
 		MT_muon1METUnProp =  TMass(Pt_muon1,Pt_METUnProp, fabs(Phi_muon1 - Phi_METUnProp) );
 		MT_muon1MET1UnProp =  TMass(Pt_muon1,Pt_MET1UnProp, fabs(Phi_muon1 - Phi_MET1UnProp) );
 
-		// std::cout<<" -------------------- "<<std::endl;
-		// std::cout<<MT_muon1MET<<"  "<<MT_muon1MET1<<"  "<<MT_muon1METR<<std::endl;
-		// std::cout<<MT_muon1METUnProp<<"  "<<MT_muon1MET1UnProp<<std::endl;
-		// std::cout<<Pt_muon1<<"  "<<Pt_muon2<<std::endl;
-
 		RelIso_muon1 = RecoMuonIso[0];
 		RelIso_muon2 = RecoMuonIso[1];
 
 		TLorentzVector  v_Met;
 		v_Met.SetPtEtaPhiM ( Pt_MET, 0, Phi_MET,0 );
-		// Pt_W = (RecoMuons[0]+v_Met).Pt();
-		// Phi_W = (RecoMuons[0]+v_Met).Phi();
-		DeltaPhi_muon1MET = RecoMuons[0].DeltaPhi(v_Met);
+		// DeltaPhi_muon1MET = RecoMuons[0].DeltaPhi(v_Met);
 
-		// MET_pfsig = PFMETSig->at(0);
-		// MET_pf_charged = PFMETCharged->at(0);
-
-		// ST_muonMET = Pt_MET+Pt_muon1 ;
-		// ST_muonMETpfjet1 = ST_muonMET + Pt_pfjet1 ;
-		// ST_muonMETpfjet12 = ST_muonMETpfjet1 + Pt_pfjet2 ;
-		// ST_muonMETpfjet123 = ST_muonMETpfjet12 + Pt_pfjet3 ;
-		// ST_muonMETpfjet1234 = ST_muonMETpfjet123 + Pt_pfjet4 ;
-		// ST_muonMETpfjet12345 = ST_muonMETpfjet1234 + Pt_pfjet5 ;
 
 		Pt_HEEPele1=0.0;
 		if (HEEPEle25Count>=1) Pt_HEEPele1 = ElectronPt->at(v_idx_ele_good_final[0]);
@@ -2522,13 +2044,16 @@ void placeholder::Loop()
 		TLorentzVector PZ;
 		TLorentzVector PW;
 
+
 		if (MuonCount>=2) UZ = -v_Met - RecoMuons[0] - RecoMuons[1];
 		if (MuonCount>=1) UW = -v_Met - RecoMuons[0];
 		if (MuonCount>=2) PZ = RecoMuons[0] + RecoMuons[1];
+
 		if (!isData)
 		{
-			if (MuonCount>=1) PW = v_GenMet + SortedGenMuons[0];
+			if (GenMuonCount>=1) PW = v_GenMet + GenMuons[0];
 		}
+
 
 		float UZx = UZ.Px();
 		float UZy = UZ.Py();
@@ -2559,13 +2084,17 @@ void placeholder::Loop()
 		//========================     Skimming and such  ================================//
 
 		bool skipevent = true;
+		bool hasmuon = false;
+		bool hasjet = false;
 
-		if ( ( Pt_muon1>24 || Pt_genmuon1 > 24 ) && (Pt_pfjet1>29 || Pt_genjet1_bare > 29) ) skipevent = false;
+		if (Pt_muon1>25) hasmuon = true;
+		if (Pt_genmuon1 > 24) hasmuon = true;
+		if (Pt_pfjet1>30) hasjet = true;
+		if (RecoJetsLooseEta[0].Pt()>20) hasjet = true;
+		if (RecoJetsLoosePt[0].Pt()>20) hasjet = true;
+		if (Pt_genjet1>30) hasjet = true;
 
-		// if ((Muon25Count>0)&&(HEEPEle25Count>0)) skipevent = false;
-		// if (Pt_muon2>25) skipevent = true;
-
-		//std::cout<<skipevent<<std::endl;
+		if (hasjet && hasmuon) skipevent = false;
 		if (skipevent) continue;
 
 		tree->Fill();
