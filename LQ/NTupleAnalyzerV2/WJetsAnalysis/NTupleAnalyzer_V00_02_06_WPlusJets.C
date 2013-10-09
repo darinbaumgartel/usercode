@@ -31,6 +31,22 @@ Double_t MuonRescaleFactor = 1.00;
 Double_t JetSmearFactor = 0.0;
 Double_t MuonSmearFactor = 0.0;
 
+
+
+float HasMatchInCollection(TLorentzVector inputvector, std::vector<TLorentzVector>& coll)
+{
+	
+	float ismatched = 0.0;
+
+	for(unsigned int ic = 0; ic != coll.size(); ++ic)
+	{
+		if (inputvector.DeltaR(coll[ic]) < 0.5) ismatched = 1.0;
+	}
+
+	return ismatched;
+
+}
+
 // Recoil Correction Function. 
 TLorentzVector Recoil_Corr(TLorentzVector L, TLorentzVector U, TLorentzVector P)
 {
@@ -97,6 +113,8 @@ TLorentzVector Recoil_Corr(TLorentzVector L, TLorentzVector U, TLorentzVector P)
 	return METprime;
 
 }
+
+
 
 // Phi Modulation Correction
 TLorentzVector PhiMod_Corr(TLorentzVector MET, float Nvtx, bool _isdata)
@@ -896,6 +914,19 @@ void placeholder::Loop()
 	BRANCH(Pt_pfjet4_pt20);   BRANCH(Eta_pfjet4_eta2p5);
 	BRANCH(Pt_pfjet5_pt20);   BRANCH(Eta_pfjet5_eta2p5);
 
+
+	BRANCH(DeltaPhi_pfjet1muon1_hasgenmatch);
+	BRANCH(DeltaPhi_pfjet2muon1_hasgenmatch);
+	BRANCH(DeltaPhi_pfjet3muon1_hasgenmatch);
+	BRANCH(DeltaPhi_pfjet4muon1_hasgenmatch);
+	BRANCH(DeltaPhi_pfjet5muon1_hasgenmatch);
+
+	BRANCH(Pt_pfjet1_pt20_hasgenmatch);   BRANCH(Eta_pfjet1_eta2p5_hasgenmatch);
+	BRANCH(Pt_pfjet2_pt20_hasgenmatch);   BRANCH(Eta_pfjet2_eta2p5_hasgenmatch);
+	BRANCH(Pt_pfjet3_pt20_hasgenmatch);   BRANCH(Eta_pfjet3_eta2p5_hasgenmatch);
+	BRANCH(Pt_pfjet4_pt20_hasgenmatch);   BRANCH(Eta_pfjet4_eta2p5_hasgenmatch);
+	BRANCH(Pt_pfjet5_pt20_hasgenmatch);   BRANCH(Eta_pfjet5_eta2p5_hasgenmatch);
+
 	BRANCH(HT_pfjets);
 
 	BRANCH(Pt_muon1);  BRANCH(Phi_muon1);  BRANCH(Eta_muon1);
@@ -1646,7 +1677,7 @@ void placeholder::Loop()
 		GenZ.SetPtEtaPhiM(0.,0.,0.,0.);
 
 		TLorentzVector  v_GenMet;
-		vector<TLorentzVector> GenMuons, GenJets, GenJetsBare, SortedGenMuons, SortedGenJets, GenMuNeutrinos;
+		vector<TLorentzVector> GenMuons, GenJets, GenJetsLoose, GenJetsBare, SortedGenMuons, SortedGenJets, GenMuNeutrinos;
 
 		int GenMuonCount = 0;
 		if (!isData)
@@ -1780,6 +1811,9 @@ void placeholder::Loop()
 				if (!KeepGenJet) continue;
 
 				GenJets.push_back(thisgenjet);
+
+				if ((fabs(thisgenjet.Eta())<2.6)&&( thisgenjet.Pt() > 15.0)) GenJetsLoose.push_back(thisgenjet);
+
 				if (fabs(GenJetEta->at(ijet))>2.4) continue;
 				if (thisgenjet.Pt()<30.0) continue;
 				GenJetsBare.push_back(thisgenjet);
@@ -1858,6 +1892,19 @@ void placeholder::Loop()
 		Pt_pfjet4_pt20 = 0;   Eta_pfjet4_eta2p5 = 99;
 		Pt_pfjet5_pt20 = 0;   Eta_pfjet5_eta2p5 = 99;
 
+
+		DeltaPhi_pfjet1muon1_hasgenmatch = 0;
+		DeltaPhi_pfjet2muon1_hasgenmatch = 0;
+		DeltaPhi_pfjet3muon1_hasgenmatch = 0;
+		DeltaPhi_pfjet4muon1_hasgenmatch = 0;
+		DeltaPhi_pfjet5muon1_hasgenmatch = 0;
+
+		Pt_pfjet1_pt20_hasgenmatch = 0;   Eta_pfjet1_eta2p5_hasgenmatch = 0;
+		Pt_pfjet2_pt20_hasgenmatch = 0;   Eta_pfjet2_eta2p5_hasgenmatch = 0;
+		Pt_pfjet3_pt20_hasgenmatch = 0;   Eta_pfjet3_eta2p5_hasgenmatch = 0;
+		Pt_pfjet4_pt20_hasgenmatch = 0;   Eta_pfjet4_eta2p5_hasgenmatch = 0;
+		Pt_pfjet5_pt20_hasgenmatch = 0;   Eta_pfjet5_eta2p5_hasgenmatch = 0;
+
 		Pt_muon1 = 0;      Phi_muon1 = 0;      Eta_muon1 = 0;
 		Pt_muon2 = 0;      Phi_muon2 = 0;      Eta_muon2 = 0;
 
@@ -1919,26 +1966,34 @@ void placeholder::Loop()
 		if (PFJet30Count>=1)  Eta_pfjet1 =    RecoJets[0].Eta();
 		if (PFJet30Count>=1)  Phi_pfjet1 =    RecoJets[0].Phi();
 		if (PFJet30Count>=1)  DeltaPhi_pfjet1muon1 =  fabs(RecoJets[0].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=1)  DeltaPhi_pfjet1muon1_hasgenmatch =  HasMatchInCollection(RecoJets[0],GenJetsLoose);
+
 
 		if (PFJet30Count>=2)  Pt_pfjet2  =    RecoJets[1].Pt();
 		if (PFJet30Count>=2)  Eta_pfjet2 =    RecoJets[1].Eta();
 		if (PFJet30Count>=2)  Phi_pfjet2 =    RecoJets[1].Phi();
 		if (PFJet30Count>=2)  DeltaPhi_pfjet2muon1 =  fabs(RecoJets[1].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=2)  DeltaPhi_pfjet2muon1_hasgenmatch =  HasMatchInCollection(RecoJets[1],GenJetsLoose);
+
 
 		if (PFJet30Count>=3)  Pt_pfjet3  =    RecoJets[2].Pt();
 		if (PFJet30Count>=3)  Eta_pfjet3 =    RecoJets[2].Eta();
 		if (PFJet30Count>=3)  Phi_pfjet3 =    RecoJets[2].Phi();
 		if (PFJet30Count>=3)  DeltaPhi_pfjet3muon1 =  fabs(RecoJets[2].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=3)  DeltaPhi_pfjet3muon1_hasgenmatch =  HasMatchInCollection(RecoJets[2],GenJetsLoose);
 
 		if (PFJet30Count>=4)  Pt_pfjet4  =    RecoJets[3].Pt();
 		if (PFJet30Count>=4)  Eta_pfjet4 =    RecoJets[3].Eta();
 		if (PFJet30Count>=4)  Phi_pfjet4 =    RecoJets[3].Phi();
 		if (PFJet30Count>=4)  DeltaPhi_pfjet4muon1 =  fabs(RecoJets[3].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=4)  DeltaPhi_pfjet4muon1_hasgenmatch =  HasMatchInCollection(RecoJets[3],GenJetsLoose);
 
 		if (PFJet30Count>=5)  Pt_pfjet5  =    RecoJets[4].Pt();
 		if (PFJet30Count>=5)  Eta_pfjet5 =    RecoJets[4].Eta();
 		if (PFJet30Count>=5)  Phi_pfjet5 =    RecoJets[4].Phi();
 		if (PFJet30Count>=5)  DeltaPhi_pfjet5muon1 =  fabs(RecoJets[4].DeltaPhi(RecoMuons[0]));
+		if (PFJet30Count>=5)  DeltaPhi_pfjet5muon1_hasgenmatch =  HasMatchInCollection(RecoJets[4],GenJetsLoose);
+
 
 
 		// Assign jet variables with underflows for unfolding
@@ -1956,37 +2011,57 @@ void placeholder::Loop()
 
 		// Set the Pt_pfjetX_pt20 to a value if all jets < X meet good pT>30 conditions (i.e. give underflow to only the Xth jet)
 		Pt_pfjet1_pt20 = RecoJetsLoosePt[0].Pt(); 
+		Pt_pfjet1_pt20_hasgenmatch = HasMatchInCollection(RecoJetsLoosePt[0],GenJetsLoose);
 		if (RecoJetsLoosePt[0].Pt()>30)
 		{
 			Pt_pfjet2_pt20 = RecoJetsLoosePt[1].Pt();
+			Pt_pfjet2_pt20_hasgenmatch = HasMatchInCollection(RecoJetsLoosePt[1],GenJetsLoose);
+
 			if (RecoJetsLoosePt[1].Pt()>30)
 			{
 				Pt_pfjet3_pt20 = RecoJetsLoosePt[2].Pt();
+				Pt_pfjet3_pt20_hasgenmatch = HasMatchInCollection(RecoJetsLoosePt[2],GenJetsLoose);
+
 				if (RecoJetsLoosePt[2].Pt()>30)
 				{
 					Pt_pfjet4_pt20 = RecoJetsLoosePt[3].Pt();
+					Pt_pfjet4_pt20_hasgenmatch = HasMatchInCollection(RecoJetsLoosePt[3],GenJetsLoose);
+
 					if (RecoJetsLoosePt[3].Pt()>30)
 					{
 						Pt_pfjet5_pt20 = RecoJetsLoosePt[4].Pt();
+						Pt_pfjet5_pt20_hasgenmatch = HasMatchInCollection(RecoJetsLoosePt[4],GenJetsLoose);
+
 					}
 				}
 			}	
 		}
 
+
+
 		// Set the Eta_pfjetX_eta2p5 to a value if all jets < X meet good eta<2.4 conditions (i.e. give under/overflow to only the Xth jet)
 		Eta_pfjet1_eta2p5 = RecoJetsLooseEta[0].Eta(); 
+		Eta_pfjet1_eta2p5_hasgenmatch = HasMatchInCollection(RecoJetsLooseEta[0],GenJetsLoose);
+
 		if ( fabs(RecoJetsLooseEta[0].Pt())>30.0)
 		{
 			Eta_pfjet2_eta2p5 = RecoJetsLooseEta[1].Eta();
+			Eta_pfjet2_eta2p5_hasgenmatch = HasMatchInCollection(RecoJetsLooseEta[1],GenJetsLoose);
+
 			if (fabs(RecoJetsLooseEta[1].Pt())>30.0)
 			{
 				Eta_pfjet3_eta2p5 = RecoJetsLooseEta[2].Eta();
+				Eta_pfjet3_eta2p5_hasgenmatch = HasMatchInCollection(RecoJetsLooseEta[2],GenJetsLoose);
+
 				if (fabs(RecoJetsLooseEta[2].Pt())>30.0)
 				{
 					Eta_pfjet4_eta2p5 = RecoJetsLooseEta[3].Eta();
+					Eta_pfjet4_eta2p5_hasgenmatch = HasMatchInCollection(RecoJetsLooseEta[3],GenJetsLoose);
+
 					if (fabs(RecoJetsLooseEta[3].Pt())>30.0)
 					{
 						Eta_pfjet5_eta2p5 = RecoJetsLooseEta[4].Eta();
+						Eta_pfjet5_eta2p5_hasgenmatch = HasMatchInCollection(RecoJetsLooseEta[4],GenJetsLoose);
 					}
 				}
 			}	
