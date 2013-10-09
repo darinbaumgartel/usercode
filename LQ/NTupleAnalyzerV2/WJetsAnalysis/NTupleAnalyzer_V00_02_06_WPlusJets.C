@@ -35,16 +35,12 @@ Double_t MuonSmearFactor = 0.0;
 
 float HasMatchInCollection(TLorentzVector inputvector, std::vector<TLorentzVector>& coll)
 {
-	
 	float ismatched = 0.0;
-
 	for(unsigned int ic = 0; ic != coll.size(); ++ic)
 	{
 		if (inputvector.DeltaR(coll[ic]) < 0.5) ismatched = 1.0;
 	}
-
 	return ismatched;
-
 }
 
 // Recoil Correction Function. 
